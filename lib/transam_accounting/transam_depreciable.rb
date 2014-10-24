@@ -41,19 +41,19 @@ module TransamAccounting
   #
   #------------------------------------------------------------------------------
   extend ActiveSupport::Concern
-  
+
   included do
 
-    # ----------------------------------------------------  
+    # ----------------------------------------------------
     # Associations
-    # ----------------------------------------------------  
+    # ----------------------------------------------------
 
 
-    # ----------------------------------------------------  
+    # ----------------------------------------------------
     # Validations
-    # ----------------------------------------------------  
-    
-    
+    # ----------------------------------------------------
+
+
   end
 
   #------------------------------------------------------------------------------
@@ -77,7 +77,25 @@ module TransamAccounting
   def depreciable?
     property_type
   end
-                
+
+  protected
+    # NEED TO ADD AS JOB?
+    def update_asset_depreciated_state(policy = nil)
+      # Update the depreciated and salvage value
+      begin
+        # see what metric we are using for the depreciated value of the asset
+        class_name = policy.depreciation_calculation_type.class_name
+
+        # caches depreciated value as an integer
+        asset.book_value = calculate(asset, policy, class_name, depreciated_value).round(0)
+
+        # caches residual value as an integer
+        asset.salvage_value = calculate(asset, policy, class_name).round(0)
+      rescue Exception => e
+        Rails.logger.warn e.message
+      end
+    end
+
   end
-end  
+end
 ActiveRecord::Base.send(:include, TransamAccounting::TransamDepreciable) if defined?(Asset)
