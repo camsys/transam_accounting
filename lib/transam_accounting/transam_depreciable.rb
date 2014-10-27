@@ -95,7 +95,5 @@ module TransamAccounting
         Rails.logger.warn e.message
       end
     end
-
   end
 end
-ActiveRecord::Base.send(:include, TransamAccounting::TransamDepreciable) if defined?(Asset)
