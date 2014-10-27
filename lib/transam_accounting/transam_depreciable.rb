@@ -71,6 +71,38 @@ module TransamAccounting
       property_type
     end
 
+  def get_depreciable_table
+    # get FYs for calculating depreciation
+
+    # get previous depreciation dates
+    years = (depreciation_start_date.year..current_depreciation_date.year - 1)
+            .to_a
+            .map{ |d| Date.new(d, depreciation_start_date.month, depreciation_start_date.day) }
+
+    # add current depreciation date to array of dates
+    years << current_depreciation_date
+
+    begin
+      # create an instance of this class and call the method
+      class_name = policy.depreciation_calculation_type.class_name
+      Rails.logger.debug "Instance created #{calculator_instance}"
+      calculator_instance = policy.depreciation_calculation_type.class_name.constantize.new
+
+      estimated_value_method = calculator_instance.method('calculate')
+      depreciated_value_method = calculator_instance.method('depreciated_value')
+      years.each do |year|
+        data[:year] = year
+        data[:estimated_value] = estimated_value_method.call(asset,year)
+        data[:depreciated_value] = depreciated_value_method.call(asset,year)
+        table << data
+      end
+    rescue Exception => e
+      Rails.logger.error e.message
+    end
+
+    return table
+  end
+
     protected
 
       # Update the asset depreciation model
