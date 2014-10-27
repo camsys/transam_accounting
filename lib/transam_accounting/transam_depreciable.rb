@@ -35,36 +35,36 @@ module TransamAccounting
     #
     #------------------------------------------------------------------------------
     extend ActiveSupport::Concern
-  
+
     included do
-  
+
       # ----------------------------------------------------
       # Associations
       # ----------------------------------------------------
-  
-  
+
+
       # ----------------------------------------------------
       # Validations
       # ----------------------------------------------------
-      
+
     end
-  
+
     #------------------------------------------------------------------------------
     #
     # Class Methods
     #
     #------------------------------------------------------------------------------
-  
+
     module ClassMethods
-  
+
     end
-  
+
     #------------------------------------------------------------------------------
     #
     # Instance Methods
     #
     #------------------------------------------------------------------------------
-  
+
     # returns true if this asset instance is depreciable, false
     # otherwise
     def depreciable?
@@ -90,10 +90,11 @@ module TransamAccounting
 
       estimated_value_method = calculator_instance.method('calculate')
       depreciated_value_method = calculator_instance.method('depreciated_value')
+
+      table = Array.new
+
       years.each do |year|
-        data[:year] = year
-        data[:estimated_value] = estimated_value_method.call(asset,year)
-        data[:depreciated_value] = depreciated_value_method.call(asset,year)
+        data = { :year => year, :estimated_value => estimated_value_method.call(asset,year), :depreciated_value => depreciated_value_method.call(asset,year) }
         table << data
       end
     rescue Exception => e
@@ -111,10 +112,10 @@ module TransamAccounting
         begin
           # see what metric we are using for the depreciated value of the asset
           class_name = policy.depreciation_calculation_type.class_name
-  
+
           # caches depreciated value as an integer
           asset.book_value = calculate(asset, policy, class_name, depreciated_value).round(0)
-  
+
           # caches residual value as an integer
           asset.salvage_value = calculate(asset, policy, class_name).round(0)
         rescue Exception => e
@@ -122,5 +123,5 @@ module TransamAccounting
         end
       end
   end
-  
+
 end
