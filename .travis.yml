@@ -11,5 +11,5 @@ script:
 - bundle exec rake app:transam_accounting:prepare_rspec
 - bundle exec $TEST_SUITE
 before_install:
-- openssl aes-256-cbc -K $encrypted_b6ac448b830a_key -iv $encrypted_b6ac448b830a_iv
-  -in spec/dummy/db/schema.rb.enc -out spec/dummy/db/schema.rb -d
+- openssl aes-256-cbc -K $encrypted_1dcbfc78be6f_key -iv $encrypted_1dcbfc78be6f_iv
+  -in spec/dummy/schema.rb.enc -out spec/dummy/db/schema.rb -d
