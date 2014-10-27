@@ -3,4 +3,10 @@ Rails.configuration.to_prepare do
   Asset.class_eval do
     include TransamAccounting::TransamDepreciable
   end
+  Organization.class_eval do
+    include TransamAccounting::TransamAccountable
+  end
+  Policy.class_eval do
+    include TransamAccounting::TransamAccountingPolicy
+  end
 end

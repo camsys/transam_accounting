@@ -1,13 +1,6 @@
 class AddAccountingTables < ActiveRecord::Migration
   def change
 
-    create_table :depreciation_calculation_types do |t|
-      t.string     :name,                :limit => 64, :null => :false
-      t.string     :class_name,          :limit => 64, :null => :false
-      t.string     :description,         :limit => 254,:null => :false
-      t.boolean    :active
-    end
-
     create_table :chart_of_accounts do |t|
       t.string     :object_key,            :limit => 12,  :null => :false
       t.references :organization,                         :null => :false
@@ -36,11 +29,12 @@ class AddAccountingTables < ActiveRecord::Migration
 
     end
 
-    add_index :general_ledger_accounts, :object_key,       :unique => :true, :name => :general_ledger_accounts_idx1
-    add_index :general_ledger_accounts, :chart_of_account,                   :name => :general_ledger_accounts_idx2
+    add_index :general_ledger_accounts, :object_key,            :unique => :true, :name => :general_ledger_accounts_idx1
+    add_index :general_ledger_accounts, :chart_of_account_id,                     :name => :general_ledger_accounts_idx2
 
     # Join table for assets and general ledger accounts
     create_join_table :assets, :general_ledger_accounts
+    
     # and index it for mysql    
     add_index :assets_general_ledger_accounts,   [:asset_id, :general_ledger_account_id], :name => :assets_general_ledger_accounts_idx1
     
