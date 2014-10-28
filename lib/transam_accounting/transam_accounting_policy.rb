@@ -1,5 +1,4 @@
 module TransamAccounting
-
   module TransamAccountingPolicy
     #------------------------------------------------------------------------------
     #
@@ -19,10 +18,19 @@ module TransamAccounting
       # Associations
       # ----------------------------------------------------
 
+      # Has a single method for calculating asset depreciation
+      belongs_to  :depreciation_calculation_type
+
       # ----------------------------------------------------
       # Validations
       # ----------------------------------------------------
-      
+      validates :depreciation_calculation_type,  :presence => true
+
+      # List of hash parameters allowed by the controller
+      FORM_PARAMS = [
+        :depreciation_calculation_type_id
+      ]
+
     end
   
     #------------------------------------------------------------------------------
@@ -33,6 +41,10 @@ module TransamAccounting
   
     module ClassMethods
   
+      def self.allowable_params
+        FORM_PARAMS
+      end
+
     end
   
     #------------------------------------------------------------------------------

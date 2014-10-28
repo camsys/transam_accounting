@@ -18,7 +18,7 @@ module TransamAccounting
     #
     #   :property_type     -- boolean, true if the asset is depreciable, false otherwise
     #
-    #   :depreciation_state_date -- the date that the asset starts depreciating. This is
+    #   :depreciation_start_date -- the date that the asset starts depreciating. This is
     #                         usually the same as the in_service_date but can be changed
     #                         depending on specific needs.
     #
@@ -38,14 +38,20 @@ module TransamAccounting
 
     included do
 
-      # ----------------------------------------------------
+      #----------------------------------------------------
       # Associations
-      # ----------------------------------------------------
+      #----------------------------------------------------
 
 
-      # ----------------------------------------------------
+      #----------------------------------------------------
       # Validations
-      # ----------------------------------------------------
+      #----------------------------------------------------
+      validates  :depreciation_start_date,    :presence => true
+      validates  :current_depreciation_date,  :presence => true
+      validates  :book_value,                 :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
+      validates  :salvage_value,              :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
+      validates  :replacement_value,          :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
+      validates_inclusion_of :property_type, :in => [true, false]
 
     end
 
@@ -83,7 +89,8 @@ module TransamAccounting
     end
 
     # the amount of depreciation for the previous accounting period
-    def beginning_ytd_depreciation(asset)
+    def beginning_ytd_depreciation
+      
       # Make sure we are working with a concrete asset class
       asset = is_typed? ? self : Asset.get_typed_asset(self)
 
@@ -94,7 +101,8 @@ module TransamAccounting
     end
 
     # the amount of accumulated depreciation for the previous accounting period
-    def beginning_accumulated_depreciation(asset)
+    def beginning_accumulated_depreciation
+      
       # Make sure we are working with a concrete asset class
       asset = is_typed? ? self : Asset.get_typed_asset(self)
 
@@ -104,7 +112,7 @@ module TransamAccounting
       calculate(asset, policy, class_name, 'beginning_accumulated_depreciation')
     end
 
-    def get_depreciable_table
+    def get_depreciation_table
       # Make sure we are working with a concrete asset class
       asset = is_typed? ? self : Asset.get_typed_asset(self)
 
@@ -124,8 +132,8 @@ module TransamAccounting
       table = Array.new
 
       years.each do |year|
-        estimated_value = calculate(asset, policy, class_name, 'calculate',year)
-        depreciated_value = calculate(asset, policy, class_name, 'depreciated_value',year)
+        estimated_value = calculate(asset, policy, class_name, 'calculate', year)
+        depreciated_value = calculate(asset, policy, class_name, 'depreciated_value', year)
 
         data = { :year => year, :estimated_value => estimated_value, :depreciated_value => depreciated_value }
         table << data
@@ -135,6 +143,33 @@ module TransamAccounting
     end
 
     protected
+
+      # updates the estimated value of an asset
+      def update_asset_value(policy = nil)
+        Rails.logger.info "Updating estimated value for asset = #{object_key}"
+    
+        # Make sure we are working with a concrete asset class
+        asset = is_typed? ? self : Asset.get_typed_asset(self)
+    
+        # Get the policy to use
+        policy = policy.nil? ? asset.policy : policy
+    
+        # exit if we can find a policy to work on
+        if policy.nil?
+          Rails.logger.warn "Can't find a policy for asset = #{object_key}"
+          return
+        end
+    
+        begin
+          # see what metric we are using to determine the service life of the asset
+          class_name = policy.depreciation_calculation_type.class_name
+          asset.estimated_value = calculate(asset, policy, class_name)
+          # save changes to this asset
+          asset.save
+        rescue Exception => e
+          Rails.logger.warn e.message
+        end
+      end
 
       # Update the asset depreciation model
       def update_asset_depreciated_state(policy = nil)
@@ -163,23 +198,6 @@ module TransamAccounting
       #------------------------------------------------------------------------------
       private
 
-      # Calls a calculate method on a Calculator class to perform a condition or cost calculation
-      # for the asset. The method name defaults to x.calculate(asset) but other methods
-      # with the same signature can be passed in
-      def calculate(asset, policy, class_name, target_method = 'calculate',on_date=nil)
-        begin
-          Rails.logger.debug "#{class_name}, #{target_method}"
-          # create an instance of this class and call the method
-          calculator_instance = class_name.constantize.new
-          Rails.logger.debug "Instance created #{calculator_instance}"
-          method_object = calculator_instance.method(target_method)
-          Rails.logger.debug "Instance method created #{method_object}"
-          method_object.call(asset,on_date)
-        rescue Exception => e
-          Rails.logger.error e.message
-          raise RuntimeError.new "#{class_name} calculation failed for asset #{asset.object_key} and policy #{policy.name}"
-        end
-      end
   end
 
 end

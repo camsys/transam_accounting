@@ -1,7 +1,14 @@
+require 'transam_core'
+
 module TransamAccounting
   class Engine < ::Rails::Engine
     # Add a load path for this specific Engine
     config.autoload_paths += %W(#{Rails.root}/app/calculators)
+    config.autoload_paths += %W(#{Rails.root}/app/jobs)
+    config.autoload_paths += %W(#{Rails.root}/app/mixins)
+    config.autoload_paths += %W(#{Rails.root}/app/reports)
+    config.autoload_paths += %W(#{Rails.root}/app/searches)
+    config.autoload_paths += %W(#{Rails.root}/app/services)
 
     # Append migrations from the engine into the main app    
     initializer :append_migrations do |app|
@@ -12,11 +19,5 @@ module TransamAccounting
       end
     end
 
-    config.generators do |g|
-      g.test_framework      :rspec,        :fixture => false
-      g.fixture_replacement :factory_girl, :dir => 'spec/factories'
-      g.assets false
-      g.helper false
-    end
   end
 end

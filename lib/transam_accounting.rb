@@ -4,4 +4,5 @@ require "transam_accounting/transam_accountable"
 require "transam_accounting/transam_accounting_policy"
 
 module TransamAccounting
+  
 end
