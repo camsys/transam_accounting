@@ -6,7 +6,6 @@ branches:
   - master
 env:
 - TEST_SUITE=rspec
-- TEST_SUITE=cucumber
 script:
 - bundle exec rake app:transam_accounting:prepare_rspec
 - bundle exec $TEST_SUITE
