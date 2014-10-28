@@ -20,28 +20,28 @@ class DepreciationCalculator < Calculator
   end
 
   def depreciated_value(asset, on_date=nil)
-    purchase_cost(asset) - calculate(asset, on_date)
+    purchase_cost(asset) - calculate_on_date(asset, on_date)
   end
 
   # the amount of depreciation for the current accounting period
   def current_ytd_depreciation(asset)
     prev_accounting_period = Date.new(asset.current_depreciation_date.year - 1, asset.depreciation_start_date.month, asset.depreciation_start_date.day)
 
-    calculate(asset) - calculate(asset,prev_accounting_period)
+    calculate(asset) - calculate_on_date(asset,prev_accounting_period)
   end
 
   # the amount of depreciation for the previous accounting period
   def beginning_ytd_depreciation(asset)
     prev_accounting_period = Date.new(asset.current_depreciation_date.year - 1, asset.depreciation_start_date.month, asset.depreciation_start_date.day)
 
-    calculate(asset,prev_accounting_period) - calculate(asset,prev_accounting_period - 1.years)
+    calculate_on_date(asset,prev_accounting_period) - calculate_on_date(asset,prev_accounting_period - 1.years)
   end
 
   # the amount of accumulated depreciation for the previous accounting period
   def beginning_accumulated_depreciation(asset)
     prev_accounting_period = Date.new(asset.current_depreciation_date.year - 1, asset.depreciation_start_date.month, asset.depreciation_start_date.day)
 
-    calculate(asset,prev_accounting_period)
+    calculate_on_date(asset,prev_accounting_period)
   end
 
 end

@@ -38,6 +38,11 @@ module TransamAccounting
 
     included do
 
+      #------------------------------------------------------------------------------
+      # Callbacks
+      #------------------------------------------------------------------------------
+      after_initialize  :set_depreciation_defaults
+
       #----------------------------------------------------
       # Associations
       #----------------------------------------------------
@@ -93,19 +98,19 @@ module TransamAccounting
 
     # the amount of depreciation for the previous accounting period
     def beginning_ytd_depreciation
-      
+
       # Make sure we are working with a concrete asset class
       asset = is_typed? ? self : Asset.get_typed_asset(self)
 
       # see what metric we are using for the depreciated value of the asset
       class_name = policy.depreciation_calculation_type.class_name
 
-      calculate(asset, policy, class_name, 'beginning_ytd_depreciation')
+      calculate(self, policy, class_name, 'beginning_ytd_depreciation')
     end
 
     # the amount of accumulated depreciation for the previous accounting period
     def beginning_accumulated_depreciation
-      
+
       # Make sure we are working with a concrete asset class
       asset = is_typed? ? self : Asset.get_typed_asset(self)
 
@@ -116,16 +121,19 @@ module TransamAccounting
     end
 
     def get_depreciation_table
-      
+
       if depreciation_start_date.nil? or current_depreciation_date.nil?
         return []
       end
-      
+
       # Make sure we are working with a concrete asset class
       asset = is_typed? ? self : Asset.get_typed_asset(self)
 
       # see what metric we are using for the depreciated value of the asset
       class_name = policy.depreciation_calculation_type.class_name
+
+      # create an instance of this calculator class
+      calculator_instance = class_name.constantize.new
 
       # get FYs for calculating depreciation
       # get previous depreciation dates
@@ -140,8 +148,8 @@ module TransamAccounting
       table = Array.new
 
       years.each do |year|
-        estimated_value = calculate(asset, policy, class_name, 'calculate', year)
-        depreciated_value = calculate(asset, policy, class_name, 'depreciated_value', year)
+        estimated_value = calculator_instance.calculate_on_date(asset, year)
+        depreciated_value = calculator_instance.depreciated_value(asset, year)
 
         data = { :year => year, :estimated_value => estimated_value, :depreciated_value => depreciated_value }
         table << data
@@ -155,19 +163,19 @@ module TransamAccounting
       # updates the estimated value of an asset
       def update_asset_value(policy = nil)
         Rails.logger.info "Updating estimated value for asset = #{object_key}"
-    
+
         # Make sure we are working with a concrete asset class
         asset = is_typed? ? self : Asset.get_typed_asset(self)
-    
+
         # Get the policy to use
         policy = policy.nil? ? asset.policy : policy
-    
+
         # exit if we can find a policy to work on
         if policy.nil?
           Rails.logger.warn "Can't find a policy for asset = #{object_key}"
           return
         end
-    
+
         begin
           # see what metric we are using to determine the service life of the asset
           class_name = policy.depreciation_calculation_type.class_name
@@ -197,6 +205,13 @@ module TransamAccounting
         rescue Exception => e
           Rails.logger.warn e.message
         end
+      end
+
+      # Set resonable defaults for a new asset
+      def set_depreciation_defaults
+        self.depreciation_start_date ||= self.in_service_date
+
+        self.current_depreciation_date ||= fiscal_year_last_date(Date.today)
       end
 
       #------------------------------------------------------------------------------

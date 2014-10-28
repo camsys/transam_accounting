@@ -5,18 +5,18 @@
 #------------------------------------------------------------------------------
 class DecliningBalanceDepreciationCalculator < DepreciationCalculator
 
+  def calculate(asset)
+    calculate_on_date(asset,asset.current_depreciation_date)
+  end
+
   # Determines the estimated value for an asset.
-  def calculate(asset, on_date=nil)
+  def calculate_on_date(asset,on_date)
 
     # depreciation time
     num_years = asset.policy_rule.max_service_life_years
 
     # Age of the asset
-    if on_date.nil?
-      asset_age = asset.age(asset.current_depreciation_date)
-    else
-      asset_age = asset.age(on_date)
-    end
+    age = asset.age(on_date)
 
     Rails.logger.debug "Age = #{asset_age}, max service life = #{num_years}"
     # calculate the annual depreciation rate. This is double the actual depreciation rate
