@@ -46,6 +46,9 @@ module TransamAccounting
       #----------------------------------------------------
       # Validations
       #----------------------------------------------------
+
+      alias_attribute :replacement_value, :estimated_replacement_cost
+
       validates  :depreciation_start_date,    :presence => true
       validates  :current_depreciation_date,  :presence => true
       validates  :book_value,                 :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
