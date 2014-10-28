@@ -4,7 +4,7 @@ class GeneralLedgerAccountsController < OrganizationAwareController
   add_breadcrumb "Chart of Accounts", :general_ledger_accounts_path
   
   # Set the @chart_of_accounts variable
-  before_filter :get_chart_of_account
+  before_filter :get_chart_of_accounts
   # Set the @ledger_account variable
   before_filter :get_ledger_account, :except => [:index]
       
@@ -48,7 +48,7 @@ class GeneralLedgerAccountsController < OrganizationAwareController
   end
 
   def get_chart_of_accounts
-    @chart_of_accounts = ChartOfAccount.find_by_organization(@organization)
+    @chart_of_accounts = @organization.chart_of_accounts
   end
 
   def get_ledger_account

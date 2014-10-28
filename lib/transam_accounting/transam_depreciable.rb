@@ -113,6 +113,11 @@ module TransamAccounting
     end
 
     def get_depreciation_table
+      
+      if depreciation_start_date.nil? or current_depreciation_date.nil?
+        return []
+      end
+      
       # Make sure we are working with a concrete asset class
       asset = is_typed? ? self : Asset.get_typed_asset(self)
 
