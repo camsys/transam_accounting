@@ -16,7 +16,7 @@ class DecliningBalanceDepreciationCalculator < DepreciationCalculator
     num_years = asset.policy_rule.max_service_life_years
 
     # Age of the asset
-    age = asset.age(on_date)
+    asset_age = asset.age(on_date)
 
     Rails.logger.debug "Age = #{asset_age}, max service life = #{num_years}"
     # calculate the annual depreciation rate. This is double the actual depreciation rate
