@@ -211,7 +211,7 @@ module TransamAccounting
       def set_depreciation_defaults
         self.depreciation_start_date ||= self.in_service_date
 
-        self.current_depreciation_date ||= fiscal_year_last_date(Date.today)
+        self.current_depreciation_date ||= fiscal_year_end_date(Date.today)
       end
 
       #------------------------------------------------------------------------------
