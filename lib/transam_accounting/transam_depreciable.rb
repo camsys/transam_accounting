@@ -209,7 +209,9 @@ module TransamAccounting
 
       # Set resonable defaults for a new asset
       def set_depreciation_defaults
-        self.depreciation_start_date ||= self.in_service_date
+        if self.depreciation_start_date.nil?
+          self.depreciation_start_date = self.in_service_date.nil? ? Date.today : self.in_service_date
+        end
 
         self.current_depreciation_date ||= fiscal_year_end_date(Date.today)
       end
