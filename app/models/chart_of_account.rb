@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------------
 class ChartOfAccount < ActiveRecord::Base
-  
+
   # Include the object key mixin
   include TransamObjectKey
 
@@ -16,7 +16,7 @@ class ChartOfAccount < ActiveRecord::Base
   # Callbacks
   #------------------------------------------------------------------------------
   after_initialize  :set_defaults
-  
+
   #------------------------------------------------------------------------------
   # Associations
   #------------------------------------------------------------------------------
@@ -26,15 +26,15 @@ class ChartOfAccount < ActiveRecord::Base
 
   # Every Chart of Accounts has a set of General Ledger Accounts
   has_many    :general_ledger_accounts, :dependent => :destroy
-  
+
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
-    
-  validates :organization,      :presence => true
-  
 
-  # List of allowable form param hash keys  
+  validates :organization,      :presence => true
+
+
+  # List of allowable form param hash keys
   FORM_PARAMS = [
     :organization_id,
     :active
@@ -53,11 +53,11 @@ class ChartOfAccount < ActiveRecord::Base
   # Class Methods
   #
   #------------------------------------------------------------------------------
-      
+
   def self.allowable_params
     FORM_PARAMS
   end
-            
+
   #------------------------------------------------------------------------------
   #
   # Instance Methods
@@ -70,12 +70,18 @@ class ChartOfAccount < ActiveRecord::Base
   def to_s
     name
   end
-    
+
   #------------------------------------------------------------------------------
   #
   # Protected Methods
   #
   #------------------------------------------------------------------------------
   protected
-  
+
+    # Set resonable defaults for chart of accounts
+    def set_defaults
+      self.active ||= true
+    end
+
+
 end

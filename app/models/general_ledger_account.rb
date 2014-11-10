@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------------
 class GeneralLedgerAccount < ActiveRecord::Base
-  
+
   # Include the object key mixin
   include TransamObjectKey
 
@@ -16,27 +16,27 @@ class GeneralLedgerAccount < ActiveRecord::Base
   # Callbacks
   #------------------------------------------------------------------------------
   after_initialize  :set_defaults
-  
+
   #------------------------------------------------------------------------------
   # Associations
   #------------------------------------------------------------------------------
 
   # Every ledger account belongs to an chart of accounts
   belongs_to :chart_of_account
-  
+
   # Every GLA has an account type
   belongs_to :general_ledger_account_type
 
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
-    
+
   validates :chart_of_account,              :presence => true
   validates :general_ledger_account_type,   :presence => true
   validates :name,                          :presence => true, :length => {:maximum => 64}
   validates :account_number,                :presence => true, :length => {:maximum => 32}
- 
-  # List of allowable form param hash keys  
+
+  # List of allowable form param hash keys
   FORM_PARAMS = [
     :chart_of_account_id,
     :general_ledger_account_type_id,
@@ -58,11 +58,11 @@ class GeneralLedgerAccount < ActiveRecord::Base
   # Class Methods
   #
   #------------------------------------------------------------------------------
-      
+
   def self.allowable_params
     FORM_PARAMS
   end
-            
+
   #------------------------------------------------------------------------------
   #
   # Instance Methods
@@ -72,13 +72,17 @@ class GeneralLedgerAccount < ActiveRecord::Base
   def to_s
     name
   end
-    
+
   #------------------------------------------------------------------------------
   #
   # Protected Methods
   #
   #------------------------------------------------------------------------------
   protected
-  
+
+    # Set resonable defaults for general ledger accounts
+    def set_defaults
+      self.active ||= true
+    end
+
 end
-      
