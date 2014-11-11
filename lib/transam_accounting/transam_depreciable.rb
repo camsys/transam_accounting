@@ -214,6 +214,12 @@ module TransamAccounting
         end
 
         self.current_depreciation_date ||= fiscal_year_end_date(Date.today)
+
+        self.book_value ||= 0
+        self.salvage_value ||= 0
+        self.replacement_value ||= 0
+        self.property_type ||= true
+
       end
 
       #------------------------------------------------------------------------------
