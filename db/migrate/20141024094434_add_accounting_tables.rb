@@ -32,9 +32,13 @@ class AddAccountingTables < ActiveRecord::Migration
     add_index :general_ledger_accounts, :object_key,            :unique => :true, :name => :general_ledger_accounts_idx1
     add_index :general_ledger_accounts, :chart_of_account_id,                     :name => :general_ledger_accounts_idx2
 
+    # Join table for general ledger accounts and grants 
+    create_join_table :general_ledger_accounts, :grants    
+    # and index it for mysql    
+    add_index :general_ledger_accounts_grants,   [:general_ledger_account_id, :grant_id], :name => :general_ledger_accounts_grants_idx1
+
     # Join table for assets and general ledger accounts
     create_join_table :assets, :general_ledger_accounts
-    
     # and index it for mysql    
     add_index :assets_general_ledger_accounts,   [:asset_id, :general_ledger_account_id], :name => :assets_general_ledger_accounts_idx1
     

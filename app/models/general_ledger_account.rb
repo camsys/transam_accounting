@@ -16,6 +16,10 @@ class GeneralLedgerAccount < ActiveRecord::Base
   # Callbacks
   #------------------------------------------------------------------------------
   after_initialize  :set_defaults
+  
+  # Clean up any HABTM associations before the asset is destroyed
+  before_destroy { grants.clear }
+  
 
   #------------------------------------------------------------------------------
   # Associations
@@ -26,6 +30,11 @@ class GeneralLedgerAccount < ActiveRecord::Base
 
   # Every GLA has an account type
   belongs_to :general_ledger_account_type
+
+  # Every GLA has 0 or more grants. This is not a strictly HABTM relationship
+  # but it allows us to relate GLAs to grants without modifying the grants table
+  # which is in the transit engine
+  has_and_belongs_to_many :grants
 
   #------------------------------------------------------------------------------
   # Validations
