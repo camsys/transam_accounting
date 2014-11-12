@@ -1,16 +1,16 @@
 class GeneralLedgerAccountsController < OrganizationAwareController
-  
+
   add_breadcrumb "Home", :root_path
   add_breadcrumb "Chart of Accounts", :general_ledger_accounts_path
-  
+
   # Set the @chart_of_accounts variable
   before_filter :get_chart_of_accounts
   # Set the @ledger_account variable
   before_filter :get_ledger_account, :except => [:index]
-      
+
   # Session Variables
   INDEX_KEY_LIST_VAR        = "general_ledger_accounts_list_cache_var"
-      
+
   def index
 
     @ledger_accounts = @chart_of_accounts.general_ledger_accounts
@@ -31,7 +31,7 @@ class GeneralLedgerAccountsController < OrganizationAwareController
     get_next_and_prev_object_keys(@ledger_account, INDEX_KEY_LIST_VAR)
     @prev_record_path = @prev_record_key.nil? ? "#" : general_ledger_account_path(@prev_record_key)
     @next_record_path = @next_record_key.nil? ? "#" : general_ledger_account_path(@next_record_key)
-    
+
     respond_to do |format|
       format.html # show.html.erb
       format.js
@@ -39,9 +39,8 @@ class GeneralLedgerAccountsController < OrganizationAwareController
     end
   end
 
-    
   private
-  
+
   # Never trust parameters from the scary internet, only allow the white list through.
   def form_params
     params.require(:notice).permit(GeneralLedgerAccount.allowable_params)
@@ -53,7 +52,7 @@ class GeneralLedgerAccountsController < OrganizationAwareController
 
   def get_ledger_account
     # See if it is our chart of accounts
-    @ledger_account = @chart_of_accounts.find_by_object_key(params[:id]) unless params[:id].nil?
+    @ledger_account = @chart_of_accounts.general_ledger_accounts.find_by_object_key(params[:id]) unless params[:id].nil?
     # if not found or the object does not belong to the users
     # send them back to index.html.erb
     if @ledger_account.nil?
@@ -61,7 +60,7 @@ class GeneralLedgerAccountsController < OrganizationAwareController
       redirect_to general_ledger_accounts_url
       return
     end
-    
+
   end
-    
+
 end

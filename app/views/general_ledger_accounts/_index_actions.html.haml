@@ -1,10 +1,10 @@
 .btn-group.pull-right.panel-action
   %button.btn.btn-primary.btn-sm.dropdown-toggle{:data => {:toggle => 'dropdown'}}
-    I want to  
+    I want to
     %span.caret
   %ul.dropdown-menu{:role => 'menu'}
-    - if can? :create, AssetGroup
+    - if can? :create, GeneralLedgerAccount
       %li
-        = link_to new_asset_group_path do
+        = link_to new_general_ledger_account_path do
           %i.fa.fa-plus.fa-fw
-          = " Create new grouop";  
+          = " Create new general ledger account";

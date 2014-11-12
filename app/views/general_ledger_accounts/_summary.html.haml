@@ -1,4 +1,3 @@
-= format_field("Name", asset_group.name )
-= format_field("Code", asset_group.code )
-= format_field("Asset Count", format_as_integer(asset_group.assets.count))
-= format_field("Description", asset_group.description )
+= format_field("Name", ledger_account.name )
+= format_field("Account Number", format_as_integer(ledger_account.account_number) )
+= format_field("Account Type", ledger_account.general_ledger_account_type.name )
