@@ -6,4 +6,4 @@
 .tab-content
   .tab-pane.fade#table
     .tab-content
-      = render 'grants'
+      = render :partial => 'grants/grants_table', :locals => {:grants => @ledger_account.grants}
