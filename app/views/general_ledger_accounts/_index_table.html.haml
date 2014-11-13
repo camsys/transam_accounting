@@ -2,14 +2,14 @@
   %thead
     %tr
       %th.left Name
-      %th.left Account Number
+      %th.right Account Number
       %th.left Account Type
 
   %tbody
     - @ledger_accounts.each do |a|
       %tr.popup-details{:data => {:action_path => general_ledger_account_path(a)}}
         %td.left= a.name
-        %td.left= a.account_number
+        %td.right= a.account_number
         %td.left= a.general_ledger_account_type.name
 
 = render 'shared/datatable_javascript'

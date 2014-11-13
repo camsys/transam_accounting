@@ -1,15 +1,11 @@
-:ruby
-  grants = @ledger_account.grants
-
-- if grants.empty?
-  %p There are no grants for this fund.
+- if @ledger_account.grants.empty?
+  %p There are no grants associated with this account.
 -else
   %table.table.table-hover
     %thead
       %tr
         %th.left Source
         %th.center Fiscal Year
-        %th.left Recipient
         %th.left Number
         %th.right Amount
         %th.center Active
@@ -17,12 +13,11 @@
 
     %tbody
       - total = 0
-      - grants.each do |f|
+      - @ledger_account.grants.each do |f|
         - total += f.amount
         %tr.popup-details{:data => {:action_path => assets_grant_path(f)}}
           %td.left= f.funding_source
           %td.center= format_as_fiscal_year(f.fy_year)
-          %td.left= f.organization.short_name unless f.organization.nil?
           %td.left= f.grant_number
           %td.right= format_as_currency(f.amount)
           %td.center= format_as_boolean(true)
