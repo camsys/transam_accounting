@@ -3,12 +3,10 @@
     .panel.panel-default.header-part
       .panel-heading
         .row
-          .col-md-6
+          .col-md-12
             %h3.panel-title
               %i.fa.fa-list
               General Ledger Account
-          .col-md-6
-            = render 'actions'
       .panel-body
         = render :partial => 'summary', :locals => {:ledger_account => @ledger_account}
 
