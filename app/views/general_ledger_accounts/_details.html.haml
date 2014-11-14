@@ -1,6 +1,7 @@
 %ul.nav.nav-tabs
   %li
     %a{:href => "#table", :data =>{:toggle => 'tab'}}
+      %span.badge.pull-right= @ledger_account.grants.count
       = "Grants"
 
 .tab-content

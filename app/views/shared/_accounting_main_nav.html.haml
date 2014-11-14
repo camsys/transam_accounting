@@ -5,7 +5,15 @@
     Accounting
     %b.caret
   %ul.dropdown-menu.multi-level{:role => 'menu'}      
-    %li.text-left
+
+    %li.text-left.dropdown-submenu
       = link_to general_ledger_accounts_path do
         %i.fa.fa-usd.fa-fw
         Chart of Accounts
+
+      %ul.dropdown-menu
+        - GeneralLedgerAccountType.all.each do |account_type|
+          %li.text-left
+            = link_to general_ledger_accounts_path(:type => account_type) do
+              %i.fa.fa-fw.fa-tag
+              = account_type
