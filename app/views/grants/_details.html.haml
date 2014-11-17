@@ -1,0 +1,22 @@
+:ruby
+  @assets = @grant.assets
+%ul.nav.nav-tabs
+  %li
+    %a{:href => "#gla", :data =>{:toggle => 'tab'}}
+      %span.badge.pull-right= @grant.general_ledger_accounts.count
+      = "GL Accounts"
+  %li
+    %a{:href => "#alloc", :data =>{:toggle => 'tab'}}
+      %span.badge.pull-right= @grant.assets.count
+      = "Expenditures"
+
+.tab-content
+  .tab-pane.fade#gla
+    .tab-content
+      = render :partial => 'general_ledger_accounts/gl_accounts_table', :locals => {:gl_accounts => @grant.general_ledger_accounts}
+  .tab-pane.fade#alloc
+    .tab-content
+      - if @grant.assets.empty?
+        %p There are no expenditures associated with this grant.
+      - else
+        = render :partial => 'assets/asset_datatable', :locals => {:assets => @grant.assets}
