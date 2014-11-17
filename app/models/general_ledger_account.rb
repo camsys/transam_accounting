@@ -34,9 +34,9 @@ class GeneralLedgerAccount < ActiveRecord::Base
   # Every GLA has 0 or more grants. This is not a strictly HABTM relationship
   # but it allows us to relate GLAs to grants without modifying the grants table
   # which is in the transit engine
-  has_many :general_ledger_account_grants
+  has_many :grant_budgets
 
-  has_many :grants, :through => :general_ledger_account_grants
+  has_many :grants, :through => :grant_budgets
 
   # Every GLA has and belongs to many assets
   has_and_belongs_to_many :assets

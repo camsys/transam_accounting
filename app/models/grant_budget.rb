@@ -1,11 +1,11 @@
 #------------------------------------------------------------------------------
 #
-# GeneralLedgerAccountGrant
+# GrantBudget
 #
 # Represents the join between a general ledge account and a grant
 #
 #------------------------------------------------------------------------------
-class GeneralLedgerAccountGrant < ActiveRecord::Base
+class GrantBudget < ActiveRecord::Base
 
   #------------------------------------------------------------------------------
   # Associations
