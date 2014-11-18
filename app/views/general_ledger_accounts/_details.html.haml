@@ -11,7 +11,7 @@
 .tab-content
   .tab-pane.fade#grants_table
     .tab-content
-      = render :partial => 'grants/grants_table', :locals => {:grants => @ledger_account.grants}
+      = render :partial => 'gla_budgets', :locals => {:gla_budgets => @ledger_account.grant_budgets}
   .tab-pane.fade#expenditures
     .tab-content
       - if @ledger_account.assets.empty?

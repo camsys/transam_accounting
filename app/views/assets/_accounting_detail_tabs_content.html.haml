@@ -1,6 +1,3 @@
 .tab-pane.fade#acct
   .tab-content
     = render 'depreciation_table'
-.tab-pane.fade#gla
-  .tab-content
-    = render :partial => 'general_ledger_accounts/gl_accounts_table', :locals => {:gl_accounts => @asset.general_ledger_accounts}

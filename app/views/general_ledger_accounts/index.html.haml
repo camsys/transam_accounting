@@ -12,4 +12,4 @@
           %p No general ledger accounts found
         - else
           .col-md-12
-            = render :partial => 'gl_accounts_table', :locals => {:gl_accounts => @ledger_accounts}
+            = render :partial => 'index_table', :locals => {:gl_accounts => @ledger_accounts}

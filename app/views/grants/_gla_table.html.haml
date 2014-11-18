@@ -1,0 +1,26 @@
+- if gla_budgets.empty?
+  %p There are no grant budgets associated with this account.
+-else
+  %table.table.table-hover#datatable
+    %thead
+      %tr
+        %th.left Name
+        %th.right Account Number
+        %th.right Account Type
+        %th.right Budget
+
+    %tbody
+      - total = 0
+      - gla_budgets.each do |gl_budget|
+        - total += gl_budget.amount
+        %tr.popup-details{:data => {:action_path => general_ledger_account_path(gl_budget.general_ledger_account)}}
+          %td.left= gl_budget.general_ledger_account.name
+          %td.right= gl_budget.general_ledger_account.account_number
+          %td.right= gl_budget.general_ledger_account.general_ledger_account_type.name
+          %td.right= gl_budget.amount
+      %tr
+        %td{:colspan => 3}
+        %td.right= format_as_currency(total)
+
+
+  = render 'shared/datatable_javascript'
