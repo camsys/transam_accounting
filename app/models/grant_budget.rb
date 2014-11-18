@@ -20,6 +20,6 @@ class GrantBudget < ActiveRecord::Base
   #------------------------------------------------------------------------------
   validates :general_ledger_account,    :presence => true
   validates :grant,                     :presence => true
-  validates :amount,                    :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
+  validates :amount,                    :allow_nil => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
 
 end
