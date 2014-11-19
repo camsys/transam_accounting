@@ -7,8 +7,8 @@
         %th.left Grant
         %th.center Fiscal Year
         %th.left Source
-        %th.right Total Amount
         %th.right GLA Amount
+        %th.right Total Amount
         %th.right Expenditures
         %th.right Total Expended
         %th.center
@@ -19,14 +19,14 @@
       - spent = 0
       - gla_budgets.each do |gla_budget|
         - total += gla_budget.grant.amount
-        - gla_total += gla_budget.amount
+        - gla_total += gla_budget.amount unless gla_budget.amount.nil?
         - spent += gla_budget.grant.spent
         %tr.popup-details{:data => {:action_path => grant_path(gla_budget.grant)}}
           %td.left= gla_budget.grant.grant_number
           %td.center= format_as_fiscal_year(gla_budget.grant.fy_year)
           %td.left= gla_budget.grant.funding_source
+          %td.right= format_as_currency(gla_budget.amount) unless gla_budget.amount.nil?
           %td.right= format_as_currency(gla_budget.grant.amount)
-          %td.right= format_as_currency(gla_budget.amount)
           %td.right= format_as_integer(gla_budget.grant.grant_purchases.count)
           %td.right= format_as_currency(gla_budget.grant.spent)
           %td.center
@@ -34,8 +34,8 @@
     %tfoot
       %tr
         %td{:colspan => 3}
-        %td.right= format_as_currency(total)
         %td.right= format_as_currency(gla_total)
+        %td.right= format_as_currency(total)
         %td.right
         %td.right= format_as_currency(spent)
 
