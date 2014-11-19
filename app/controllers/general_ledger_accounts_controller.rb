@@ -28,9 +28,11 @@ class GeneralLedgerAccountsController < OrganizationAwareController
       
     end
         
-
-    if @chart_of_accounts # guard for orgs without a chart of accounts
+    if @chart_of_accounts 
       @ledger_accounts = @chart_of_accounts.general_ledger_accounts.where(conditions.join(' AND '), *values) 
+    else
+      Rails.logger.warn "No chart of accounts found for org #{@organization.short_name}"
+      @ledger_accounts = []
     end
     # cache the set of accounts ids in case we need them later
     cache_list(@ledger_accounts, INDEX_KEY_LIST_VAR)

@@ -8,7 +8,7 @@
               %i.fa.fa-list
               General Ledger Accounts
       .panel-body
-        - if @ledger_accounts.blank?
+        - if @ledger_accounts.empty?
           %p No general ledger accounts found
         - else
           .col-md-12
