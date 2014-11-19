@@ -25,11 +25,13 @@ class GeneralLedgerAccountsController < OrganizationAwareController
       
       account_type = GeneralLedgerAccountType.find(@account_type_id)
       add_breadcrumb account_type, general_ledger_accounts_path(:type => account_type)
-
+      
     end
         
 
-    @ledger_accounts = @chart_of_accounts.general_ledger_accounts.where(conditions.join(' AND '), *values)
+    if @chart_of_accounts # guard for orgs without a chart of accounts
+      @ledger_accounts = @chart_of_accounts.general_ledger_accounts.where(conditions.join(' AND '), *values) 
+    end
     # cache the set of accounts ids in case we need them later
     cache_list(@ledger_accounts, INDEX_KEY_LIST_VAR)
 
