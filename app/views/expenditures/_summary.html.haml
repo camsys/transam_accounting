@@ -1,0 +1,5 @@
+= format_field("Expense", expenditure.description )
+= format_field("Amount", format_as_currency(expenditure.amount))
+= format_field("Category", expenditure.expense_type )
+= format_field("Date", format_as_date(expenditure.expense_date))
+= format_field("Account", expenditure.general_ledger_account )

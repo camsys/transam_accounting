@@ -2,7 +2,7 @@
 #
 # GeneralLedgerAccount
 #
-# Represents a general ledge account that exists in an external accounting
+# Represents a general ledger account that exists in an external accounting
 # system. This model is used to associate assets with accounting system accounts
 # in an external business system and is not designed to replicate a general ledger
 #
@@ -38,6 +38,9 @@ class GeneralLedgerAccount < ActiveRecord::Base
 
   has_many :grants, :through => :grant_budgets
 
+  # Each GLA has 0 or more expenditures
+  has_many :expenditures
+  
   # Every GLA has and belongs to many assets
   has_and_belongs_to_many :assets
 

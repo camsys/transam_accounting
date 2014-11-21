@@ -17,3 +17,15 @@
             = link_to general_ledger_accounts_path(:type => account_type) do
               %i.fa.fa-fw.fa-tag
               = account_type
+
+    %li.divider
+    %li.text-left
+      = link_to grants_path do
+        %i.fa.fa-fw.fa-tag
+        = ' Grants'
+
+    %li.divider
+    %li.text-left
+      = link_to expenditures_path do
+        %i.fa.fa-fw.fa-tag
+        = ' Expenditures'
