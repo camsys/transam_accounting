@@ -1,3 +1,2 @@
-- @assets = @expenditure.assets
-= render 'assets/asset_datatable'
+= render 'assets/asset_datatable', :locals => {:assets => @expenditure.assets}
 = render 'shared/datatable_javascript'
