@@ -46,6 +46,7 @@ class Expenditure < ActiveRecord::Base
   #------------------------------------------------------------------------------
   
   validates :general_ledger_account,    :presence => true
+  validates :organization,              :presence => true
   #validates :grant,                     :presence => true
   validates :expense_type,              :presence => true
   validates :expense_date,              :presence => true
