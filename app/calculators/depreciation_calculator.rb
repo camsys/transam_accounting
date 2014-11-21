@@ -8,11 +8,11 @@ class DepreciationCalculator < Calculator
   def total_depreciation(asset)
     # Get the total_depreciation for the depreciation as the purchase price minus the residual value at
     # the end of the asset's useful life
-    purchase_cost(asset) - residual_value(asset)
+    purchase_cost(asset) - salvage_value(asset)
   end
 
-  def residual_value(asset)
-    purchase_cost(asset) * (asset.policy_rule.pcnt_residual_value / 100.0)
+  def salvage_value(asset)
+    asset.salvage_value.nil? ? purchase_cost(asset) * (asset.policy_rule.pcnt_residual_value / 100.0) : asset.salvage_value
   end
 
   def purchase_cost(asset)

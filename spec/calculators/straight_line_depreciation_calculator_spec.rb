@@ -44,7 +44,7 @@ RSpec.describe StraightLineDepreciationCalculator, :type => :calculator do
       @policy_item.pcnt_residual_value = 50
       @policy_item.save
 
-      expect(test_calculator.calculate(@test_asset)).to eq(test_calculator.residual_value(@test_asset))
+      expect(test_calculator.calculate(@test_asset)).to eq(test_calculator.salvage_value(@test_asset))
     end
   end
 

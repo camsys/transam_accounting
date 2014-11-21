@@ -24,7 +24,7 @@ class StraightLineDepreciationCalculator < DepreciationCalculator
     depreciated_value = purchase_cost(asset) - (annual_depreciation * age)
     Rails.logger.debug "num_years = #{num_years} annual_depreciation = #{annual_depreciation} purchase_cost = #{purchase_cost(asset)} total_depreciation = #{total_depreciation(asset)} age = #{age} depreciated_value = #{depreciated_value}"
     # return the max of the residual value and the depreciated value
-    [depreciated_value, residual_value(asset)].max
+    [depreciated_value, salvage_value(asset)].max
   end
 
 end
