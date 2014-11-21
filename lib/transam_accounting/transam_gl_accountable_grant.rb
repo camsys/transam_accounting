@@ -21,6 +21,8 @@ module TransamAccounting
       has_many :grant_budgets
       has_many :general_ledger_accounts, :through => :grant_budgets
 
+      has_many :expenditures
+
       # ----------------------------------------------------
       # Validations
       # ----------------------------------------------------

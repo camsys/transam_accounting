@@ -4,17 +4,27 @@
       %span.badge.pull-right= @ledger_account.grants.count
       = "Grants"
   %li
-    %a{:href => "#expenditures", :data =>{:toggle => 'tab'}}
+    %a{:href => "#assets", :data =>{:toggle => 'tab'}}
       %span.badge.pull-right= @ledger_account.assets.count
+      = "Assets"
+  %li
+    %a{:href => "#expenditures", :data =>{:toggle => 'tab'}}
+      %span.badge.pull-right= @ledger_account.expenditures.count
       = "Expenditures"
 
 .tab-content
   .tab-pane.fade#grants_table
     .tab-content
       = render :partial => 'gla_budgets', :locals => {:gla_budgets => @ledger_account.grant_budgets}
-  .tab-pane.fade#expenditures
+  .tab-pane.fade#assets
     .tab-content
       - if @ledger_account.assets.empty?
-        %p There are no expenditures associated with this general ledger account.
+        %p There are no assets associated with this general ledger account.
       - else
         = render :partial => 'assets/asset_datatable', :locals => {:assets => @ledger_account.assets}
+  .tab-pane.fade#expenditures
+    .tab-content
+      - if @ledger_account.expenditures.empty?
+        %p There are no expenditures associated with this general ledger account.
+      - else
+        = render :partial => 'expenditures/expenditures_table', :locals => {:expenditures => @ledger_account.expenditures}

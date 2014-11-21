@@ -8,9 +8,9 @@
       %th.right Amount
       %th.left Grant
       %th.right Grant %
-      				
+
   %tbody
-    - @expenditures.each do |e|      
+    - expenditures.each do |e|      
       %tr.popup-details{:data => {:action_path => expenditure_path(e)}}
         %td.left= e.general_ledger_account
         %td.left= e.expense_type
