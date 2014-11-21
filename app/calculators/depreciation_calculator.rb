@@ -5,8 +5,8 @@
 #------------------------------------------------------------------------------
 class DepreciationCalculator < Calculator
 
-  def basis(asset)
-    # Get the basis for the depreciation as the purchase price minus the residual value at
+  def total_depreciation(asset)
+    # Get the total_depreciation for the depreciation as the purchase price minus the residual value at
     # the end of the asset's useful life
     purchase_cost(asset) - residual_value(asset)
   end

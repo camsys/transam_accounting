@@ -20,10 +20,10 @@ RSpec.describe DepreciationCalculator, :type => :calculator do
 
   let(:test_calculator) { DepreciationCalculator.new }
 
-  describe '#basis' do
+  describe '#total_depreciation' do
     it 'is 0 for a purchase price of 0' do
       @test_asset.purchase_cost = 0
-      expect(test_calculator.basis(@test_asset)).to eq(0)
+      expect(test_calculator.total_depreciation(@test_asset)).to eq(0)
     end
 
     it 'is 0 for a percentage residual value of 100' do
