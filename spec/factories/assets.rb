@@ -21,7 +21,7 @@ FactoryGirl.define do
     purchase_cost 2000.0
     expected_useful_life 10
     reported_condition_rating 2.0
-    property_type true
+    depreciable true
     book_value 100
     salvage_value 100
     #replacement_value 100

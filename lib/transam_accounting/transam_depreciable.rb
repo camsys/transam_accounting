@@ -16,7 +16,7 @@ module TransamAccounting
     #                         assets are depreciable (default) but in some cases like
     #                         land etc. the assets are not.
     #
-    #   :property_type     -- boolean, true if the asset is depreciable, false otherwise
+    #   :depreciable     -- boolean, true if the asset is depreciable, false otherwise
     #
     #   :depreciation_start_date -- the date that the asset starts depreciating. This is
     #                         usually the same as the in_service_date but can be changed
@@ -59,7 +59,7 @@ module TransamAccounting
       validates  :book_value,                 :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
       validates  :salvage_value,              :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
       validates  :replacement_value,          :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
-      validates_inclusion_of :property_type, :in => [true, false]
+      validates_inclusion_of :depreciable, :in => [true, false]
 
     end
 
@@ -78,12 +78,6 @@ module TransamAccounting
     # Instance Methods
     #
     #------------------------------------------------------------------------------
-
-    # returns true if this asset instance is depreciable, false
-    # otherwise
-    def depreciable?
-      property_type
-    end
 
     # the amount of depreciation for the current accounting period
     def current_ytd_depreciation
@@ -218,7 +212,7 @@ module TransamAccounting
         self.book_value ||= 0
         self.salvage_value ||= 0
         self.replacement_value ||= 0
-        self.property_type ||= true
+        self.depreciable ||= true
 
       end
 
