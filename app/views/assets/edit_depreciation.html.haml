@@ -1,0 +1,13 @@
+= render(:partial => 'shared/form_errors', :locals => {:obj => @asset}) unless @asset.errors.empty?
+
+.row
+  .col-md-3
+    = dialog_tag('Asset', {:icon => "fa fa-list", :class => "header-part"}) do
+      = render 'assets/summary'
+  .col-md-9
+    = render "#{@asset.class.name.underscore}_depreciation_form"
+
+:javascript
+  $(document).ready(function() {
+    transam.make_same_height('.form_part');
+    });

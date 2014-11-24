@@ -15,6 +15,9 @@ Rails.configuration.to_prepare do
     include TransamAccounting::TransamDepreciable
     include TransamAccounting::TransamGlAccountableAsset
   end
+  AssetsController.class_eval do
+    include TransamAccounting::TransamAccountingAssetsController
+  end
   Grant.class_eval do
     include TransamAccounting::TransamGlAccountableGrant
   end

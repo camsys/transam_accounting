@@ -1,0 +1,4 @@
+%fieldset
+  %legend.panel-legend Depreciation
+  = format_field("Book Value", format_as_currency(@asset.book_value))
+  = format_field("Current Depreciation Date", format_as_date(@asset.current_depreciation_date))

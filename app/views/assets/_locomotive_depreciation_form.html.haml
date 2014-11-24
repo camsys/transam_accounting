@@ -1,0 +1,30 @@
+= simple_form_for(@proxy,
+:url => update_depreciation_inventory_path,
+:method => 'post',
+:html => {:class => 'form-vertical'},
+:wrapper => :vertical_form,
+:wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes,
+  :radio_buttons => :vertical_radio_and_checkboxes,
+  :file => :vertical_file_input,
+  :boolean => :vertical_boolean}) do |f|
+  = f.input :object_key, :as => :hidden
+
+  = dialog_tag('Depreciation', {:icon => 'fa fa-refresh', :class => "form_part"}) do
+    = f.input :depreciable, :as => :radio_buttons, :label => "Depreciable?"
+    = f.input :depreciation_start_date, :wrapper => :vertical_append, :label => "Depreciation Start Date" do
+      = f.input_field :depreciation_start_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => f.object.depreciation_start_date.strftime("%m-%d-%Y")
+      %span.input-group-addon
+        %i.fa.fa-calendar
+    = f.input :salvage_value, :wrapper=> :vertical_prepend, :label => "Salvage Value" do
+      %span.input-group-addon
+        %i.fa.fa-usd
+  = f.button :submit, 'Update Depreciation', :class => 'btn btn-primary'
+
+:javascript
+
+  // Document Ready
+  $(document).ready(function(){
+    $('[data-behavior~=datepicker]').datepicker({
+      format: "mm-dd-yyyy"
+    });
+  });

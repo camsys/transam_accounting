@@ -4,6 +4,7 @@ require "transam_accounting/transam_accountable"
 require "transam_accounting/transam_accounting_policy"
 require "transam_accounting/transam_gl_accountable_grant"
 require "transam_accounting/transam_gl_accountable_asset"
+require "transam_accounting/transam_accounting_assets_controller"
 
 module TransamAccounting
 
