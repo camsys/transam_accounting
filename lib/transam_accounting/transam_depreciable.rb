@@ -79,41 +79,6 @@ module TransamAccounting
     #
     #------------------------------------------------------------------------------
 
-    # the amount of depreciation for the current accounting period
-    def current_ytd_depreciation
-      # Make sure we are working with a concrete asset class
-      asset = is_typed? ? self : Asset.get_typed_asset(self)
-
-      # see what metric we are using for the depreciated value of the asset
-      class_name = policy.depreciation_calculation_type.class_name
-
-      calculate(asset, policy, class_name, 'current_ytd_depreciation')
-    end
-
-    # the amount of depreciation for the previous accounting period
-    def beginning_ytd_depreciation
-
-      # Make sure we are working with a concrete asset class
-      asset = is_typed? ? self : Asset.get_typed_asset(self)
-
-      # see what metric we are using for the depreciated value of the asset
-      class_name = policy.depreciation_calculation_type.class_name
-
-      calculate(self, policy, class_name, 'beginning_ytd_depreciation')
-    end
-
-    # the amount of accumulated depreciation for the previous accounting period
-    def beginning_accumulated_depreciation
-
-      # Make sure we are working with a concrete asset class
-      asset = is_typed? ? self : Asset.get_typed_asset(self)
-
-      # see what metric we are using for the depreciated value of the asset
-      class_name = policy.depreciation_calculation_type.class_name
-
-      calculate(asset, policy, class_name, 'beginning_accumulated_depreciation')
-    end
-
     def get_depreciation_table
 
       if depreciation_start_date.nil? or current_depreciation_date.nil?
@@ -130,22 +95,31 @@ module TransamAccounting
       calculator_instance = class_name.constantize.new
 
       # get FYs for calculating depreciation
-      # get previous depreciation dates
-      years = (depreciation_start_date.year..current_depreciation_date.year - 1)
-              .to_a
-              .map{ |d| Date.new(d, depreciation_start_date.month, depreciation_start_date.day) }
+      fiscal_years = []
 
-      # add current depreciation date to array of dates
-      years << current_depreciation_date
+      fy = fiscal_year_end_date(depreciation_start_date)
+
+      while fiscal_year_year_on_date(fy) <= fiscal_year_year_on_date(current_depreciation_date)
+        fiscal_years << fy
+        fy = fy + 1.year
+      end
 
       # initialize table of results
       table = Array.new
 
-      years.each do |year|
-        estimated_value = calculator_instance.calculate_on_date(asset, year)
-        depreciated_value = calculator_instance.depreciated_value(asset, year)
+      fiscal_years.each do |year|
+        book_value_start = calculator_instance.book_value_start(asset, year)
+        depreciated_expense = calculator_instance.depreciated_expense(asset, year)
+        book_value_end = calculator_instance.book_value_end(asset,year)
+        accumulated_depreciation = calculator_instance.accumulated_depreciation(asset, year)
 
-        data = { :year => year, :estimated_value => estimated_value, :depreciated_value => depreciated_value }
+        data = {
+          :year => fiscal_year(fiscal_year_year_on_date(year)),
+          :book_value_start => book_value_start,
+          :depreciated_expense => depreciated_expense,
+          :book_value_end => book_value_end,
+          :accumulated_depreciation => accumulated_depreciation
+        }
         table << data
       end
 
