@@ -99,7 +99,8 @@ module TransamAccounting
 
       fy = fiscal_year_end_date(depreciation_start_date)
 
-      while fiscal_year_year_on_date(fy) <= fiscal_year_year_on_date(current_depreciation_date)
+      # get list of past fiscal years not including current_depreciation_date
+      while fiscal_year_year_on_date(fy) <= fiscal_year_year_on_date(current_depreciation_date - 1.years)
         fiscal_years << fy
         fy = fy + 1.year
       end
