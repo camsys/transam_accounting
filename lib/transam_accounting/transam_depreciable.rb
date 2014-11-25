@@ -94,28 +94,41 @@ module TransamAccounting
       # create an instance of this calculator class
       calculator_instance = class_name.constantize.new
 
-      # get FYs for calculating depreciation
-      fiscal_years = []
+      # get date intervals for calculating depreciation
+      date_interval_months = policy.depreciation_interval_type.months
+      intervals = []
 
-      fy = fiscal_year_end_date(depreciation_start_date)
+      if date_interval_months == 12
+        interval = fiscal_year_end_date(depreciation_start_date)
+      else
+        interval = depreciation_start_date.end_of_month
+      end
 
-      # get list of past fiscal years not including current_depreciation_date
-      while fiscal_year_year_on_date(fy) <= fiscal_year_year_on_date(current_depreciation_date - 1.years)
-        fiscal_years << fy
-        fy = fy + 1.year
+      # get list of past date intervals not including current_depreciation_date
+      while interval <= current_depreciation_date - date_interval_months.months
+        intervals << interval
+
+        # get next interval
+        # round to end of month to deal with varying month lengths (ex: Feb)
+        interval = (interval + date_interval_months.months).end_of_month
       end
 
       # initialize table of results
       table = Array.new
 
-      fiscal_years.each do |year|
-        book_value_start = calculator_instance.book_value_start(asset, year)
-        depreciated_expense = calculator_instance.depreciated_expense(asset, year)
-        book_value_end = calculator_instance.book_value_end(asset,year)
-        accumulated_depreciation = calculator_instance.accumulated_depreciation(asset, year)
+      intervals.each do |interval|
+        if date_interval_months == 12
+          timestep = fiscal_year(fiscal_year_year_on_date(interval))
+        else
+          timestep = interval
+        end
+        book_value_start = calculator_instance.book_value_start(asset, interval)
+        depreciated_expense = calculator_instance.depreciated_expense(asset, interval)
+        book_value_end = calculator_instance.book_value_end(asset, interval)
+        accumulated_depreciation = calculator_instance.accumulated_depreciation(asset, interval)
 
         data = {
-          :year => fiscal_year(fiscal_year_year_on_date(year)),
+          :timestep => timestep,
           :book_value_start => book_value_start,
           :depreciated_expense => depreciated_expense,
           :book_value_end => book_value_end,
