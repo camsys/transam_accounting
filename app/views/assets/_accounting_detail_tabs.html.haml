@@ -1,3 +1,7 @@
 %li
-  %a{:href => "#acct", :data =>{:toggle => 'tab'}}
-    Accounting
+  %a{:href => "#depreciation", :data =>{:toggle => 'tab'}}
+    Depreciation
+%li
+  %a{:href => "#expenditures", :data =>{:toggle => 'tab'}}
+    %span.badge.pull-right= @asset.expenditures.count
+    Expenditures

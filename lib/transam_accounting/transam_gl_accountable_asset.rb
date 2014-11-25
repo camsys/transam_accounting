@@ -19,6 +19,7 @@ module TransamAccounting
       # ----------------------------------------------------
 
       has_and_belongs_to_many :general_ledger_accounts
+      has_and_belongs_to_many :expenditures
 
       # ----------------------------------------------------
       # Validations

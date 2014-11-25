@@ -1,3 +1,9 @@
-.tab-pane.fade#acct
+.tab-pane.fade#depreciation
   .tab-content
     = render 'depreciation_table'
+.tab-pane.fade#expenditures
+  .tab-content
+    - if @asset.expenditures.empty?
+      %p There are no expenditures associated with this asset.
+    - else
+      = render :partial => 'expenditures/expenditures_table', :locals => {:expenditures => @asset.expenditures}

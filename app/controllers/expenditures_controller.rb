@@ -1,8 +1,8 @@
 class ExpendituresController < OrganizationAwareController
-  
+
   add_breadcrumb "Home", :root_path
   add_breadcrumb "Expenditures", :expenditures_path
-  
+
   before_action :set_expenditure, only: [:show, :edit, :update, :destroy]
 
   # Session Variables
@@ -14,23 +14,23 @@ class ExpendituresController < OrganizationAwareController
     # Start to set up the query
     conditions  = []
     values      = []
-    
+
     # Limit to the org
     conditions << 'organization_id = ?'
     values << @organization.id
-    
-    @expenditure_type_id = params[:type]
-    unless @expenditure_type_id.blank?
-      @expenditure_type_id = @expenditure_type_id.to_i
-      conditions << 'expenditure_type_id = ?'
-      values << @expenditure_type_id
-      
-      expenditure_type = ExpenditureType.find(@expenditure_type_id)
-      add_breadcrumb expenditure_type, expenditures_path(:type => expenditure_type)
-      
+
+    @expense_type_id = params[:type]
+    unless @expense_type_id.blank?
+      @expense_type_id = @expense_type_id.to_i
+      conditions << 'expense_type_id = ?'
+      values << @expense_type_id
+
+      expense_type = ExpenditureType.find(@expense_type_id)
+      add_breadcrumb expense_type, expenditures_path(:type => expense_type)
+
     end
-    
-    @expenditures = Expenditure.where(conditions.join(' AND '), *values) 
+
+    @expenditures = Expenditure.where(conditions.join(' AND '), *values)
 
     # cache the expenditure ids in case we need them later
     cache_list(@expenditures, INDEX_KEY_LIST_VAR)
@@ -40,14 +40,14 @@ class ExpendituresController < OrganizationAwareController
   # GET /expenditures/1
   def show
 
-    add_breadcrumb @expenditure.expenditure_type, expenditures_path(:type => @expenditure.expenditure_type)
+    add_breadcrumb @expenditure.expense_type, expenditures_path(:type => @expenditure.expense_type)
     add_breadcrumb @expenditure
 
     # get the @prev_record_path and @next_record_path view vars
     get_next_and_prev_object_keys(@expenditure, INDEX_KEY_LIST_VAR)
     @prev_record_path = @prev_record_key.nil? ? "#" : expenditure_path(@prev_record_key)
     @next_record_path = @next_record_key.nil? ? "#" : expenditure_path(@next_record_key)
-    
+
   end
 
   # GET /expenditures/new

@@ -14,4 +14,4 @@
           %p No expenses found
         - else
           .col-md-12
-            = render 'expenditures_table', :locals => {:expenditures => @expenditures}
+            = render :partial => 'expenditures_table', :locals => {:expenditures => @expenditures}
