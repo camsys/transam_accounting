@@ -37,21 +37,21 @@ class Expenditure < ActiveRecord::Base
 
   # Every expenditure must be associated with an expense type
   belongs_to :expense_type
-  
+
   # Every expenditure can be associated with one or more assets
   has_and_belongs_to_many :assets
 
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
-  
+
   validates :general_ledger_account,    :presence => true
   validates :organization,              :presence => true
   #validates :grant,                     :presence => true
   validates :expense_type,              :presence => true
   validates :expense_date,              :presence => true
   validates :description,               :presence => true
-  validates :amount,                    :allow_nil => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
+  validates :amount,                    :allow_nil => true, :numericality => {:only_integer => :true}
   validates :pcnt_from_grant,           :allow_nil => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
 
   # List of hash parameters specific to this class that are allowed by the controller
@@ -85,7 +85,7 @@ class Expenditure < ActiveRecord::Base
   def to_s
     name
   end
-  
+
   def name
     "#{expense_type}: $#{amount}"
   end
@@ -96,11 +96,11 @@ class Expenditure < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
   protected
-  
+
   # Set resonable defaults for a suppoert facility
   def set_defaults
     self.amount ||= 0
     self.pcnt_from_grant ||= 0
-  end    
+  end
 
 end
