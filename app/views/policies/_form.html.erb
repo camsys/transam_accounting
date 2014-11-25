@@ -1,7 +1,7 @@
 <div class="row">
-  <%= simple_form_for(@policy, 
-    :html => {:class => 'form-horizontal' },  
-    :wrapper => :horizontal_form, 
+  <%= simple_form_for(@policy,
+    :html => {:class => 'form-horizontal' },
+    :wrapper => :horizontal_form,
     :wrapper_mappings => {:check_boxes => :horizontal_radio_and_checkboxes, :radio_buttons => :horizontal_radio_and_checkboxes, :file => :horizontal_file_input, :boolean => :horizontal_boolean}
     ) do |f| %>
     <div class="col-md-6">
@@ -19,6 +19,7 @@
         <%= f.association :condition_estimation_type, :label => "Condition Estimator", :prompt => "Select..." %>
         <%= f.input :condition_threshold, :label => "Condition Threshold" %>
         <%= f.association :depreciation_calculation_type, :label => "Depreciation Calculator", :prompt => "Select..." %>
+        <%= f.association :depreciation_interval_type, :label => "Depreciation Interval", :prompt => "Select..." %>
       <% end %>
     </div>
     <div class="col-md-12">

@@ -29,7 +29,13 @@ depreciation_calculation_types = [
   {:active => 1, :name => 'Declining Balance',  :class_name => "DecliningBalanceDepreciationCalculator",  :description => 'Calculates the value of an asset using a double declining balance depreciation method.'}
 ]
 
-lookup_tables = %w{ general_ledger_account_types depreciation_calculation_types }
+depreciation_interval_types = [
+  {:active => 1, :name => 'Yearly', :description => 'Depreciation calculated by fiscal year.', :months => 12},
+  {:active => 1, :name => 'Quarterly', :description => 'Depreciation calculated quarterly.', :months => 3},
+  {:active => 1, :name => 'Monthly', :description => 'Depreciation calculated monthly.', :months => 1}
+]
+
+lookup_tables = %w{ general_ledger_account_types depreciation_calculation_types depreciation_interval_types}
 
 lookup_tables.each do |table_name|
   puts "  Loading #{table_name}"
