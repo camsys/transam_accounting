@@ -18,9 +18,9 @@
           %td.right= gl_budget.general_ledger_account.account_number
           %td.right= gl_budget.general_ledger_account.general_ledger_account_type.name
           %td.right= format_as_currency(gl_budget.amount) unless gl_budget.amount.nil?
+    %tfoot
       %tr
         %td{:colspan => 3}
         %td.right= format_as_currency(total)
-
 
   = render :partial => 'shared/datatable_javascript', :locals => {:id => 'grants_datatable'}

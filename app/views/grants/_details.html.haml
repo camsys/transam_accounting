@@ -1,5 +1,3 @@
-:ruby
-  @assets = @grant.assets
 %ul.nav.nav-tabs
   %li
     %a{:href => "#gla", :data =>{:toggle => 'tab'}}
@@ -18,12 +16,14 @@
   .tab-pane.fade#gla
     .tab-content
       = render :partial => 'gla_table', :locals => {:gla_budgets => @grant.grant_budgets}
+      
   .tab-pane.fade#assets
     .tab-content
       - if @grant.assets.empty?
         %p There are no assets associated with this grant.
       - else
         = render :partial => 'assets/asset_datatable', :locals => {:assets => @grant.assets}
+        
   .tab-pane.fade#expenditures
     .tab-content
       - if @grant.expenditures.empty?
