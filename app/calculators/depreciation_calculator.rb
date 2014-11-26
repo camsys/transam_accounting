@@ -46,7 +46,7 @@ class DepreciationCalculator < Calculator
   end
 
   def book_value_start(asset, fiscal_year_date)
-    calculate_on_date(asset, fiscal_year_date - 1.year)
+    calculate_on_date(asset, [asset.depreciation_start_date,fiscal_year_date - 1.year].max)
   end
 
   def book_value_end(asset, fiscal_year_date)
