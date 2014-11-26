@@ -10,6 +10,13 @@ namespace :transam_accounting do
       Rake::Task[cmd].invoke
     end
   end
+
+  desc "Updates the book value of every asset"
+  task update_book_value: :environment do
+    Asset.all.each do |a|
+      a.update_book_value
+    end
+  end
 end
 
 namespace :test do
