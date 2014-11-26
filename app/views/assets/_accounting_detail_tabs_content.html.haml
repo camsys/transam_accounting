@@ -1,6 +1,7 @@
-.tab-pane.fade#depreciation
-  .tab-content
-    = render 'depreciation_table'
+- if @asset.depreciable
+  .tab-pane.fade#depreciation
+    .tab-content
+      = render 'depreciation_table'
 .tab-pane.fade#expenditures
   .tab-content
     - if @asset.expenditures.empty?

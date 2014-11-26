@@ -145,11 +145,20 @@ module TransamAccounting
       return table
     end
 
+    # Forces an update of an assets book value. This performs an update on the record
+    def update_book_value(policy = nil)
+
+      # can't do this if it is a new record as none of the IDs would be set
+      unless new_record?
+        update_asset_book_value(policy)
+      end
+    end
+
     protected
 
       # updates the estimated value of an asset
-      def update_asset_value(policy = nil)
-        Rails.logger.info "Updating estimated value for asset = #{object_key}"
+      def update_asset_book_value(policy = nil)
+        Rails.logger.info "Updating book value for asset = #{object_key}"
 
         # Make sure we are working with a concrete asset class
         asset = is_typed? ? self : Asset.get_typed_asset(self)
@@ -166,29 +175,9 @@ module TransamAccounting
         begin
           # see what metric we are using to determine the service life of the asset
           class_name = policy.depreciation_calculation_type.class_name
-          asset.estimated_value = calculate(asset, policy, class_name)
+          asset.book_value = calculate(asset, policy, class_name)
           # save changes to this asset
           asset.save
-        rescue Exception => e
-          Rails.logger.warn e.message
-        end
-      end
-
-      # Update the asset depreciation model
-      def update_asset_depreciated_state(policy = nil)
-        # Update the depreciated and salvage value
-        begin
-          # Make sure we are working with a concrete asset class
-          asset = is_typed? ? self : Asset.get_typed_asset(self)
-
-          # see what metric we are using for the depreciated value of the asset
-          class_name = policy.depreciation_calculation_type.class_name
-
-          # caches depreciated value as an integer
-          asset.book_value = calculate(asset, policy, class_name, 'depreciated_value').round(0)
-
-          # caches residual value as an integer
-          asset.salvage_value = calculate(asset, policy, class_name).round(0)
         rescue Exception => e
           Rails.logger.warn e.message
         end
@@ -202,10 +191,10 @@ module TransamAccounting
 
         self.current_depreciation_date ||= fiscal_year_end_date(Date.today)
 
-        self.book_value ||= 0
+        self.book_value ||= self.purchase_cost.nil? ? 0 : self.purchase_cost
         self.salvage_value ||= 0
         self.replacement_value ||= 0
-        self.depreciable ||= true
+        self.depreciable = true if new_record?
 
       end
 

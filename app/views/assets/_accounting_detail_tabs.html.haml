@@ -1,6 +1,7 @@
-%li
-  %a{:href => "#depreciation", :data =>{:toggle => 'tab'}}
-    Depreciation
+- if @asset.depreciable
+  %li
+    %a{:href => "#depreciation", :data =>{:toggle => 'tab'}}
+      Depreciation
 %li
   %a{:href => "#expenditures", :data =>{:toggle => 'tab'}}
     %span.badge.pull-right= @asset.expenditures.count
