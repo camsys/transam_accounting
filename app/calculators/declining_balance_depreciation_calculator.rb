@@ -13,26 +13,26 @@ class DecliningBalanceDepreciationCalculator < DepreciationCalculator
   def calculate_on_date(asset,on_date)
 
     # depreciation time
-    num_years = asset.policy_rule.max_service_life_years
+    num_months = asset.policy_rule.max_service_life_months
 
-    # Age of the asset
-    asset_age = asset.age(on_date)
+    # Depreciation months of the asset
+    depreciation_months = asset.depreciation_months(on_date)
 
-    Rails.logger.debug "Age = #{asset_age}, max service life = #{num_years}"
+    Rails.logger.debug "Depreciation months = #{depreciation_months}, max service life months = #{num_months}"
     # calculate the annual depreciation rate. This is double the actual depreciation rate
-    depreciation_rate = (1 / num_years.to_f) * 2
+    depreciation_rate = (1 / num_months.to_f) * 2
     rv = salvage_value(asset)
     v  = purchase_cost(asset)
     Rails.logger.debug "purchase cost = #{v}, residual value = #{rv} depreciation_rate = #{depreciation_rate}"
 
-    if asset_age < 1
+    if depreciation_months < 1
       return v
     end
 
     # calculate the value of the asset at the end of each year
-    (1..asset_age).each do |year|
+    (1..depreciation_months).each do |month|
       v -= (v * depreciation_rate)
-      Rails.logger.debug "year = #{year}, value = #{v}"
+      Rails.logger.debug "month = #{month}, value = #{v}"
       # if the value drops below the residual value then the depreciation stops
       break if v < rv
     end
