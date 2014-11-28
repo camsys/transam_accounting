@@ -21,7 +21,8 @@
       - if @ledger_account.assets.empty?
         %p There are no assets associated with this general ledger account.
       - else
-        = render :partial => 'assets/asset_datatable', :locals => {:assets => @ledger_account.assets}
+        = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => @ledger_account.assets}
+        
   .tab-pane.fade#expenditures
     .tab-content
       - if @ledger_account.expenditures.empty?
