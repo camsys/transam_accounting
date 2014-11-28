@@ -38,6 +38,9 @@ class Expenditure < ActiveRecord::Base
   # Every expenditure must be associated with an expense type
   belongs_to :expense_type
 
+  # each was puchased from a vendor
+  belongs_to :vendor
+
   # Every expenditure can be associated with one or more assets
   has_and_belongs_to_many :assets
 
