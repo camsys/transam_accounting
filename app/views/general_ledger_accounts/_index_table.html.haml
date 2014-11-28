@@ -1,7 +1,7 @@
 - if gl_accounts.empty?
   %p There are no grants associated with this account.
 -else
-  %table.table.table-hover#datatable
+  %table.table.table-hover#gl_datatable
     %thead
       %tr
         %th.left Name
@@ -15,4 +15,4 @@
           %td.right= a.account_number
           %td.right= a.general_ledger_account_type.name
 
-  = render 'shared/datatable_javascript'
+  = render :partial => 'shared/datatable_javascript', :locals => {:id => 'gl_datatable'}
