@@ -27,4 +27,7 @@ Rails.configuration.to_prepare do
   Policy.class_eval do
     include TransamAccounting::TransamAccountingPolicy
   end
+  Vendor.class_eval do
+    include TransamAccounting::TransamAccountingVendor
+  end
 end

@@ -49,7 +49,7 @@ module TransamAccounting
       asset = Asset.find_by_object_key(proxy.object_key)
 
       # reformat date
-      asset.depreciation_start_date = reformat_depreciation_date(proxy.depreciation_start_date) if proxy.depreciation_start_date
+      asset.depreciation_start_date = reformat_date(proxy.depreciation_start_date) if proxy.depreciation_start_date
 
       asset.depreciable = proxy.depreciable
       asset.salvage_value = proxy.salvage_value if proxy.salvage_value
@@ -64,10 +64,7 @@ module TransamAccounting
     end
 
     private
-      def reformat_depreciation_date(date_str)
-        form_date = Date.strptime(date_str, '%m-%d-%Y')
-        return form_date.strftime('%Y-%m-%d')
-      end
+
 
   end
 end
