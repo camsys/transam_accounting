@@ -36,7 +36,7 @@ module TransamAccounting
 
       add_breadcrumb "#{@asset.asset_type.name}".pluralize(2), inventory_index_path
       add_breadcrumb @asset.name, inventory_path(@asset)
-      add_breadcrumb "Modify Depreciation", edit_depreciation_inventory_path(@asset)
+      add_breadcrumb "Update depreciation data", edit_depreciation_inventory_path(@asset)
 
       @proxy = AssetDepreciableProxy.new
       @proxy.set_defaults(@asset)
