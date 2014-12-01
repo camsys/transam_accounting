@@ -45,7 +45,6 @@ module TransamAccounting
 
     def update_depreciation
       proxy = AssetDepreciableProxy.new(params[:asset_depreciable_proxy])
-      Rails.logger.debug "PROXPROX"+proxy.inspect
       asset = Asset.find_by_object_key(proxy.object_key)
 
       # reformat date
