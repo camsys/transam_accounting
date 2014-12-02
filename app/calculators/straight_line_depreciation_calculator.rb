@@ -13,7 +13,7 @@ class StraightLineDepreciationCalculator < DepreciationCalculator
   def calculate_on_date(asset,on_date)
 
     # depreciation time
-    num_months = asset.asset_or_policy_useful_life_months
+    num_months = asset.expected_useful_life.nil? asset.policy_rule.max_service_life_months : asset.expected_useful_life
 
     # calcuate the depreciation
     monthly_depreciation = total_depreciation(asset) / num_months.to_f
