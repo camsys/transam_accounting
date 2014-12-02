@@ -52,6 +52,15 @@ module TransamAccounting
       # Validations
       #----------------------------------------------------
 
+      #----------------------------------------------------
+      # Lists
+      #----------------------------------------------------
+
+      UPDATE_METHODS = [
+        :update_book_value
+      ]
+
+
       alias_attribute :replacement_value, :estimated_replacement_cost
 
       validates  :depreciation_start_date,    :presence => true
@@ -143,6 +152,12 @@ module TransamAccounting
       end
 
       return table
+    end
+
+    # This would normally run super, but it gets added to Asset.  Since there are no TransAM classes
+    # above it, it just returns its own UPDATE_METHODS
+    def update_methods
+      UPDATE_METHODS
     end
 
     # Forces an update of an assets book value. This performs an update on the record
