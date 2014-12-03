@@ -90,7 +90,7 @@ class Expenditure < ActiveRecord::Base
   end
 
   def name
-    "#{expense_type}: $#{amount}"
+    description
   end
 
   #------------------------------------------------------------------------------
