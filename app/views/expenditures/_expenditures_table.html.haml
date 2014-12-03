@@ -19,6 +19,7 @@
         %td.left= e.expense_type
         %td.left= format_as_date(e.expense_date)
         %td.left= e.description
+        %td.left= link_to(e.vendor, vendor_path(e.vendor)) unless e.vendor.nil?
         %td.right= format_as_currency(e.amount)
         %td.left= e.grant unless e.grant.nil?
         %td.right= format_as_percentage(e.pcnt_from_grant) unless e.grant.nil?

@@ -14,6 +14,8 @@ module TransamAccounting
 
     included do
 
+      include FiscalYear
+
       #------------------------------------------------------------------------------
       # Callbacks
       #------------------------------------------------------------------------------
@@ -45,6 +47,14 @@ module TransamAccounting
     # Instance Methods
     #
     #------------------------------------------------------------------------------
+
+    # return expenditures in the current fiscal year
+    def expenditures_ytd
+      # get end of last fiscal year
+      last_fy_end = fiscal_year_end_date(Date.today - 1.year)
+
+      expenditures.where("expense_date > ?", last_fy_end)
+    end
 
     protected
 
