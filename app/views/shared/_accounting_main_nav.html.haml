@@ -8,27 +8,34 @@
 
     %li.text-left.dropdown-submenu
       = link_to general_ledger_accounts_path do
-        %i.fa.fa-usd.fa-fw
+        %i.fa.fa-book.fa-fw
         Chart of Accounts
 
       %ul.dropdown-menu
         - GeneralLedgerAccountType.all.each do |account_type|
           %li.text-left
             = link_to general_ledger_accounts_path(:type => account_type) do
-              %i.fa.fa-fw.fa-tag
+              %i.fa.fa-fw.fa-book
               = account_type
 
     %li.divider
     %li.text-left
       = link_to grants_path do
-        %i.fa.fa-fw.fa-tag
+        %i.fa.fa-fw.fa-legal
         = ' Grants'
 
     %li.divider
-    %li.text-left
+    %li.text-left.dropdown-submenu
       = link_to expenditures_path do
-        %i.fa.fa-fw.fa-tag
+        %i.fa.fa-fw.fa-usd
         = ' Expenditures'
+
+      %ul.dropdown-menu
+        - ExpenseType.all.each do |type|
+          %li.text-left
+            = link_to expenditures_path(:type => type) do
+              %i.fa.fa-fw.fa-usd
+              = type
 
     %li.divider
     %li.text-left
