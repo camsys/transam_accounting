@@ -4,7 +4,7 @@
     %br
     Accounting
     %b.caret
-  %ul.dropdown-menu.multi-level{:role => 'menu'}      
+  %ul.dropdown-menu.multi-level{:role => 'menu'}
 
     %li.text-left.dropdown-submenu
       = link_to general_ledger_accounts_path do
@@ -19,10 +19,17 @@
               = account_type
 
     %li.divider
-    %li.text-left
+    %li.text-left.dropdown-submenu
       = link_to grants_path do
         %i.fa.fa-fw.fa-legal
         = ' Grants'
+
+      %ul.dropdown-menu
+        - FundingSource.all.each do |funding_source|
+          %li.text-left
+            = link_to grants_path(:funding_source_id => funding_source.id) do
+              %i.fa.fa-fw.fa-legal
+              = funding_source
 
     %li.divider
     %li.text-left.dropdown-submenu
