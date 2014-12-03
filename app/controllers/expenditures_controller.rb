@@ -25,7 +25,7 @@ class ExpendituresController < OrganizationAwareController
       conditions << 'expense_type_id = ?'
       values << @expense_type_id
 
-      expense_type = ExpenditureType.find(@expense_type_id)
+      expense_type = ExpenseType.find(@expense_type_id)
       add_breadcrumb expense_type, expenditures_path(:type => expense_type)
 
     end
