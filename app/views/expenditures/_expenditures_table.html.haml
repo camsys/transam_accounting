@@ -11,15 +11,22 @@
       %th.right Grant %
 
   %tbody
-    - expenditures.each do |e|      
+    - sum_expenditures = 0
+    - expenditures.each do |e|
+      - sum_expenditures += e.amount
       %tr.popup-details{:data => {:action_path => expenditure_path(e)}}
         %td.left= e.general_ledger_account
         %td.left= e.expense_type
         %td.left= format_as_date(e.expense_date)
         %td.left= e.description
-        %td.left= link_to(e.vendor, vendor_path(e.vendor)) unless e.vendor.nil?
+        %td.right= format_as_currency(e.amount)
         %td.right= format_as_currency(e.amount)
         %td.left= e.grant unless e.grant.nil?
         %td.right= format_as_percentage(e.pcnt_from_grant) unless e.grant.nil?
+  %tfoot
+    %tr
+      %td{:colspan => 4}
+      %td.right= format_as_currency(sum_expenditures)
+      %td{:colspan => 2}
 
 = render :partial => 'shared/datatable_javascript', :locals => {:id => 'expenditures_table'}
