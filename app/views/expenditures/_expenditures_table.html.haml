@@ -5,6 +5,7 @@
       %th.left Category
       %th.left Date
       %th.left Expense
+      %th.left Vendor
       %th.right Amount
       %th.left Grant
       %th.right Grant %
@@ -16,8 +17,9 @@
         %td.left= e.expense_type
         %td.left= format_as_date(e.expense_date)
         %td.left= e.description
-        %td.right= format_as_integer(e.amount)
+        %td.left= link_to(e.vendor, vendor_path(e.vendor)) unless e.vendor.nil?
+        %td.right= format_as_currency(e.amount)
         %td.left= e.grant unless e.grant.nil?
         %td.right= format_as_percentage(e.pcnt_from_grant) unless e.grant.nil?
 
-= render 'shared/datatable_javascript'
+= render :partial => 'shared/datatable_javascript', :locals => {:id => 'expenditures_table'}
