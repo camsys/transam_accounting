@@ -104,6 +104,7 @@ class Expenditure < ActiveRecord::Base
   def set_defaults
     self.amount ||= 0
     self.pcnt_from_grant ||= 0
+    self.expense_date ||= Date.today
   end
 
 end
