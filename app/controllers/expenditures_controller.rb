@@ -1,5 +1,8 @@
 class ExpendituresController < OrganizationAwareController
 
+  # Include the fiscal year mixin
+  include FiscalYear
+
   add_breadcrumb "Home", :root_path
   add_breadcrumb "Expenditures", :expenditures_path
 
@@ -11,6 +14,10 @@ class ExpendituresController < OrganizationAwareController
   # GET /expenditures
   def index
 
+    # get range of fiscal years of all expenditures
+    min_date = Expenditure.minimum(:expense_date)
+    @fiscal_years = get_fiscal_years(min_date)
+
     # Start to set up the query
     conditions  = []
     values      = []
@@ -18,6 +25,13 @@ class ExpendituresController < OrganizationAwareController
     # Limit to the org
     conditions << 'organization_id = ?'
     values << @organization.id
+
+    @general_ledger_account_id = params[:general_ledger_account_id]
+    unless @general_ledger_account_id.blank?
+      @general_ledger_account_id = @general_ledger_account_id.to_i
+      conditions << 'general_ledger_account_id = ?'
+      values << @general_ledger_account_id
+    end
 
     @expense_type_id = params[:type]
     unless @expense_type_id.blank?
@@ -27,6 +41,27 @@ class ExpendituresController < OrganizationAwareController
 
       expense_type = ExpenseType.find(@expense_type_id)
       add_breadcrumb expense_type, expenditures_path(:type => expense_type)
+    end
+
+    @vendor_id = params[:vendor_id]
+    unless @vendor_id.blank?
+      @vendor_id = @vendor_id.to_i
+      conditions << 'vendor_id = ?'
+      values << @vendor_id
+    end
+
+    @fiscal_year = params[:fiscal_year]
+    unless @fiscal_year.blank?
+      @fiscal_year = @fiscal_year.to_i
+
+      date_str = "#{SystemConfig.instance.start_of_fiscal_year}-#{@fiscal_year}"
+      start_date = Date.strptime(date_str, "%m-%d-%Y")
+      end_date = start_date + 1.year
+
+      conditions << 'expense_date >= ?'
+      values << start_date
+      conditions << 'expense_date < ?'
+      values << end_date
 
     end
 
