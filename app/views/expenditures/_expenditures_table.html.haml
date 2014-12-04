@@ -12,7 +12,7 @@
 
   %tbody
     - sum_expenditures = 0
-    - expenditures.each do |e|
+    - expenditures.includes(:general_ledger_account, :expense_type, :vendor, :grant).each do |e|
       - sum_expenditures += e.amount
       %tr.popup-details{:data => {:action_path => expenditure_path(e)}}
         %td.left= e.general_ledger_account
