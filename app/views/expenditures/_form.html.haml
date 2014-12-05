@@ -5,14 +5,14 @@
   :radio_buttons => :vertical_radio_and_checkboxes,
   :file => :vertical_file_input,
   :boolean => :vertical_boolean}) do |f|
-  = f.input :description
+  = f.input :description, :label => 'Expense'
 
   = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
     %span.input-group-addon
       %i.fa.fa-usd
     = f.input_field :amount, :class => "form-control"
 
-  = f.association :expense_type, :label => 'Expense Type'
+  = f.association :expense_type, :label => 'Category'
 
   = f.input :expense_date, :wrapper => :vertical_append, :label => "Expense Date" do
     = f.input_field :expense_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => f.object.expense_date.strftime("%m-%d-%Y")
