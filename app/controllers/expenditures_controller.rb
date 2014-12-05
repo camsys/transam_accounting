@@ -88,15 +88,22 @@ class ExpendituresController < OrganizationAwareController
   # GET /expenditures/new
   def new
     @expenditure = Expenditure.new
+
+    add_breadcrumb "New expenditure", new_expenditure_path(@expenditure)
   end
 
   # GET /expenditures/1/edit
   def edit
+    add_breadcrumb @expenditure.expense_type, expenditures_path(:type => @expenditure.expense_type)
+    add_breadcrumb @expenditure, expenditure_path(@expenditure)
+    add_breadcrumb 'Update expenditure', edit_expenditure_path(@expenditure)
   end
 
   # POST /expenditures
   def create
+
     @expenditure = Expenditure.new(expenditure_params)
+    @expenditure.organization = @organization
 
     if @expenditure.save
       redirect_to @expenditure, notice: 'Expenditure was successfully created.'
@@ -107,6 +114,7 @@ class ExpendituresController < OrganizationAwareController
 
   # PATCH/PUT /expenditures/1
   def update
+
     if @expenditure.update(expenditure_params)
       redirect_to @expenditure, notice: 'Expenditure was successfully updated.'
     else

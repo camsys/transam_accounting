@@ -1,34 +1,30 @@
-.row
-  = simple_form_for(@expenditure,
-  :html => {:class => 'form-vertical'},
-  :wrapper => :vertical_form,
-  :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes,
-    :radio_buttons => :vertical_radio_and_checkboxes,
-    :file => :vertical_file_input,
-    :boolean => :vertical_boolean}) do |f|
-    .col-md-6.col-md-offset-3
-      %fieldset
-        %legend New Expense
-        = f.input :description
+= simple_form_for(@expenditure,
+:html => {:class => 'form-vertical'},
+:wrapper => :vertical_form,
+:wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes,
+  :radio_buttons => :vertical_radio_and_checkboxes,
+  :file => :vertical_file_input,
+  :boolean => :vertical_boolean}) do |f|
+  = f.input :description
 
-        = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
-          %span.input-group-addon
-            %i.fa.fa-usd
-          = f.input_field :amount, :class => "form-control"
+  = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
+    %span.input-group-addon
+      %i.fa.fa-usd
+    = f.input_field :amount, :class => "form-control"
 
-        = f.association :expense_type, :label => 'Expense Type'
+  = f.association :expense_type, :label => 'Expense Type'
 
-        = f.input :expense_date, :wrapper => :vertical_append, :label => "Expense Date" do
-          = f.input_field :expense_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => f.object.expense_date.strftime("%m-%d-%Y")
-          %span.input-group-addon
-            %i.fa.fa-calendar
+  = f.input :expense_date, :wrapper => :vertical_append, :label => "Expense Date" do
+    = f.input_field :expense_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => f.object.expense_date.strftime("%m-%d-%Y")
+    %span.input-group-addon
+      %i.fa.fa-calendar
 
-        = f.association :general_ledger_account, :label => 'General Ledger Account'
-        = f.association :grant, :label => 'Grant'
+  = f.association :general_ledger_account, :label => 'General Ledger Account'
+  = f.association :grant, :label => 'Grant'
 
-        = f.input :pcnt_from_grant, :wrapper => :vertical_append, :label => "Percent From Grant" do
-          = f.input :pcnt_from_grant, :class => 'form-control', :input_html => {:max => 100, :min => 0, :class => "at-least-one"}, :label => false
-          %span.input-group-addon
-            = '%'
+  = f.input :pcnt_from_grant, :wrapper => :vertical_append, :label => "Percent From Grant" do
+    = f.input :pcnt_from_grant, :class => 'form-control', :input_html => {:max => 100, :min => 0, :class => "at-least-one"}, :label => false
+    %span.input-group-addon
+      = '%'
 
-        = f.button :submit, :class => 'btn btn-primary'
+  = f.button :submit, :class => 'btn btn-primary'
