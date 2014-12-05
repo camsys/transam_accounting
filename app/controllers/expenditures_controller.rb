@@ -89,14 +89,14 @@ class ExpendituresController < OrganizationAwareController
   def new
     @expenditure = Expenditure.new
 
-    add_breadcrumb "New expenditure", new_expenditure_path(@expenditure)
+    add_breadcrumb "New", new_expenditure_path(@expenditure)
   end
 
   # GET /expenditures/1/edit
   def edit
     add_breadcrumb @expenditure.expense_type, expenditures_path(:type => @expenditure.expense_type)
     add_breadcrumb @expenditure, expenditure_path(@expenditure)
-    add_breadcrumb 'Update expenditure', edit_expenditure_path(@expenditure)
+    add_breadcrumb 'Update', edit_expenditure_path(@expenditure)
   end
 
   # POST /expenditures
