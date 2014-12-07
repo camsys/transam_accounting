@@ -28,7 +28,7 @@
     - if @proxy.respond_to?(:expected_useful_miles) && @proxy.expected_useful_miles
       = f.input :expected_useful_miles, :label => "Expected Useful Miles",  :collection => get_max_useful_miles_collection
 
-  = f.button :submit, 'Update Depreciation', :class => 'btn btn-primary'
+    = f.button :submit, 'Update Depreciation', :class => 'btn btn-primary'
 
 :javascript
 
