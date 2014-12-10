@@ -190,7 +190,8 @@ module TransamAccounting
         begin
           # see what metric we are using to determine the service life of the asset
           class_name = policy.depreciation_calculation_type.class_name
-          asset.book_value = calculate(asset, policy, class_name)
+          book_value = calculate(asset, policy, class_name)
+          asset.book_value = book_value.to_i
           # save changes to this asset
           asset.save
         rescue Exception => e
