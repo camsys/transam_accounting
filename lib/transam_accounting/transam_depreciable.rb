@@ -41,7 +41,7 @@ module TransamAccounting
       #------------------------------------------------------------------------------
       # Callbacks
       #------------------------------------------------------------------------------
-      after_initialize  :set_depreciation_defaults
+      before_validation  :set_depreciation_defaults
 
       #----------------------------------------------------
       # Associations
@@ -200,10 +200,10 @@ module TransamAccounting
 
       # Set resonable defaults for a new asset
       def set_depreciation_defaults
-        if self.depreciation_start_date.nil?
-          self.depreciation_start_date = self.purchase_date.nil? ? Date.today : self.purchase_date
+        if self.in_service_date.nil?
+          self.in_service_date = self.purchase_date.nil? ? Date.today : self.purchase_date
         end
-
+        self.depreciation_start_date ||= self.in_service_date
         self.current_depreciation_date ||= fiscal_year_end_date(Date.today)
 
         self.book_value ||= self.purchase_cost.nil? ? 0 : self.purchase_cost
