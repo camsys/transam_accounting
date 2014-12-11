@@ -7,6 +7,7 @@ class ExpendituresController < OrganizationAwareController
   add_breadcrumb "Expenditures", :expenditures_path
 
   before_action :set_expenditure, only: [:show, :edit, :update, :destroy]
+  before_action :reformat_date_field, only: [:create, :update]
 
   # Session Variables
   INDEX_KEY_LIST_VAR        = "expenditures_list_cache_var"
@@ -138,4 +139,11 @@ class ExpendituresController < OrganizationAwareController
     def expenditure_params
       params.require(:expenditure).permit(Expenditure.allowable_params)
     end
+
+    def reformat_date_field
+      date_str = params[:expenditure][:expense_date]
+      form_date = Date.strptime(date_str, '%m-%d-%Y')
+      params[:expenditure][:expense_date] = form_date.strftime('%Y-%m-%d')
+    end
+
 end
