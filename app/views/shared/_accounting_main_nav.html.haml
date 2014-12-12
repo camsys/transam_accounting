@@ -27,9 +27,10 @@
       %ul.dropdown-menu
         - FundingSource.all.each do |funding_source|
           %li.text-left
-            = link_to grants_path(:funding_source_id => funding_source.id) do
-              %i.fa.fa-fw.fa-legal
-              = funding_source
+            - if @organization.grants.where(:funding_source_id => funding_source.id).count > 0
+              = link_to grants_path(:funding_source_id => funding_source.id) do
+                %i.fa.fa-fw.fa-legal
+                = funding_source
 
     %li.divider
     %li.text-left.dropdown-submenu

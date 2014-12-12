@@ -11,25 +11,28 @@
 #
 ###############################################################################
 Rails.configuration.to_prepare do
-  
+
   Asset.class_eval do
     include TransamAccounting::TransamDepreciable
     include TransamAccounting::TransamGlAccountableAsset
   end
-  
+
   AssetsController.class_eval do
     include TransamAccounting::TransamAccountingAssetsController
   end
-  
+
   Organization.class_eval do
     include TransamAccounting::TransamAccountable
   end
-  
+
   Policy.class_eval do
     include TransamAccounting::TransamAccountingPolicy
   end
-  
+
   Vendor.class_eval do
     include TransamAccounting::TransamAccountingVendor
+  end
+  Grant.class_eval do
+    include TransamAccounting::TransamGlAccountableGrant
   end
 end

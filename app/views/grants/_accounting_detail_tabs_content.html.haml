@@ -1,0 +1,10 @@
+.tab-pane.fade#gla
+  .tab-content
+    = render :partial => 'gla_table', :locals => {:gla_budgets => @grant.grant_budgets}
+
+.tab-pane.fade#expn
+  .tab-content
+    - if @grant.expenditures.empty?
+      %p There are no expenditures associated with this grant.
+    - else
+      = render :partial => 'expenditures/expenditures_table', :locals => {:expenditures => @grant.expenditures}

@@ -1,0 +1,8 @@
+%li
+  %a{:href => "#gla", :data =>{:toggle => 'tab'}}
+    %span.badge.pull-right= @grant.general_ledger_accounts.count
+    = "GL Accounts"
+%li
+  %a{:href => "#expn", :data =>{:toggle => 'tab'}}
+    %span.badge.pull-right= @grant.expenditures.count
+    = "Expenditures"
