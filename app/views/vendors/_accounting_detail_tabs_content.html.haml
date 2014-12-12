@@ -1,0 +1,10 @@
+.tab-pane.fade#summ
+  .tab-content
+    = render 'vendor_to_date'
+
+.tab-pane.fade#expn
+  .tab-content
+    - if @vendor.expenditures.empty?
+      %p There are no expenditures associated with this vendor.
+    - else
+      = render :partial => 'expenditures/expenditures_table', :locals => {:expenditures => @vendor.expenditures}

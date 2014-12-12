@@ -1,0 +1,4 @@
+= format_field("Number of Expenditures YTD", format_as_integer(@vendor.expenditures_ytd.count) )
+= format_field("Total Expenditures YTD", format_as_currency(@vendor.expenditures_ytd.sum(:amount)) )
+= format_field("Number of Expenditures", format_as_integer(@vendor.expenditures.count) )
+= format_field("Total Expenditures", format_as_currency(@vendor.expenditures.sum(:amount)) )
