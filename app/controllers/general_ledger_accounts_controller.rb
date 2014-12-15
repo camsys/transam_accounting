@@ -6,7 +6,7 @@ class GeneralLedgerAccountsController < OrganizationAwareController
   # Set the @chart_of_accounts variable
   before_filter :get_chart_of_accounts
   # Set the @ledger_account variable
-  before_filter :get_ledger_account, :except => [:index]
+  before_filter :get_ledger_account, :only => [:show, :edit, :update, :destroy]
 
   # Session Variables
   INDEX_KEY_LIST_VAR        = "general_ledger_accounts_list_cache_var"
@@ -22,14 +22,14 @@ class GeneralLedgerAccountsController < OrganizationAwareController
       @account_type_id = @account_type_id.to_i
       conditions << 'general_ledger_account_type_id = ?'
       values << @account_type_id
-      
+
       account_type = GeneralLedgerAccountType.find(@account_type_id)
       add_breadcrumb account_type, general_ledger_accounts_path(:type => account_type)
-      
+
     end
-        
-    if @chart_of_accounts 
-      @ledger_accounts = @chart_of_accounts.general_ledger_accounts.where(conditions.join(' AND '), *values) 
+
+    if @chart_of_accounts
+      @ledger_accounts = @chart_of_accounts.general_ledger_accounts.where(conditions.join(' AND '), *values)
     else
       Rails.logger.warn "No chart of accounts found for org #{@organization.short_name}"
       @ledger_accounts = []
@@ -60,11 +60,77 @@ class GeneralLedgerAccountsController < OrganizationAwareController
     end
   end
 
+  # GET /general_ledger_accounts/new
+  def new
+
+    add_breadcrumb "New", new_general_ledger_account_path
+
+    @ledger_account = GeneralLedgerAccount.new
+
+  end
+
+  # GET /general_ledger_accounts/1/edit
+  def edit
+
+    add_breadcrumb @ledger_account.name, general_ledger_account_path(@ledger_account)
+    add_breadcrumb "Update"
+
+  end
+
+  # POST /general_ledger_accounts
+  # POST /general_ledger_accounts.json
+  def create
+
+    add_breadcrumb "New", new_general_ledger_account_path
+
+    @ledger_account = GeneralLedgerAccount.new(form_params)
+    @ledger_account.chart_of_account = @chart_of_accounts
+
+    respond_to do |format|
+      if @ledger_account.save
+        notify_user(:notice, "The general ledger account was successfully saved.")
+        format.html { redirect_to general_ledger_account_url(@ledger_account) }
+        format.json { render action: 'show', status: :created, location: @ledger_account }
+      else
+        format.html { render action: 'new' }
+        format.json { render json: @ledger_account.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # PATCH/PUT /general_ledger_accounts/1
+  # PATCH/PUT /general_ledger_accounts/1.json
+  def update
+
+    add_breadcrumb @ledger_account.name, general_ledger_account_path(@ledger_account)
+    add_breadcrumb "Update"
+
+    respond_to do |format|
+      if @ledger_account.update(form_params)
+        notify_user(:notice, "The general ledger account was successfully updated.")
+        format.html { redirect_to general_ledger_account_url(@ledger_account) }
+        format.json { head :no_content }
+      else
+        format.html { render action: 'edit' }
+        format.json { render json: @ledger_account.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  def destroy
+    if @ledger_account.assets.count == 0 && @ledger_account.expenditures.count == 0
+      @ledger_account.destroy
+      redirect_to general_ledger_accounts_url, notice: 'General ledger account was successfully destroyed.'
+    else
+      redirect_to @ledger_account, notice: 'General ledger account cannot be destroyed as there are assets and expenditures associated with it.'
+    end
+  end
+
   private
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def form_params
-    params.require(:notice).permit(GeneralLedgerAccount.allowable_params)
+    params.require(:general_ledger_account).permit(GeneralLedgerAccount.allowable_params)
   end
 
   def get_chart_of_accounts

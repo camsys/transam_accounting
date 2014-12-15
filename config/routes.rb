@@ -2,7 +2,7 @@ Rails.application.routes.draw do
 
   resources :expenditures
 
-  resources :general_ledger_accounts, :only => [:index, :show]
+  resources :general_ledger_accounts
 
   resources :inventory, :only => [], :controller => 'assets' do
     member do

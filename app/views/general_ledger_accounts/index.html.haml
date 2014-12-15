@@ -3,10 +3,12 @@
     .panel.panel-default.header-part
       .panel-heading
         .row
-          .col-md-12
+          .col-md-4
             %h3.panel-title
               %i.fa.fa-list
               General Ledger Accounts
+          .col-md-8
+            = render 'index_actions'
       .panel-body
         - if @ledger_accounts.empty?
           %p No general ledger accounts found

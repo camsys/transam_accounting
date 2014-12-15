@@ -22,10 +22,18 @@
         %p There are no assets associated with this general ledger account.
       - else
         = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => @ledger_account.assets}
-        
+
   .tab-pane.fade#expenditures
     .tab-content
       - if @ledger_account.expenditures.empty?
         %p There are no expenditures associated with this general ledger account.
       - else
         = render :partial => 'expenditures/expenditures_table', :locals => {:expenditures => @ledger_account.expenditures}
+
+      - if can? :create, Expenditure
+        .row{:style => 'margin-top:50px;'}
+          .col-md-12
+            %fieldset
+              %legend Add Expenditure
+              - @expenditure = Expenditure.new
+              = render :partial => 'expenditures/form'

@@ -8,11 +8,3 @@
       %p There are no expenditures associated with this grant.
     - else
       = render :partial => 'expenditures/expenditures_table', :locals => {:expenditures => @grant.expenditures}
-
-    - if can? :create, Expenditure
-      .row{:style => 'margin-top:50px;'}
-        .col-md-12
-          %fieldset
-            %legend Add Expenditure
-            - @expenditure = Expenditure.new
-            = render :partial => 'expenditures/form'
