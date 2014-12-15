@@ -34,7 +34,7 @@
           %i.fa.fa-usd
         = f.input_field :amount, :class => "form-control"
     .col-sm-2
-      = f.input :pcnt_from_grant, :wrapper => :vertical_append, :label => "Percent From Grant" do
+      = f.input :pcnt_from_grant, :wrapper => :vertical_append, :label => "% From Grant" do
         = f.input :pcnt_from_grant, :class => 'form-control', :input_html => {:max => 100, :min => 0, :class => "at-least-one"}, :label => false
         %span.input-group-addon
           = '%'
