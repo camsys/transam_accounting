@@ -19,8 +19,8 @@
     %span.input-group-addon
       %i.fa.fa-calendar
 
-  = f.association :general_ledger_account, :label => 'General Ledger Account'
-  = f.association :grant, :label => 'Grant'
+  = f.association :general_ledger_account, :label => 'General Ledger Account', :collection => @organization.chart_of_accounts.general_ledger_accounts
+  = f.association :grant, :label => 'Grant', :collection => @organization.grants
 
   = f.input :pcnt_from_grant, :wrapper => :vertical_append, :label => "Percent From Grant" do
     = f.input :pcnt_from_grant, :class => 'form-control', :input_html => {:max => 100, :min => 0, :class => "at-least-one"}, :label => false
