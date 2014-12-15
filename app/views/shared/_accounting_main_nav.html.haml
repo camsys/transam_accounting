@@ -31,6 +31,11 @@
               = link_to grants_path(:funding_source_id => funding_source.id) do
                 %i.fa.fa-fw.fa-legal
                 = funding_source
+          %li.divider
+          %li
+            = link_to new_grant_path do
+              %i.fa.fa-plus.fa-fw
+              = "Add Grant";
 
     %li.divider
     %li.text-left.dropdown-submenu
@@ -44,6 +49,11 @@
             = link_to expenditures_path(:type => type) do
               %i.fa.fa-fw.fa-usd
               = type
+          %li.divider
+          %li
+            = link_to new_expenditure_path do
+              %i.fa.fa-plus.fa-fw
+              = "Add Expenditure";
 
     %li.divider
     %li.text-left
