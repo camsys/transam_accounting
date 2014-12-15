@@ -1,3 +1,3 @@
 module TransamAccounting
-  VERSION = "0.0.4g"
+  VERSION = "0.0.5"
 end
