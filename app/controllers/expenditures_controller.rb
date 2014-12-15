@@ -106,6 +106,11 @@ class ExpendituresController < OrganizationAwareController
     @expenditure = Expenditure.new(expenditure_params)
     @expenditure.organization = @organization
 
+    unless params[:asset_key].nil?
+      @asset = Asset.find_by_object_key(params[:asset_key])
+      @expenditure.assets << @asset
+    end
+
     if @expenditure.save
       redirect_to @expenditure, notice: 'Expenditure was successfully created.'
     else

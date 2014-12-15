@@ -5,26 +5,38 @@
   :radio_buttons => :vertical_radio_and_checkboxes,
   :file => :vertical_file_input,
   :boolean => :vertical_boolean}) do |f|
-  = f.input :description, :label => 'Expense'
 
-  = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
-    %span.input-group-addon
-      %i.fa.fa-usd
-    = f.input_field :amount, :class => "form-control"
+  - unless @asset.nil?
+    = hidden_field_tag :asset_key, @asset.object_key
 
-  = f.association :expense_type, :label => 'Category'
-
-  = f.input :expense_date, :wrapper => :vertical_append, :label => "Expense Date" do
-    = f.input_field :expense_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => f.object.expense_date.strftime("%m-%d-%Y")
-    %span.input-group-addon
-      %i.fa.fa-calendar
-
-  = f.association :general_ledger_account, :label => 'General Ledger Account', :collection => @organization.chart_of_accounts.general_ledger_accounts
-  = f.association :grant, :label => 'Grant', :collection => @organization.grants
-
-  = f.input :pcnt_from_grant, :wrapper => :vertical_append, :label => "Percent From Grant" do
-    = f.input :pcnt_from_grant, :class => 'form-control', :input_html => {:max => 100, :min => 0, :class => "at-least-one"}, :label => false
-    %span.input-group-addon
-      = '%'
+  .row
+    .col-sm-4
+      = f.input :description, :label => 'Expense'
+    .col-sm-4
+      = f.association :expense_type, :label => 'Category'
+    .col-sm-4
+      = f.input :expense_date, :wrapper => :vertical_append, :label => "Expense Date" do
+        = f.input_field :expense_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => f.object.expense_date.strftime("%m-%d-%Y")
+        %span.input-group-addon
+          %i.fa.fa-calendar
+  .row
+    .col-sm-4
+      - if @grant.nil?
+        -# auto-select grant_id if it exists when redirected to new form for validation errors
+        = f.association :grant, :collection => @organization.grants, :label => 'Grant'
+      - else
+        = f.association :grant, :collection => @organization.grants, :label => 'Grant', :selected => @grant.id
+    .col-sm-4
+      = f.association :general_ledger_account, :label => 'General Ledger Account', :collection => @organization.chart_of_accounts.general_ledger_accounts
+    .col-sm-2
+      = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
+        %span.input-group-addon
+          %i.fa.fa-usd
+        = f.input_field :amount, :class => "form-control"
+    .col-sm-2
+      = f.input :pcnt_from_grant, :wrapper => :vertical_append, :label => "Percent From Grant" do
+        = f.input :pcnt_from_grant, :class => 'form-control', :input_html => {:max => 100, :min => 0, :class => "at-least-one"}, :label => false
+        %span.input-group-addon
+          = '%'
 
   = f.button :submit, :class => 'btn btn-primary'
