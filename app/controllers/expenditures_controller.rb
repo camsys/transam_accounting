@@ -90,7 +90,8 @@ class ExpendituresController < OrganizationAwareController
   def new
     @expenditure = Expenditure.new
 
-    add_breadcrumb "New", new_expenditure_path(@expenditure)
+    add_breadcrumb "New"
+
   end
 
   # GET /expenditures/1/edit
@@ -106,6 +107,8 @@ class ExpendituresController < OrganizationAwareController
     @expenditure = Expenditure.new(expenditure_params)
     @expenditure.organization = @organization
 
+    add_breadcrumb "New"
+
     unless params[:asset_key].nil?
       @asset = Asset.find_by_object_key(params[:asset_key])
       @expenditure.assets << @asset
@@ -120,6 +123,10 @@ class ExpendituresController < OrganizationAwareController
 
   # PATCH/PUT /expenditures/1
   def update
+
+    add_breadcrumb @expenditure.expense_type, expenditures_path(:type => @expenditure.expense_type)
+    add_breadcrumb @expenditure, expenditure_path(@expenditure)
+    add_breadcrumb 'Update'
 
     if @expenditure.update(expenditure_params)
       redirect_to @expenditure, notice: 'Expenditure was successfully updated.'
