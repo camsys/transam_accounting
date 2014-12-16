@@ -24,18 +24,19 @@
           %i.fa.fa-calendar
     .col-sm-4
       = f.association :expense_type, :label => 'Category'
-  .row
-    .col-sm-4
-      - if @ledger_account.nil?
-        = f.association :general_ledger_account, :label => 'General Ledger Account', :collection => @organization.chart_of_accounts.general_ledger_accounts
-      - else
-        = f.association :general_ledger_account, :label => 'General Ledger Account', :collection => @organization.chart_of_accounts.general_ledger_accounts, :selected => @ledger_account.id
-    .col-sm-4
-      = f.association :grant, :collection => @organization.grants, :label => 'Grant'
-    .col-sm-4
-      = f.input :pcnt_from_grant, :wrapper => :vertical_append, :label => "Percent From Grant" do
-        = f.input :pcnt_from_grant, :class => 'form-control', :input_html => {:max => 100, :min => 0, :class => "at-least-one"}, :label => false
-        %span.input-group-addon
-          = '%'
+  - unless @organization.chart_of_accounts.blank?
+    .row
+      .col-sm-4
+        - if @ledger_account.nil?
+          = f.association :general_ledger_account, :label => 'General Ledger Account', :collection => @organization.chart_of_accounts.general_ledger_accounts
+        - else
+          = f.association :general_ledger_account, :label => 'General Ledger Account', :collection => @organization.chart_of_accounts.general_ledger_accounts, :selected => @ledger_account.id
+      .col-sm-4
+        = f.association :grant, :collection => @organization.grants, :label => 'Grant'
+      .col-sm-4
+        = f.input :pcnt_from_grant, :wrapper => :vertical_append, :label => "Percent From Grant" do
+          = f.input :pcnt_from_grant, :class => 'form-control', :input_html => {:max => 100, :min => 0, :class => "at-least-one"}, :label => false
+          %span.input-group-addon
+            = '%'
 
   = f.button :submit, :class => 'btn btn-primary'

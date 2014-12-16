@@ -1,6 +1,7 @@
-.tab-pane.fade#gla
-  .tab-content
-    = render :partial => 'gla_table', :locals => {:gla_budgets => @grant.grant_budgets}
+- unless @organization.chart_of_accounts.blank?
+  .tab-pane.fade#gla
+    .tab-content
+      = render :partial => 'gla_table', :locals => {:gla_budgets => @grant.grant_budgets}
 
 .tab-pane.fade#expn
   .tab-content
