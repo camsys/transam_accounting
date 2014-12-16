@@ -10,7 +10,7 @@
     = hidden_field_tag :asset_key, @asset.object_key
 
   = f.input :description, :label => 'Expense'
-  = f.association :expense_type, :label => 'Category'
+  = f.association :expense_type, :collection => @organization.expense_types, :label => 'Category'
 
   .row
     .col-sm-3

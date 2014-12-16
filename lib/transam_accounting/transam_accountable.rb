@@ -25,6 +25,9 @@ module TransamAccounting
       # Each org can have 0 or more expenditures
       has_many  :expeditures
 
+      # Each org can have 0 or more expense types
+      has_many  :expense_types
+
       # Each org can have 0 or 1 chart of accounts
       has_one   :chart_of_account
 

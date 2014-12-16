@@ -13,7 +13,7 @@
     .form-group
       = select_tag(:general_ledger_account_id, options_for_select(@organization.general_ledger_accounts.collect{|a| [a.name, a.id]}, :selected => @general_ledger_account_id), :class => "form-control", :style => "width: 100px;", :prompt => "Any GLA...")
   .form-group
-    = select_tag(:type, options_for_select(ExpenseType.all.collect{|a| [a.name, a.id]}, :selected => @expense_type_id), :class => "form-control", :style => "width: 100px;", :prompt => "Any Type...")
+    = select_tag(:type, options_for_select(@organization.expense_types.collect{|a| [a.name, a.id]}, :selected => @expense_type_id), :class => "form-control", :style => "width: 100px;", :prompt => "Any Type...")
   .form-group
     = select_tag(:vendor_id, options_for_select(@organization.vendors.collect{|a| [a.name, a.id]}, :selected => @vendor_id), :class => "form-control", :style => "width: 100px;", :prompt => "Any Vendor...")
   .form-group
