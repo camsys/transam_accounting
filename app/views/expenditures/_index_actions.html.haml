@@ -9,12 +9,13 @@
           %i.fa.fa-plus.fa-fw
           = " Add Expenditure";
 = form_tag expenditures_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
-  .form-group
-    = select_tag(:general_ledger_account_id, options_for_select(GeneralLedgerAccount.all.collect{|a| [a.name, a.id]}, :selected => @general_ledger_account_id), :class => "form-control", :style => "width: 100px;", :prompt => "Any GLA...")
+  - unless @organization.general_ledger_accounts.blank?
+    .form-group
+      = select_tag(:general_ledger_account_id, options_for_select(@organization.general_ledger_accounts.collect{|a| [a.name, a.id]}, :selected => @general_ledger_account_id), :class => "form-control", :style => "width: 100px;", :prompt => "Any GLA...")
   .form-group
     = select_tag(:type, options_for_select(ExpenseType.all.collect{|a| [a.name, a.id]}, :selected => @expense_type_id), :class => "form-control", :style => "width: 100px;", :prompt => "Any Type...")
   .form-group
-    = select_tag(:vendor_id, options_for_select(Vendor.all.collect{|a| [a.name, a.id]}, :selected => @vendor_id), :class => "form-control", :style => "width: 100px;", :prompt => "Any Vendor...")
+    = select_tag(:vendor_id, options_for_select(@organization.vendors.collect{|a| [a.name, a.id]}, :selected => @vendor_id), :class => "form-control", :style => "width: 100px;", :prompt => "Any Vendor...")
   .form-group
     = select_tag(:fiscal_year, options_for_select(@fiscal_years, :selected => @fiscal_year), :class => "form-control", :style => "width: 100px;", :prompt => "Any FY...")
 
