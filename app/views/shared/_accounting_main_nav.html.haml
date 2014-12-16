@@ -5,20 +5,22 @@
     Accounting
     %b.caret
   %ul.dropdown-menu.multi-level{:role => 'menu'}
+    - unless @organization.chart_of_accounts.blank?
+      %li.text-left.dropdown-submenu
+        = link_to general_ledger_accounts_path do
+          %i.fa.fa-book.fa-fw
+          Chart of Accounts
 
-    %li.text-left.dropdown-submenu
-      = link_to general_ledger_accounts_path do
-        %i.fa.fa-book.fa-fw
-        Chart of Accounts
+        %ul.dropdown-menu
+          - GeneralLedgerAccountType.all.each do |account_type|
+            - if @organization.general_ledger_accounts.where(:general_ledger_account_type_id => account_type.id).count > 0
+              %li.text-left
+                = link_to general_ledger_accounts_path(:type => account_type) do
+                  %i.fa.fa-fw.fa-book
+                  = account_type
 
-      %ul.dropdown-menu
-        - GeneralLedgerAccountType.all.each do |account_type|
-          %li.text-left
-            = link_to general_ledger_accounts_path(:type => account_type) do
-              %i.fa.fa-fw.fa-book
-              = account_type
+      %li.divider
 
-    %li.divider
     %li.text-left.dropdown-submenu
       = link_to grants_path do
         %i.fa.fa-fw.fa-legal
@@ -26,8 +28,8 @@
 
       %ul.dropdown-menu
         - FundingSource.all.each do |funding_source|
-          %li.text-left
-            - if @organization.grants.where(:funding_source_id => funding_source.id).count > 0
+          - if @organization.grants.where(:funding_source_id => funding_source.id).count > 0
+            %li.text-left
               = link_to grants_path(:funding_source_id => funding_source.id) do
                 %i.fa.fa-fw.fa-legal
                 = funding_source
