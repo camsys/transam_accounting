@@ -18,9 +18,19 @@ module TransamAccounting
       # ----------------------------------------------------
       # Associations
       # ----------------------------------------------------
-      has_many :grants
-      has_many :expeditures
-      
+
+      # Each org can have 0 or more grants
+      has_many  :grants
+
+      # Each org can have 0 or more expenditures
+      has_many  :expeditures
+
+      # Each org can have 0 or 1 chart of accounts
+      has_one   :chart_of_account
+
+      # Each org can have 0 or more general ledger accounts if they have a chart of accounts
+      has_many  :general_ledger_accounts, :through => :chart_of_account
+
       # ----------------------------------------------------
       # Validations
       # ----------------------------------------------------
@@ -43,10 +53,9 @@ module TransamAccounting
     #
     #------------------------------------------------------------------------------
 
-    # Retrieve the chart of accounts for this organization. Chart of accounts are designed
-    # to be immutable thus we do it this way and not via an association
+    # Utility method for returning the chart of accounts
     def chart_of_accounts
-      ChartOfAccount.where(:organization => self).first
+      chart_of_account
     end
 
     protected
