@@ -38,7 +38,7 @@ class DepreciationCalculator < Calculator
   def total_depreciation(asset)
     # Get the total_depreciation for the depreciation as the purchase price minus the residual value at
     # the end of the asset's useful life
-    purchase_cost(asset) - salvage_value(asset)
+    [purchase_cost(asset) - salvage_value(asset), 0].max
   end
 
   def salvage_value(asset)
@@ -47,7 +47,7 @@ class DepreciationCalculator < Calculator
 
   def book_value_start(asset, fiscal_year_date)
     if asset.depreciation_start_date > fiscal_year_date - 1.year
-      purchase_cost(asset)
+      [purchase_cost(asset), salvage_value(asset)].max
     else
       calculate_on_date(asset, fiscal_year_date - 1.year)
     end
@@ -62,7 +62,7 @@ class DepreciationCalculator < Calculator
   end
 
   def accumulated_depreciation(asset, fiscal_year_date)
-    purchase_cost(asset) - book_value_end(asset, fiscal_year_date)
+    [purchase_cost(asset) - book_value_end(asset, fiscal_year_date), 0].max
   end
 
 end
