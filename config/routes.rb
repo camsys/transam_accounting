@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
 
-  resources :expenditures
+  resources :expenditures do
+    resources :comments
+    resources :documents
+  end
 
   resources :general_ledger_accounts
 

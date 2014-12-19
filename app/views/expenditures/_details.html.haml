@@ -2,6 +2,14 @@
   %li
     %a{:href => "#assets", :data =>{:toggle => 'tab'}}
       = "Assets"
+  %li
+    %a{:href => "#docs", :data =>{:toggle => 'tab'}}
+      %span.badge.pull-right= @expenditure.documents.count
+      = "Supporting Documents "
+  %li
+    %a{:href => "#comm", :data =>{:toggle => 'tab'}}
+      %span.badge.pull-right= @expenditure.comments.count
+      = "Comments "
 
 .tab-content
   .tab-pane.fade#assets
@@ -10,3 +18,9 @@
         %p There are no assets associated with this expenditure.
       - else
         = render 'assets'
+  .tab-pane.fade#comm
+    .tab-content
+      = render 'comments'
+  .tab-pane.fade#docs
+    .tab-content
+      = render 'documents'

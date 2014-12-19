@@ -44,6 +44,12 @@ class Expenditure < ActiveRecord::Base
   # Every expenditure can be associated with one or more assets
   has_and_belongs_to_many :assets
 
+  # Has 0 or more documents. Using a polymorphic association. These will be removed if the project is removed
+  has_many    :documents,   :as => :documentable, :dependent => :destroy
+
+  # Has 0 or more comments. Using a polymorphic association, These will be removed if the project is removed
+  has_many    :comments,    :as => :commentable,  :dependent => :destroy
+  
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
