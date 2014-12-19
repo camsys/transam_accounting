@@ -3,4 +3,4 @@
 = format_field("Category", expenditure.expense_type )
 = format_field("Vendor", link_to(expenditure.vendor.name, vendor_path(expenditure.vendor))) unless expenditure.vendor.nil?
 = format_field("Date", format_as_date(expenditure.expense_date))
-= format_field("Account", expenditure.general_ledger_account )
+= format_field("Account", expenditure.general_ledger_account ) unless @organization.chart_of_accounts.blank?

@@ -1,7 +1,8 @@
 %table.table.table-hover#expenditures_table
   %thead
     %tr
-      %th.left Account
+      - unless @organization.chart_of_accounts.blank?
+        %th.left Account
       %th.left Category
       %th.left Date
       %th.left Expense
@@ -15,7 +16,8 @@
     - expenditures.includes(:general_ledger_account, :expense_type, :vendor, :grant).each do |e|
       - sum_expenditures += e.amount
       %tr.popup-details{:data => {:action_path => expenditure_path(e)}}
-        %td.left= e.general_ledger_account
+        - unless @organization.chart_of_accounts.blank?
+          %td.left= e.general_ledger_account
         %td.left= e.expense_type
         %td.left= format_as_date(e.expense_date)
         %td.left= e.description
@@ -25,7 +27,11 @@
         %td.right= format_as_percentage(e.pcnt_from_grant) unless e.grant.nil?
   %tfoot
     %tr
-      %td{:colspan => 5}
+      - if @organization.chart_of_accounts.blank?
+        %td{:colspan => 4}
+      - else
+        %td{:colspan => 5}
+
       %td.right= format_as_currency(sum_expenditures)
       %td{:colspan => 2}
 
