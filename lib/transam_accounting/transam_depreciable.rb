@@ -42,6 +42,7 @@ module TransamAccounting
       # Callbacks
       #------------------------------------------------------------------------------
       before_validation  :set_depreciation_defaults
+      before_update      :clear_depreciation_cache
 
       #----------------------------------------------------
       # Associations
@@ -216,6 +217,12 @@ module TransamAccounting
         self.replacement_value ||= 0
         self.depreciable = true if new_record?
 
+      end
+
+      def clear_depreciation_cache
+        # clear cache for other cached depreciation objects that are not attributes
+        # hard-coded temporarily
+        delete_cached_object('depreciation_table')
       end
 
       #------------------------------------------------------------------------------
