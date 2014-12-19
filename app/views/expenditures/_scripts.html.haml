@@ -1,7 +1,24 @@
 :javascript
-  
+
   var user_tab_key = 'expenditure_tab_key';
-  
+
+  // Override placement of validator msg on .input-groups
+  $.validator.setDefaults({errorPlacement: function(error, element) {
+      console.log(element);
+      if(element.parents('.input-group').length) {
+        error.insertAfter(element.parents('.input-group'));
+      } else {
+        error.insertAfter(element);
+      }
+    }
+  });
+
+  $('#new_expenditure').validate({
+    submitHandler: function(form) {
+      form.submit();
+    }
+  });
+
   $(document).ready(function() {
 
     transam.make_same_height('.header-part');
@@ -20,5 +37,5 @@
     } else {
       // Default to the first tab if no tab is stored
       $('a[data-toggle="tab"]:first').tab('show');
-    }   
-  }); 
+    }
+  });
