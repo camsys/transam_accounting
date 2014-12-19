@@ -26,6 +26,18 @@
     .col-sm-6
       = f.association :vendor
 
+  - if SystemConfig.transam_module_loaded? :transit
+    .row
+      .col-md-7
+        = f.input :grant_id, :collection => @organization.grants
+      .col-md-5
+        .form-group
+          %label.control-label Pcnt
+          .input-group
+            = f.input :pcnt_from_grant, :style => 'text-align:right;', :label => false
+            %span.input-group-addon %
+
+
   - unless @organization.chart_of_accounts.blank?
     .row
       .col-sm-4
