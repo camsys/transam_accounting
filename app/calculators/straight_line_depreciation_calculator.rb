@@ -5,10 +5,6 @@
 #------------------------------------------------------------------------------
 class StraightLineDepreciationCalculator < DepreciationCalculator
 
-  def calculate(asset)
-    calculate_on_date(asset, asset.policy.current_depreciation_date)
-  end
-
   # Determines the estimated value for an asset on the current date.
   def calculate_on_date(asset, on_date)
 

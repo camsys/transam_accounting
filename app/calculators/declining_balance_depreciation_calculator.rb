@@ -5,10 +5,6 @@
 #------------------------------------------------------------------------------
 class DecliningBalanceDepreciationCalculator < DepreciationCalculator
 
-  def calculate(asset)
-    calculate_on_date(asset,asset.current_depreciation_date)
-  end
-
   # Determines the estimated value for an asset.
   def calculate_on_date(asset,on_date)
 
