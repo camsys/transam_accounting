@@ -59,12 +59,28 @@ module TransamAccounting
     #
     #------------------------------------------------------------------------------
 
+    # Based on today's date, this method returns the current depreciation date.
+    # this is the last date that depreciation should be calculated for based on
+    # the setting in this policy
+    def current_depreciation_date
+      if depreciation_interval_type.id == 3
+        # monthly
+        d = (Date.today - 1.month).end_of_month
+      elsif depreciation_interval_type.id == 2
+        # quarterly
+        d = (Date.today - 3.months).end_of_quarter
+      else
+        # default to end of the fiscal year
+        d = fiscal_year_end_date(Date.today - 1.year)
+      end
+      d
+    end
+
     protected
       # Set resonable defaults for the policy
       def set_depreciation_defaults
         self.depreciation_calculation_type ||= DepreciationCalculationType.find_by_name('Straight Line')
-        self.depreciation_interval_type ||= DepreciationIntervalType.find_by_name('Yearly')
-
+        self.depreciation_interval_type ||= DepreciationIntervalType.find_by_name('Annually')
       end
 
   end

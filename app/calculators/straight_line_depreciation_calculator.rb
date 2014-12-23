@@ -6,11 +6,11 @@
 class StraightLineDepreciationCalculator < DepreciationCalculator
 
   def calculate(asset)
-    calculate_on_date(asset,asset.current_depreciation_date)
+    calculate_on_date(asset, asset.policy.current_depreciation_date)
   end
 
   # Determines the estimated value for an asset on the current date.
-  def calculate_on_date(asset,on_date)
+  def calculate_on_date(asset, on_date)
 
     # depreciation time
     num_months = asset.expected_useful_life.nil? ? asset.policy_rule.max_service_life_months : asset.expected_useful_life

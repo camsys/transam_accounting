@@ -8,9 +8,7 @@
 class AssetValueUpdateJob < AbstractAssetUpdateJob
 
   def execute_job(asset)
-    if asset.current_depreciation_date == Date.today
-      asset.update_book_value
-    end
+    asset.update_book_value
   end
 
   def prepare

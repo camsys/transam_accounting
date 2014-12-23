@@ -176,7 +176,7 @@ module TransamAccounting
 
     protected
 
-      # updates the estimated value of an asset
+      # updates the book value of an asset
       def update_asset_book_value(policy = nil)
         Rails.logger.info "Updating book value for asset = #{object_key}"
 
@@ -193,13 +193,13 @@ module TransamAccounting
         end
 
         begin
-          # see what metric we are using to determine the service life of the asset
+          # see what algorithm we are using to calculate the book value
           class_name = policy.depreciation_calculation_type.class_name
           book_value = calculate(asset, policy, class_name)
           asset.book_value = book_value.to_i
 
           #update current depreciation date
-          asset.current_depreciation_date = asset.current_depreciation_date + policy.depreciation_interval_type.months.months
+          asset.current_depreciation_date = policy.current_depreciation_date
 
           # save changes to this asset
           asset.save

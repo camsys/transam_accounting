@@ -30,7 +30,7 @@ depreciation_calculation_types = [
 ]
 
 depreciation_interval_types = [
-  {:active => 1, :name => 'Yearly', :description => 'Depreciation calculated by fiscal year.', :months => 12},
+  {:active => 1, :name => 'Annually', :description => 'Depreciation calculated annually at the end of the fiscal year.', :months => 12},
   {:active => 1, :name => 'Quarterly', :description => 'Depreciation calculated quarterly.', :months => 3},
   {:active => 1, :name => 'Monthly', :description => 'Depreciation calculated monthly.', :months => 1}
 ]
