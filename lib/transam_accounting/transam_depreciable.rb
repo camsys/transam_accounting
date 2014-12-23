@@ -197,6 +197,10 @@ module TransamAccounting
           class_name = policy.depreciation_calculation_type.class_name
           book_value = calculate(asset, policy, class_name)
           asset.book_value = book_value.to_i
+
+          #update current depreciation date
+          asset.current_depreciation_date = asset.current_depreciation_date + policy.depreciation_interval_type.months.months
+
           # save changes to this asset
           asset.save
         rescue Exception => e
