@@ -76,6 +76,11 @@ module TransamAccounting
       d
     end
 
+    # Returns the next depreciation date for the org based on the policy they
+    # have selected
+    def next_depreciation_date
+      current_depreciation_date + depreciation_interval_type.months.months
+    end
     protected
       # Set resonable defaults for the policy
       def set_depreciation_defaults
