@@ -214,7 +214,6 @@ module TransamAccounting
           self.in_service_date = self.purchase_date.nil? ? Date.today : self.purchase_date
         end
         self.depreciation_start_date ||= self.in_service_date
-        self.current_depreciation_date ||= fiscal_year_end_date(Date.today)
 
         self.book_value ||= self.purchase_cost.nil? ? 0 : self.purchase_cost
         self.salvage_value ||= 0
