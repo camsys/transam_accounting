@@ -121,6 +121,12 @@ module TransamAccounting
             interval = depreciation_start_date.end_of_month
           end
 
+          # always add depreciation_start_date as first interval (deals with corner cases)
+          intervals << interval
+
+          # get next interval
+          interval = (interval + date_interval_months.months).end_of_month
+
           # get list of past date intervals not including current_depreciation_date
           while interval <= current_depreciation_date - date_interval_months.months
             intervals << interval
