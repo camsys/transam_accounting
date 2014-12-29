@@ -116,7 +116,7 @@ module TransamAccounting
           date_interval_months = current_policy.depreciation_interval_type.months
 
           # always add depreciation_start_date as first interval (deals with corner cases)
-          on_date = current_policy.depreciation_date(depreciation_start_date)
+          on_date = current_policy.depreciation_date(asset.depreciation_start_date)
 
           # initialize table of results
           table = []
