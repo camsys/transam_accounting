@@ -59,17 +59,21 @@ module TransamAccounting
     #
     #------------------------------------------------------------------------------
 
-    # Calculates the depreciation date based on the policy
-    def depreciation_date(on_date = Date.today)
+    # Calculates the depreciation date based on the policy and the date that has been specified.
+    # This method calulates the next depreciation date
+    def depreciation_date(on_date)
+
+      return nil if on_date.nil?
+
       if depreciation_interval_type.id == 3
         # monthly
         d = on_date.end_of_month
       elsif depreciation_interval_type.id == 2
         # quarterly
-        d = (on_date - 2.months).end_of_quarter
+        d = on_date.end_of_quarter
       else
         # default to end of the fiscal year
-        d = fiscal_year_end_date(on_date - 11.months)
+        d = fiscal_year_end_date(on_date)
       end
       d
     end
@@ -78,7 +82,17 @@ module TransamAccounting
     # this is the last date that depreciation should be calculated for based on
     # the setting in this policy
     def current_depreciation_date
-      depreciation_date(Date.today)
+      if depreciation_interval_type.id == 3
+        # monthly
+        d = Date.today - 1.month.end_of_month
+      elsif depreciation_interval_type.id == 2
+        # quarterly
+        d = Date.today - 3.month.end_of_quarter
+      else
+        # default to end of the fiscal year
+        d = fiscal_year_end_date(Date.today - 1.year)
+      end
+      d
     end
 
     # Returns the next depreciation date for the org based on the policy they

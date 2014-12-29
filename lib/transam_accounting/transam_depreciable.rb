@@ -112,9 +112,6 @@ module TransamAccounting
           # create an instance of this calculator class
           calculator_instance = class_name.constantize.new
 
-          # get date intervals for calculating depreciation
-          date_interval_months = current_policy.depreciation_interval_type.months
-
           # always add depreciation_start_date as first interval (deals with corner cases)
           on_date = current_policy.depreciation_date(asset.depreciation_start_date)
 
@@ -138,7 +135,7 @@ module TransamAccounting
               :accumulated_depreciation => accumulated_depreciation
             }
 
-            on_date += date_interval_months.months
+            on_date += current_policy.depreciation_interval_type.months.months
           end
         end
         cache_object('depreciation_table', table)
