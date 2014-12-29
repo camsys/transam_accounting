@@ -104,60 +104,41 @@ module TransamAccounting
         else
           # Make sure we are working with a concrete asset class
           asset = is_typed? ? self : Asset.get_typed_asset(self)
+          current_policy = asset.policy
 
           # see what metric we are using for the depreciated value of the asset
-          class_name = policy.depreciation_calculation_type.class_name
+          class_name = current_policy.depreciation_calculation_type.class_name
 
           # create an instance of this calculator class
           calculator_instance = class_name.constantize.new
 
           # get date intervals for calculating depreciation
-          date_interval_months = policy.depreciation_interval_type.months
-          intervals = []
-
-          if date_interval_months == 12
-            interval = fiscal_year_end_date(depreciation_start_date)
-          else
-            interval = depreciation_start_date.end_of_month
-          end
+          date_interval_months = current_policy.depreciation_interval_type.months
 
           # always add depreciation_start_date as first interval (deals with corner cases)
-          intervals << interval
-
-          # get next interval
-          interval = (interval + date_interval_months.months).end_of_month
-
-          # get list of past date intervals not including current_depreciation_date
-          while interval <= current_depreciation_date - date_interval_months.months
-            intervals << interval
-
-            # get next interval
-            # round to end of month to deal with varying month lengths (ex: Feb)
-            interval = (interval + date_interval_months.months).end_of_month
-          end
+          on_date = current_policy.depreciation_date(depreciation_start_date)
 
           # initialize table of results
-          table = Array.new
+          table = []
 
-          intervals.each do |interval|
-            if date_interval_months == 12
-              timestep = fiscal_year(fiscal_year_year_on_date(interval))
-            else
-              timestep = interval
-            end
-            book_value_start = calculator_instance.book_value_start(asset, interval)
-            depreciated_expense = calculator_instance.depreciated_expense(asset, interval)
-            book_value_end = calculator_instance.book_value_end(asset, interval)
-            accumulated_depreciation = calculator_instance.accumulated_depreciation(asset, interval)
+          # get all the depreciation dates from the first date based on the depreciation_start_date to the current
+          # depreciation date
+          while on_date <= current_policy.current_depreciation_date
 
-            data = {
-              :timestep => timestep,
+            book_value_start = calculator_instance.book_value_start(asset, on_date)
+            depreciated_expense = calculator_instance.depreciated_expense(asset, on_date)
+            book_value_end = calculator_instance.book_value_end(asset, on_date)
+            accumulated_depreciation = calculator_instance.accumulated_depreciation(asset, on_date)
+
+            table << {
+              :on_date => on_date,
               :book_value_start => book_value_start,
               :depreciated_expense => depreciated_expense,
               :book_value_end => book_value_end,
               :accumulated_depreciation => accumulated_depreciation
             }
-            table << data
+
+            on_date += date_interval_months.months
           end
         end
         cache_object('depreciation_table', table)
