@@ -34,7 +34,7 @@
         .form-group
           %label.control-label Pcnt
           .input-group
-            = f.input :pcnt_from_grant, :style => 'text-align:right;', :label => false
+            = f.input :pcnt_from_grant, :input_html => {:min => 0}, :style => 'text-align:right;', :label => false
             %span.input-group-addon %
 
 
