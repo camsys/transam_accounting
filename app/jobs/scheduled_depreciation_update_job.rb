@@ -40,7 +40,7 @@ class ScheduledDepreciationUpdateJob < Job
 
       # Find the depreciable assets for this organization where the current depreciation date for the assets is
       # before the current depeciation date. We only need the object keys
-      matches = org.assets.where('depreciable = true AND current_depreciation_date < ?', current_depreciation_date).pluck(:object_key)
+      matches = org.assets.where(depreciable: true).where('current_depreciation_date IS NULL OR current_depreciation_date < ?', current_depreciation_date).pluck(:object_key)
 
       if matches.empty?
         msg = "#{matches.count} need to be depreciated."
@@ -67,7 +67,7 @@ class ScheduledDepreciationUpdateJob < Job
             message = Message.new
             message.organization = org
             message.to_user = user
-            message.from_user = sys_user
+            message.user = sys_user
             message.subject = message_subject
             message.body = message_body
             message.save
