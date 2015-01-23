@@ -4,7 +4,6 @@ rvm:
 branches:
   only:
   - master
-  - rspec
 env:
 - TEST_SUITE=rspec RAILS_VERSION=4.1.9
 script:

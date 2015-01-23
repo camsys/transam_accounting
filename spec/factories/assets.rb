@@ -26,6 +26,7 @@ FactoryGirl.define do
     reported_condition_rating 2.0
     depreciable true
     book_value 100
+    salvage_value 0
     #replacement_value 100
     estimated_replacement_cost { 100 }
   end

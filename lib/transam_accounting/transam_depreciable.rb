@@ -188,12 +188,12 @@ module TransamDepreciable
         self.in_service_date = self.purchase_date.nil? ? Date.today : self.purchase_date
       end
       self.depreciation_start_date ||= self.in_service_date
-
       self.book_value ||= self.purchase_cost.nil? ? 0 : self.purchase_cost
-      self.salvage_value ||= 0
+      self.salvage_value ||= self.purchase_cost.nil? ? 0 : (self.policy_rule.pcnt_residual_value / 100.0 * self.purchase_cost).to_i
       self.depreciable = true if new_record?
 
     end
+
 
     def clear_depreciation_cache
       # clear cache for other cached depreciation objects that are not attributes
