@@ -7,7 +7,6 @@ branches:
   - rspec
 env:
 - TEST_SUITE=rspec RAILS_VERSION=4.1.9
-- TEST_SUITE=cucumber RAILS_VERSION=4.1.9
 script:
 - bundle exec rake app:transam_accounting:prepare_rspec
 - bundle exec $TEST_SUITE
