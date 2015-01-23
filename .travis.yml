@@ -4,11 +4,15 @@ rvm:
 branches:
   only:
   - master
+  - rspec
 env:
-- TEST_SUITE=rspec
+- TEST_SUITE=rspec RAILS_VERSION=4.1.9
+- TEST_SUITE=cucumber RAILS_VERSION=4.1.9
 script:
 - bundle exec rake app:transam_accounting:prepare_rspec
 - bundle exec $TEST_SUITE
+before_script:
+- cp spec/dummy/config/database.travis.yml spec/dummy/config/database.yml
 before_install:
 - openssl aes-256-cbc -K $encrypted_1dcbfc78be6f_key -iv $encrypted_1dcbfc78be6f_iv
   -in spec/dummy/db/schema.rb.enc -out spec/dummy/db/schema.rb -d

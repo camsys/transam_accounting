@@ -1,3 +1,5 @@
+TransamCore::Engine.load_seed
+TransamTransit::Engine.load_seed
 TransamAccounting::Engine.load_seed
 
 puts "  Processing system_config"
