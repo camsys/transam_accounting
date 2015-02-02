@@ -30,7 +30,7 @@
           %td.right= format_as_integer(gla_budget.grant.grant_purchases.count)
           %td.right= format_as_currency(gla_budget.grant.spent)
           %td.center
-            %i.fa.fa-info-circle.text-info.popup-details{:data => {:title => "#{gla_budget.grant.grant_number}: expenditures", :content => "#{raw render :partial => 'grants/popup_table', :locals => {:grant => gla_budget.grant, :popup => false}}"}}
+            = render :partial => "grants/popup_table", :locals => {:grant => gla_budget.grant}
     %tfoot
       %tr
         %td{:colspan => 3}
