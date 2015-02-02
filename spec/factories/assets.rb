@@ -11,7 +11,7 @@ FactoryGirl.define do
     asset_tag
     purchase_date { 1.year.ago }
     in_service_date { 1.year.ago }
-    depreciation_start_date { 1.year.ago }
+    depreciation_start_date Date.new(2014,1,1)
     manufacture_year "2000"
     fta_funding_type_id 1
     created_by_id 1

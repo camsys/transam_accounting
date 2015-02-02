@@ -22,7 +22,7 @@ RSpec.describe DecliningBalanceDepreciationCalculator, :type => :calculator do
 
   describe '#calculate' do
     it 'calculates' do
-      expect(test_calculator.calculate(@test_asset)).to eq(1838)
+      expect(test_calculator.calculate_on_date(@test_asset,Date.new(2014,6,30))).to eq(1838)
     end
 
     it 'returns purchase cost if asset is new' do

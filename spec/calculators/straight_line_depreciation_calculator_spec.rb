@@ -22,7 +22,7 @@ RSpec.describe StraightLineDepreciationCalculator, :type => :calculator do
 
   describe '#calculate' do
     it 'calculates' do
-      expect(test_calculator.calculate(@test_asset).to_i).to eq(1916)
+      expect(test_calculator.calculate_on_date(@test_asset,Date.new(2014,6,30)).to_i).to eq(1916)
     end
 
     it 'returns purchase cost if asset is new' do
