@@ -28,7 +28,7 @@ class DecliningBalanceDepreciationCalculator < DepreciationCalculator
     # calculate the value of the asset at the end of each year
     (1..depreciation_months).each do |month|
       v -= (v * depreciation_rate)
-      Rails.logger.debug "month = #{month}, value = #{v}"
+      #Rails.logger.debug "month = #{month}, value = #{v}"
       # if the value drops below the residual value then the depreciation stops
       break if v < rv
     end

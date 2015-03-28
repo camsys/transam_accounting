@@ -1,13 +1,12 @@
 class ExpenseType < ActiveRecord::Base
 
   belongs_to  :organization
-            
-  # default scope
-  default_scope { where(:active => true) }
+
+  # Active scope -- always use this scope in forms
+  scope :active, -> { where(active: true) }
 
   def to_s
     name
   end
 
 end
-
