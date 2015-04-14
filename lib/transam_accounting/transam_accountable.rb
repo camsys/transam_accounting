@@ -21,7 +21,7 @@ module TransamAccountable
     has_many  :grants
 
     # Each org can have 0 or more expenditures
-    has_many  :expeditures
+    has_many  :expenditures
 
     # Each org can have 0 or more expense types
     has_many  :expense_types
