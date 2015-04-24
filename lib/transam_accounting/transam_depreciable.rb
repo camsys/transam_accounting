@@ -79,6 +79,17 @@ module TransamDepreciable
   #
   #------------------------------------------------------------------------------
 
+  # Render the asset as a JSON object -- overrides the default json encoding
+  def as_json(options={})
+    super.merge(
+    {
+      :depreciable => self.depreciable,
+      :depreciation_start_date => self.depreciation_start_date,
+      :book_value => self.book_value,
+      :salvage_value => self.salvage_value
+    })
+  end
+
   # returns the number of months the asset has depreciated
   def depreciation_months(on_date=Date.today)
     (on_date.year * 12 + on_date.month) - (depreciation_start_date.year * 12 + depreciation_start_date.month)
