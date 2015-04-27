@@ -8,4 +8,4 @@
     - if @grant.expenditures.empty?
       %p There are no expenditures associated with this grant.
     - else
-      = render :partial => 'expenditures/expenditures_table', :locals => {:expenditures => @grant.expenditures}
+      = render :partial => 'expenditures/index_table', :locals => {:expenditures => @grant.expenditures}

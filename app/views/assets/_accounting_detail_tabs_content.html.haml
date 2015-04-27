@@ -7,7 +7,7 @@
     - if @asset.expenditures.empty?
       %p There are no expenditures associated with this asset.
     - else
-      = render :partial => 'expenditures/expenditures_table', :locals => {:expenditures => @asset.expenditures}
+      = render :partial => 'expenditures/index_table', :locals => {:expenditures => @asset.expenditures}
 
     - if can? :create, Expenditure
       .row{:style => 'margin-top:50px;'}

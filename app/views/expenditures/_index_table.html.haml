@@ -1,0 +1,85 @@
+:ruby
+  table_dom_id = SecureRandom.hex
+  show_actions ||= 0
+
+- if show_actions == 1
+  #table_actions.btn-group
+    = render :partial => "expenditures/index_actions"
+
+%table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
+  :pagination => 'true',
+  :show_pagination_switch => 'true',
+  :page_list => "[5, 10, 20, 50, 100, 200]",
+  :page_size => current_user.num_table_rows,
+  :search => 'false',
+  :toolbar => "#table_actions",
+  :export_types => "['csv', 'txt', 'excel']",
+  :show_export => 'true',
+  :show_columns => 'true',
+  :show_footer => 'true',
+  :show_toggle => 'true'}}
+  %thead
+    %tr
+      %th.left{:data => {:visible => 'false'}} Object Key
+      %th.left{:data => {:visible => 'false', :sortable => 'true'}} External Id
+      %th.left{:data => {:sortable => 'true'}} Account
+      %th.left{:data => {:sortable => 'true'}} Category
+      %th.left{:data => {:sortable => 'true'}} Date
+      %th.left{:data => {:sortable => 'true'}} Expense
+      %th.left{:data => {:sortable => 'true'}} Vendor
+      %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_column_as_currency'}} Amount
+      %th.left{:data => {:sortable => 'true'}} Grant
+      %th.right{:data => {:sortable => 'true'}} Grant %
+  %tbody
+    - expenditures.includes(:general_ledger_account, :expense_type, :vendor, :grant).each do |e|
+      %tr{:id => e.object_key, :class => 'action-path'}
+        %td.left= e.object_key
+        %td.left= e.external_id
+        %td.left= e.general_ledger_account
+        %td.left= e.expense_type
+        %td.left= format_as_date(e.expense_date)
+        %td.left= e.description.html_safe
+        %td.left= link_to(e.vendor, vendor_path(e.vendor)) unless e.vendor.nil?
+        %td.right= e.amount
+        %td.left= e.grant unless e.grant.nil?
+        %td.right= format_as_percentage(e.pcnt_from_grant) unless e.grant.nil?
+
+:javascript
+
+  var path = '#{expenditure_path("0")}';
+
+  $('##{table_dom_id}').on('click-row.bs.table', function (e, row, $element) {
+    //alert($element.attr('id'));
+    var url = path.replace("0", $element.attr('id'));
+    //alert(url);
+    document.location.href = url;
+  }).on('post-body.bs.table', function() {
+    $('.fixed-table-container').css('min-height', '300px')
+  });
+
+  $(window).resize(function() {
+    $("##{table_dom_id}").bootstrapTable('resetView');
+  });
+
+  function integer_formatter(value) {
+    if (value) {
+      return format("###,###.", value);
+    } else {
+      return value;
+    }
+  };
+  function currency_formatter(value) {
+    if (value) {
+      return '$' + integer_formatter(value);
+    } else {
+      return value;
+    }
+  };
+
+  function sum_column_as_currency(col_data) {
+    var sum = 0;
+    for (i = 0; i < col_data.length; i++) {
+      sum += parseInt(col_data[i][7]);
+    }
+    return "<strong>" + currency_formatter(sum) + "</strong>";
+  };

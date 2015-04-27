@@ -8,6 +8,9 @@ class GeneralLedgerAccountsController < OrganizationAwareController
   # Set the @ledger_account variable
   before_filter :get_ledger_account, :only => [:show, :edit, :update, :destroy]
 
+  # Protect the controller
+  authorize_resource
+
   # Session Variables
   INDEX_KEY_LIST_VAR        = "general_ledger_accounts_list_cache_var"
 

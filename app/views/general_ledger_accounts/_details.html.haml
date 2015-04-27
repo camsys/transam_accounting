@@ -28,7 +28,7 @@
       - if @ledger_account.expenditures.empty?
         %p There are no expenditures associated with this general ledger account.
       - else
-        = render :partial => 'expenditures/expenditures_table', :locals => {:expenditures => @ledger_account.expenditures}
+        = render :partial => 'expenditures/index_table', :locals => {:expenditures => @ledger_account.expenditures}
 
       - if can? :create, Expenditure
         .row{:style => 'margin-top:50px;'}

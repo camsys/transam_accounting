@@ -24,7 +24,7 @@
         %span.input-group-addon
           %i.fa.fa-calendar
     .col-sm-6
-      = f.association :vendor
+      = f.input :vendor, :collection => @organization.vendors
 
   - if SystemConfig.transam_module_loaded? :transit
     .row

@@ -1,14 +1,8 @@
-.btn-group.pull-right.panel-action
-  %button.btn.btn-primary.btn-sm.dropdown-toggle{:data => {:toggle => 'dropdown'}}
-    %i.fa.fa-cog
-    = " Actions"
-    %span.caret
-  %ul.dropdown-menu{:role => 'menu'}
-    - if can? :create, Expenditure
-      %li
-        = link_to new_expenditure_path do
-          %i.fa.fa-plus.fa-fw
-          = " Add Expenditure";
+- if can? :create, Expenditure
+  = link_to new_expenditure_path, :class => 'btn btn-default' do
+    %i.fa.fa-plus.fa-fw
+    = " Add Expenditure"
+
 = form_tag expenditures_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
   - unless @organization.general_ledger_accounts.blank?
     .form-group
