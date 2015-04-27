@@ -9,6 +9,9 @@ class ExpendituresController < OrganizationAwareController
   before_action :set_expenditure, only: [:show, :edit, :update, :destroy]
   before_action :reformat_date_field, only: [:create, :update]
 
+  # Protect the controller
+  authorize_resource
+
   # Session Variables
   INDEX_KEY_LIST_VAR        = "expenditures_list_cache_var"
 
