@@ -80,14 +80,14 @@ module TransamDepreciable
   #------------------------------------------------------------------------------
 
   # Render the asset as a JSON object -- overrides the default json encoding
-  def as_json(options={})
-    super.merge(
+  def depreciable_as_json(options={})
     {
       :depreciable => self.depreciable,
       :depreciation_start_date => self.depreciation_start_date,
       :book_value => self.book_value,
-      :salvage_value => self.salvage_value
-    })
+      :salvage_value => self.salvage_value,
+      :depreciation_date => self.current_depreciation_date
+    }
   end
 
   # returns the number of months the asset has depreciated
@@ -187,7 +187,7 @@ module TransamDepreciable
         asset.current_depreciation_date = policy.current_depreciation_date
 
         # save changes to this asset
-        asset.save
+        asset.save(:validate => false)
       rescue Exception => e
         Rails.logger.warn e.message
       end
