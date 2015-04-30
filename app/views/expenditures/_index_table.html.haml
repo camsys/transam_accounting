@@ -30,6 +30,8 @@
       %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_column_as_currency'}} Amount
       %th.left{:data => {:sortable => 'true'}} Grant
       %th.right{:data => {:sortable => 'true'}} Grant %
+      %th.right{:data => {:visible => 'false', :sortable => 'true'}} Created At
+      %th.right{:data => {:visible => 'false', :sortable => 'true'}} Updated At
   %tbody
     - expenditures.includes(:general_ledger_account, :expense_type, :vendor, :grant).each do |e|
       %tr{:id => e.object_key, :class => 'action-path'}
@@ -43,38 +45,12 @@
         %td.right= e.amount
         %td.left= e.grant unless e.grant.nil?
         %td.right= format_as_percentage(e.pcnt_from_grant) unless e.grant.nil?
+        %td.right= format_as_date_time(e.created_at)
+        %td.right= format_as_date_time(e.updated_at)
+
+= render :partial => 'shared/table_scripts', :locals => {:table_id => table_dom_id, :path_pattern => expenditure_path("xxx")}
 
 :javascript
-
-  var path = '#{expenditure_path("0")}';
-
-  $('##{table_dom_id}').on('click-row.bs.table', function (e, row, $element) {
-    //alert($element.attr('id'));
-    var url = path.replace("0", $element.attr('id'));
-    //alert(url);
-    document.location.href = url;
-  }).on('post-body.bs.table', function() {
-    $('.fixed-table-container').css('min-height', '300px')
-  });
-
-  $(window).resize(function() {
-    $("##{table_dom_id}").bootstrapTable('resetView');
-  });
-
-  function integer_formatter(value) {
-    if (value) {
-      return format("###,##0.", value);
-    } else {
-      return value;
-    }
-  };
-  function currency_formatter(value) {
-    if (value) {
-      return '$' + integer_formatter(value);
-    } else {
-      return value;
-    }
-  };
 
   function sum_column_as_currency(col_data) {
     var sum = 0;
