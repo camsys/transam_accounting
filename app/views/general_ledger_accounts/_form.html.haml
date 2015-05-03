@@ -6,7 +6,7 @@
   :file => :vertical_file_input,
   :boolean => :vertical_boolean}) do |f|
 
-  = f.association :general_ledger_account_type, :label => 'Account Type'
+  = f.association :general_ledger_account_type, :collection => GeneralLedgerAccountType.active, :label => 'Account Type'
   = f.input :account_number
   = f.input :name
 
