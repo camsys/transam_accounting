@@ -49,7 +49,7 @@ class Expenditure < ActiveRecord::Base
 
   # Has 0 or more comments. Using a polymorphic association, These will be removed if the project is removed
   has_many    :comments,    :as => :commentable,  :dependent => :destroy
-  
+
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
@@ -76,6 +76,16 @@ class Expenditure < ActiveRecord::Base
     :asset_ids => []
   ]
 
+  # List of fields which can be searched using a simple text-based search
+  SEARCHABLE_FIELDS = [
+    :object_key,
+    :general_ledger_account,
+    :grant,
+    :expense_type,
+    :name,
+    :description
+  ]
+
   #------------------------------------------------------------------------------
   #
   # Class Methods
@@ -98,6 +108,10 @@ class Expenditure < ActiveRecord::Base
 
   def name
     description
+  end
+
+  def searchable_fields
+    SEARCHABLE_FIELDS
   end
 
   #------------------------------------------------------------------------------
