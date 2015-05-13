@@ -43,7 +43,10 @@ module TransamAccountingAssetsController
 
   def update_depreciation
     proxy = AssetDepreciableProxy.new(params[:asset_depreciable_proxy])
-    asset = Asset.find_by_object_key(proxy.object_key)
+    base_asset = Asset.find_by_object_key(proxy.object_key)
+
+    # Make sure we are working with a full-typed asset
+    asset = Asset.get_typed_asset(base_asset)
 
     # reformat date
     asset.depreciation_start_date = reformat_date(proxy.depreciation_start_date) if proxy.depreciation_start_date
@@ -55,7 +58,9 @@ module TransamAccountingAssetsController
 
     asset.updator = current_user
 
-    asset.save
+    if asset.save
+      notify_user(:notice, "Asset #{@asset.name} was successfully updated.")
+    end
 
     redirect_to inventory_path(asset)
   end
