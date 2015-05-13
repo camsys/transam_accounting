@@ -122,7 +122,7 @@ class ExpendituresController < OrganizationAwareController
 
     if @expenditure.save
       if @asset.present?
-        redirect_to @asset, notice: 'Expenditure was successfully created.'
+        redirect_to inventory_url(@asset), notice: 'Expenditure was successfully created.'
       else
         redirect_to @expenditure, notice: 'Expenditure was successfully created.'
       end
