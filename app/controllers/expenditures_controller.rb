@@ -112,13 +112,20 @@ class ExpendituresController < OrganizationAwareController
 
     add_breadcrumb "New"
 
+    # If we have an asset to add we need to return to the asset page
+    # not the expenditure page
     unless params[:asset_key].nil?
-      @asset = Asset.find_by_object_key(params[:asset_key])
+      raw_asset = Asset.find_by_object_key(params[:asset_key])
+      @asset = Asset.get_typed_asset(raw_asset)
       @expenditure.assets << @asset
     end
 
     if @expenditure.save
-      redirect_to @expenditure, notice: 'Expenditure was successfully created.'
+      if @asset.present?
+        redirect_to @asset, notice: 'Expenditure was successfully created.'
+      else
+        redirect_to @expenditure, notice: 'Expenditure was successfully created.'
+      end
     else
       render :new
     end
@@ -145,20 +152,21 @@ class ExpendituresController < OrganizationAwareController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_expenditure
-      @expenditure = Expenditure.find_by(:object_key => params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def expenditure_params
-      params.require(:expenditure).permit(Expenditure.allowable_params)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_expenditure
+    @expenditure = Expenditure.find_by(:object_key => params[:id])
+  end
 
-    def reformat_date_field
-      date_str = params[:expenditure][:expense_date]
-      form_date = Date.strptime(date_str, '%m-%d-%Y')
-      params[:expenditure][:expense_date] = form_date.strftime('%Y-%m-%d')
-    end
+  # Only allow a trusted parameter "white list" through.
+  def expenditure_params
+    params.require(:expenditure).permit(Expenditure.allowable_params)
+  end
+
+  def reformat_date_field
+    date_str = params[:expenditure][:expense_date]
+    form_date = Date.strptime(date_str, '%m-%d-%Y')
+    params[:expenditure][:expense_date] = form_date.strftime('%Y-%m-%d')
+  end
 
 end
