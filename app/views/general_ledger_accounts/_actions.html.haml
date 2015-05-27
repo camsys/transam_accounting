@@ -9,7 +9,7 @@
         = link_to edit_general_ledger_account_path(@ledger_account) do
           %i.fa.fa-edit.fa-fw
           = " Update this general ledger account"
-    - if can? :delete, @ledger_account
+    - if can? :destroy, @ledger_account
       %li.divider
       %li
         = link_to general_ledger_account_path(@ledger_account), :method => :delete, :data => {:confirm => "Are you sure you want to remove this general ledger account? The action can't be undone."} do
