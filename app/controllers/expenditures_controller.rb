@@ -165,7 +165,7 @@ class ExpendituresController < OrganizationAwareController
 
   def reformat_date_field
     date_str = params[:expenditure][:expense_date]
-    form_date = Date.strptime(date_str, '%m-%d-%Y')
+    form_date = Date.strptime(date_str, '%m/%d/%Y')
     params[:expenditure][:expense_date] = form_date.strftime('%Y-%m-%d')
   end
 

@@ -16,7 +16,7 @@
     .row
       .col-xs-3
         = f.input :depreciation_start_date, :wrapper => :vertical_append, :label => "Depreciation Start Date" do
-          = f.input_field :depreciation_start_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => f.object.depreciation_start_date.strftime("%m-%d-%Y")
+          = f.input_field :depreciation_start_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.depreciation_start_date)
           %span.input-group-addon
             %i.fa.fa-calendar
 
@@ -41,6 +41,6 @@
   // Document Ready
   $(document).ready(function(){
     $('[data-behavior~=datepicker]').datepicker({
-      format: "mm-dd-yyyy"
+      format: "mm/dd/yyyy"
     });
   });
