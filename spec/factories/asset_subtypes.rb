@@ -4,6 +4,7 @@ FactoryGirl.define do
     association :asset_type
     name "Test Asset Subtype"
     description "Test Asset Subtype"
+    active true
   end
 
 end
