@@ -46,12 +46,12 @@
         = ' Expenditures'
 
       %ul.dropdown-menu
-        - ExpenseType.all.each do |type|
+        - @organization.expense_types.active.each do |type|
           %li.text-left
             = link_to expenditures_path(:type => type) do
               %i.fa.fa-fw.fa-usd
               = type
-          %li.divider
+        %li.divider
         %li
           = link_to new_expenditure_path do
             %i.fa.fa-plus.fa-fw
