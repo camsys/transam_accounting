@@ -78,6 +78,8 @@ class ExpendituresController < OrganizationAwareController
 
   # GET /expenditures/1
   def show
+    asset = Asset.find_by(object_key: params[:id])
+    @expenditure = Expenditure.find_by(grant_id: asset.grants.first.id)
 
     add_breadcrumb @expenditure.expense_type, expenditures_path(:type => @expenditure.expense_type)
     add_breadcrumb @expenditure
