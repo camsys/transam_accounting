@@ -1,0 +1,25 @@
+= simple_form_for(@grant,
+  :html => {:class => 'form-vertical'},
+  :wrapper => :vertical_form,
+  :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes,
+    :radio_buttons => :vertical_radio_and_checkboxes,
+    :file => :vertical_file_input,
+    :boolean => :vertical_boolean}) do |f|
+
+  = f.association :funding_source
+  = f.input :fy_year, :collection => @fiscal_years, :label => 'Fiscal Year'
+  = f.input :grant_number
+
+  = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
+    %span.input-group-addon
+      %i.fa.fa-usd
+    = f.input_field :amount, :class => "form-control"
+
+  = f.association :general_ledger_accounts
+
+  = f.button :submit, :class => "btn btn-primary"
+
+:javascript
+  $(document).ready(function(){
+    transam.make_same_height('.header-part');
+  });
