@@ -69,7 +69,7 @@ class ExpendituresController < OrganizationAwareController
 
     end
 
-    @expenditures = Expenditure.where(conditions.join(' AND '), *values)
+    @expenditures = Expenditure.where(conditions.join(' AND '), *values).order(expense_date: :desc)
 
     # cache the expenditure ids in case we need them later
     cache_list(@expenditures, INDEX_KEY_LIST_VAR)

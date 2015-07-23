@@ -32,7 +32,7 @@ class GeneralLedgerAccountsController < OrganizationAwareController
     end
 
     if @chart_of_accounts
-      @ledger_accounts = @chart_of_accounts.general_ledger_accounts.where(conditions.join(' AND '), *values)
+      @ledger_accounts = @chart_of_accounts.general_ledger_accounts.where(conditions.join(' AND '), *values).order(:name)
     else
       Rails.logger.warn "No chart of accounts found for org #{@organization.short_name}"
       @ledger_accounts = []
