@@ -15,7 +15,9 @@
       %i.fa.fa-usd
     = f.input_field :amount, :class => "form-control"
 
-  = f.association :general_ledger_accounts
+  = f.association :grant_budgets do |b|
+    = b.input :general_ledger_account_id, collection: GeneralLedgerAccount.all
+    = b.input :amount
 
   = f.button :submit, :class => "btn btn-primary"
 
