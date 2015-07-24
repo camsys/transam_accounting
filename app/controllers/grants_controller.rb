@@ -114,16 +114,24 @@ class GrantsController < OrganizationAwareController
     @grant = Grant.new(grant_params)
     @grant.organization = @organization
 
-     # Create Grant Budgets
-    account_ids = params[:grant][:general_ledger_account_ids]
-    accounts = GeneralLedgerAccount.where(id: account_ids)
-    accounts.each { |account| GrantBudget.create(grant: @grant, general_ledger_account: account, amount: @grant.amount) }
+    # Create Grant Budgets
+    grant_budget = GrantBudget.new
+    grant_budget.grant_id = @grant.id
+    grant_budget.general_ledger_account_id = params[:grant][:grant_budgets][:general_ledger_account_id]
+    grant_budget.amount = params[:grant][:grant_budgets][:amount]
 
     # get fiscal years up to planning year + 3 years
     @fiscal_years = fiscal_year_range(4)
 
     respond_to do |format|
       if @grant.save
+        # Create Grant Budgets
+        grant_budget = GrantBudget.new
+        grant_budget.grant_id = @grant.id
+        grant_budget.general_ledger_account_id = params[:grant][:grant_budgets][:general_ledger_account_id]
+        grant_budget.amount = params[:grant][:grant_budgets][:amount]
+        grant_budget.save
+
         notify_user(:notice, "The Grant was successfully saved.")
         format.html { redirect_to grant_url(@grant) }
         format.json { render action: 'show', status: :created, location: @grant }

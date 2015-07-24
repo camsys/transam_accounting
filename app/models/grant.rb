@@ -63,7 +63,7 @@ class Grant < ActiveRecord::Base
     :grant_number,
     :amount,
     :active,
-    :general_ledger_account_ids
+    :grant_budgets
   ]
 
   # List of fields which can be searched using a simple text-based search
