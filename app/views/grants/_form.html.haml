@@ -17,7 +17,10 @@
 
   = f.association :grant_budgets do |b|
     = b.input :general_ledger_account_id, collection: GeneralLedgerAccount.all, required: false
-    = b.input :amount, required: false, :label => "Amount from this general ledger account"
+    = b.input :amount, required: false, :wrapper=> :vertical_prepend,:label => "Amount from this general ledger account" do
+      %span.input-group-addon
+        %i.fa.fa-usd
+      = f.input_field :amount, :class => "form-control"
 
   = f.button :submit, :class => "btn btn-primary"
 
