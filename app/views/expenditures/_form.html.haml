@@ -26,19 +26,23 @@
     .col-sm-6
       = f.association :vendor, :collection => @organization.vendors
 
-  - if SystemConfig.transam_module_loaded? :transit
-    .row
-      .col-md-7
-        = f.input :grant_id, :collection => @organization.grants
-      .col-md-5
-        = f.input :pcnt_from_grant, :wrapper => :vertical_append, :label => "Pcnt" do
-          = f.input_field :pcnt_from_grant, :input_html => {:min => 0}, :style => 'text-align:right;', :class => 'form-control', :label => false
-          %span.input-group-addon %
-
   - unless @organization.chart_of_accounts.blank?
     - if @ledger_account.nil?
       = f.association :general_ledger_account, :label => 'General Ledger Account', :collection => @organization.chart_of_accounts.general_ledger_accounts
     - else
       = f.association :general_ledger_account, :label => 'General Ledger Account', :collection => @organization.chart_of_accounts.general_ledger_accounts, :selected => @ledger_account.id
 
+
+  - if SystemConfig.transam_module_loaded? :transit
+    .row
+      .col-md-7#grant-selector
+        = f.input :grant_id, :collection => @organization.chart_of_accounts.general_ledger_accounts, :as => :grouped_select, :group_method => :grants
+      .col-md-5
+        = f.input :pcnt_from_grant, :wrapper => :vertical_append, :label => "Pcnt" do
+          = f.input_field :pcnt_from_grant, :input_html => {:min => 0}, :style => 'text-align:right;', :class => 'form-control', :label => false
+          %span.input-group-addon %
+
+
   = f.button :submit, :class => 'btn btn-primary'
+
+  = render 'expenditures/form_scripts'
