@@ -18,7 +18,7 @@
       = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
         %span.input-group-addon
           %i.fa.fa-usd
-        = f.input_field :amount, :class => "form-control"
+        = f.input_field :amount, :class => "form-control", :input_html => {:min => 0}
     .col-sm-3
       = f.input :expense_date, :wrapper => :vertical_append, :label => "Expense Date" do
         = f.input_field :expense_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.expense_date)
