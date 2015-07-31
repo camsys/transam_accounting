@@ -26,5 +26,20 @@
       }
 
     });
+      $('#new_expenditure').validate({
+        ignore: [], //validate hidden fields
+        submitHandler: function(form) {
+          form.submit();
+        }
+      });
+
+      $('#expenditure_amount').rules("add", {
+        min: 0,
+      });
+
+      $('#expenditure_pcnt_from_grant').rules("add", {
+        min: 0,
+        max: 100
+      });
   });
 </script>
