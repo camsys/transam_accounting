@@ -1,15 +1,17 @@
 <script type="text/javascript">
   $(document).ready(function() {
 
-    $('#grant-selector').hide();
+    $('#grant-selector-chart-of-accounts-present').hide();
+    $('#pcnt_from_grant-chart-of-accounts-present').hide();
 
     $('#expenditure_general_ledger_account_id').change(function(){
       var selection = $(this).find(":selected").text()
       console.log( selection );
 
       if (selection.length > 0){
-        $('#grant-selector').fadeIn();
-        $('#grant-selector').find('optgroup').each(function(index, group){
+        $('#pcnt_from_grant-chart-of-accounts-present').fadeIn();
+        $('#grant-selector-chart-of-accounts-present').fadeIn();
+        $('#grant-selector-chart-of-accounts-present').find('optgroup').each(function(index, group){
             var label = $(group).attr('label')
             if (label !== selection){
               $(group).children('option').prop('selected', false);
@@ -19,7 +21,8 @@
             };
           }); // each of each
       } else{
-        $('#grant-selector').fadeOut();
+        $('#grant-selector-chart-of-accounts-present').fadeOut();
+        $('#pcnt_from_grant-chart-of-accounts-present').fadeOut();
       }
 
     });
