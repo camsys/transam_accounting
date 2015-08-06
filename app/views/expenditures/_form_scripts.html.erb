@@ -1,10 +1,12 @@
 <script type="text/javascript">
   $(document).ready(function() {
 
+    // Formats the dates for the date-picker and makes it read-only
     $('[data-behavior~=datepicker]').datepicker({
       format: "mm/dd/yyyy"
     }).attr( 'readOnly' , 'true' );
 
+    // Requires users to select a GLA account before the grant if the organization has a chart of accounts
     $('#grant-selector-chart-of-accounts-present').hide();
     $('#pcnt_from_grant-chart-of-accounts-present').hide();
 
@@ -23,13 +25,15 @@
             } else {
               $(group).fadeIn();
             };
-          }); // each of each
+          }); // end of each
       } else{
         $('#grant-selector-chart-of-accounts-present').fadeOut();
         $('#pcnt_from_grant-chart-of-accounts-present').fadeOut();
       }
 
     });
+
+      // jquery validations
       $('#new_expenditure').validate({
         ignore: [], //validate hidden fields
         submitHandler: function(form) {
