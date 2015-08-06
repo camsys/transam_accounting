@@ -1,6 +1,10 @@
 <script type="text/javascript">
   $(document).ready(function() {
 
+    $('[data-behavior~=datepicker]').datepicker({
+      format: "mm/dd/yyyy"
+    }).attr( 'readOnly' , 'true' );
+
     $('#grant-selector-chart-of-accounts-present').hide();
     $('#pcnt_from_grant-chart-of-accounts-present').hide();
 
