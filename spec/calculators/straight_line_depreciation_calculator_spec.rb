@@ -15,7 +15,6 @@ RSpec.describe StraightLineDepreciationCalculator, :type => :calculator do
     @organization = create(:organization)
     @test_asset = create(:buslike_asset, :organization => @organization)
     @policy = create(:policy, :organization => @organization)
-    @policy_item = create(:policy_item, :policy => @policy, :asset_subtype => @test_asset.asset_subtype)
   end
 
   let(:test_calculator) { StraightLineDepreciationCalculator.new }
@@ -37,9 +36,6 @@ RSpec.describe StraightLineDepreciationCalculator, :type => :calculator do
       @test_asset.depreciation_start_date = Date.new(1900,1,1)
       @test_asset.save
 
-      # set percent residual value so easy to predict
-      @policy_item.pcnt_residual_value = 50
-      @policy_item.save
 
       expect(test_calculator.calculate(@test_asset)).to eq(@test_asset.salvage_value)
     end

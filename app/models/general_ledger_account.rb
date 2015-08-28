@@ -40,7 +40,7 @@ class GeneralLedgerAccount < ActiveRecord::Base
 
   # Each GLA has 0 or more expenditures
   has_many :expenditures
-  
+
   # Every GLA has and belongs to many assets
   has_and_belongs_to_many :assets
 
@@ -68,7 +68,8 @@ class GeneralLedgerAccount < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
-  default_scope { where(:active => true) }
+  # Allow selection of active instances
+  scope :active, -> { where(:active => true) }
 
   #------------------------------------------------------------------------------
   #

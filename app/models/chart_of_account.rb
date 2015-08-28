@@ -46,7 +46,8 @@ class ChartOfAccount < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
-  default_scope { where(:active => true) }
+  # Allow selection of active instances
+  scope :active, -> { where(:active => true) }
 
   #------------------------------------------------------------------------------
   #
