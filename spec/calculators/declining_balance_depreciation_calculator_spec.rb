@@ -15,7 +15,8 @@ RSpec.describe DecliningBalanceDepreciationCalculator, :type => :calculator do
     @organization = create(:organization)
     @test_asset = create(:buslike_asset, :organization => @organization)
     @policy = create(:policy, :organization => @organization)
-    @policy_item = create(:policy_item, :policy => @policy, :asset_subtype => @test_asset.asset_subtype)
+    create(:policy_asset_type_rule, :policy => @policy, :asset_type => @test_asset.asset_type)
+    create(:policy_asset_subtype_rule, :policy => @policy, :asset_subtype => @test_asset.asset_subtype)
   end
 
   let(:test_calculator) { DecliningBalanceDepreciationCalculator.new }
@@ -38,8 +39,7 @@ RSpec.describe DecliningBalanceDepreciationCalculator, :type => :calculator do
       @test_asset.save
 
       # set percent residual value so easy to predict
-      @policy_item.pcnt_residual_value = 50
-      @policy_item.save
+      PolicyAssetTypeRule.last.update!(:pcnt_residual_value => 50)
 
       expect(test_calculator.calculate(@test_asset)).to eq(@test_asset.salvage_value)
     end
