@@ -200,7 +200,7 @@ module TransamDepreciable
       end
       self.depreciation_start_date ||= self.in_service_date
       self.book_value ||= self.purchase_cost.nil? ? 0 : self.purchase_cost
-      self.salvage_value ||= self.purchase_cost.nil? ? 0 : (self.policy_rule.pcnt_residual_value / 100.0 * self.purchase_cost).to_i
+      self.salvage_value ||= 0
       self.depreciable = true if new_record?
 
     end
