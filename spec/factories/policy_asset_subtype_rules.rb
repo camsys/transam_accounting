@@ -7,5 +7,7 @@ FactoryGirl.define do
     cost_fy_year 6
     replace_with_new true
     replace_with_leased false
+    rehabilitation_code 'XXXXXXXX'
+    purchase_replacement_code 'XXXXXXXX'
   end
 end
