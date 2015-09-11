@@ -91,7 +91,7 @@ module TransamDepreciable
     # See if the table has already been created and cached
     table = get_cached_object('depreciation_table')
     if table.nil?
-      if depreciation_start_date.nil? or current_depreciation_date.nil?
+      if depreciation_start_date.nil?
         table = []
       else
         # Make sure we are working with a concrete asset class
