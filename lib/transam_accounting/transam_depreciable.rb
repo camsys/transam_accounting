@@ -138,9 +138,12 @@ module TransamDepreciable
   # This would normally run super, but it gets added to Asset.  Since there are no TransAM classes
   # above it, it just returns its own UPDATE_METHODS
   def update_methods
-    [
-      :update_book_value
-    ]
+    a = []
+    a << super
+    [:update_book_value].each do |method|
+      a << method
+    end
+    a.flatten
   end
 
   # Forces an update of an assets book value. This performs an update on the record
