@@ -164,19 +164,10 @@ module TransamDepreciable
       # Make sure we are working with a concrete asset class
       asset = is_typed? ? self : Asset.get_typed_asset(self)
 
-      # Get the policy to use
-      policy = policy.nil? ? asset.policy : policy
-
-      # exit if we can find a policy to work on
-      if policy.nil?
-        Rails.logger.warn "Can't find a policy for asset = #{object_key}"
-        return
-      end
-
       begin
         # see what algorithm we are using to calculate the book value
-        class_name = policy.depreciation_calculation_type.class_name
-        book_value = calculate(asset, policy, class_name)
+        class_name = asset.policy_analyzer.get_depreciation_calculation_type.class_name
+        book_value = calculate(asset, class_name)
         asset.book_value = book_value.to_i
 
         #update current depreciation date
@@ -191,11 +182,9 @@ module TransamDepreciable
 
     # Set resonable defaults for a new asset
     def set_depreciation_defaults
-      if self.in_service_date.nil?
-        self.in_service_date = self.purchase_date.nil? ? Date.today : self.purchase_date
-      end
+      self.in_service_date ||= self.in_service_date.nil? ? self.purchase_date : self.in_service_date
       self.depreciation_start_date ||= self.in_service_date
-      self.book_value ||= self.purchase_cost.nil? ? 0 : self.purchase_cost
+      self.book_value ||= self.purchase_cost.to_i
       self.salvage_value ||= 0
       self.depreciable = true if new_record?
 
