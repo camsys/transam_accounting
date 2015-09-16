@@ -83,10 +83,10 @@ module TransamAccountingPolicy
   def current_depreciation_date
     if depreciation_interval_type.id == 3
       # monthly
-      d = Date.today - 1.month.end_of_month
+      d = (Date.today - 1.month).end_of_month
     elsif depreciation_interval_type.id == 2
       # quarterly
-      d = Date.today - 3.month.end_of_quarter
+      d = (Date.today - 3.month).end_of_quarter
     else
       # default to end of the fiscal year
       d = fiscal_year_end_date(Date.today - 1.year)

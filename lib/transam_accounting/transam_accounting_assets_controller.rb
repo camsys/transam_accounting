@@ -59,7 +59,7 @@ module TransamAccountingAssetsController
     asset.updator = current_user
 
     if asset.save
-      notify_user(:notice, "Asset #{@asset.name} was successfully updated.")
+      notify_user(:notice, "Asset #{asset.name} was successfully updated.")
     end
 
     redirect_to inventory_path(asset)
