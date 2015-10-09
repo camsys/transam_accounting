@@ -97,7 +97,7 @@ module TransamAccountingPolicy
   # Returns the next depreciation date for the org based on the policy they
   # have selected
   def next_depreciation_date
-    current_depreciation_date + depreciation_interval_type.months.months
+    (current_depreciation_date + depreciation_interval_type.months.months).end_of_month
   end
 
   protected
