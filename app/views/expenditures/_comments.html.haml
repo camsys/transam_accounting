@@ -1,7 +1,7 @@
 .row
   .col-md-12{:style => 'height:200px;overflow-y:auto;'}
     - if @expenditure.comments.empty?
-      %p There are no comments for this expenditure.
+      %p There are no comments for this CapEx.
     - else
       = render :partial => 'shared/comments', :locals => {:comments => @expenditure.comments}
 

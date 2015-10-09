@@ -5,6 +5,6 @@
 .tab-pane.fade#expn
   .tab-content
     - if @vendor.expenditures.empty?
-      %p There are no expenditures associated with this vendor.
+      %p There are no CapEx associated with this vendor.
     - else
       = render :partial => 'expenditures/index_table', :locals => {:expenditures => @vendor.expenditures}

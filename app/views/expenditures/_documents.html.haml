@@ -1,7 +1,7 @@
 .row
   .col-md-12{:style => 'height:180px;overflow-y:auto;'}
     - if @expenditure.documents.empty?
-      %p There are no documents for this expenditure.
+      %p There are no documents for this CapEx.
     - else
       = render :partial => 'shared/documents', :locals => {:documents => @expenditure.documents}
 
