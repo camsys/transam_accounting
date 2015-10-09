@@ -6,6 +6,6 @@
 .tab-pane.fade#expn
   .tab-content
     - if @grant.expenditures.empty?
-      %p There are no expenditures associated with this grant.
+      %p There are no CapEx associated with this grant.
     - else
       = render :partial => 'expenditures/index_table', :locals => {:expenditures => @grant.expenditures}

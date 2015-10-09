@@ -41,7 +41,7 @@
     %li.text-left.dropdown-submenu
       = link_to expenditures_path do
         %i.fa.fa-fw.fa-usd
-        = ' Expenditures'
+        = 'CapEx'
 
       %ul.dropdown-menu
         - @organization.expense_types.active.each do |type|
@@ -53,7 +53,7 @@
         %li
           = link_to new_expenditure_path do
             %i.fa.fa-plus.fa-fw
-            = "Add Expenditure";
+            = "Add CapEx";
 
     %li.divider
     %li.text-left

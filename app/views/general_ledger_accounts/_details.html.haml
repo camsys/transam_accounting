@@ -10,7 +10,7 @@
   %li
     %a{:href => "#expenditures", :data =>{:toggle => 'tab'}}
       %span.badge.pull-right= @ledger_account.expenditures.count
-      = "Expenditures"
+      = "CapEx"
 
 .tab-content
   .tab-pane.fade#grants_table
@@ -26,7 +26,7 @@
   .tab-pane.fade#expenditures
     .tab-content
       - if @ledger_account.expenditures.empty?
-        %p There are no expenditures associated with this general ledger account.
+        %p There are no CapEx associated with this general ledger account.
       - else
         = render :partial => 'expenditures/index_table', :locals => {:expenditures => @ledger_account.expenditures}
 
@@ -34,6 +34,6 @@
         .row{:style => 'margin-top:50px;'}
           .col-md-12
             %fieldset
-              %legend Add Expenditure
+              %legend Add CapEx
               - @expenditure = Expenditure.new
               = render :partial => 'expenditures/form'

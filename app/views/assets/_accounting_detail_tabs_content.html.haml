@@ -5,7 +5,7 @@
 .tab-pane.fade#expenditures
   .tab-content
     - if @asset.expenditures.empty?
-      %p There are no expenditures associated with this asset.
+      %p There are no CapEx associated with this asset.
     - else
       = render :partial => 'expenditures/index_table', :locals => {:expenditures => @asset.expenditures}
 
@@ -13,6 +13,6 @@
       .row{:style => 'margin-top:50px;'}
         .col-md-12
           %fieldset
-            %legend Add Expenditure
+            %legend Add CapEx
             - @expenditure = Expenditure.new
             = render :partial => 'expenditures/form'
