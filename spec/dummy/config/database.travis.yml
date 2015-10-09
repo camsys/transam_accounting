@@ -8,7 +8,7 @@ mysql: &mysql
   adapter: mysql2
   username: root
   password:
-  database: transam_core_testing
+  database: transam_accounting_testing
 
 # postgresql: &postgresql
 #   adapter: postgresql
