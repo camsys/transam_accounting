@@ -47,7 +47,7 @@ module TransamGlAccountableGrant
     total_capex = 0
 
     expenditures.each do |exp|
-      spending = exp.amount.to_f * exp.pct_from_grant / 100
+      spending = exp.amount.to_f * exp.pcnt_from_grant / 100
       total_capex += spending
     end
 
