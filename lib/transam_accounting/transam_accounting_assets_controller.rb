@@ -32,9 +32,10 @@ module TransamAccountingAssetsController
   def edit_depreciation
     get_asset
 
-    add_breadcrumb "#{@asset.asset_type.name}".pluralize(2), inventory_index_path
-    add_breadcrumb @asset.name, inventory_path(@asset)
-    add_breadcrumb "Update depreciation data", edit_depreciation_inventory_path(@asset)
+    add_breadcrumb "#{@asset.asset_type.name}".pluralize(2), inventory_index_path(:asset_type => @asset.asset_type, :asset_subtype => 0)
+    add_breadcrumb "#{@asset.asset_subtype.name}", inventory_index_path(:asset_subtype => @asset.asset_subtype)
+    add_breadcrumb @asset.asset_tag, inventory_path(@asset)
+    add_breadcrumb "Update depreciation data"
 
     @proxy = AssetDepreciableProxy.new
     @proxy.set_defaults(@asset)
@@ -53,8 +54,6 @@ module TransamAccountingAssetsController
 
     asset.depreciable = proxy.depreciable
     asset.salvage_value = proxy.salvage_value if proxy.salvage_value
-    asset.expected_useful_life = proxy.expected_useful_life if proxy.expected_useful_life
-    asset.expected_useful_miles = proxy.expected_useful_miles if proxy.expected_useful_miles
 
     asset.updator = current_user
 

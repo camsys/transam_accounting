@@ -26,15 +26,8 @@
             %i.fa.fa-usd
           = f.input_field :salvage_value, :class => "form-control"
 
-    .row
-      .col-xs-3
-        = f.input :expected_useful_life,  :label => "Expected Useful Life",   :collection => get_max_useful_years_collection
-
-      .col-xs-3
-        - if @proxy.respond_to?(:expected_useful_miles) && @proxy.expected_useful_miles
-          = f.input :expected_useful_miles, :label => "Expected Useful Miles",  :collection => get_max_useful_miles_collection
-
     = f.button :submit, 'Update Depreciation', :class => 'btn btn-primary'
+    = link_to "Cancel", :back, {:id => 'cancel-button', :class => "btn btn-default"}
 
 :javascript
 
