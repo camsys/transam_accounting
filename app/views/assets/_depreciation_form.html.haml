@@ -11,9 +11,10 @@
 
   = dialog_tag('Depreciation', {:icon => 'fa fa-refresh', :class => "header-part"}) do
 
-    = f.input :depreciable, :as => :radio_buttons, :label => "Depreciable?"
-
     .row
+      .col-xs-3
+        = f.input :depreciable, :as => :radio_buttons, :label => "Asset is depreciable?"
+
       .col-xs-3
         = f.input :depreciation_start_date, :wrapper => :vertical_append, :label => "Depreciation Start Date" do
           = f.input_field :depreciation_start_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.depreciation_start_date)
@@ -35,5 +36,5 @@
   $(document).ready(function(){
     $('[data-behavior~=datepicker]').datepicker({
     });
-    
+
   });

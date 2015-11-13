@@ -3,7 +3,7 @@
 .row
   .col-md-3
     = dialog_tag('Asset', {:icon => "fa fa-list", :class => "header-part"}) do
-      = render 'assets/summary'
+      = render :partial => 'assets/summary', :locals => {:asset => @asset}
   .col-md-9
     = render "depreciation_form"
 
