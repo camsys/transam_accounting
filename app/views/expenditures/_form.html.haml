@@ -1,5 +1,5 @@
 = simple_form_for(@expenditure,
-:html => {:class => 'form-vertical'},
+:html => {:class => 'form-vertical expenditure_form'},
 :wrapper => :vertical_form,
 :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes,
   :radio_buttons => :vertical_radio_and_checkboxes,
@@ -9,18 +9,18 @@
   - unless @asset.nil?
     = hidden_field_tag :asset_key, @asset.object_key
 
-  = f.input :description, :label => 'Expense'
+  = f.input :description, :required => true, :label => 'Expense'
 
   .row
     .col-sm-3
-      = f.association :expense_type, :collection => @organization.expense_types.active, :label => 'Category'
+      = f.association :expense_type, :required => true, :collection => @organization.expense_types.active, :label => 'Category'
     .col-sm-3
       = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
         %span.input-group-addon
           %i.fa.fa-usd
         = f.input_field :amount, :class => "form-control", :min => 0
     .col-sm-3
-      = f.input :expense_date, :wrapper => :vertical_append, :label => "Expense Date" do
+      = f.input :expense_date, :required => true, :wrapper => :vertical_append, :label => "Expense Date" do
         = f.input_field :expense_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.expense_date)
         %span.input-group-addon
           %i.fa.fa-calendar
