@@ -1,6 +1,6 @@
 RSpec.configure do |config|
 
-  DatabaseCleaner.strategy = :truncation, {:only => %w[assets asset_subtypes asset_types policies organizations organization_types]}
+  DatabaseCleaner.strategy = :truncation, {:only => %w[assets policies organizations]}
   config.before(:suite) do
     begin
       DatabaseCleaner.start
