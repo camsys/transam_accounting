@@ -14,7 +14,7 @@ RSpec.describe DepreciationCalculator, :type => :calculator do
 
   before(:all) do
     @organization = create(:organization)
-    @asset_subtype = create(:asset_subtype)
+    @asset_subtype = AssetSubtype.first
     @policy = create(:policy, :organization => @organization)
   end
 
