@@ -9,10 +9,10 @@ RSpec.describe Policy, :type => :model do
   let(:test_policy) { create(:policy) }
 
   it 'has a depreciation calculation type' do
-    expect(test_policy.attributes).to include('depreciation_calculation_type_id')
+    expect(test_policy).to belong_to(:depreciation_calculation_type)
   end
   it 'has a depreciation interval' do
-    expect(test_policy.attributes).to include('depreciation_interval_type_id')
+    expect(test_policy).to belong_to(:depreciation_interval_type)
   end
 
   it 'form params' do

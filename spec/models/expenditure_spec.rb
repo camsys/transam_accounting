@@ -6,19 +6,19 @@ RSpec.describe Expenditure, :type => :model do
 
   describe 'associations' do
     it 'has an org' do
-      expect(test_expenditure.attributes).to include('organization_id')
+      expect(test_expenditure).to belong_to(:organization)
     end
     it 'has a gla' do
-      expect(test_expenditure.attributes).to include('general_ledger_account_id')
+      expect(test_expenditure).to belong_to(:general_ledger_account)
     end
     it 'has a grant' do
-      expect(test_expenditure.attributes).to include('grant_id')
+      expect(test_expenditure).to belong_to(:grant)
     end
     it 'has an expense type' do
-      expect(test_expenditure.attributes).to include('expense_type_id')
+      expect(test_expenditure).to belong_to(:expense_type)
     end
     it 'has a vendor' do
-      expect(test_expenditure.attributes).to include('vendor_id')
+      expect(test_expenditure).to belong_to(:vendor)
     end
   end
 

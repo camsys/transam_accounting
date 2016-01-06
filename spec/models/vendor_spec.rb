@@ -8,7 +8,7 @@ RSpec.describe Vendor, :type => :model do
   let(:test_vendor) { create(:vendor) }
 
   it 'has many expenditures' do
-    expect(Expenditure.column_names).to include('vendor_id')
+    expect(test_vendor).to have_many(:expenditures)
   end
   it '.expenditures_ytd' do
     old_expenditure = create(:expenditure, :expense_date => Date.today - 2.years, :vendor => test_vendor)

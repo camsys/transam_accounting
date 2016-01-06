@@ -6,12 +6,12 @@ RSpec.describe GrantBudget, :type => :model do
 
   describe 'associations/validations' do
     it 'must have a GLA' do
-      expect(test_grant_budget.attributes).to include('general_ledger_account_id')
+      expect(test_grant_budget).to belong_to(:general_ledger_account)
       test_grant_budget.general_ledger_account = nil
       expect(test_grant_budget.valid?).to be false
     end
     it 'must have a grant' do
-      expect(test_grant_budget.attributes).to include('grant_id')
+      expect(test_grant_budget).to belong_to(:grant)
       test_grant_budget.grant = nil
       expect(test_grant_budget.valid?).to be false
     end

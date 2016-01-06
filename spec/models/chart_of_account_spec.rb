@@ -4,6 +4,15 @@ RSpec.describe ChartOfAccount, :type => :model do
 
   let(:test_chart) { build_stubbed(:chart_of_account) }
 
+  describe 'associations' do
+    it 'has an org' do
+      expect(test_chart).to belong_to(:organization)
+    end
+    it 'has many GLAs' do
+      expect(test_chart).to have_many(:general_ledger_accounts)
+    end
+  end
+
   it 'must have an organization' do
     expect(test_chart.attributes).to include('organization_id')
     test_chart.organization = nil

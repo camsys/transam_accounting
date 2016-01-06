@@ -5,20 +5,20 @@ require 'rails_helper'
 
 RSpec.describe Organization, :type => :model do
   it 'has many grants' do
-    expect(Grant.column_names).to include('organization_id')
+    expect(Organization.new).to have_many(:grants)
   end
 
   it 'has expenditures' do
-    expect(Expenditure.column_names).to include('organization_id')
+    expect(Organization.new).to have_many(:expenditures)
   end
 
   it 'has expense types' do
-    expect(ExpenseType.column_names).to include('organization_id')
+    expect(Organization.new).to have_many(:expense_types)
   end
 
   it 'has a chart of account and thus many GLAs' do
-    expect(GeneralLedgerAccount.column_names).to include('chart_of_account_id')
-    expect(ChartOfAccount.column_names).to include('organization_id')
+    expect(Organization.new).to have_one(:chart_of_account)
+    expect(Organization.new).to have_many(:general_ledger_accounts)
   end
 
   it '.chart_of_accounts' do

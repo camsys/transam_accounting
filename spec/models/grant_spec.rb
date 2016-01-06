@@ -5,13 +5,13 @@ require 'rails_helper'
 
 RSpec.describe Grant, :type => :model do
   it 'has many grant budgets' do
-    expect(GrantBudget.column_names).to include('grant_id')
+    expect(Grant.new).to have_many(:grant_budgets)
   end
   it 'and thus has many GLAs' do
-    expect(GrantBudget.column_names).to include('general_ledger_account_id')
+    expect(Grant.new).to have_many(:general_ledger_accounts)
   end
 
   it 'has many expenditures' do
-    expect(Expenditure.column_names).to include('grant_id')
+    expect(Grant.new).to have_many(:expenditures)
   end
 end

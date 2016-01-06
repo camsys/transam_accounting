@@ -6,12 +6,10 @@ RSpec.describe GeneralLedgerAccount, :type => :model do
 
   describe 'associations/validations' do
     it 'must have a chart of account' do
-      expect(test_gla.attributes).to include('chart_of_account_id')
-      test_gla.chart_of_account = nil
-      expect(test_gla.valid?).to be false
+      expect(test_gla).to belong_to(:chart_of_account)
     end
     it 'must have a gla type' do
-      expect(test_gla.attributes).to include('general_ledger_account_type_id')
+      expect(test_gla).to belong_to(:general_ledger_account_type)
       test_gla.general_ledger_account_type = nil
       expect(test_gla.valid?).to be false
     end

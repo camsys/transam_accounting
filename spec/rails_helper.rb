@@ -5,6 +5,7 @@ require File.expand_path("../dummy/config/environment", __FILE__)
 require 'rspec/rails'
 require 'factory_girl_rails'
 require 'database_cleaner'
+require 'shoulda-matchers'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -22,4 +23,13 @@ RSpec.configure do |config|
   config.include Devise::TestHelpers, :type => :controller
   config.infer_spec_type_from_file_location!
   config.use_transactional_fixtures = true
+end
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    # Choose a test framework:
+    with.test_framework :rspec
+
+    with.library :rails
+  end
 end
