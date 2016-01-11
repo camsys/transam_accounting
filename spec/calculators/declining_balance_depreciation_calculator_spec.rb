@@ -33,9 +33,27 @@ RSpec.describe DecliningBalanceDepreciationCalculator, :type => :calculator do
       expect(test_calculator.calculate(@test_asset)).to eq(@test_asset.purchase_cost)
     end
 
+    it 'returns purchase cost if date is in future' do
+      @test_asset.depreciation_start_date = Date.today+1.year
+      @test_asset.save
+
+      expect(test_calculator.calculate(@test_asset)).to eq(@test_asset.purchase_cost)
+    end
+
     it 'returns residual value if larger than calculated' do
       # make test_asset impossibly old
       @test_asset.depreciation_start_date = Date.new(1900,1,1)
+      @test_asset.save
+
+      # set percent residual value so easy to predict
+      PolicyAssetTypeRule.last.update!(:pcnt_residual_value => 50)
+
+      expect(test_calculator.calculate(@test_asset)).to eq(@test_asset.salvage_value)
+    end
+    it 'returns residual value if end of EUL', :focus do
+      # add a year to show that should be replaced (i.e. depreciated completed) immediately/next year
+      @test_asset.depreciation_start_date = fiscal_year_end_date(Date.today) - (@test_asset.expected_useful_life+12).months
+      @test_asset.salvage_value = 275
       @test_asset.save
 
       # set percent residual value so easy to predict

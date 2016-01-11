@@ -39,6 +39,13 @@ RSpec.describe StraightLineDepreciationCalculator, :type => :calculator do
 
       expect(test_calculator.calculate(@test_asset)).to eq(@test_asset.salvage_value)
     end
+    it 'returns residual value if EUL end' do
+      # add a year to show that should be replaced (i.e. depreciated completed) immediately/next year
+      @test_asset.depreciation_start_date = fiscal_year_end_date(Date.today) - (@test_asset.expected_useful_life+12).months
+      @test_asset.save
+
+      expect(test_calculator.calculate(@test_asset)).to eq(@test_asset.salvage_value)
+    end
   end
 
   describe '#book_value_start' do
