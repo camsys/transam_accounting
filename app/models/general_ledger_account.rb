@@ -100,7 +100,7 @@ class GeneralLedgerAccount < ActiveRecord::Base
 
     # Set resonable defaults for general ledger accounts
     def set_defaults
-      self.active ||= true
+      self.active = self.active.nil? ? true : self.active
     end
 
 end
