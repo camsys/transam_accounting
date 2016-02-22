@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe "policies/_form.html.haml", :type => :view do
   it 'fields' do
-    assign(:policy, Policy.new)
+    assign(:policy, create(:policy))
     render
 
     expect(rendered).to have_field('policy_description')
