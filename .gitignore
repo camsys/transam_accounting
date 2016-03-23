@@ -5,7 +5,6 @@ spec/dummy/db/*.sqlite3
 spec/dummy/db/*.sqlite3-journal
 spec/dummy/tmp/
 spec/dummy/.sass-cache
-spec/dummy/db/schema.rb
 spec/dummy/log/*
 spec/tmp/*
 tmp/*
