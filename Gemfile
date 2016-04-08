@@ -10,6 +10,7 @@ source "https://rubygems.org"
 gem 'transam_core', :github => 'camsys/transam_core'
 gem 'transam_transit', :github => 'camsys/transam_transit'
 gem 'mysql2', '~> 0.3.20' # lock gem for dummy app
+gem "capybara", '2.6.2' # lock gem for old capybara behavior on hidden element xpath
 
 # Declare your gem's dependencies in transam_accounting.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
