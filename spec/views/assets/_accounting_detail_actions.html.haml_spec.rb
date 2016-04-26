@@ -5,6 +5,6 @@ describe "assets/_accounting_detail_actions.html.haml", :type => :view do
     assign(:asset, create(:buslike_asset))
     render
 
-    expect(rendered).to have_link('Update the accounting record')
+    expect(rendered).to have_link('Depreciation Data')
   end
 end

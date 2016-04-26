@@ -589,10 +589,10 @@ ActiveRecord::Schema.define(version: 20151103201401) do
 
   add_index "forms", ["object_key"], name: "forms_idx1", using: :btree
 
-  create_table "frequency_types", :force => true do |t|
-    t.string  "name",        :limit => 32,  :null => false
-    t.string  "description", :limit => 254, :null => false
-    t.boolean "active",                     :null => false
+  create_table "frequency_types", force: true do |t|
+    t.string  "name",        limit: 32,  null: false
+    t.string  "description", limit: 254, null: false
+    t.boolean "active",                  null: false
   end
 
   create_table "fta_agency_types", force: true do |t|
