@@ -147,18 +147,18 @@ module TransamDepreciable
   end
 
   # Forces an update of an assets book value. This performs an update on the record
-  def update_book_value(policy = nil)
+  def update_book_value(save_asset = true, policy = nil)
 
     # can't do this if it is a new record as none of the IDs would be set
     unless new_record?
-      update_asset_book_value(policy)
+      update_asset_book_value(save_asset, policy)
     end
   end
 
   protected
 
     # updates the book value of an asset
-    def update_asset_book_value(policy = nil)
+    def update_asset_book_value(save_asset = true, policy = nil)
       Rails.logger.info "Updating book value for asset = #{object_key}"
 
       # Make sure we are working with a concrete asset class
@@ -174,7 +174,7 @@ module TransamDepreciable
         asset.current_depreciation_date = asset.policy_analyzer.get_current_depreciation_date
 
         # save changes to this asset
-        asset.save(:validate => false)
+        asset.save(:validate => false) if save_asset
       rescue Exception => e
         Rails.logger.warn e.message
       end
