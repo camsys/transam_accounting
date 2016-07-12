@@ -9,15 +9,17 @@ class StraightLineDepreciationCalculator < DepreciationCalculator
   def calculate_on_date(asset, on_date)
 
     # depreciation time
-    num_months = asset.expected_useful_life.nil? ? asset.policy_analyzer.get_max_service_life_months : asset.expected_useful_life
+    num_months = asset.expected_useful_life.nil? ? asset.policy_analyzer.get_min_service_life_months : asset.expected_useful_life
 
     # calcuate the depreciation
-    monthly_depreciation = total_depreciation(asset) / num_months.to_f
+    if num_months > 0
+      monthly_depreciation = total_depreciation(asset) / num_months.to_f
+    end
 
     # Depreciation months of the asset
     depreciation_months = asset.depreciation_months(on_date)
 
-    if depreciation_months < 1
+    if depreciation_months < 1 || monthly_depreciation.nil?
       return purchase_cost(asset)
     end
 

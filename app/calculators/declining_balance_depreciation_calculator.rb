@@ -16,12 +16,12 @@ class DecliningBalanceDepreciationCalculator < DepreciationCalculator
 
     Rails.logger.debug "Depreciation months = #{depreciation_months}, max service life months = #{num_months}"
     # calculate the annual depreciation rate. This is double the actual depreciation rate
-    depreciation_rate = (1 / num_months.to_f) * 2
+    depreciation_rate = (1 / num_months.to_f) * 2 if num_months > 0
     rv = asset.salvage_value
     v  = purchase_cost(asset)
     Rails.logger.debug "purchase cost = #{v}, residual value = #{rv} depreciation_rate = #{depreciation_rate}"
 
-    if depreciation_months < 1
+    if depreciation_months < 1 || depreciation_rate.nil?
       return v
     end
 
