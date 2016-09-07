@@ -103,8 +103,10 @@ module TransamAccountingPolicy
   protected
     # Set resonable defaults for the policy
     def set_depreciation_defaults
-      self.depreciation_calculation_type ||= DepreciationCalculationType.find_by_name('Straight Line')
-      self.depreciation_interval_type ||= DepreciationIntervalType.find_by_name('Annually')
+      if new_record?
+        self.depreciation_calculation_type ||= DepreciationCalculationType.find_by_name('Straight Line')
+        self.depreciation_interval_type ||= DepreciationIntervalType.find_by_name('Annually')
+      end
     end
 
 end
