@@ -1,0 +1,10 @@
+:ruby
+  # Add one or two grant purchases to the builder
+  if @funding_template.grant_purchases.blank?
+    2.times { @asset.grant_purchases.build }
+  else
+    @asset.grant_purchases.build
+  end
+
+= f.simple_fields_for :grant_purchases do |i_f|
+  = render 'fund_template_type_form', :i_f => i_f

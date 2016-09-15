@@ -1,0 +1,26 @@
+= simple_form_for(@funding_template,
+  :html => {:class => 'form-vertical funding_template_form' },
+  :wrapper => :vertical_form,
+  :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
+
+  = f.association :funding_source, :required => true, :collection => FundingSource.active, :include_blank => true, :label => "Funding Program"
+  = f.input :name, :required => true, :input_html => {:maxlength => 64}
+  = f.input :description, :input_html => {:maxlength => 256}
+  = f.association :contributer, :collection => FundingSourceType.active, :required => true
+  = f.input :transfer_only
+  = f.association :owner, :collection => FundingSourceType.active, :required => true
+  = f.input :recurring
+  = f.input :match_required
+
+  = f.association :funding_template_types, :as => :check_boxes, :label => "For"
+
+  = f.button :submit, :class => "btn btn-primary"
+
+:javascript
+
+  // jquery validations
+  $('.funding_template_form').validate({
+    submitHandler: function(form) {
+      form.submit();
+    }
+  });

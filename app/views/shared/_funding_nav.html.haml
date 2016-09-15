@@ -1,0 +1,53 @@
+%li{:class => get_nav_link_class(['funding'])}
+  = link_to "#", :class => "dropdown-toggle", :data => {"toggle" => "dropdown"}, :title => 'Accounting' do
+    %i.fa.fa-usd.fa-2x
+    %b.caret
+  %ul.dropdown-menu.multi-level{:role => 'menu'}
+    %li.text-left.dropdown-submenu
+      = link_to funding_sources_path do
+        %i.fa.fa-book.fa-fw
+        Funding Programs
+
+      %ul.dropdown-menu
+        - FundingSource.active.each do |program|
+          %li.text-left
+            = link_to funding_source_path(program) do
+              %i.fa.fa-fw.fa-book
+              = program
+
+        - if can? :create, FundingSource
+          %li.divider
+          %li
+            = link_to new_funding_source_path do
+              %i.fa.fa-plus.fa-fw
+              = "Add Funding Program";
+
+    %li.text-left.dropdown-submenu
+      = link_to funding_templates_path do
+        %i.fa.fa-fw.fa-legal
+        = ' Templates'
+
+      %ul.dropdown-menu
+        - FundingTemplate.active.each do |template|
+          %li.text-left
+            = link_to funding_template_path(template) do
+              %i.fa.fa-fw.fa-legal
+              = template
+
+        - if can? :create, FundingTemplate
+          %li.divider
+          %li
+            = link_to new_funding_template_path do
+              %i.fa.fa-plus.fa-fw
+              = "Add Template";
+
+    %li.text-left.dropdown-submenu
+      = link_to '#' do
+        %i.fa.fa-fw.fa-legal
+        = ' Buckets'
+
+    %li.divider
+    %li.text-left.dropdown-submenu
+      = link_to '#' do
+        %i.fa.fa-fw.fa-usd
+        = 'My Funds'
