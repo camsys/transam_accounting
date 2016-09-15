@@ -1,0 +1,16 @@
+%ul.nav.nav-tabs
+  %li
+    %a{:href => "#desc", :data =>{:toggle => 'tab'}}
+      = "Description"
+  %li
+    %a{:href => "#bckts", :data =>{:toggle => 'tab'}}
+      %span.badge.pull-right= "TBD"
+      = "Buckets"
+
+.tab-content{:style => 'max-height:400px;overflow-y: auto;'}
+  .tab-pane.fade#desc
+    .tab-content
+      = @funding_template.description
+
+  .tab-pane.fade#bckts
+    .tab-content
