@@ -1,7 +1,4 @@
 .row
-  .col-md-6.col-md-offset-3
-    %fieldset
-      %legend New Template
-      = render(:partial => 'shared/form_errors', :locals => {:obj => @funding_template}) unless @funding_template.errors.empty?
+  = render(:partial => 'shared/form_errors', :locals => {:obj => @funding_template}) unless @funding_template.errors.empty?
 
-      = render 'form'
+  = render 'form'

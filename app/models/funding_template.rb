@@ -35,9 +35,11 @@ class FundingTemplate < ActiveRecord::Base
       :description,
       :contributer_id,
       :owner_id,
+      :transfer_only,
       :recurring,
       :match_required,
       :active,
+      :organization_ids,
       {:funding_template_type_ids=>[]}
   ]
 

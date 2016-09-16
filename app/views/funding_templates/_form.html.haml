@@ -3,23 +3,39 @@
   :wrapper => :vertical_form,
   :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
 
-  = f.association :funding_source, :required => true, :collection => FundingSource.active, :include_blank => true, :label => "Funding Program"
-  = f.input :name, :required => true, :input_html => {:maxlength => 64}
-  = f.input :description, :input_html => {:maxlength => 256}
-  = f.association :contributer, :collection => FundingSourceType.active, :required => true
-  = f.input :transfer_only
-  = f.association :owner, :collection => FundingSourceType.active, :required => true
-  = f.input :recurring
-  = f.input :match_required
+  .col-md-6
+    = dialog_tag('Details', {:icon => 'fa fa-book', :class => "header-part"}) do
 
-  = f.association :funding_template_types, :as => :check_boxes, :label => "For"
+      = f.association :funding_source, :required => true, :collection => FundingSource.active, :include_blank => true, :label => "Funding Program"
+      = f.input :name, :required => true, :input_html => {:maxlength => 64}
+      = f.input :description, :input_html => {:maxlength => 256}
+      = f.association :contributer, :collection => FundingSourceType.active, :required => true
+      = f.input :transfer_only
+      = f.association :owner, :collection => FundingSourceType.active, :required => true
+      = f.input :recurring
+      = f.input :match_required, :wrapper => :vertical_append do
+        = f.input_field :match_required, :class => 'form-control'
+        %span.input-group-addon
+          %i.fa.fa-percent
+
+      = f.association :funding_template_types, :as => :check_boxes, :label => "For"
+
+      = f.input :organization_ids, :as => :hidden
+
+  .col-md-6
+    = dialog_tag('Eligibility', {:icon => 'fa fa-book', :class => "header-part"}) do
+
+      #org_select.input-large
 
   = f.button :submit, :class => "btn btn-primary"
+
+= render 'form_scripts'
 
 :javascript
 
   // jquery validations
   $('.funding_template_form').validate({
+    ignore: '#funding_template_organization_ids, .filter-input, .filtered',
     submitHandler: function(form) {
       form.submit();
     }

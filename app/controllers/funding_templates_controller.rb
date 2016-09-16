@@ -3,10 +3,45 @@ class FundingTemplatesController < OrganizationAwareController
 
   add_breadcrumb 'Funding Programs', :funding_sources_path
 
+  INDEX_KEY_LIST_VAR    = "funding_template_key_list_cache_var"
+
   # GET /funding_templates
   def index
 
     add_breadcrumb 'Templates', funding_templates_path
+
+
+    # Start to set up the query
+    conditions  = []
+    values      = []
+
+    @funding_source_id = params[:funding_source_id]
+    unless @funding_source_id.blank?
+      @funding_source_id = @funding_source_id.to_i
+      conditions << 'funding_source_id = ?'
+      values << @funding_source_id
+
+      program = FundingSource.find_by(id: @funding_source_id)
+      add_breadcrumb program.to_s, funding_source_path(program)
+    end
+
+    @show_active_only = params[:show_active_only]
+    if @show_active_only
+      conditions << 'active = ?'
+      values << true
+    end
+
+    #puts conditions.inspect
+    #puts values.inspect
+    @funding_templates = FundingTemplate.where(conditions.join(' AND '), *values)
+
+    # cache the set of object keys in case we need them later
+    cache_list(@funding_templates, INDEX_KEY_LIST_VAR)
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render :json => @funding_templates }
+    end
 
     @funding_templates = FundingTemplate.all
   end
@@ -42,9 +77,15 @@ class FundingTemplatesController < OrganizationAwareController
 
   # POST /funding_templates
   def create
-    @funding_template = FundingTemplate.new(funding_template_params)
+    @funding_template = FundingTemplate.new(funding_template_params.except(:organization_ids))
 
     if @funding_template.save
+
+      org_list = funding_template_params[:organization_ids].split(',').uniq
+      org_list.each do |id|
+        @funding_template.organizations << Organization.find(id)
+      end
+
       redirect_to @funding_template, notice: 'Funding template was successfully created.'
     else
       render :new
@@ -53,7 +94,16 @@ class FundingTemplatesController < OrganizationAwareController
 
   # PATCH/PUT /funding_templates/1
   def update
-    if @funding_template.update(funding_template_params)
+    if @funding_template.update(funding_template_params.except(:organization_ids))
+
+      # clear the existing list of organizations
+      @funding_template.organizations.clear
+      # Add the (possibly) new organizations into the object
+      org_list = funding_template_params[:organization_ids].split(',')
+      org_list.each do |id|
+        @funding_template.organizations << Organization.find(id)
+      end
+
       redirect_to @funding_template, notice: 'Funding template was successfully updated.'
     else
       render :edit
