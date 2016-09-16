@@ -1,0 +1,20 @@
+- if can? :create, FundingSource
+  = link_to new_funding_source_path, :class => 'btn btn-default' do
+    %i.fa.fa-plus.fa-fw
+    = "Add Funding Program";
+
+= form_tag funding_sources_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
+  .form-group
+    = select_tag(:funding_source_type_id, options_for_select(FundingSourceType.active.collect{|a| [a.name, a.id]}, :selected => @funding_source_type_id), :class => "form-control", :style => "width: 100px;", :prompt => "Any Source...")
+    %label
+      = check_box_tag(:show_active_only, '1', false, {:class => "form-control"})
+      Show Active Programs Only
+
+:javascript
+  $(document).ready(function() {
+
+    $('.form-control').change(function() {
+      $('#filter_form').submit();
+    });
+
+  });

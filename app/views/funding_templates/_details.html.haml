@@ -13,7 +13,10 @@
 .tab-content{:style => 'max-height:400px;overflow-y: auto;'}
   .tab-pane.fade#desc
     .tab-content
-      = @funding_template.description
+      - if @funding_template.description.present?
+        = @funding_template.description
+      - else
+        There is no description associated with this template.
 
   .tab-pane.fade#elgby
     .tab-content

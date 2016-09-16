@@ -14,6 +14,14 @@ is_sqlite =  (ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'sqlite
 
 puts "======= Processing TransAM Accounting Lookup Tables  ======="
 
+funding_source_types = [
+    {:active => 1, :name => 'Federal',  :description => 'Federal Funding Source'},
+    {:active => 1, :name => 'State',    :description => 'State Funding Source'},
+    {:active => 1, :name => 'Local',    :description => 'Local Funding Source'},
+    {:active => 1, :name => 'Agency',    :description => 'Agency Funding Source'},
+    {:active => 1, :name => 'Other',    :description => 'Other Funding Source'}
+]
+
 
 general_ledger_account_types = [
   {:active => 1, :name => 'Asset Account',      :description => 'Accounts representing different types of resources owned or controlled by the business.'},
@@ -42,7 +50,7 @@ funding_template_types = [
   {:active => 1, :name => 'Other', :description => 'Other Funding Template'},
 ]
 
-lookup_tables = %w{ general_ledger_account_types depreciation_calculation_types depreciation_interval_types funding_template_types}
+lookup_tables = %w{ funding_source_types general_ledger_account_types depreciation_calculation_types depreciation_interval_types funding_template_types}
 
 lookup_tables.each do |table_name|
   puts "  Loading #{table_name}"

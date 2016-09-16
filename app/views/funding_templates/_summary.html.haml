@@ -4,8 +4,10 @@
 = format_field("Contributer", @funding_template.contributer)
 = format_field("Transfer Only", format_as_boolean(@funding_template.transfer_only)) if @funding_template.transfer_only
 = format_field("Owner", @funding_template.owner)
-%hr
-= format_field("For", format_as_list(@funding_template.funding_template_types))
-%hr
-= format_field("Recurring", format_as_boolean(@funding_template.recurring))
-= format_field("Pcnt Match", format_as_percentage(@funding_template.match_required, 3))
+- if @funding_template.funding_template_types.count > 0
+  %hr
+  = format_field("For", format_as_list(@funding_template.funding_template_types))
+- if @funding_template.recurring || @funding_template.match_required.present?
+  %hr
+  = format_field("Recurring", format_as_boolean(@funding_template.recurring)) if @funding_template.recurring
+  = format_field("Pcnt Match", format_as_percentage(@funding_template.match_required, 3)) if @funding_template.match_required.present?

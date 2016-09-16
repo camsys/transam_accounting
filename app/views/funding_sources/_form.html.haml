@@ -1,0 +1,98 @@
+.row
+  = simple_form_for(@funding_source,
+    :html => {:class => 'form-vertical funding_source_form' },
+    :wrapper => :vertical_form,
+    :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
+
+    .col-md-4
+      = dialog_tag('Type', {:icon => 'fa fa-book', :class => "header-part"}) do
+        = f.input :formula_fund, :disabled => !@funding_source.new_record?
+        = f.input :discretionary_fund, :disabled => !@funding_source.new_record?
+
+        .inflation-rate
+          = f.input :inflation_rate
+
+    .col-md-4
+      = dialog_tag('Fund Details', {:icon => 'fa fa-book', :class => "header-part"}) do
+        = f.input :name, :placeholder => "Enter a name for this fund...", :input_html => {:maxlength => 64}
+        = f.input :external_id, :label => 'dotGrants ID'
+        = f.input :description, :class => 'form-control', :input_html => { :rows => 4 }, :placeholder => "Enter a description for this fund..."
+        = f.input :details, :class => 'form-control', :input_html => { :rows => 4 }, :placeholder => "Enter details for this fund..."
+
+    .col-md-4
+      = dialog_tag('Rules', {:icon => 'fa fa-book', :class => "header-part"}) do
+        = f.association :funding_source_type, :collection => FundingSourceType.funding_program.active
+        = f.input :life_in_years, label: 'Life of $', :wrapper => :vertical_append do
+          = f.input_field :life_in_years, :class => 'form-control', :min => 1, :allow_blank => true
+          %span.input-group-addon= "years"
+        = f.input :match_required, :label => 'Pcnt Match', :wrapper => :vertical_append do
+          = f.input_field :match_required, :class => 'form-control', :max => 100
+          %span.input-group-addon
+            %i.fa.fa-percent
+
+        = f.input :fy_start, collection: get_fiscal_years, label: 'Valid From'
+        = f.input :fy_end, collection: get_fiscal_years, label: 'Valid To'
+
+    .col-md-12
+      = f.button :submit, :class => "btn btn-primary"
+
+:javascript
+
+  // Document Ready
+  $(document).ready(function(){
+    transam.make_same_height('.header-part');
+
+    $('#funding_source_formula_fund').change();
+  });
+
+  $('#funding_source_formula_fund').change(function() {
+    if(this.checked) {
+      $(".inflation-rate").show();
+      $("#funding_source_discretionary_fund").prop('checked' , false);
+    } else {
+      $(".inflation-rate").hide();
+    }
+  });
+
+  $('#funding_source_discretionary_fund').change(function() {
+    if(this.checked) {
+      $(".inflation-rate").hide();
+      $("#funding_source_formula_fund").prop('checked' , false);
+    }
+  });
+
+  // jquery validations
+  $('.funding_source_form').validate({
+    submitHandler: function(form) {
+      form.submit();
+    }
+  });
+
+  $( "#funding_source_fy_start" ).rules( "add", {
+    FYRange: true
+  });
+
+  $( "#funding_source_fy_end" ).rules( "add", {
+    FYRange: true
+  });
+
+  $( "#funding_source_match_required" ).rules( "add", {
+    greaterThan: 0,
+    PercentThreeDigits: true
+  });
+
+  $.validator.addMethod("FYRange", function(value, element) {
+    if (($('#funding_source_fy_start').val() != "") && ($('#funding_source_fy_end').val() != "")) {
+      return (parseInt($('#funding_source_fy_start').val()) <= parseInt($('#funding_source_fy_end').val()));
+    } else {
+      return true;
+    }
+  }, "Not a valid year range.");
+
+  $.validator.addMethod('greaterThan', function(value, element, params) {
+      return this.optional(element) || parseFloat(value) > params;
+  }, "Please enter a value greater than {0}.");
+
+  $.validator.addMethod('PercentThreeDigits', function(value, element) {
+      return this.optional(element) || /^\d+(\.\d{0,3})?$/.test(value);
+  }, "Please enter a correct percent up to three decimal places.");

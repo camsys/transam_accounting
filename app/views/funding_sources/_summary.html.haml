@@ -1,0 +1,12 @@
+= format_field("Type",  @funding_source.funding_source_type)
+= format_field("External ID", @funding_source.external_id) if @funding_source.external_id.present?
+= format_field("Formula", format_as_boolean(@funding_source.formula_fund)) if @funding_source.formula_fund
+= format_field("Discretionary", format_as_boolean(@funding_source.discretionary_fund)) if @funding_source.discretionary_fund
+= format_field("Inflation Rate", format_as_percentage(@funding_source.inflation_rate, 2)) if @funding_source.inflation_rate.present?
+%hr
+= format_field("Pcnt Match", format_as_percentage(@funding_source.match_required, 3))
+= format_field("Life of $ (years)", format_as_integer(@funding_source.life_in_years)) if @funding_source.life_in_years.present?
+- if @funding_source.fy_start.present? || @funding_source.fy_end.present?
+  %hr
+  = format_field("Valid From", format_as_fiscal_year(@funding_source.fy_start))
+  = format_field("Valid To", format_as_fiscal_year(@funding_source.fy_end))
