@@ -8,13 +8,13 @@
 
       = f.association :funding_source, :required => true, :collection => FundingSource.active, :include_blank => true, :label => "Funding Program"
       = f.input :name, :required => true, :input_html => {:maxlength => 64}
-      = f.input :description, :input_html => {:maxlength => 256}
-      = f.association :contributer, :collection => FundingSourceType.active, :required => true
+      = f.input :description
+      = f.association :contributer, :collection => FundingSourceType.contributer.active, :required => true
       = f.input :transfer_only
-      = f.association :owner, :collection => FundingSourceType.active, :required => true
+      = f.association :owner, :collection => FundingSourceType.owner.active, :required => true
       = f.input :recurring
-      = f.input :match_required, :wrapper => :vertical_append do
-        = f.input_field :match_required, :class => 'form-control'
+      = f.input :match_required, :label => 'Pcnt Match', :wrapper => :vertical_append do
+        = f.input_field :match_required, :class => 'form-control', :max => 100
         %span.input-group-addon
           %i.fa.fa-percent
 
@@ -40,3 +40,16 @@
       form.submit();
     }
   });
+
+  $( "#funding_template_match_required" ).rules( "add", {
+    greaterThan: 0,
+    PercentThreeDigits: true
+  });
+
+  $.validator.addMethod('greaterThan', function(value, element, params) {
+      return this.optional(element) || parseFloat(value) > params;
+  }, "Please enter a value greater than {0}.");
+
+  $.validator.addMethod('PercentThreeDigits', function(value, element) {
+      return this.optional(element) || /^\d+(\.\d{0,3})?$/.test(value);
+  }, "Please enter a correct percent up to three decimal places.");

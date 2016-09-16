@@ -24,10 +24,11 @@ class FundingTemplate < ActiveRecord::Base
   # Validations
   #------------------------------------------------------------------------------
 
-  validates :funding_source_id,              :presence => true
-  validates :name,                           :presence => true
-  validates :contributer_id,                 :presence => true
-  validates :owner_id,                       :presence => true
+  validates :funding_source_id,         :presence => true
+  validates :name,                      :presence => true
+  validates :contributer_id,            :presence => true
+  validates :owner_id,                  :presence => true
+  validates :match_required,            :allow_nil => true, :numericality => {:greater_than => 0.0, :less_than_or_equal_to => 100.0}
 
   FORM_PARAMS = [
       :funding_source_id,
