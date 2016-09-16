@@ -22,29 +22,29 @@
               %i.fa.fa-plus.fa-fw
               = "Add Funding Program";
 
-    %li.text-left.dropdown-submenu
-      = link_to funding_templates_path do
-        %i.fa.fa-fw.fa-legal
-        = ' Templates'
+    - if can? :create, FundingTemplate
+      %li.text-left.dropdown-submenu
+        = link_to funding_templates_path do
+          %i.fa.fa-fw.fa-legal
+          = ' Templates'
 
-      %ul.dropdown-menu
-        - FundingTemplate.active.each do |template|
-          %li.text-left
-            = link_to funding_template_path(template) do
-              %i.fa.fa-fw.fa-legal
-              = template
+        %ul.dropdown-menu
+          - FundingTemplate.active.each do |template|
+            %li.text-left
+              = link_to funding_template_path(template) do
+                %i.fa.fa-fw.fa-legal
+                = template
 
-        - if can? :create, FundingTemplate
           %li.divider
           %li
             = link_to new_funding_template_path do
               %i.fa.fa-plus.fa-fw
               = "Add Template";
 
-    %li.text-left.dropdown-submenu
-      = link_to '#' do
-        %i.fa.fa-fw.fa-legal
-        = ' Buckets'
+      %li.text-left.dropdown-submenu
+        = link_to '#' do
+          %i.fa.fa-fw.fa-legal
+          = ' Buckets'
 
     %li.divider
     %li.text-left.dropdown-submenu
