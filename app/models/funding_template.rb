@@ -51,7 +51,7 @@ class FundingTemplate < ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   # Allow selection of active instances
-  scope :active, -> { where(active: true) }
+  scope :active, -> { where(funding_source_id: FundingSource.active.ids) }
 
   #------------------------------------------------------------------------------
   #

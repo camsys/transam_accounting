@@ -27,8 +27,8 @@ class FundingTemplatesController < OrganizationAwareController
 
     @show_active_only = params[:show_active_only]
     if @show_active_only
-      conditions << 'active = ?'
-      values << true
+      conditions << 'funding_source_id IN (?)'
+      values << FundingSource.active.ids
     end
 
     #puts conditions.inspect
