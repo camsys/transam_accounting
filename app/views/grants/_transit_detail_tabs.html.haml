@@ -1,0 +1,14 @@
+%li
+  %a{:href => "#asst", :data =>{:toggle => 'tab'}}
+    %span.badge.pull-right= @assets.count
+    = "Assets"
+
+%li
+  %a{:href => "#docs", :data =>{:toggle => 'tab'}}
+    %span.badge.pull-right= @grant.documents.count
+    = "Supporting Documents "
+
+%li
+  %a{:href => "#comm", :data =>{:toggle => 'tab'}}
+    %span.badge.pull-right= @grant.comments.count
+    = "Comments "

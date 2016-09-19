@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151103201401) do
+ActiveRecord::Schema.define(version: 20160916150223) do
 
   create_table "activities", force: true do |t|
     t.string   "object_key",           limit: 12
@@ -679,6 +679,7 @@ ActiveRecord::Schema.define(version: 20151103201401) do
     t.string   "object_key",                      limit: 12, null: false
     t.string   "name",                            limit: 64, null: false
     t.text     "description",                                null: false
+    t.text     "details"
     t.integer  "funding_source_type_id",                     null: false
     t.string   "external_id",                     limit: 32
     t.boolean  "state_administered_federal_fund"
@@ -688,8 +689,10 @@ ActiveRecord::Schema.define(version: 20151103201401) do
     t.boolean  "contracted_fund"
     t.boolean  "discretionary_fund"
     t.float    "state_match_required",            limit: 24
-    t.float    "federal_match_required",          limit: 24
+    t.float    "match_required",                  limit: 24
     t.float    "local_match_required",            limit: 24
+    t.integer  "fy_start"
+    t.integer  "fy_end"
     t.boolean  "rural_providers"
     t.boolean  "urban_providers"
     t.boolean  "shared_ride_providers"
@@ -700,9 +703,55 @@ ActiveRecord::Schema.define(version: 20151103201401) do
     t.boolean  "active"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.float    "inflation_rate",                  limit: 24
+    t.integer  "life_in_years"
   end
 
   add_index "funding_sources", ["object_key"], name: "funding_sources_idx1", using: :btree
+
+  create_table "funding_template_types", force: true do |t|
+    t.integer "funding_source_id"
+    t.string  "name",              limit: 64,  null: false
+    t.string  "description",       limit: 256, null: false
+    t.boolean "active",                        null: false
+  end
+
+  add_index "funding_template_types", ["funding_source_id"], name: "index_funding_template_types_on_funding_source_id", using: :btree
+
+  create_table "funding_templates", force: true do |t|
+    t.string   "object_key",        limit: 12, null: false
+    t.integer  "funding_source_id"
+    t.string   "name",              limit: 64, null: false
+    t.text     "description"
+    t.integer  "contributer_id",               null: false
+    t.integer  "owner_id",                     null: false
+    t.boolean  "recurring"
+    t.boolean  "transfer_only"
+    t.float    "match_required",    limit: 24
+    t.boolean  "active",                       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "funding_templates", ["contributer_id"], name: "index_funding_templates_on_contributer_id", using: :btree
+  add_index "funding_templates", ["funding_source_id"], name: "index_funding_templates_on_funding_source_id", using: :btree
+  add_index "funding_templates", ["owner_id"], name: "index_funding_templates_on_owner_id", using: :btree
+
+  create_table "funding_templates_funding_template_types", id: false, force: true do |t|
+    t.integer "funding_template_id"
+    t.integer "funding_template_type_id"
+  end
+
+  add_index "funding_templates_funding_template_types", ["funding_template_id"], name: "funding_templates_funding_template_types_idx1", using: :btree
+  add_index "funding_templates_funding_template_types", ["funding_template_type_id"], name: "funding_templates_funding_template_types_idx2", using: :btree
+
+  create_table "funding_templates_organizations", id: false, force: true do |t|
+    t.integer "funding_template_id"
+    t.integer "organization_id"
+  end
+
+  add_index "funding_templates_organizations", ["funding_template_id"], name: "index_funding_templates_organizations_on_funding_template_id", using: :btree
+  add_index "funding_templates_organizations", ["organization_id"], name: "index_funding_templates_organizations_on_organization_id", using: :btree
 
   create_table "general_ledger_account_types", force: true do |t|
     t.string  "name",        limit: 64,  null: false

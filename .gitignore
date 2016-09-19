@@ -9,3 +9,4 @@ spec/dummy/log/*
 spec/tmp/*
 tmp/*
 Gemfile.lock
+.idea/

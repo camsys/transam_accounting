@@ -27,25 +27,11 @@ RSpec.describe FundingSource, :type => :model do
       expect(test_fund.valid?).to be false
     end
     describe 'match required must be a percentage' do
-      it 'state match' do
-        test_fund.state_match_required = 95
+      it 'match required' do
+        test_fund.match_required = 95
         expect(test_fund.valid?).to be true
 
-        test_fund.state_match_required = 105
-        expect(test_fund.valid?).to be false
-      end
-      it 'fed match' do
-        test_fund.federal_match_required = 95
-        expect(test_fund.valid?).to be true
-
-        test_fund.federal_match_required = 105
-        expect(test_fund.valid?).to be false
-      end
-      it 'local match' do
-        test_fund.local_match_required = 95
-        expect(test_fund.valid?).to be true
-
-        test_fund.local_match_required = 105
+        test_fund.match_required = 105
         expect(test_fund.valid?).to be false
       end
     end
@@ -55,23 +41,16 @@ RSpec.describe FundingSource, :type => :model do
     expect(FundingSource.allowable_params).to eq([
       :object_key,
       :name,
-      :description,
-      :funding_source_type_id,
-      :state_match_required,
-      :federal_match_required,
-      :local_match_required,
       :external_id,
-      :state_administered_federal_fund,
-      :bond_fund,
+      :description,
+      :details,
+      :funding_source_type_id,
+      :life_in_years,
+      :match_required,
+      :fy_start,
+      :fy_end,
       :formula_fund,
-      :non_committed_fund,
-      :contracted_fund,
       :discretionary_fund,
-      :rural_providers,
-      :urban_providers,
-      :shared_ride_providers,
-      :inter_city_bus_providers,
-      :inter_city_rail_providers,
       :active
     ])
   end

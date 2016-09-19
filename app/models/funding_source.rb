@@ -40,7 +40,7 @@ class FundingSource < ActiveRecord::Base
   has_many    :grants, -> { order(:fy_year) }, :dependent => :destroy
 
   has_many    :funding_templates, :dependent => :destroy
-  has_many    :funding_buckets, :dependent => :destroy
+  #has_many    :funding_buckets, :dependent => :destroy
 
   #------------------------------------------------------------------------------
   # Validations
@@ -73,7 +73,6 @@ class FundingSource < ActiveRecord::Base
     :match_required,
     :fy_start,
     :fy_end,
-    :bond_fund,
     :formula_fund,
     :discretionary_fund,
     :active
