@@ -60,6 +60,7 @@ class FundingTemplatesController < OrganizationAwareController
 
     if @funding_template.funding_source.present?
       add_breadcrumb @funding_template.funding_source.to_s, funding_source_path(@funding_template.funding_source)
+      add_breadcrumb "#{@funding_template.funding_source} Templates", funding_templates_path(:funding_source_id => params[:funding_source_id])
     else
       add_breadcrumb 'Templates', funding_templates_path
     end
@@ -112,8 +113,9 @@ class FundingTemplatesController < OrganizationAwareController
 
   # DELETE /funding_templates/1
   def destroy
+    funding_source = @funding_template.funding_source
     @funding_template.destroy
-    redirect_to funding_templates_url, notice: 'Funding template was successfully destroyed.'
+    redirect_to funding_source_path(funding_source), notice: 'Template was successfully destroyed.'
   end
 
   private

@@ -1,7 +1,7 @@
 = format_field("Program",  link_to(@funding_template.funding_source, funding_source_path(@funding_template.funding_source)))
 = format_field("Name", @funding_template.name)
 %hr
-= format_field("Contributer", @funding_template.contributer)
+= format_field("Contributor", @funding_template.contributor)
 = format_field("Transfer Only", format_as_boolean(@funding_template.transfer_only)) if @funding_template.transfer_only
 = format_field("Owner", @funding_template.owner)
 - if @funding_template.funding_template_types.count > 0

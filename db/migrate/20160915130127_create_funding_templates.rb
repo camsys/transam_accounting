@@ -38,8 +38,8 @@ class CreateFundingTemplates < ActiveRecord::Migration
     # add seed data
     funding_template_types = [
         {:active => 1, :name => 'Capital', :description => 'Capital Funding Template'},
-        {:active => 1, :name => 'Debt Service', :description => 'Debt Service Funding Template'},
         {:active => 1, :name => 'Operating', :description => 'Operating Funding Template'},
+        {:active => 1, :name => 'Debt Service', :description => 'Debt Service Funding Template'},
         {:active => 1, :name => 'Other', :description => 'Other Funding Template'},
     ]
     funding_template_types.each do |type|

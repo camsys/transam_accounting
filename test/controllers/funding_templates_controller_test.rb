@@ -18,7 +18,7 @@ class FundingTemplatesControllerTest < ActionController::TestCase
 
   test "should create funding_template" do
     assert_difference('FundingTemplate.count') do
-      post :create, funding_template: { contributer_id: @funding_template.contributer_id, description: @funding_template.description, federal_match_required: @funding_template.federal_match_required, funding_source_id: @funding_template.funding_source_id, local_match_required: @funding_template.local_match_required, name: @funding_template.name, owner_id: @funding_template.owner_id, recurring: @funding_template.recurring, state_match_required: @funding_template.state_match_required, template_types_id: @funding_template.template_types_id }
+      post :create, funding_template: { contributor_id: @funding_template.contributor_id, description: @funding_template.description, federal_match_required: @funding_template.federal_match_required, funding_source_id: @funding_template.funding_source_id, local_match_required: @funding_template.local_match_required, name: @funding_template.name, owner_id: @funding_template.owner_id, recurring: @funding_template.recurring, state_match_required: @funding_template.state_match_required, template_types_id: @funding_template.template_types_id }
     end
 
     assert_redirected_to funding_template_path(assigns(:funding_template))
@@ -35,7 +35,7 @@ class FundingTemplatesControllerTest < ActionController::TestCase
   end
 
   test "should update funding_template" do
-    patch :update, id: @funding_template, funding_template: { contributer_id: @funding_template.contributer_id, description: @funding_template.description, federal_match_required: @funding_template.federal_match_required, funding_source_id: @funding_template.funding_source_id, local_match_required: @funding_template.local_match_required, name: @funding_template.name, owner_id: @funding_template.owner_id, recurring: @funding_template.recurring, state_match_required: @funding_template.state_match_required, template_types_id: @funding_template.template_types_id }
+    patch :update, id: @funding_template, funding_template: { contributor_id: @funding_template.contributor_id, description: @funding_template.description, federal_match_required: @funding_template.federal_match_required, funding_source_id: @funding_template.funding_source_id, local_match_required: @funding_template.local_match_required, name: @funding_template.name, owner_id: @funding_template.owner_id, recurring: @funding_template.recurring, state_match_required: @funding_template.state_match_required, template_types_id: @funding_template.template_types_id }
     assert_redirected_to funding_template_path(assigns(:funding_template))
   end
 

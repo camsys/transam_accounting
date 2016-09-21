@@ -16,7 +16,7 @@
           %legend Add Document
           = simple_form_for([@funding_source, Document.new],
               :html => {:multipart => true, :class => 'form-vertical document_form' },
-              :url => inventory_documents_path(@funding_source, Document.new),
+              :url => funding_source_documents_path(@funding_source, Document.new),
               :wrapper => :vertical_form,
               :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
             = f.input :document, :required => true, :input_html => { :extension => "pdf,xls,xlsx,doc,docx,ppt" }

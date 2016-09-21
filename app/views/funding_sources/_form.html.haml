@@ -1,40 +1,46 @@
-.row
-  = simple_form_for(@funding_source,
-    :html => {:class => 'form-vertical funding_source_form' },
-    :wrapper => :vertical_form,
-    :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
+= simple_form_for(@funding_source,
+  :html => {:class => 'form-vertical funding_source_form' },
+  :wrapper => :vertical_form,
+  :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
 
-    .col-md-4
-      = dialog_tag('Type', {:icon => 'fa fa-book', :class => "header-part"}) do
-        = f.input :formula_fund, :disabled => !@funding_source.new_record?
-        = f.input :discretionary_fund, :disabled => !@funding_source.new_record?
 
-        .inflation-rate
-          = f.input :inflation_rate
+  .row
+    = f.input :formula_fund, :as => :hidden
+    = f.input :discretionary_fund, :as => :hidden
+    %label
+      = radio_button_tag :fund, 'formula', @funding_source.formula_fund, {disabled: !@funding_source.new_record?, style: 'margin-left: 10px;'}
+      Formula
+    %label
+      = radio_button_tag :fund, 'discretionary', @funding_source.discretionary_fund, {disabled: !@funding_source.new_record?, style: 'margin-left: 10px;'}
+      Discretionary
 
-    .col-md-4
-      = dialog_tag('Fund Details', {:icon => 'fa fa-book', :class => "header-part"}) do
-        = f.input :name, :placeholder => "Enter a name for this fund...", :input_html => {:maxlength => 64}
-        = f.input :external_id, :label => 'dotGrants ID'
-        = f.input :description, :class => 'form-control', :input_html => { :rows => 4 }, :placeholder => "Enter a description for this fund..."
-        = f.input :details, :class => 'form-control', :input_html => { :rows => 4 }, :placeholder => "Enter details for this fund..."
+  .inflation-rate{style: 'margin-top: 10px;'}
+    = f.input :inflation_rate
 
-    .col-md-4
-      = dialog_tag('Rules', {:icon => 'fa fa-book', :class => "header-part"}) do
-        = f.association :funding_source_type, :collection => FundingSourceType.funding_program.active
-        = f.input :life_in_years, label: 'Life of $', :wrapper => :vertical_append do
-          = f.input_field :life_in_years, :class => 'form-control', :min => 1, :allow_blank => true
-          %span.input-group-addon= "years"
-        = f.input :match_required, :label => 'Pcnt Match', :wrapper => :vertical_append do
-          = f.input_field :match_required, :class => 'form-control', :max => 100
-          %span.input-group-addon
-            %i.fa.fa-percent
+  = f.input :name, :placeholder => "Enter a name for this fund...", :input_html => {:maxlength => 64}
+  = f.input :description, :class => 'form-control', :input_html => { :maxlength => 256 }, :placeholder => "Enter a description for this fund..."
+  = f.input :details, :class => 'form-control', :input_html => { :rows => 4 }, :placeholder => "Enter details for this fund..."
 
-        = f.input :fy_start, collection: get_fiscal_years, label: 'Valid From'
-        = f.input :fy_end, collection: get_fiscal_years, label: 'Valid To'
+  .row
+    .col-sm-4
+      = f.association :funding_source_type, :collection => FundingSourceType.funding_program.active, :label => 'Source'
+    .col-sm-4
+      = f.input :life_in_years, label: 'Life of $', :wrapper => :vertical_append do
+        = f.input_field :life_in_years, :class => 'form-control', :min => 1, :allow_blank => true
+        %span.input-group-addon= "years"
+    .col-sm-4
+      = f.input :match_required, :label => 'Pcnt Match', :wrapper => :vertical_append do
+        = f.input_field :match_required, :class => 'form-control', :max => 100
+        %span.input-group-addon
+          %i.fa.fa-percent
 
-    .col-md-12
-      = f.button :submit, :class => "btn btn-primary"
+  .row
+    .col-sm-4
+      = f.input :fy_start, collection: get_fiscal_years, label: 'Valid From'
+    .col-sm-4
+      = f.input :fy_end, collection: get_fiscal_years, label: 'Valid To'
+
+  = f.button :submit, :class => "btn btn-primary"
 
 :javascript
 
@@ -42,22 +48,18 @@
   $(document).ready(function(){
     transam.make_same_height('.header-part');
 
-    $('#funding_source_formula_fund').change();
+    $(".inflation-rate").hide();
   });
 
-  $('#funding_source_formula_fund').change(function() {
-    if(this.checked) {
+  $("input[name='fund']").on("click", function() {
+    if ($(this).val() == 'formula') {
       $(".inflation-rate").show();
-      $("#funding_source_discretionary_fund").prop('checked' , false);
+      $("#funding_source_formula_fund").val('1');
+      $("#funding_source_discretionary_fund").val('0');
     } else {
       $(".inflation-rate").hide();
-    }
-  });
-
-  $('#funding_source_discretionary_fund').change(function() {
-    if(this.checked) {
-      $(".inflation-rate").hide();
-      $("#funding_source_formula_fund").prop('checked' , false);
+      $("#funding_source_formula_fund").val('0');
+      $("#funding_source_discretionary_fund").val('1');
     }
   });
 

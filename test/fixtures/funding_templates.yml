@@ -4,7 +4,7 @@ one:
   funding_source_id: 
   name: MyString
   description: MyString
-  contributer_id: 
+  contributor_id:
   owner_id: 
   template_types_id: 
   recurring: false
@@ -16,7 +16,7 @@ two:
   funding_source_id: 
   name: MyString
   description: MyString
-  contributer_id: 
+  contributor_id:
   owner_id: 
   template_types_id: 
   recurring: false

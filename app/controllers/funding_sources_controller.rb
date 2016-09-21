@@ -115,7 +115,7 @@ class FundingSourcesController < OrganizationAwareController
 
     respond_to do |format|
       if @funding_source.save
-        notify_user(:notice, "The Funding Source was successfully saved.")
+        notify_user(:notice, "The funding program was successfully saved.")
         format.html { redirect_to funding_source_url(@funding_source) }
         format.json { render action: 'show', status: :created, location: @funding_source }
       else
@@ -133,7 +133,7 @@ class FundingSourcesController < OrganizationAwareController
 
     respond_to do |format|
       if @funding_source.update(form_params)
-        notify_user(:notice, "The Funding Source was successfully updated.")
+        notify_user(:notice, "The funding program was successfully updated.")
         format.html { redirect_to funding_source_url(@funding_source) }
         format.json { head :no_content }
       else
@@ -148,7 +148,7 @@ class FundingSourcesController < OrganizationAwareController
   # DELETE /funding_sources/1.json
   def destroy
     @funding_source.destroy
-    notify_user(:notice, "The Funding Source was successfully removed.")
+    notify_user(:notice, "The funding program was successfully removed.")
     respond_to do |format|
       format.html { redirect_to funding_sources_url }
       format.json { head :no_content }

@@ -10,7 +10,7 @@
     .col-md-12
       %fieldset
         %legend Add Comment
-        = form_for [@funding_source, Comment.new], :html => {:multipart => true, :class => 'form-vertical comment_form' }, :url => inventory_comments_path(@funding_source, Comment.new), :role => 'form' do |f|
+        = form_for [@funding_source, Comment.new], :html => {:multipart => true, :class => 'form-vertical comment_form' }, :url => funding_source_comments_path(@funding_source, Comment.new), :role => 'form' do |f|
           .form-group
             = f.text_area :comment, :class => 'form-control', :placeholder => 'Enter a new comment...', :required => true, :minlength => 10, :maxlength => 254
           = f.submit :class => 'btn btn-primary', :id => 'comment_submit'

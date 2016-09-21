@@ -8,15 +8,27 @@
 
       = f.association :funding_source, :required => true, :collection => FundingSource.active, :include_blank => true, :label => "Funding Program"
       = f.input :name, :required => true, :input_html => {:maxlength => 64}
+      = f.input :external_id, :label => 'dotGrants ID', :input_html => {:maxlength => 32}
       = f.input :description
-      = f.association :contributer, :collection => FundingSourceType.contributer.active, :required => true
-      = f.input :transfer_only
-      = f.association :owner, :collection => FundingSourceType.owner.active, :required => true
-      = f.input :recurring
-      = f.input :match_required, :label => 'Pcnt Match', :wrapper => :vertical_append do
-        = f.input_field :match_required, :class => 'form-control', :max => 100
-        %span.input-group-addon
-          %i.fa.fa-percent
+
+      .row
+        .col-sm-6
+          = f.association :contributor, :collection => FundingSourceType.contributor.active, :required => true
+        .col-sm-6
+          = f.association :owner, :collection => FundingSourceType.owner.active, :required => true
+
+      .row
+        .col-sm-3
+          = f.input :recurring
+        .col-sm-3
+          = f.input :transfer_only
+
+      .row
+        .col-sm-6
+          = f.input :match_required, :label => 'Pcnt Match', :wrapper => :vertical_append do
+            = f.input_field :match_required, :class => 'form-control', :max => 100
+            %span.input-group-addon
+              %i.fa.fa-percent
 
       = f.association :funding_template_types, :as => :check_boxes, :label => "For"
 
@@ -25,6 +37,8 @@
   .col-md-6
     = dialog_tag('Eligibility', {:icon => 'fa fa-book', :class => "header-part"}) do
 
+      = f.input :all_organizations
+
       #org_select.input-large
 
   = f.button :submit, :class => "btn btn-primary"
@@ -32,6 +46,14 @@
 = render 'form_scripts'
 
 :javascript
+
+  $('#funding_template_all_organizations').change(function() {
+    if($(this).prop('checked')) {
+      $("#org_select").hide();
+    } else {
+      $("#org_select").show();
+    }
+  });
 
   // jquery validations
   $('.funding_template_form').validate({
@@ -45,6 +67,8 @@
     greaterThan: 0,
     PercentThreeDigits: true
   });
+
+
 
   $.validator.addMethod('greaterThan', function(value, element, params) {
       return this.optional(element) || parseFloat(value) > params;
