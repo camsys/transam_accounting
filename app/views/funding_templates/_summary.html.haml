@@ -1,5 +1,6 @@
 = format_field("Program",  link_to(@funding_template.funding_source, funding_source_path(@funding_template.funding_source)))
 = format_field("Name", @funding_template.name)
+= format_field("dotGrants ID", @funding_template.external_id) unless @funding_template.external_id.blank?
 %hr
 = format_field("Contributor", @funding_template.contributor)
 = format_field("Transfer Only", format_as_boolean(@funding_template.transfer_only)) if @funding_template.transfer_only

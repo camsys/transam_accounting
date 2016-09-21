@@ -20,7 +20,10 @@
 
   .tab-pane.fade#elgby
     .tab-content
-      = format_field("Agencies", format_as_list(@funding_template.organizations))
+      - if @funding_template.all_organizations
+        = format_field("Agencies", "All")
+      - else
+        = format_field("Agencies", format_as_list(@funding_template.organizations))
 
   .tab-pane.fade#bckts
     .tab-content

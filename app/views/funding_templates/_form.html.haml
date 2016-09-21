@@ -47,6 +47,12 @@
 
 :javascript
 
+  if($('#funding_template_all_organizations').prop('checked')) {
+      $("#org_select").hide();
+    } else {
+      $("#org_select").show();
+    }
+
   $('#funding_template_all_organizations').change(function() {
     if($(this).prop('checked')) {
       $("#org_select").hide();

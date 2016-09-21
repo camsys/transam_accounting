@@ -23,25 +23,12 @@
               = "Add Funding Program";
 
     - if can? :create, FundingTemplate
-      %li.text-left.dropdown-submenu
+      %li.text-left
         = link_to funding_templates_path do
-          %i.fa.fa-fw.fa-legal
+          %i.fa.fa-fw.fa-tag
           = ' Templates'
 
-        %ul.dropdown-menu
-          - FundingTemplate.active.each do |template|
-            %li.text-left
-              = link_to funding_template_path(template) do
-                %i.fa.fa-fw.fa-legal
-                = template
-
-          %li.divider
-          %li
-            = link_to new_funding_template_path do
-              %i.fa.fa-plus.fa-fw
-              = "Add Template";
-
-      %li.text-left.dropdown-submenu
+      %li.text-left
         = link_to '#' do
           %i.fa.fa-fw.fa-legal
           = ' Buckets'

@@ -84,6 +84,7 @@ class FundingTemplate < ActiveRecord::Base
   protected
 
   def set_defaults
+    self.all_organizations = self.all_organizations.nil? ? true : self.all_organizations
     self.active = self.active.nil? ? true : self.active
   end
 
