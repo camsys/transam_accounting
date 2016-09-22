@@ -41,7 +41,6 @@ RSpec.describe FundingSource, :type => :model do
     expect(FundingSource.allowable_params).to eq([
       :object_key,
       :name,
-      :external_id,
       :description,
       :details,
       :funding_source_type_id,
