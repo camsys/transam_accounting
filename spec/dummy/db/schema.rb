@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160916150223) do
+ActiveRecord::Schema.define(version: 20160919181213) do
 
   create_table "activities", force: true do |t|
     t.string   "object_key",           limit: 12
@@ -676,11 +676,11 @@ ActiveRecord::Schema.define(version: 20160916150223) do
   end
 
   create_table "funding_sources", force: true do |t|
-    t.string   "object_key",                      limit: 12, null: false
-    t.string   "name",                            limit: 64, null: false
-    t.text     "description",                                null: false
+    t.string   "object_key",                      limit: 12,  null: false
+    t.string   "name",                            limit: 64,  null: false
+    t.string   "description",                     limit: 256, null: false
     t.text     "details"
-    t.integer  "funding_source_type_id",                     null: false
+    t.integer  "funding_source_type_id",                      null: false
     t.string   "external_id",                     limit: 32
     t.boolean  "state_administered_federal_fund"
     t.boolean  "bond_fund"
@@ -723,7 +723,7 @@ ActiveRecord::Schema.define(version: 20160916150223) do
     t.integer  "funding_source_id"
     t.string   "name",              limit: 64, null: false
     t.text     "description"
-    t.integer  "contributer_id",               null: false
+    t.integer  "contributor_id",               null: false
     t.integer  "owner_id",                     null: false
     t.boolean  "recurring"
     t.boolean  "transfer_only"
@@ -731,9 +731,11 @@ ActiveRecord::Schema.define(version: 20160916150223) do
     t.boolean  "active",                       null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "all_organizations"
+    t.string   "external_id",       limit: 32
   end
 
-  add_index "funding_templates", ["contributer_id"], name: "index_funding_templates_on_contributer_id", using: :btree
+  add_index "funding_templates", ["contributor_id"], name: "index_funding_templates_on_contributor_id", using: :btree
   add_index "funding_templates", ["funding_source_id"], name: "index_funding_templates_on_funding_source_id", using: :btree
   add_index "funding_templates", ["owner_id"], name: "index_funding_templates_on_owner_id", using: :btree
 
