@@ -2,7 +2,7 @@
   %li
     %a{:href => "#desc", :data =>{:toggle => 'tab'}}
       = "Details"
-  - if can? :create, FundingTemplate
+  - if can? :read, FundingTemplate
     %li
       %a{:href => "#templates", :data =>{:toggle => 'tab'}}
         %span.badge.pull-right= @funding_source.funding_templates.count
@@ -25,7 +25,7 @@
     .tab-content
       = render :partial => 'description', :locals => {:funding_source => @funding_source}
 
-  - if can? :create, FundingTemplate
+  - if can? :read, FundingTemplate
     .tab-pane.fade#templates
       .tab-content
         = render :partial => 'funding_templates/index_table', :locals => {:funding_templates => @funding_source.funding_templates, :show_actions => 0}

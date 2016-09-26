@@ -58,6 +58,7 @@
   $("input[name='fund']").on("click", function() {
     if ($(this).val() == 'formula') {
       $(".inflation-rate").show();
+      $("#funding_source_inflation_rate").val('0');
       $("#funding_source_formula_fund").val('1');
       $("#funding_source_discretionary_fund").val('0');
     } else {

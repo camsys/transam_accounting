@@ -45,7 +45,7 @@ class FundingSource < ActiveRecord::Base
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
-  validates :name,                      :presence => true
+  validates :name,                      :presence => true, :uniqueness => true
   validates :description,               :presence => true
   validates :funding_source_type,       :presence => true
 
@@ -53,6 +53,7 @@ class FundingSource < ActiveRecord::Base
   validates :match_required,            :presence => true, :numericality => {:greater_than => 0.0, :less_than_or_equal_to => 100.0}
   validates :fy_start,                  :allow_nil => true, :numericality => {:greater_than_or_equal_to => SystemConfig.instance.epoch.year.to_i, :only_integer => true}
   validates :fy_end,                    :allow_nil => true, :numericality => {:greater_than_or_equal_to => SystemConfig.instance.epoch.year.to_i, :only_integer => true}
+  validates :inflation_rate,            :allow_nil => true, :numericality => {:greater_than_or_equal_to => 0.0, :less_than_or_equal_to => 100.0}
 
   validate :validate_fy_start_less_than_or_equal_fy_end
   validate :validate_either_formula_or_discretionary

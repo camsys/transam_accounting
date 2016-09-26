@@ -26,7 +26,7 @@ class FundingTemplate < ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   validates :funding_source_id,         :presence => true
-  validates :name,                      :presence => true
+  validates :name,                      :presence => true, :uniqueness => {scope: :funding_source, message: "must be unique within a funding program"}
   validates :contributor_id,            :presence => true
   validates :owner_id,                  :presence => true
   validates :match_required,            :allow_nil => true, :numericality => {:greater_than => 0.0, :less_than_or_equal_to => 100.0}

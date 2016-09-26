@@ -22,7 +22,7 @@
               %i.fa.fa-plus.fa-fw
               = "Add Funding Program";
 
-    - if can? :create, FundingTemplate
+    - if can? :read, FundingTemplate
       %li.text-left
         = link_to funding_templates_path do
           %i.fa.fa-fw.fa-tag
