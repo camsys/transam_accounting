@@ -21,12 +21,13 @@
   :toolbar => "#table_actions",
   :export_types => "['csv', 'txt', 'excel']",
   :show_export => 'true',
-  :show_columns => 'true'}}
+  :show_columns => 'true'}, :style => 'width:100%;'}
 
   %thead
     %tr
       %th.center{:data => {:visible => 'false'}} Object Key
-      %th.center{:data => {:sortable => 'true'}} Program
+      - if show_actions == 1
+        %th.center{:data => {:sortable => 'true'}} Program
       %th.center{:data => {:sortable => 'true'}} Name
 
       %th.center{:data => {:sortable => 'true'}} Contributor
@@ -45,8 +46,11 @@
     - funding_templates.each do |f|
       %tr
         %td.left= f.object_key
-        %td.left= f.funding_source.to_s
-        %td.left= link_to(f.name, funding_template_path(f))
+        - if show_actions == 1
+          %td.left= f.funding_source.to_s
+        %td.left
+          %span.hidden= f.name
+          = link_to(f.name, funding_template_path(f))
 
         %td.left= f.contributor.to_s
         %td.center= format_as_boolean(f.transfer_only)

@@ -23,7 +23,8 @@
       - if @funding_template.all_organizations
         = format_field("Agencies", "All")
       - else
-        = format_field("Agencies", format_as_list(@funding_template.organizations))
+        = render :partial => 'organizations/index_table', :locals => {:organizations => @funding_template.organizations, :show_actions => 0}
+
 
   .tab-pane.fade#bckts
     .tab-content

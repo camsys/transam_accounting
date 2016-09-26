@@ -73,6 +73,7 @@ class FundingTemplatesController < OrganizationAwareController
 
     add_breadcrumb @funding_template.funding_source.to_s, funding_source_path(@funding_template.funding_source)
     add_breadcrumb @funding_template.to_s, funding_template_path(@funding_template)
+    add_breadcrumb 'Update', funding_template_path(@funding_template)
 
   end
 

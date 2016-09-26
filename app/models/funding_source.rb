@@ -74,6 +74,7 @@ class FundingSource < ActiveRecord::Base
     :fy_end,
     :formula_fund,
     :discretionary_fund,
+    :inflation_rate,
     :active
   ]
 

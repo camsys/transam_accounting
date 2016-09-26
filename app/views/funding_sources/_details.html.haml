@@ -2,14 +2,15 @@
   %li
     %a{:href => "#desc", :data =>{:toggle => 'tab'}}
       = "Details"
-  %li
-    %a{:href => "#templates", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @funding_source.funding_templates.count
-      = "Templates"
-  %li
-    %a{:href => "#bckts", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= "TBD"
-      = "Buckets"
+  - if can? :create, FundingTemplate
+    %li
+      %a{:href => "#templates", :data =>{:toggle => 'tab'}}
+        %span.badge.pull-right= @funding_source.funding_templates.count
+        = "Templates"
+    %li
+      %a{:href => "#bckts", :data =>{:toggle => 'tab'}}
+        %span.badge.pull-right= "TBD"
+        = "Buckets"
   %li
     %a{:href => "#docs", :data =>{:toggle => 'tab'}}
       %span.badge.pull-right= @funding_source.documents.count
@@ -24,12 +25,13 @@
     .tab-content
       = render :partial => 'description', :locals => {:funding_source => @funding_source}
 
-  .tab-pane.fade#templates
-    .tab-content
-      = render :partial => 'funding_templates/index_table', :locals => {:funding_templates => @funding_source.funding_templates, :show_actions => 0}
+  - if can? :create, FundingTemplate
+    .tab-pane.fade#templates
+      .tab-content
+        = render :partial => 'funding_templates/index_table', :locals => {:funding_templates => @funding_source.funding_templates, :show_actions => 0}
 
-  .tab-pane.fade#bckts
-    .tab-content
+    .tab-pane.fade#bckts
+      .tab-content
 
   .tab-pane.fade#docs
     .tab-content

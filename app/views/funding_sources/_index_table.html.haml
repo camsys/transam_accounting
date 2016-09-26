@@ -21,13 +21,12 @@
       %th.center{:data => {:visible => 'false'}} Object Key
       %th.center{:data => {:visible => 'false', :sortable => 'true'}} External ID
       %th.center{:data => {:sortable => 'true'}} Name
-      %th.center{:data => {:sortable => 'true'}} Type
+      %th.center{:data => {:sortable => 'true'}} Source
 
-      %th.center{:data => {:sortable => 'true'}} Formula
-      %th.center{:data => {:sortable => 'true'}} Discretionary
+      %th.center{:data => {:sortable => 'true'}} Type
       %th.center{:data => {:sortable => 'true', :formatter => 'inflation_percentage_formatter'}} Inflation Rate
 
-      %th.center{:data => {:sortable => 'true'}} Life of $
+      %th.center{:data => {:sortable => 'true'}} Life of $ (yrs)
       %th.center{:data => {:sortable => 'true'}} Pcnt Match
 
       %th.center{:data => {:sortable => 'true'}} Valid From
@@ -40,11 +39,12 @@
       %tr
         %td.left= f.object_key
         %td.left= f.external_id
-        %td.left= link_to(f.name, funding_source_path(f))
+        %td.left
+          %span.hidden= f.name
+          = link_to(f.name, funding_source_path(f))
         %td.left= f.funding_source_type
 
-        %td.center= format_as_boolean(f.formula_fund)
-        %td.center= format_as_boolean(f.discretionary_fund)
+        %td.center= f.formula_fund.present? ? 'Formula' : (f.discretionary_fund.present? ? 'Discretionary' : 'Unknown')
         %td.right= f.inflation_rate.present? ? format_as_decimal(f.inflation_rate, 2) : ''
 
         %td.center= format_as_integer(f.life_in_years)
