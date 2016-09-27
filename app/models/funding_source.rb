@@ -90,11 +90,11 @@ class FundingSource < ActiveRecord::Base
   end
 
   def self.active
-    where('(fy_start IS NULL OR fy_start <= ?) AND (fy_end IS NULL OR fy_end >= ?)', current_fiscal_year_year, current_fiscal_year_year)
+    where('(fy_start IS NULL OR fy_start <= ?) AND (fy_end IS NULL OR fy_end >= ?)', current_planning_year_year, current_planning_year_year)
   end
 
-  def self.current_fiscal_year_year
-    FundingSource.new.current_fiscal_year_year
+  def self.current_planning_year_year
+    FundingSource.new.current_planning_year_year
   end
 
   #------------------------------------------------------------------------------

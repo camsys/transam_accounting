@@ -9,7 +9,7 @@
         Funding Programs
 
       %ul.dropdown-menu
-        - FundingSource.active.each do |program|
+        - FundingSource.all.each do |program|
           %li.text-left
             = link_to funding_source_path(program) do
               %i.fa.fa-fw.fa-book
