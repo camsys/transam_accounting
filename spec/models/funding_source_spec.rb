@@ -50,6 +50,7 @@ RSpec.describe FundingSource, :type => :model do
       :fy_end,
       :formula_fund,
       :discretionary_fund,
+      :inflation_rate,
       :active
     ])
   end
