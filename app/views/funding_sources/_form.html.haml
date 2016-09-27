@@ -11,10 +11,12 @@
     .col-sm-6
       = f.input :formula_fund, :as => :hidden
       = f.input :discretionary_fund, :as => :hidden
-      %label
+      .form-group.required
+        %label.required.control-label
+          %abbr{title: 'required'} *
+          = " Type"
         = radio_button_tag :fund, 'formula', @funding_source.formula_fund, {disabled: !@funding_source.new_record?, style: 'margin-left: 10px;'}
         Formula
-      %label
         = radio_button_tag :fund, 'discretionary', @funding_source.discretionary_fund, {disabled: !@funding_source.new_record?, style: 'margin-left: 10px;'}
         Discretionary
     .col-sm-6
