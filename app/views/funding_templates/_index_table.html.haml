@@ -60,7 +60,7 @@
           %td.center= f.funding_template_types.include?(type) ? format_as_boolean(true) : ''
 
         %td.center= format_as_boolean(f.recurring)
-        %td.right= format_as_percentage(f.match_required, 3)
+        %td.right= f.match_required.present? ? format_as_percentage(f.match_required, 3): ''
 
         %td.center.nowrap
           %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: f.description}, title: 'Description', tabindex: '0'}
