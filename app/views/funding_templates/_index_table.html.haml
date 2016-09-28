@@ -38,7 +38,7 @@
         %th.center{:data => {:sortable => 'true'}}= type.name
 
       %th.center{:data => {:sortable => 'true'}} Recurring
-      %th.center{:data => {:sortable => 'true'}} Pcnt Match
+      %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Pcnt Match
 
       %th
 
@@ -60,7 +60,7 @@
           %td.center= f.funding_template_types.include?(type) ? format_as_boolean(true) : ''
 
         %td.center= format_as_boolean(f.recurring)
-        %td.right= f.match_required.present? ? format_as_percentage(f.match_required, 3): ''
+        %td.right= f.match_required.present? ? f.match_required : ''
 
         %td.center.nowrap
           %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: f.description}, title: 'Description', tabindex: '0'}
@@ -81,3 +81,11 @@
 
     $('.transam-tooltip').tooltip();
   });
+
+  function percentage_formatter(value) {
+    if (value == "") {
+      return value;
+    } else {
+      return format("##0.000", value) + "%";
+    }
+  };

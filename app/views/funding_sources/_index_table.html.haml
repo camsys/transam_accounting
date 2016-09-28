@@ -27,7 +27,7 @@
       %th.center{:data => {:sortable => 'true', :formatter => 'inflation_percentage_formatter'}} Inflation Rate
 
       %th.center{:data => {:sortable => 'true'}} Life of $ (yrs)
-      %th.center{:data => {:sortable => 'true'}} Pcnt Match
+      %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Pcnt Match
 
       %th.center{:data => {:sortable => 'true'}} Valid From
       %th.center{:data => {:sortable => 'true'}} Valid To
@@ -45,10 +45,10 @@
         %td.left= f.funding_source_type
 
         %td.center= f.formula_fund.present? ? 'Formula' : (f.discretionary_fund.present? ? 'Discretionary' : 'Unknown')
-        %td.right= f.inflation_rate.present? ? format_as_decimal(f.inflation_rate, 2) : ''
+        %td.right= f.inflation_rate.present? ? f.inflation_rate : ''
 
         %td.center= format_as_integer(f.life_in_years)
-        %td.right= format_as_percentage(f.match_required, 3)
+        %td.right= f.match_required
 
         %td.center= format_as_fiscal_year(f.fy_start)
         %td.center= format_as_fiscal_year(f.fy_end)
@@ -78,5 +78,13 @@
       return value;
     } else {
       return format("##0.00", value) + "%";
+    }
+  };
+
+  function percentage_formatter(value) {
+    if (value == "") {
+      return value;
+    } else {
+      return format("##0.000", value) + "%";
     }
   };
