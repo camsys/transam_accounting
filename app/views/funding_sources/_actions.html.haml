@@ -9,10 +9,10 @@
         %li
           = link_to edit_funding_source_path(@funding_source) do
             %i.fa.fa-edit.fa-fw
-            = " Update this funding source"
+            = " Update this funding program"
       - if (can? :destroy, @funding_source) && @funding_source.deleteable?
         %li.divider
         %li
           = link_to funding_source_path(@funding_source), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
             %i.fa.fa-trash-o.fa-fw
-            = " Remove this funding source"
+            = " Remove this funding program"
