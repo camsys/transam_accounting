@@ -6,7 +6,7 @@ describe "funding_sources/_actions.html.haml", :type => :view do
     assign(:funding_source, create(:funding_source))
     render
 
-    expect(rendered).to have_link('Update this funding source')
-    expect(rendered).to have_link('Remove this funding source')
+    expect(rendered).to have_link('Update this funding program')
+    expect(rendered).to have_link('Remove this funding program')
   end
 end
