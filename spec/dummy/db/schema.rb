@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160919181213) do
+ActiveRecord::Schema.define(version: 20161003140404) do
 
   create_table "activities", force: true do |t|
     t.string   "object_key",           limit: 12
@@ -99,19 +99,19 @@ ActiveRecord::Schema.define(version: 20160919181213) do
     t.integer  "annual_affected_ridership"
     t.integer  "annual_dollars_generated"
     t.integer  "sales_proceeds"
-    t.string   "new_owner_name",                 limit: 64
-    t.string   "address1",                       limit: 128
-    t.string   "address2",                       limit: 128
-    t.string   "city",                           limit: 64
-    t.string   "state",                          limit: 2
-    t.string   "zip",                            limit: 10
     t.text     "comments"
+    t.integer  "organization_id"
     t.datetime "created_at",                                                         null: false
     t.datetime "updated_at",                                                         null: false
+    t.string   "state",                          limit: 32
+    t.string   "document",                       limit: 128
+    t.string   "original_filename",              limit: 128
+    t.integer  "created_by_id"
   end
 
   add_index "asset_events", ["asset_event_type_id"], name: "asset_events_idx3", using: :btree
   add_index "asset_events", ["asset_id"], name: "asset_events_idx2", using: :btree
+  add_index "asset_events", ["created_by_id"], name: "asset_events_creator_idx", using: :btree
   add_index "asset_events", ["event_date"], name: "asset_events_idx4", using: :btree
   add_index "asset_events", ["object_key"], name: "asset_events_idx1", using: :btree
   add_index "asset_events", ["upload_id"], name: "asset_events_idx5", using: :btree
@@ -211,6 +211,7 @@ ActiveRecord::Schema.define(version: 20160919181213) do
     t.integer  "scheduled_rehabilitation_year"
     t.integer  "scheduled_disposition_year"
     t.integer  "scheduled_replacement_cost"
+    t.text     "early_replacement_reason"
     t.boolean  "scheduled_replace_with_new"
     t.integer  "scheduled_rehabilitation_cost"
     t.integer  "replacement_reason_type_id"
@@ -294,6 +295,7 @@ ActiveRecord::Schema.define(version: 20160919181213) do
     t.integer  "updated_by_id"
     t.datetime "created_at",                                                              null: false
     t.datetime "updated_at",                                                              null: false
+    t.integer  "upload_id"
   end
 
   add_index "assets", ["asset_subtype_id"], name: "assets_idx4", using: :btree
@@ -614,6 +616,12 @@ ActiveRecord::Schema.define(version: 20160919181213) do
     t.boolean "active",                  null: false
   end
 
+  create_table "fta_funding_source_types", force: true do |t|
+    t.string  "name",        limit: 64,  null: false
+    t.string  "description", limit: 256, null: false
+    t.boolean "active",                  null: false
+  end
+
   create_table "fta_funding_types", force: true do |t|
     t.string  "name",        limit: 64,  null: false
     t.string  "code",        limit: 4,   null: false
@@ -663,10 +671,10 @@ ActiveRecord::Schema.define(version: 20160919181213) do
   end
 
   create_table "fuel_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 2,   null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
+    t.string  "name",        null: false
+    t.string  "code",        null: false
+    t.string  "description", null: false
+    t.boolean "active",      null: false
   end
 
   create_table "funding_source_types", force: true do |t|
@@ -676,34 +684,23 @@ ActiveRecord::Schema.define(version: 20160919181213) do
   end
 
   create_table "funding_sources", force: true do |t|
-    t.string   "object_key",                      limit: 12,  null: false
-    t.string   "name",                            limit: 64,  null: false
-    t.string   "description",                     limit: 256, null: false
+    t.string   "object_key",             limit: 12,  null: false
+    t.string   "name",                   limit: 64,  null: false
+    t.string   "description",            limit: 256, null: false
     t.text     "details"
-    t.integer  "funding_source_type_id",                      null: false
-    t.string   "external_id",                     limit: 32
-    t.boolean  "state_administered_federal_fund"
-    t.boolean  "bond_fund"
+    t.integer  "funding_source_type_id",             null: false
+    t.string   "external_id",            limit: 32
     t.boolean  "formula_fund"
-    t.boolean  "non_committed_fund"
-    t.boolean  "contracted_fund"
     t.boolean  "discretionary_fund"
-    t.float    "state_match_required",            limit: 24
-    t.float    "match_required",                  limit: 24
-    t.float    "local_match_required",            limit: 24
+    t.float    "match_required",         limit: 24
     t.integer  "fy_start"
     t.integer  "fy_end"
-    t.boolean  "rural_providers"
-    t.boolean  "urban_providers"
-    t.boolean  "shared_ride_providers"
-    t.boolean  "inter_city_bus_providers"
-    t.boolean  "inter_city_rail_providers"
     t.integer  "created_by_id"
     t.integer  "updated_by_id"
     t.boolean  "active"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.float    "inflation_rate",                  limit: 24
+    t.float    "inflation_rate",         limit: 24
     t.integer  "life_in_years"
   end
 
@@ -846,11 +843,13 @@ ActiveRecord::Schema.define(version: 20160919181213) do
   end
 
   create_table "issues", force: true do |t|
-    t.string   "object_key",          limit: 12, null: false
-    t.integer  "issue_type_id",                  null: false
-    t.integer  "web_browser_type_id",            null: false
-    t.integer  "created_by_id",                  null: false
-    t.text     "comments",                       null: false
+    t.string   "object_key",           limit: 12, null: false
+    t.integer  "issue_type_id",                   null: false
+    t.integer  "web_browser_type_id",             null: false
+    t.integer  "created_by_id",                   null: false
+    t.text     "comments",                        null: false
+    t.integer  "issue_status_type_id"
+    t.text     "resolution_comments"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -931,6 +930,7 @@ ActiveRecord::Schema.define(version: 20160919181213) do
     t.integer  "thread_message_id"
     t.string   "subject",           limit: 64, null: false
     t.text     "body"
+    t.boolean  "active"
     t.datetime "opened_at"
     t.datetime "created_at",                   null: false
   end
@@ -962,6 +962,19 @@ ActiveRecord::Schema.define(version: 20160919181213) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "notifications", force: true do |t|
+    t.string   "object_key",      limit: 12, null: false
+    t.string   "text",                       null: false
+    t.string   "link",                       null: false
+    t.integer  "notifiable_id"
+    t.string   "notifiable_type"
+    t.boolean  "active"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "notifications", ["notifiable_id", "notifiable_type"], name: "index_notifications_on_notifiable_id_and_notifiable_type", using: :btree
 
   create_table "organization_types", force: true do |t|
     t.string  "name",              limit: 64,  null: false
@@ -1241,7 +1254,7 @@ ActiveRecord::Schema.define(version: 20160919181213) do
 
   create_table "uploads", force: true do |t|
     t.string   "object_key",              limit: 12,         null: false
-    t.integer  "organization_id",                            null: false
+    t.integer  "organization_id"
     t.integer  "user_id",                                    null: false
     t.integer  "file_content_type_id",                       null: false
     t.integer  "file_status_type_id",                        null: false
@@ -1266,6 +1279,17 @@ ActiveRecord::Schema.define(version: 20160919181213) do
   add_index "uploads", ["organization_id"], name: "uploads_idx2", using: :btree
   add_index "uploads", ["user_id"], name: "uploads_idx3", using: :btree
 
+  create_table "user_notifications", force: true do |t|
+    t.integer  "user_id",         null: false
+    t.integer  "notification_id", null: false
+    t.datetime "opened_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "user_notifications", ["notification_id"], name: "index_user_notifications_on_notification_id", using: :btree
+  add_index "user_notifications", ["user_id"], name: "index_user_notifications_on_user_id", using: :btree
+
   create_table "user_organization_filters", force: true do |t|
     t.string   "object_key",  limit: 12,  null: false
     t.integer  "user_id",                 null: false
@@ -1274,6 +1298,7 @@ ActiveRecord::Schema.define(version: 20160919181213) do
     t.boolean  "active",                  null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "sort_order"
   end
 
   add_index "user_organization_filters", ["object_key"], name: "user_organization_filters_idx1", using: :btree
