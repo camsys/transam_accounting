@@ -28,7 +28,7 @@
 
   .row
     .col-sm-4
-      = f.association :funding_source_type, :collection => FundingSourceType.funding_program.active, :label => 'Source'
+      = f.association :funding_source_type, :collection => FundingSourceType.funding_program.active, :label => 'Source', :include_blank => false
     .col-sm-4
       = f.input :life_in_years, label: 'Life of $', :wrapper => :vertical_append do
         = f.input_field :life_in_years, :class => 'form-control', :min => 1, :allow_blank => true
