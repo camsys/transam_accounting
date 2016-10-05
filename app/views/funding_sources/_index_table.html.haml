@@ -59,7 +59,7 @@
           - if can? :update, f
             = link_to edit_funding_source_path(f), :class => "button btn-xs", :title => "Edit program" do
               %i.fa.fa-edit.fa-1-5x.text-success
-            - if can? :destroy, f
+            - if (can? :destroy, f) && f.deleteable?
               = link_to funding_source_path(f), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
                 %i.fa.fa-trash-o.fa-fw.text-danger
 
