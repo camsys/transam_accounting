@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  resources :buckets
+
   resources :funding_sources, :path => :funding_programs do
     collection do
       get 'details'

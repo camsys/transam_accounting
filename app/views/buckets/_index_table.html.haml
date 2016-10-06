@@ -1,0 +1,82 @@
+:ruby
+  table_dom_id = SecureRandom.hex
+
+%table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
+  :card_view => "false",
+  :pagination => 'true',
+  :show_pagination_switch => 'true',
+  :page_list => "[5, 10, 20, 50, 100, 200]",
+  :page_size => current_user.num_table_rows,
+  :search => 'false',
+  :toolbar => "#table_actions",
+  :export_types => "['csv', 'txt', 'excel']",
+  :show_export => 'true',
+  :show_columns => 'true'}, :style => 'width:100%;'}
+
+  %thead
+    %tr
+      %th.center{:data => {:visible => 'false'}} Object Key
+      %th.center{:data => {:sortable => 'true'}} ID
+      %th.center{:data => {:sortable => 'true'}} FY
+      %th.center{:data => {:sortable => 'true'}} Program (Template)
+      %th.center{:data => {:sortable => 'true'}} Type
+      %th.center{:data => {:sortable => 'true'}} Owner
+      %th.center{:data => {:sortable => 'true'}} Total
+      %th.center{:data => {:sortable => 'true'}} Committed
+      %th.center{:data => {:sortable => 'true'}} Available
+      %th.center{:data => {:sortable => 'true'}} Expires
+
+  %tbody
+  - buckets.each do |b|
+    %tr
+      %td.left= b.object_key
+    %tr
+      %td.left= b.id
+    %tr
+      %td.left= b.fiscal_year
+    %tr
+      %td.left= b.funding_template.id
+    %tr
+      %td.left= b.bucket_type.name
+    %tr
+      -unless b.owner.nil?
+        %td.left= b.owner.name
+      -else
+        %td.left= state
+    %tr
+      %td.left= b.budget_amount
+    %tr
+      %td.left= b.budget_committed
+    %tr
+      %td.left= b.budget_remaining
+    %tr
+      -unless b.funding_template.funding_source.life_in_years.nil?
+        %td.left= b.fiscal_year + b.funding_template.funding_source.life_in_years
+      -else
+        %td.left= 1
+
+  #table_actions.btn-group
+  - if can? :create, Bucket
+    -#= link_to new_funding_template_path(:bucket_id => bucket.try(:id)), :class => 'btn btn-default' do
+    -#  %i.fa.fa-plus.fa-fw
+    -#  = "Add Template"
+    %i.fa.fa-plus.fa-fw
+    = "Add Bucket"
+
+:javascript
+
+  $('#' + '#{table_dom_id}').on('post-body.bs.table', function () {
+    $('.transam-popover').popover({
+      trigger: 'hover'
+    });
+
+    $('.transam-tooltip').tooltip();
+  });
+
+  function percentage_formatter(value) {
+    if (value == "") {
+      return value;
+    } else {
+      return format("##0.000", value) + "%";
+    }
+  };

@@ -15,6 +15,7 @@ class Bucket< ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   belongs_to :funding_template
+  belongs_to :bucket_type
   belongs_to :owner, :class_name => "Organization"
 
   #------------------------------------------------------------------------------
@@ -28,8 +29,10 @@ class Bucket< ActiveRecord::Base
   FORM_PARAMS = [
       :funding_template_id,
       :fiscal_year,
-      :budget_amount,
+      :bucket_type_id,
       :owner_id,
+      :budget_amount,
+      :budget_committed,
       :description
   ]
 
@@ -59,7 +62,11 @@ class Bucket< ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   def to_s
-    name
+    "#{self.id}_#{self.fiscal_year}_#{self.owner_id}_#{self.template_id} #{self.description}"
+  end
+
+  def budget_remaining
+    self.budget_amount - self.budget_committed
   end
 
   #------------------------------------------------------------------------------
