@@ -5,7 +5,7 @@ class BucketsController < OrganizationAwareController
 
   INDEX_KEY_LIST_VAR    = "buckets_key_list_cache_var"
 
-  # GET /funding_templates
+  # GET /buckets
   def index
     add_breadcrumb 'All Buckets', funding_templates_path
 
@@ -44,37 +44,48 @@ class BucketsController < OrganizationAwareController
       format.json { render :json => @buckets }
     end
 
-    # @buckets = Bucket.all
+    @buckets = Bucket.all
   end
 
-  # GET /funding_templates/1
+  # GET /buckets/1
   def show
 
   end
 
-  # GET /funding_templates/new
+  # GET /buckets/new
   def new
+    @programs = FundingSource.all
 
   end
 
-  # GET /funding_templates/1/edit
+  # GET /buckets/1/edit
   def edit
 
   end
 
-  # POST /funding_templates
+  # POST /buckets
   def create
 
   end
 
-  # PATCH/PUT /funding_templates/1
+  # PATCH/PUT /buckets/1
   def update
 
   end
 
-  # DELETE /funding_templates/1
+  # DELETE /buckets/1
   def destroy
 
+  end
+
+  def find_organizations_from_template_id(template)
+    organizaitons = Grantor.all.pluck(:name, :id)
+
+    organizaitons + Organization.where("id in (Select organization_id FROM funding_templates_organizations where funding_template_id = #{template.id}) and id <> #{Grantor.first.id}").pluck(:id, :name)
+  end
+
+  def find_templates_from_program(program)
+    FundingTemplate.where(funding_source_id: program.id).pluck(:id, :name)
   end
 
   private

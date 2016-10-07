@@ -62,7 +62,7 @@ class Bucket< ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   def to_s
-    "#{self.id}_#{self.fiscal_year}_#{self.owner_id}_#{self.template_id} #{self.description}"
+    "#{self.id}_#{self.fiscal_year}_#{self.owner_id}_#{self.funding_template_id} #{self.description}"
   end
 
   def budget_remaining

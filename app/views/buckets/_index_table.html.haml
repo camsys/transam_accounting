@@ -27,33 +27,24 @@
       %th.center{:data => {:sortable => 'true'}} Expires
 
   %tbody
-  - buckets.each do |b|
-    %tr
-      %td.left= b.object_key
-    %tr
-      %td.left= b.id
-    %tr
-      %td.left= b.fiscal_year
-    %tr
-      %td.left= b.funding_template.id
-    %tr
-      %td.left= b.bucket_type.name
-    %tr
-      -unless b.owner.nil?
-        %td.left= b.owner.name
-      -else
-        %td.left= state
-    %tr
-      %td.left= b.budget_amount
-    %tr
-      %td.left= b.budget_committed
-    %tr
-      %td.left= b.budget_remaining
-    %tr
-      -unless b.funding_template.funding_source.life_in_years.nil?
-        %td.left= b.fiscal_year + b.funding_template.funding_source.life_in_years
-      -else
-        %td.left= 1
+    - buckets.each do |b|
+      %tr
+        %td.left= b.object_key
+        %td.left= b.id
+        %td.left= b.fiscal_year
+        %td.left= b.funding_template.id
+        %td.left= b.bucket_type.name
+        -unless b.owner.nil?
+          %td.left= b.owner.name
+        -else
+          %td.left= state
+        %td.left= format_as_currency(b.budget_amount)
+        %td.left= format_as_currency(b.budget_committed)
+        %td.left= format_as_currency(b.budget_remaining)
+        -unless b.funding_template.funding_source.life_in_years.nil?
+          %td.left= b.fiscal_year + b.funding_template.funding_source.life_in_years
+        -else
+          %td.left= 1
 
   #table_actions.btn-group
   - if can? :create, Bucket
@@ -72,11 +63,3 @@
 
     $('.transam-tooltip').tooltip();
   });
-
-  function percentage_formatter(value) {
-    if (value == "") {
-      return value;
-    } else {
-      return format("##0.000", value) + "%";
-    }
-  };
