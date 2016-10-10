@@ -8,7 +8,7 @@ Rails.application.routes.draw do
     resources :documents
   end
 
-  resources :funding_templates
+  resources :funding_templates, :funding_template_proxies_path
 
   resources :grants do
     member do

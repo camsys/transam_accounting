@@ -58,6 +58,9 @@ class FundingTemplatesController < OrganizationAwareController
   def new
     @funding_template = FundingTemplate.new(:funding_source_id => params[:funding_source_id])
 
+    @template_proxy = FundingTemplateProxy.new
+    @template_proxy.set_defaults(@funding_template)
+
     if @funding_template.funding_source.present?
       add_breadcrumb @funding_template.funding_source.to_s, funding_source_path(@funding_template.funding_source)
       add_breadcrumb "#{@funding_template.funding_source} Templates", funding_templates_path(:funding_source_id => params[:funding_source_id])
@@ -75,11 +78,19 @@ class FundingTemplatesController < OrganizationAwareController
     add_breadcrumb @funding_template.to_s, funding_template_path(@funding_template)
     add_breadcrumb 'Update', funding_template_path(@funding_template)
 
+    funding_template_proxy = FundingTemplateProxy.new
+    funding_template_proxy.set_defaults(@funding_template)
+
+    @funding_template = funding_template_proxy
+
   end
 
   # POST /funding_templates
   def create
-    @funding_template = FundingTemplate.new(funding_template_params.except(:organization_ids))
+    @funding_template_proxy = FundingTemplateProxy.new(funding_template_params.except(:organization_ids))
+
+    @funding_template = FundingTemplate.new()
+    @funding_template.set_funding_template_details(@funding_template_proxy)
 
     if @funding_template.save
 
@@ -96,8 +107,10 @@ class FundingTemplatesController < OrganizationAwareController
 
   # PATCH/PUT /funding_templates/1
   def update
-    if @funding_template.update(funding_template_params.except(:organization_ids))
+    if @funding_template_proxy.FundingTemplateProxy.new(funding_template_params.except(:organization_ids))
 
+      @funding_template = FundingTemplate.new()
+      @funding_template.set_funding_template_details(@funding_template_proxy)
       # clear the existing list of organizations
       @funding_template.organizations.clear
       # Add the (possibly) new organizations into the object

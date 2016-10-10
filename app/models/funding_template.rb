@@ -42,7 +42,7 @@ class FundingTemplate < ActiveRecord::Base
       :recurring,
       :match_required,
       :active,
-      :all_organizations,
+      :query_string,
       :organization_ids,
       {:funding_template_type_ids=>[]}
   ]
@@ -76,6 +76,30 @@ class FundingTemplate < ActiveRecord::Base
     name
   end
 
+  def set_funding_template_details(funding_template_proxy)
+    unless funding_template_proxy.nil?
+      self.object_key = funding_template_proxy.object_key
+      self.funding_source_id = funding_template_proxy.funding_source_id
+      self.name = funding_template_proxy.name
+      self.external_id = funding_template_proxy.external_id
+      self.description = funding_template_proxy.description
+      self.contributor_id = funding_template_proxy.contributor_id
+      self.owner_id = funding_template_proxy.owner_id
+      self.transfer_only = funding_template_proxy.transfer_only
+      self.recurring = funding_template_proxy.recurring
+      self.match_required = funding_template_proxy.match_required
+      self.active = funding_template_proxy.active
+      if funding_template_proxy.all_organizations
+        self.query_string = 'id > 0'
+      elsif !funding_template_proxy.query_string.blank?
+        self.query_string = funding_template_proxy.query_string
+      end
+      self.organization_ids = a.organization_ids
+      self.funding_template_type_ids = a.funding_template_type_ids
+    end
+  end
+
+
   #------------------------------------------------------------------------------
   #
   # Protected Methods
@@ -84,7 +108,7 @@ class FundingTemplate < ActiveRecord::Base
   protected
 
   def set_defaults
-    self.all_organizations = self.all_organizations.nil? ? true : self.all_organizations
+    # self.all_organizations = self.all_organizations.nil? ? true : self.all_organizations
     self.active = self.active.nil? ? true : self.active
   end
 
