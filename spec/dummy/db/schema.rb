@@ -616,12 +616,6 @@ ActiveRecord::Schema.define(version: 20161003140404) do
     t.boolean "active",                  null: false
   end
 
-  create_table "fta_funding_source_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "description", limit: 256, null: false
-    t.boolean "active",                  null: false
-  end
-
   create_table "fta_funding_types", force: true do |t|
     t.string  "name",        limit: 64,  null: false
     t.string  "code",        limit: 4,   null: false
