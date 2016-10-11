@@ -16,7 +16,8 @@
 
   = f.input :organization_ids, :as => :hidden
 
-  = f.input :all_organizations, :label =>  "Available to All Agencies"
+  = check_box_tag(:all_organizations, 1,  @funding_template.query_string=='id > 0')
+  Available to All Agencies?
 
   #org_select.input-large
 
@@ -41,13 +42,13 @@
 
 :javascript
 
-  if($('#funding_template_all_organizations').prop('checked')) {
+  if($('#all_organizations').prop('checked')) {
       $("#org_select").hide();
     } else {
       $("#org_select").show();
     }
 
-  $('#funding_template_all_organizations').change(function() {
+  $('#all_organizations').change(function() {
     if($(this).prop('checked')) {
       $("#org_select").hide();
     } else {

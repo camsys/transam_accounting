@@ -20,7 +20,7 @@
 
   .tab-pane.fade#elgby
     .tab-content
-      - if @funding_template.all_organizations
+      - if @funding_template.query_string == 'id > 0'
         = format_field("Agencies", "All")
       - else
         = render :partial => 'organizations/index_table', :locals => {:organizations => @funding_template.organizations, :show_actions => 0}

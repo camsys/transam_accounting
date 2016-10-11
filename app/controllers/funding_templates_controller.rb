@@ -70,16 +70,23 @@ class FundingTemplatesController < OrganizationAwareController
 
   # GET /funding_templates/1/edit
   def edit
-
     add_breadcrumb @funding_template.funding_source.to_s, funding_source_path(@funding_template.funding_source)
     add_breadcrumb @funding_template.to_s, funding_template_path(@funding_template)
     add_breadcrumb 'Update', funding_template_path(@funding_template)
-
   end
 
   # POST /funding_templates
   def create
     @funding_template = FundingTemplate.new(funding_template_params.except(:organization_ids))
+
+    all_organizations = params[:all_organizations]
+
+    if all_organizations
+      @funding_template.query_string = 'id > 0'
+    else
+      # TODO one day this may not be the desired behavior when editing a template because there will be other suery_strings that could apply
+      @funding_template.query_string = nil
+    end
 
     if @funding_template.save
 
@@ -97,6 +104,15 @@ class FundingTemplatesController < OrganizationAwareController
   # PATCH/PUT /funding_templates/1
   def update
     if @funding_template.update(funding_template_params.except(:organization_ids))
+
+      all_organizations = params[:all_organizations]
+
+      if all_organizations
+        @funding_template.query_string = 'id > 0'
+      else
+        # TODO one day this may not be the desired behavior when editing a template because there will be other suery_strings that could apply
+        @funding_template.query_string = nil
+      end
 
       # clear the existing list of organizations
       @funding_template.organizations.clear

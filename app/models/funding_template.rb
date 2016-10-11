@@ -42,7 +42,7 @@ class FundingTemplate < ActiveRecord::Base
       :recurring,
       :match_required,
       :active,
-      :all_organizations,
+      :query_string,
       :organization_ids,
       {:funding_template_type_ids=>[]}
   ]
@@ -76,6 +76,7 @@ class FundingTemplate < ActiveRecord::Base
     name
   end
 
+
   #------------------------------------------------------------------------------
   #
   # Protected Methods
@@ -84,12 +85,12 @@ class FundingTemplate < ActiveRecord::Base
   protected
 
   def set_defaults
-    self.all_organizations = self.all_organizations.nil? ? true : self.all_organizations
+    # self.all_organizations = self.all_organizations.nil? ? true : self.all_organizations
     self.active = self.active.nil? ? true : self.active
   end
 
   def check_orgs_list
     # clear out orgs list if template is applicable to all orgs
-    self.organizations = [] if self.all_organizations
+    self.organizations = [] if self.query_string == 'id > 0'
   end
 end
