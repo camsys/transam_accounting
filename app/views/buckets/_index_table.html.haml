@@ -48,11 +48,9 @@
 
   #table_actions.btn-group
   - if can? :create, Bucket
-    -#= link_to new_funding_template_path(:bucket_id => bucket.try(:id)), :class => 'btn btn-default' do
-    -#  %i.fa.fa-plus.fa-fw
-    -#  = "Add Template"
-    %i.fa.fa-plus.fa-fw
-    = "Add Bucket"
+    = link_to new_bucket_path, :class => 'btn btn-default' do
+      %i.fa.fa-plus.fa-fw
+      = "Add Bucket"
 
 :javascript
 
