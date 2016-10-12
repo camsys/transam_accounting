@@ -31,8 +31,5 @@ class CreateBuckets < ActiveRecord::Migration
     existing_bucket_type.save
     grant_application_bucket_type.save
 
-    bucket = Bucket.new(:funding_template_id => 7, :fiscal_year => 2017, :bucket_type_id => 1, :budget_amount => 100000000, :budget_committed => 0, :owner_id => 3, :description => 'TEST', :active => true, :created_by_id => '1', :updated_by_id => 1)
-    bucket.save
-
   end
 end
