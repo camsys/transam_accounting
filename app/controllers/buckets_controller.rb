@@ -13,22 +13,34 @@ class BucketsController < OrganizationAwareController
     conditions  = []
     values      = []
 
-    @agency_id_filter = params[:agency_id_filter]
-    unless @agency_filter_id.blank?
-      agency_filter_id = @agency_id_filter.to_i
+    if params[:template_id].present?
+      @organizations =  Organization.where("id in (Select organization_id FROM funding_templates_organizations where funding_template_id = #{template_id}}").pluck(:name, :id)
+    else
+      @organizations =  Organization.all.pluck(:name, :id)
+    end
+    if params[:agency_id].present?
+      @searched_agency_id =  params[:agency_id]
+    end
+    if params[:fiscal_year].present?
+      @searched_fiscal_year =  params[:fiscal_year]
+    end
+    if params[:funds_available].present?
+      @show_funds_available_only =  params[:funds_available]
+    end
+
+    unless @searched_agency_id.blank?
+      agency_filter_id = @searched_agency_id.to_i
       conditions << 'owner_id = ?'
       values << agency_filter_id
     end
 
-    @fiscal_year_filter = params[:fiscal_year_filter]
-    unless @fiscal_year_filter.blank? || @fiscal_year == 'ALL'
-      fiscal_year_filter = @fiscal_year_filter.to_i
+    unless @searched_fiscal_year.blank?
+      fiscal_year_filter = @searched_fiscal_year.to_i
       conditions << 'fiscal_year = ?'
       values << fiscal_year_filter
     end
 
-    @funds_available_filter = params[:funds_available_filter]
-    if @funds_available_filter
+    if @show_funds_available_only
       conditions << 'budget_amount > budget_committed'
     end
 
@@ -43,13 +55,15 @@ class BucketsController < OrganizationAwareController
       format.html # index.html.erb
       format.json { render :json => @buckets }
     end
-
-    @buckets = Bucket.all
   end
 
   # GET /buckets/1
   def show
-    @programs = FundingSource.all
+
+
+
+
+
   end
 
   # GET /buckets/new

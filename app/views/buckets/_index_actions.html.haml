@@ -1,0 +1,16 @@
+= form_tag buckets_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
+  .form-group
+    = select_tag(:agency_id, options_for_select(@organizations, :selected => @searched_agency_id), :class => "form-control", :style => "width: 150px;", :prompt => "All Organizations")
+    = select_tag(:fiscal_year, options_for_select(get_fiscal_years, :selected => @searched_fiscal_year), :class => "form-control", :style => "width: 150px;", :prompt => "All Years")
+    %label
+      = check_box_tag(:funds_available, '1', @show_funds_available_only, {:class => "form-control"})
+      Show Funds Available Only
+
+:javascript
+  $(document).ready(function() {
+
+    $('.form-control').change(function() {
+      $('#filter_form').submit();
+    });
+
+  });
