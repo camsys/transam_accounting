@@ -1,0 +1,127 @@
+= simple_form_for(@bucket_proxy,
+:url => buckets_path,
+:html => {:class => 'form-vertical bucket_form' },
+:wrapper => :vertical_form,
+:wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
+
+  = f.input :bucket_type_id, :as => :hidden, :input_html => { :value => BucketType.find_by(name: 'Formula').id }
+  -#TODO actually get these to appear on the same lin and next to the label Option:
+  -#= f.input :option, :as => :radio_buttons, :required => true, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Create', 'Update' ]
+
+  .row
+    .col-sm-8
+      = f.input :program_id, :required => true, :collection => FundingSource.all, :include_blank => true, :label => "Program"
+  .row
+    .col-sm-8
+      = f.input :template_id, :required => true, :collection => [], :include_blank => true, :label => "Template"
+  .row
+    .col-sm-8
+      = f.input :owner_id, :required => true, :collection => [], :include_blank => true, :label => "Owner"
+
+  .row
+    .col-sm-4
+      = f.input :fiscal_year_range_start, :required => true, :collection => get_fiscal_years, :include_blank => true, :label => "From FY"
+    .col-sm-4
+      = f.input :fiscal_year_range_end, :required => true, :collection => get_fiscal_years, :include_blank => true, :label => "To FY"
+
+  .escalate_by_div{:id => "escalate_by_div_id"}
+    .row
+      .col-sm-8
+        = f.input :inflation_percentage, :wrapper => :vertical_append,:label => 'Escalate By' do
+          = f.input_field :inflation_percentage, :class => 'form-control', :max => 100, :step => 0.001
+          %span.input-group-addon
+            %i.fa.fa-percent
+  .state_or_single_agency_budget{:id => "state_or_single_agency_budget_id"}
+    .row
+      .col-sm-8
+        = f.input :total_amount, :input_html => {:maxlength => 32}, :label => 'Budget'
+
+  .row
+    .col-sm-8
+      = f.button :submit, 'Create/Update', :class => "btn btn-primary"
+
+-#= render 'form_scripts'
+
+:javascript
+
+  $('#bucket_proxy_owner_id').change(function(){
+    if (bucket_proxy_owner_id.value <= 0){
+      $("#state_or_single_agency_budget_id").hide();
+      bucket_proxy_total_amount.value = null;
+    }
+    else{
+      $("#state_or_single_agency_budget_id").show();
+    }
+
+  })
+
+  function show_escalate_by(start_fy, end_fy){
+    if(start_fy === end_fy)
+    {
+      $("#escalate_by_div_id").hide();
+      bucket_proxy_inflation_percentage.value = null;
+    } else {
+      $("#escalate_by_div_id").show();
+    }
+
+  };
+
+  $('#bucket_proxy_fiscal_year_range_start').change(function(){
+    show_escalate_by(bucket_proxy_fiscal_year_range_start.value, bucket_proxy_fiscal_year_range_end.value)
+  });
+  $('#bucket_proxy_fiscal_year_range_end').change(function(){
+    show_escalate_by(bucket_proxy_fiscal_year_range_start.value, bucket_proxy_fiscal_year_range_end.value)
+  });
+
+  //$.validator.addMethod('greaterThan', function(value, element, params) {
+  //    return this.optional(element) || parseFloat(value) > params;
+  //}, "Please enter a value greater than {0}.");
+  //
+  //$.validator.addMethod('PercentThreeDigits', function(value, element) {
+  //    return this.optional(element) || /^\d+(\.\d{0,3})?$/.test(value);
+  //}, "Please enter a correct percent up to three decimal places.");
+
+
+  $('#bucket_proxy_template_id').change(function(){
+    var url = '#{find_organizations_from_template_id_buckets_path}';
+    $.ajax({
+      url: url,
+      data: {template_id: bucket_proxy_template_id.value},
+      success: function(result){
+        $('#bucket_proxy_owner_id').empty();
+        //Add a blank entry to the list. This is -2 because we already had to add the All Agenecies for this template option
+        $("#bucket_proxy_owner_id").append( $("<option></option>").attr("value", -2).text(''));
+        for(i = 0;i<result.length;i++){
+          //add an option for each organizations available to the tempalte
+          $("#bucket_proxy_owner_id").append(
+              $("<option></option>").attr("value", result[i][0]).text(result[i][1])
+          );
+        }
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+        }
+      });
+  });
+
+  $('#bucket_proxy_program_id').change(function(){
+    var url = '#{find_templates_from_program_id_buckets_path}';
+    $.ajax({
+      url: url,
+      data: {program_id: bucket_proxy_program_id.value},
+      success: function(result){
+        $('#bucket_proxy_template_id').empty();
+        //Add a blank entry to the list
+        $("#bucket_proxy_template_id").append( $("<option></option>").attr("value", -1).text(''));
+        for(i = 0;i<result.length;i++){
+          //add in option for each template available to the program
+          $("#bucket_proxy_template_id").append(
+              $("<option></option>").attr("value", result[i][0]).text(result[i][1])
+          );
+        }
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+        }
+      });
+  });
