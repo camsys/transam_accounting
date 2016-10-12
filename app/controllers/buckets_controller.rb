@@ -82,13 +82,18 @@ class BucketsController < OrganizationAwareController
       bucket.save
 
       while i <= bucket_proxy.fiscal_year_range_end.to_i
-        next_year = bucket
-        next_year.fiscal_year = i
+        next_year_bucket = Bucket.new
+        next_year_bucket.set_values_from_proxy(bucket_proxy)
+        next_year_bucket.creator = current_user
+        next_year_bucket.updator = current_user
+
+        next_year_bucket.fiscal_year = i
         unless bucket_proxy.inflation_percentage.blank?
           next_year_budget = next_year_budget + (inflation_percentage * next_year_budget)
         end
+        next_year_bucket.budget_amount = next_year_budget
 
-        next_year.budget_amount = next_year_budget
+        next_year_bucket.save
 
         i += 1
       end
