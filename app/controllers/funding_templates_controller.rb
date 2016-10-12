@@ -5,25 +5,17 @@ class FundingTemplatesController < OrganizationAwareController
 
   INDEX_KEY_LIST_VAR    = "funding_template_key_list_cache_var"
 
-  # GET /buckets
+  # GET /funding_templates
   def index
 
-    add_breadcrumb 'Templates', buckets_path
+    add_breadcrumb 'Templates', funding_templates_path
 
-    # Get User Organizations
-    organizations = []
-    organizations << nil
-    user.organizations.each { |uo|
-      organizations << uo.id
-    }
-
-    # Find buckets associated with each organization or with State
-    available_buckets = Buckets.find_all_by(owner_id: organizations)
 
     # Start to set up the query
     conditions  = []
     values      = []
 
+    @funding_source_id = params[:funding_source_id]
     unless @funding_source_id.blank?
       @funding_source_id = @funding_source_id.to_i
       conditions << 'funding_source_id = ?'
@@ -54,7 +46,7 @@ class FundingTemplatesController < OrganizationAwareController
     @funding_templates = FundingTemplate.all
   end
 
-  # GET /buckets/1
+  # GET /funding_templates/1
   def show
 
     add_breadcrumb @funding_template.funding_source.to_s, funding_source_path(@funding_template.funding_source)
@@ -62,7 +54,7 @@ class FundingTemplatesController < OrganizationAwareController
 
   end
 
-  # GET /buckets/new
+  # GET /funding_templates/new
   def new
     @funding_template = FundingTemplate.new(:funding_source_id => params[:funding_source_id])
 
@@ -76,14 +68,14 @@ class FundingTemplatesController < OrganizationAwareController
 
   end
 
-  # GET /buckets/1/edit
+  # GET /funding_templates/1/edit
   def edit
     add_breadcrumb @funding_template.funding_source.to_s, funding_source_path(@funding_template.funding_source)
     add_breadcrumb @funding_template.to_s, funding_template_path(@funding_template)
     add_breadcrumb 'Update', funding_template_path(@funding_template)
   end
 
-  # POST /buckets
+  # POST /funding_templates
   def create
     @funding_template = FundingTemplate.new(funding_template_params.except(:organization_ids))
 
@@ -109,7 +101,7 @@ class FundingTemplatesController < OrganizationAwareController
     end
   end
 
-  # PATCH/PUT /buckets/1
+  # PATCH/PUT /funding_templates/1
   def update
     if @funding_template.update(funding_template_params.except(:organization_ids))
 
@@ -136,7 +128,7 @@ class FundingTemplatesController < OrganizationAwareController
     end
   end
 
-  # DELETE /buckets/1
+  # DELETE /funding_templates/1
   def destroy
     funding_source = @funding_template.funding_source
     @funding_template.destroy

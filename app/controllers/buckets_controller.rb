@@ -7,7 +7,7 @@ class BucketsController < OrganizationAwareController
 
   # GET /buckets
   def index
-    add_breadcrumb 'All Buckets', funding_templates_path
+    add_breadcrumb 'All Buckets', buckets_path
 
     # Start to set up the query
     conditions  = []
@@ -49,43 +49,87 @@ class BucketsController < OrganizationAwareController
 
   # GET /buckets/1
   def show
-
+    @programs = FundingSource.all
   end
 
   # GET /buckets/new
   def new
+    add_breadcrumb 'New', new_bucket_path
+
     @programs = FundingSource.all
+    @bucket_proxy = BucketProxy.new
 
   end
 
   # GET /buckets/1/edit
   def edit
-
+    @programs = FundingSource.all
   end
 
   # POST /buckets
   def create
+    bucket_proxy = BucketProxy.new(bucket_proxy_params)
 
+    bucket = Bucket.new
+    bucket.set_values_from_proxy(bucket_proxy)
+    bucket.creator = current_user
+    bucket.updator = current_user
+
+    unless bucket_proxy.fiscal_year_range_start == bucket_proxy.fiscal_year_range_end
+      i = bucket_proxy.fiscal_year_range_start.to_i + 1
+      next_year_budget = bucket_proxy.total_amount.to_d
+      inflation_percentage = bucket_proxy.inflation_percentage.blank? ? 0 : bucket_proxy.inflation_percentage.to_d/100
+      bucket.save
+
+      while i <= bucket_proxy.fiscal_year_range_end.to_i
+        next_year = bucket
+        next_year.fiscal_year = i
+        unless bucket_proxy.inflation_percentage.blank?
+          next_year_budget = next_year_budget + (inflation_percentage * next_year_budget)
+        end
+
+        next_year.budget_amount = next_year_budget
+
+        i += 1
+      end
+
+    else
+      bucket.save
+    end
+
+    redirect_to buckets_path, notice: 'Bucket was successfully created.'
   end
 
   # PATCH/PUT /buckets/1
   def update
-
+    @programs = FundingSource.all
   end
 
   # DELETE /buckets/1
   def destroy
-
+    @programs = FundingSource.all
   end
 
-  def find_organizations_from_template_id(template)
-    organizaitons = Grantor.all.pluck(:name, :id)
+  def find_organizations_from_template_id
 
-    organizaitons + Organization.where("id in (Select organization_id FROM funding_templates_organizations where funding_template_id = #{template.id}) and id <> #{Grantor.first.id}").pluck(:id, :name)
+    result = []
+    template_id = params[:template_id]
+    grantor = Grantor.first
+    organizations =  Organization.where("id in (Select organization_id FROM funding_templates_organizations where funding_template_id = #{template_id}) and id <> #{grantor.id}").pluck(:id, :name)
+    result = [[-1,'All Agencies For This Template']] + [[grantor.id, grantor.name]] + organizations
+
+    respond_to do |format|
+      format.json { render json: result.to_json }
+    end
   end
 
-  def find_templates_from_program(program)
-    FundingTemplate.where(funding_source_id: program.id).pluck(:id, :name)
+  def find_templates_from_program_id
+    program_id = params[:program_id]
+    result = FundingTemplate.where(funding_source_id: program_id).pluck(:id, :name)
+
+    respond_to do |format|
+      format.json { render json: result.to_json }
+    end
   end
 
   private
@@ -95,7 +139,7 @@ class BucketsController < OrganizationAwareController
   # end
 
   # Only allow a trusted parameter "white list" through.
-  # def bucket_params
-  #   params.require(:bucket).permit(Bucket.allowable_params)
-  # end
+  def bucket_proxy_params
+    params.require(:bucket_proxy).permit(BucketProxy.allowable_params)
+  end
 end
