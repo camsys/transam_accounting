@@ -72,7 +72,7 @@ class BucketsController < OrganizationAwareController
 
     @programs = FundingSource.all
     @bucket_proxy = BucketProxy.new
-
+    @bucket_proxy.set_defaults
   end
 
   # GET /buckets/1/edit
@@ -84,24 +84,47 @@ class BucketsController < OrganizationAwareController
   def create
     bucket_proxy = BucketProxy.new(bucket_proxy_params)
 
+    unless bucket_proxy.owner_id.to_i <= 1
+      bucket = new_bucket_from_proxy(bucket_proxy)
+      create_single_organization_buckets(bucket, bucket_proxy)
+    else
+      bucket = new_bucket_from_proxy(bucket_proxy)
+      agencies = bucket.funding_template.organizations
+      agencies << Grantor.first
+
+      agencies.each { |aa|
+        bucket = new_bucket_from_proxy(bucket_proxy, aa.id)
+        bucket.budget_amount = params["agency_budget_id_#{aa.id}".parameterize.underscore.to_sym].to_d
+        # bucket_proxy inflation percentage could be modified the same way
+        create_single_organization_buckets(bucket, bucket_proxy, aa.id, )
+      }
+
+    end
+
+    redirect_to buckets_path, notice: 'Bucket was successfully created.'
+  end
+
+  def new_bucket_from_proxy(bucket_proxy, agency_id=nil)
     bucket = Bucket.new
-    bucket.set_values_from_proxy(bucket_proxy)
+    bucket.set_values_from_proxy(bucket_proxy, agency_id)
     bucket.creator = current_user
     bucket.updator = current_user
+    bucket
+  end
 
+  def create_single_organization_buckets(bucket, bucket_proxy, agency_id=nil)
     unless bucket_proxy.fiscal_year_range_start == bucket_proxy.fiscal_year_range_end
       i = bucket_proxy.fiscal_year_range_start.to_i + 1
-      next_year_budget = bucket_proxy.total_amount.to_d
+      next_year_budget = bucket.budget_amount
       inflation_percentage = bucket_proxy.inflation_percentage.blank? ? 0 : bucket_proxy.inflation_percentage.to_d/100
+
       bucket.save
 
-      while i <= bucket_proxy.fiscal_year_range_end.to_i
-        next_year_bucket = Bucket.new
-        next_year_bucket.set_values_from_proxy(bucket_proxy)
-        next_year_bucket.creator = current_user
-        next_year_bucket.updator = current_user
 
+      while i <= bucket_proxy.fiscal_year_range_end.to_i
+        next_year_bucket = new_bucket_from_proxy(bucket_proxy, agency_id)
         next_year_bucket.fiscal_year = i
+
         unless bucket_proxy.inflation_percentage.blank?
           next_year_budget = next_year_budget + (inflation_percentage * next_year_budget)
         end
@@ -115,8 +138,6 @@ class BucketsController < OrganizationAwareController
     else
       bucket.save
     end
-
-    redirect_to buckets_path, notice: 'Bucket was successfully created.'
   end
 
   # PATCH/PUT /buckets/1
@@ -132,6 +153,8 @@ class BucketsController < OrganizationAwareController
   def find_organizations_from_template_id
 
     result = []
+    @bucket_agency_allocations = []
+
     template_id = params[:template_id]
     grantor = Grantor.first
     organizations =  Organization.where("id in (Select organization_id FROM funding_templates_organizations where funding_template_id = #{template_id}) and id <> #{grantor.id}").pluck(:id, :name)

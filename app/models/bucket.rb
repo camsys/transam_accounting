@@ -64,13 +64,13 @@ class Bucket< ActiveRecord::Base
     self.budget_amount - self.budget_committed
   end
 
-  def set_values_from_proxy bucket_proxy
+  def set_values_from_proxy bucket_proxy, agency_id=nil
     self.funding_template_id = bucket_proxy.template_id
     self.fiscal_year = bucket_proxy.fiscal_year_range_start
     self.bucket_type_id = bucket_proxy.bucket_type_id
     self.budget_amount = bucket_proxy.total_amount
     self.budget_committed = 0
-    self.owner_id = bucket_proxy.owner_id
+    self.owner_id = agency_id.nil? ? bucket_proxy.owner_id : agency_id
     self.active=true
   end
 

@@ -36,6 +36,10 @@
       .col-sm-8
         = f.input :total_amount, :input_html => {:maxlength => 32}, :label => 'Budget'
 
+  .all_agencies_covered_by_template{:id => "all_agencies_covered_by_template_id"}
+    .row
+      .col-sm-3
+
   .row
     .col-sm-8
       = f.button :submit, 'Create/Update', :class => "btn btn-primary"
@@ -43,14 +47,57 @@
 -#= render 'form_scripts'
 
 :javascript
+  var agencies = []
+
+  function remove_all_agencies_fields(){
+    i=1;
+
+    while(i < agencies.length)
+    {
+        var id = agencies[i][0];
+        var label_id = 'agency_label_' + id
+        var field_id = id
+
+        $('#'+label_id).remove();
+        $('#'+field_id).remove();
+
+      i++;
+    }
+  }
+
+  function populate_all_agencies_fields(){
+    console.log(agencies);
+    //There should be an entry before the first agency. the empty space and the all agencies option
+    i = 1;
+
+    while(i < agencies.length)
+    {
+        var add_to = "#all_agencies_covered_by_template_id"
+        id = agencies[i][0];
+        name = agencies[i][1]
+        var new_label = '<label id="agency_label_' + id + '" name="agency_label' + name + '" type="text">'+name;
+        var new_in = '<input autocomplete="off" class="input form-control" id="' + id + '" name="agency_budget_id_' + id + '" label="' + id + '" type="text">';
+        var new_input = $(new_in);
+        $(add_to).before(new_label)
+        $(add_to).before(new_input);
+        $("#field" + id).attr('data-source',$(add_to).attr('data-source'));
+      i++;
+    }
+  }
+
 
   $('#bucket_proxy_owner_id').change(function(){
-    if (bucket_proxy_owner_id.value <= 0){
+    if (bucket_proxy_owner_id.value == -1){
       $("#state_or_single_agency_budget_id").hide();
       bucket_proxy_total_amount.value = null;
+      $("#all_agencies_covered_by_template_id").show()
+      populate_all_agencies_fields()
     }
     else{
+      remove_all_agencies_fields()
       $("#state_or_single_agency_budget_id").show();
+      $("#all_agencies_covered_by_template_id").hide()
+      $('#all_agencies_covered_by_template_id').empty();
     }
 
   })
@@ -83,11 +130,13 @@
 
 
   $('#bucket_proxy_template_id').change(function(){
+    remove_all_agencies_fields();
     var url = '#{find_organizations_from_template_id_buckets_path}';
     $.ajax({
       url: url,
       data: {template_id: bucket_proxy_template_id.value},
       success: function(result){
+        agencies = result
         $('#bucket_proxy_owner_id').empty();
         //Add a blank entry to the list. This is -2 because we already had to add the All Agenecies for this template option
         $("#bucket_proxy_owner_id").append( $("<option></option>").attr("value", -2).text(''));
@@ -105,6 +154,7 @@
   });
 
   $('#bucket_proxy_program_id').change(function(){
+    remove_all_agencies_fields();
     var url = '#{find_templates_from_program_id_buckets_path}';
     $.ajax({
       url: url,
