@@ -22,7 +22,7 @@
     .col-sm-6
       .inflation-rate
         = f.input :inflation_rate, :label => 'Inflation Rate', :wrapper => :vertical_append do
-          = f.input_field :inflation_rate, :class => 'form-control', :max => 100, :step => 0.01
+          = f.input_field :inflation_rate, :class => 'form-control', :max => 100, :step => 0.001
           %span.input-group-addon
             %i.fa.fa-percent
 
@@ -98,6 +98,10 @@
 
   $( "#funding_source_match_required" ).rules( "add", {
     greaterThan: 0,
+    PercentThreeDigits: true
+  });
+
+  $( "#funding_source_inflation_rate" ).rules( "add", {
     PercentThreeDigits: true
   });
 
