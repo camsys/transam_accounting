@@ -1,4 +1,4 @@
-class BucketProxy < Proxy
+class FundingBucketProxy < Proxy
 
   #-----------------------------------------------------------------------------
   # Attributes
@@ -15,7 +15,7 @@ class BucketProxy < Proxy
   attr_accessor   :fiscal_year_range_start
   attr_accessor   :fiscal_year_range_end
   attr_accessor   :total_amount
-  attr_accessor   :bucket_type_id
+  # attr_accessor   :bucket_type_id
   attr_accessor   :inflation_percentage
   attr_accessor   :description
   attr_accessor   :bucket_agency_allocations
@@ -40,7 +40,7 @@ class BucketProxy < Proxy
       :fiscal_year_range_start,
       :fiscal_year_range_end,
       :total_amount,
-      :bucket_type_id,
+      # :bucket_type_id,
       :inflation_percentage,
       :description,
       :bucket_agency_allocations

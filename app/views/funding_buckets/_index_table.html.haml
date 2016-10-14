@@ -2,11 +2,11 @@
   table_dom_id = SecureRandom.hex
 
 #table_actions.btn-group
-- if can? :create, Bucket
-  = link_to new_bucket_path, :class => 'btn btn-default' do
+- if can? :create, FundingBucket
+  = link_to new_funding_bucket_path, :class => 'btn btn-default' do
     %i.fa.fa-plus.fa-fw
     = "Add Bucket"
-= render :partial => "buckets/index_actions"
+= render :partial => "funding_buckets/index_actions"
 
 %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
   :card_view => "false",
@@ -39,8 +39,8 @@
         %td.left= b.object_key
         %td.left= b.id
         %td.left= b.fiscal_year
-        %td.left= b.funding_template.id
-        %td.left= b.bucket_type.name
+        %td.left= b.funding_template.name
+        %td.left= b.funding_template.funding_source.funding_source_type.name
         -unless b.owner.nil?
           %td.left= b.owner.name
         -else

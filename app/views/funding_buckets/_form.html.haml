@@ -1,10 +1,9 @@
 = simple_form_for(@bucket_proxy,
-:url => buckets_path,
+:url => funding_buckets_path,
 :html => {:class => 'form-vertical bucket_form' },
 :wrapper => :vertical_form,
 :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
 
-  = f.input :bucket_type_id, :as => :hidden, :input_html => { :value => BucketType.find_by(name: 'Formula').id }
   -#TODO actually get these to appear on the same lin and next to the label Option:
   -#= f.input :option, :as => :radio_buttons, :required => true, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Create', 'Update' ]
 
@@ -86,7 +85,7 @@
   }
 
 
-  $('#bucket_proxy_owner_id').change(function(){
+  $('#funding_bucket_proxy_owner_id').change(function(){
     if (bucket_proxy_owner_id.value == -1){
       $("#state_or_single_agency_budget_id").hide();
       bucket_proxy_total_amount.value = null;
@@ -106,18 +105,18 @@
     if(start_fy === end_fy)
     {
       $("#escalate_by_div_id").hide();
-      bucket_proxy_inflation_percentage.value = null;
+      funding_bucket_proxy_inflation_percentage.value = null;
     } else {
       $("#escalate_by_div_id").show();
     }
 
   };
 
-  $('#bucket_proxy_fiscal_year_range_start').change(function(){
-    show_escalate_by(bucket_proxy_fiscal_year_range_start.value, bucket_proxy_fiscal_year_range_end.value)
+  $('#funding_bucket_proxy_fiscal_year_range_start').change(function(){
+    show_escalate_by(funding_bucket_proxy_fiscal_year_range_start.value, funding_bucket_proxy_fiscal_year_range_end.value)
   });
-  $('#bucket_proxy_fiscal_year_range_end').change(function(){
-    show_escalate_by(bucket_proxy_fiscal_year_range_start.value, bucket_proxy_fiscal_year_range_end.value)
+  $('#funding_bucket_proxy_fiscal_year_range_end').change(function(){
+    show_escalate_by(funding_bucket_proxy_fiscal_year_range_start.value, funding_bucket_proxy_fiscal_year_range_end.value)
   });
 
   //$.validator.addMethod('greaterThan', function(value, element, params) {
@@ -129,20 +128,20 @@
   //}, "Please enter a correct percent up to three decimal places.");
 
 
-  $('#bucket_proxy_template_id').change(function(){
+  $('#funding_bucket_proxy_template_id').change(function(){
     remove_all_agencies_fields();
-    var url = '#{find_organizations_from_template_id_buckets_path}';
+    var url = '#{find_organizations_from_template_id_funding_buckets_path}';
     $.ajax({
       url: url,
-      data: {template_id: bucket_proxy_template_id.value},
+      data: {template_id: funding_bucket_proxy_template_id.value},
       success: function(result){
         agencies = result
-        $('#bucket_proxy_owner_id').empty();
+        $('#funding_bucket_proxy_owner_id').empty();
         //Add a blank entry to the list. This is -2 because we already had to add the All Agenecies for this template option
-        $("#bucket_proxy_owner_id").append( $("<option></option>").attr("value", -2).text(''));
+        $("#funding_bucket_proxy_owner_id").append( $("<option></option>").attr("value", -2).text(''));
         for(i = 0;i<result.length;i++){
           //add an option for each organizations available to the tempalte
-          $("#bucket_proxy_owner_id").append(
+          $("#funding_bucket_proxy_owner_id").append(
               $("<option></option>").attr("value", result[i][0]).text(result[i][1])
           );
         }
@@ -153,19 +152,19 @@
       });
   });
 
-  $('#bucket_proxy_program_id').change(function(){
+  $('#funding_bucket_proxy_program_id').change(function(){
     remove_all_agencies_fields();
-    var url = '#{find_templates_from_program_id_buckets_path}';
+    var url = '#{find_templates_from_program_id_funding_buckets_path}';
     $.ajax({
       url: url,
-      data: {program_id: bucket_proxy_program_id.value},
+      data: {program_id: funding_bucket_proxy_program_id.value},
       success: function(result){
-        $('#bucket_proxy_template_id').empty();
+        $('#funding_bucket_proxy_template_id').empty();
         //Add a blank entry to the list
-        $("#bucket_proxy_template_id").append( $("<option></option>").attr("value", -1).text(''));
+        $("#funding_bucket_proxy_template_id").append( $("<option></option>").attr("value", -1).text(''));
         for(i = 0;i<result.length;i++){
           //add in option for each template available to the program
-          $("#bucket_proxy_template_id").append(
+          $("#funding_bucket_proxy_template_id").append(
               $("<option></option>").attr("value", result[i][0]).text(result[i][1])
           );
         }

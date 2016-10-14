@@ -1,13 +1,13 @@
-class BucketsController < OrganizationAwareController
+class FundingBucketsController < OrganizationAwareController
   # before_action :set_funding_template, only: [:show, :edit, :update, :destroy]
 
-  add_breadcrumb 'Buckets', :buckets_path
+  add_breadcrumb 'Funding Buckets', :funding_buckets_path
 
-  INDEX_KEY_LIST_VAR    = "buckets_key_list_cache_var"
+  INDEX_KEY_LIST_VAR    = "funding_buckets_key_list_cache_var"
 
   # GET /buckets
   def index
-    add_breadcrumb 'All Buckets', buckets_path
+    add_breadcrumb 'All Buckets', funding_buckets_path
 
     # Start to set up the query
     conditions  = []
@@ -46,7 +46,7 @@ class BucketsController < OrganizationAwareController
 
     puts conditions.inspect
     puts values.inspect
-    @buckets = Bucket.where(conditions.join(' AND '), *values)
+    @buckets = FundingBucket.where(conditions.join(' AND '), *values)
 
     # cache the set of object keys in case we need them later
     cache_list(@buckets, INDEX_KEY_LIST_VAR)
@@ -68,10 +68,10 @@ class BucketsController < OrganizationAwareController
 
   # GET /buckets/new
   def new
-    add_breadcrumb 'New', new_bucket_path
+    add_breadcrumb 'New', new_funding_bucket_path
 
     @programs = FundingSource.all
-    @bucket_proxy = BucketProxy.new
+    @bucket_proxy = FundingBucketProxy.new
     @bucket_proxy.set_defaults
   end
 
@@ -82,7 +82,7 @@ class BucketsController < OrganizationAwareController
 
   # POST /buckets
   def create
-    bucket_proxy = BucketProxy.new(bucket_proxy_params)
+    bucket_proxy = FundingBucketProxy.new(bucket_proxy_params)
 
     unless bucket_proxy.owner_id.to_i <= 1
       bucket = new_bucket_from_proxy(bucket_proxy)
@@ -101,11 +101,11 @@ class BucketsController < OrganizationAwareController
 
     end
 
-    redirect_to buckets_path, notice: 'Bucket was successfully created.'
+    redirect_to funding_buckets_path, notice: 'Bucket was successfully created.'
   end
 
   def new_bucket_from_proxy(bucket_proxy, agency_id=nil)
-    bucket = Bucket.new
+    bucket = FundingBucket.new
     bucket.set_values_from_proxy(bucket_proxy, agency_id)
     bucket.creator = current_user
     bucket.updator = current_user
@@ -182,6 +182,6 @@ class BucketsController < OrganizationAwareController
 
   # Only allow a trusted parameter "white list" through.
   def bucket_proxy_params
-    params.require(:bucket_proxy).permit(BucketProxy.allowable_params)
+    params.require(:funding_bucket_proxy).permit(FundingBucketProxy.allowable_params)
   end
 end
