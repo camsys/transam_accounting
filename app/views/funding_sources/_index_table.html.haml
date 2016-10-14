@@ -24,7 +24,7 @@
       %th.center{:data => {:sortable => 'true'}} Source
 
       %th.center{:data => {:sortable => 'true'}} Type
-      %th.center{:data => {:sortable => 'true', :formatter => 'inflation_percentage_formatter'}} Inflation Rate
+      %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Inflation Rate
 
       %th.center{:data => {:sortable => 'true'}} Life of $ (yrs)
       %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Pcnt Match
@@ -72,14 +72,6 @@
 
     $('.transam-tooltip').tooltip();
   });
-
-  function inflation_percentage_formatter(value) {
-    if (value == "") {
-      return value;
-    } else {
-      return format("##0.00", value) + "%";
-    }
-  };
 
   function percentage_formatter(value) {
     if (value == "") {
