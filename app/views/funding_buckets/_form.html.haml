@@ -33,7 +33,7 @@
   .state_or_single_agency_budget{:id => "state_or_single_agency_budget_id"}
     .row
       .col-sm-8
-        = f.input :total_amount, :input_html => {:maxlength => 32}, :label => 'Budget'
+        = f.input :total_amount, :label => 'Budget'
 
   .all_agencies_covered_by_template{:id => "all_agencies_covered_by_template_id"}
     .row
@@ -46,6 +46,43 @@
 -#= render 'form_scripts'
 
 :javascript
+
+  // jquery validations
+  $('.bucket_form').validate({
+    submitHandler: function(form) {
+      form.submit();
+    }
+  });
+
+  $( "#funding_bucket_proxy_fiscal_year_range_start" ).rules( "add", {
+    FYRange: true
+  });
+
+  $( "#funding_bucket_proxy_fiscal_year_range_end" ).rules( "add", {
+    FYRange: true
+  });
+
+  $( "#funding_bucket_proxy_inflation_percentage" ).rules( "add", {
+    PercentThreeDigits: true
+  });
+
+  $.validator.addClassRules("agency_budget", {
+    required: true,
+    min: 0
+  });
+
+  $.validator.addMethod("FYRange", function(value, element) {
+    if (($('#funding_bucket_proxy_fiscal_year_range_start').val() != "") && ($('#funding_bucket_proxy_fiscal_year_range_end').val() != "")) {
+      return (parseInt($('#funding_bucket_proxy_fiscal_year_range_start').val()) <= parseInt($('#funding_bucket_proxy_fiscal_year_range_end').val()));
+    } else {
+      return true;
+    }
+  }, "Not a valid year range.");
+
+  $.validator.addMethod('PercentThreeDigits', function(value, element) {
+     return this.optional(element) || /^\d*(\.\d{0,3})?$/.test(value);
+  }, "Please enter a correct percent up to three decimal places.");
+
   var agencies = []
 
   function remove_all_agencies_fields(){
@@ -75,7 +112,7 @@
         id = agencies[i][0];
         name = agencies[i][1]
         var new_label = '<label id="agency_label_' + id + '" name="agency_label' + name + '" type="text">'+name;
-        var new_in = '<input autocomplete="off" class="input form-control" id="' + id + '" name="agency_budget_id_' + id + '" label="' + id + '" type="text">';
+        var new_in = '<input autocomplete="off" class="input form-control agency_budget" id="' + id + '" name="agency_budget_id_' + id + '" label="' + id + '" type="text">';
         var new_input = $(new_in);
         $(add_to).before(new_label)
         $(add_to).before(new_input);
@@ -86,9 +123,9 @@
 
 
   $('#funding_bucket_proxy_owner_id').change(function(){
-    if (bucket_proxy_owner_id.value == -1){
+    if (funding_bucket_proxy_owner_id.value == -1){
       $("#state_or_single_agency_budget_id").hide();
-      bucket_proxy_total_amount.value = null;
+      funding_bucket_proxy_total_amount.value = null;
       $("#all_agencies_covered_by_template_id").show()
       populate_all_agencies_fields()
     }
@@ -119,14 +156,6 @@
     show_escalate_by(funding_bucket_proxy_fiscal_year_range_start.value, funding_bucket_proxy_fiscal_year_range_end.value)
   });
 
-  //$.validator.addMethod('greaterThan', function(value, element, params) {
-  //    return this.optional(element) || parseFloat(value) > params;
-  //}, "Please enter a value greater than {0}.");
-  //
-  //$.validator.addMethod('PercentThreeDigits', function(value, element) {
-  //    return this.optional(element) || /^\d*(\.\d{0,3})?$/.test(value);
-  //}, "Please enter a correct percent up to three decimal places.");
-
 
   $('#funding_bucket_proxy_template_id').change(function(){
     remove_all_agencies_fields();
@@ -137,8 +166,8 @@
       success: function(result){
         agencies = result
         $('#funding_bucket_proxy_owner_id').empty();
-        //Add a blank entry to the list. This is -2 because we already had to add the All Agenecies for this template option
-        $("#funding_bucket_proxy_owner_id").append( $("<option></option>").attr("value", -2).text(''));
+        //Add a blank entry to the list.
+        $("#funding_bucket_proxy_owner_id").append( $("<option></option>").attr("value", "").text(''));
         for(i = 0;i<result.length;i++){
           //add an option for each organizations available to the tempalte
           $("#funding_bucket_proxy_owner_id").append(
