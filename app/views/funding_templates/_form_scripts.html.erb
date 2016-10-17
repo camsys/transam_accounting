@@ -31,7 +31,7 @@
      });
     var filter_orgs = [];
     var selected = [];
-    <% Organization.all.each do |org| %>
+    <% Organization.where(id: @organization_list).each do |org| %>
       filter_orgs.push({value: '<%= org.id %>', content: '<%= org.coded_name %>'});
     <% end %>
 
