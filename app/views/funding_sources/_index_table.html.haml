@@ -39,7 +39,7 @@
       %tr
         %td.left= f.object_key
         %td.left= f.external_id
-        %td.left
+        %td.left{data: {tableexport: {value: "#{f.name}"}}}
           %span.hidden= f.name
           = link_to(f.name, funding_source_path(f))
         %td.left= f.funding_source_type
