@@ -1,4 +1,4 @@
-= form_tag buckets_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
+= form_tag funding_buckets_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
   .form-group
     = select_tag(:agency_id, options_for_select(@organizations, :selected => @searched_agency_id), :class => "form-control", :style => "width: 150px;", :prompt => "All Organizations")
     = select_tag(:fiscal_year, options_for_select(get_fiscal_years, :selected => @searched_fiscal_year), :class => "form-control", :style => "width: 150px;", :prompt => "All Years")

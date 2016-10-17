@@ -1,8 +1,10 @@
-class BucketProxy < Proxy
+class FundingBucketProxy < Proxy
 
   #-----------------------------------------------------------------------------
   # Attributes
   #-----------------------------------------------------------------------------
+
+  # has_many :bucket_agency_allocation
 
   # key for the asset being manipulated
   attr_accessor   :object_key
@@ -13,7 +15,7 @@ class BucketProxy < Proxy
   attr_accessor   :fiscal_year_range_start
   attr_accessor   :fiscal_year_range_end
   attr_accessor   :total_amount
-  attr_accessor   :bucket_type_id
+  # attr_accessor   :bucket_type_id
   attr_accessor   :inflation_percentage
   attr_accessor   :description
   attr_accessor   :bucket_agency_allocations
@@ -38,7 +40,7 @@ class BucketProxy < Proxy
       :fiscal_year_range_start,
       :fiscal_year_range_end,
       :total_amount,
-      :bucket_type_id,
+      # :bucket_type_id,
       :inflation_percentage,
       :description,
       :bucket_agency_allocations
@@ -55,10 +57,8 @@ class BucketProxy < Proxy
   end
 
   # Set resonable defaults for a depreciable asset
-  def set_defaults(a)
-    unless a.nil?
-
-    end
+  def set_defaults
+    self.bucket_agency_allocations = []
   end
 
   #-----------------------------------------------------------------------------
@@ -76,6 +76,7 @@ class BucketProxy < Proxy
 
   def initialize(attrs = {})
     super
+    self.bucket_agency_allocations = []
     attrs.each do |k, v|
       self.send "#{k}=", v
     end
