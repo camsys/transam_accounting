@@ -7,6 +7,8 @@ class FundingBucketsController < OrganizationAwareController
 
   # GET /buckets
   def index
+    authorize! :read, FundingBucket
+
     add_breadcrumb 'All Buckets', funding_buckets_path
 
     # Start to set up the query
@@ -16,7 +18,7 @@ class FundingBucketsController < OrganizationAwareController
     if params[:template_id].present?
       @organizations =  Organization.where("id in (Select organization_id FROM funding_templates_organizations where funding_template_id = #{template_id}}").pluck(:name, :id)
     else
-      @organizations =  Organization.all.pluck(:name, :id)
+      @organizations =  Organization.where(id: @organization_list).pluck(:name, :id)
     end
     if params[:agency_id].present?
       @searched_agency_id =  params[:agency_id]
@@ -59,7 +61,7 @@ class FundingBucketsController < OrganizationAwareController
 
   # GET /buckets/1
   def show
-
+    authorize! :read, FundingBucket
 
 
 
@@ -68,6 +70,8 @@ class FundingBucketsController < OrganizationAwareController
 
   # GET /buckets/new
   def new
+    authorize! :create, FundingBucket
+
     add_breadcrumb 'New', new_funding_bucket_path
 
     @programs = FundingSource.all
@@ -77,11 +81,15 @@ class FundingBucketsController < OrganizationAwareController
 
   # GET /buckets/1/edit
   def edit
+    authorize! :edit, FundingBucket
+
     @programs = FundingSource.all
   end
 
   # POST /buckets
   def create
+    authorize! :read, FundingBucket
+
     bucket_proxy = FundingBucketProxy.new(bucket_proxy_params)
 
     unless bucket_proxy.owner_id.to_i <= 1
@@ -102,6 +110,66 @@ class FundingBucketsController < OrganizationAwareController
     end
 
     redirect_to funding_buckets_path, notice: 'Bucket was successfully created.'
+  end
+
+
+  # PATCH/PUT /buckets/1
+  def update
+    @programs = FundingSource.all
+  end
+
+  # DELETE /buckets/1
+  def destroy
+    @programs = FundingSource.all
+  end
+
+  def find_organizations_from_template_id
+    result = []
+    @bucket_agency_allocations = []
+    template_id = params[:template_id]
+
+    template = FundingTemplate.find_by(id: template_id)
+    if template.owner == FundingSourceType.find_by(name: 'State')
+      grantors = Grantor.where(id: @organization_list)
+      grantors.each { |g|
+        result << [g.id, g.name]
+      }
+
+    else
+      grantor = Grantor.first
+      organizations =  Organization.where("id in (Select organization_id FROM funding_templates_organizations where funding_template_id = #{template_id}) and id <> #{grantor.id}").pluck(:id, :name)
+      result = [[-1,'All Agencies For This Template']] + [[grantor.id, grantor.name]] + organizations
+    end
+
+    respond_to do |format|
+      format.json { render json: result.to_json }
+    end
+  end
+
+  def find_templates_from_program_id
+    program_id = params[:program_id]
+    result = FundingTemplate.where(funding_source_id: program_id).pluck(:id, :name)
+
+    respond_to do |format|
+      format.json { render json: result.to_json }
+    end
+  end
+
+  def delete_all_buckets
+    buckets = FundingBucket.all
+
+    buckets.each { |b|
+      b.delete
+    }
+
+  end
+
+  private
+  # Use callbacks to share common setup or constraints between actions.
+
+  # Only allow a trusted parameter "white list" through.
+  def bucket_proxy_params
+    params.require(:funding_bucket_proxy).permit(FundingBucketProxy.allowable_params)
   end
 
   def new_bucket_from_proxy(bucket_proxy, agency_id=nil)
@@ -138,50 +206,5 @@ class FundingBucketsController < OrganizationAwareController
     else
       bucket.save
     end
-  end
-
-  # PATCH/PUT /buckets/1
-  def update
-    @programs = FundingSource.all
-  end
-
-  # DELETE /buckets/1
-  def destroy
-    @programs = FundingSource.all
-  end
-
-  def find_organizations_from_template_id
-
-    result = []
-    @bucket_agency_allocations = []
-
-    template_id = params[:template_id]
-    grantor = Grantor.first
-    organizations =  Organization.where("id in (Select organization_id FROM funding_templates_organizations where funding_template_id = #{template_id}) and id <> #{grantor.id}").pluck(:id, :name)
-    result = [[-1,'All Agencies For This Template']] + [[grantor.id, grantor.name]] + organizations
-
-    respond_to do |format|
-      format.json { render json: result.to_json }
-    end
-  end
-
-  def find_templates_from_program_id
-    program_id = params[:program_id]
-    result = FundingTemplate.where(funding_source_id: program_id).pluck(:id, :name)
-
-    respond_to do |format|
-      format.json { render json: result.to_json }
-    end
-  end
-
-  private
-  # Use callbacks to share common setup or constraints between actions.
-  # def set_bucket
-  #   @funding_template = bucket.find_by(object_key: params[:id])
-  # end
-
-  # Only allow a trusted parameter "white list" through.
-  def bucket_proxy_params
-    params.require(:funding_bucket_proxy).permit(FundingBucketProxy.allowable_params)
   end
 end
