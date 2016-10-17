@@ -3,6 +3,8 @@ class FundingTemplatesController < OrganizationAwareController
 
   add_breadcrumb 'Funding Programs', :funding_sources_path
 
+  before_action :check_filter,      :only => [:index, :show, :new, :edit]
+
   INDEX_KEY_LIST_VAR    = "funding_template_key_list_cache_var"
 
   # GET /funding_templates
@@ -133,6 +135,17 @@ class FundingTemplatesController < OrganizationAwareController
     funding_source = @funding_template.funding_source
     @funding_template.destroy
     redirect_to funding_source_path(funding_source), notice: 'Template was successfully destroyed.'
+  end
+
+  protected
+
+  def check_filter
+    if current_user.user_organization_filter != current_user.user_organization_filters.system_filters.first || Organization.find_by_sql(current_user.user_organization_filters.system_filters.first.query_string).count != @organization_list.count
+      set_current_user_organization_filter_(current_user, current_user.user_organization_filters.system_filters.first)
+      notify_user(:filter_warning, "Filter reset to enter funding.")
+
+      get_organization_selections
+    end
   end
 
   private
