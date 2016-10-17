@@ -26,6 +26,10 @@ class FundingBucket< ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   validates :funding_template_id,       :presence => true
+  validates :fiscal_year,               :presence => true
+  validates :budget_amount,             :presence => true, :numericality => {:greater_than_or_equal_to => 0}
+  validates :owner_id,                  :presence => true
+
 
   #------------------------------------------------------------------------------
   #
