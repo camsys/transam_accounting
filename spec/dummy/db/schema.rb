@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161003140404) do
+ActiveRecord::Schema.define(version: 20161014201011) do
 
   create_table "activities", force: true do |t|
     t.string   "object_key",           limit: 12
@@ -671,6 +671,27 @@ ActiveRecord::Schema.define(version: 20161003140404) do
     t.boolean "active",      null: false
   end
 
+  create_table "funding_bucket_types", force: true do |t|
+    t.string  "name",        null: false
+    t.string  "description", null: false
+    t.boolean "active",      null: false
+  end
+
+  create_table "funding_buckets", force: true do |t|
+    t.string   "object_key",          limit: 12,                          null: false
+    t.integer  "funding_template_id",                                     null: false
+    t.integer  "fiscal_year",                                             null: false
+    t.decimal  "budget_amount",                  precision: 15, scale: 2, null: false
+    t.decimal  "budget_committed",               precision: 15, scale: 2, null: false
+    t.integer  "owner_id"
+    t.string   "description"
+    t.boolean  "active",                                                  null: false
+    t.integer  "created_by_id",                                           null: false
+    t.datetime "created_on"
+    t.integer  "updated_by_id",                                           null: false
+    t.datetime "updated_on"
+  end
+
   create_table "funding_source_types", force: true do |t|
     t.string  "name",        limit: 64,  null: false
     t.string  "description", limit: 254, null: false
@@ -719,10 +740,10 @@ ActiveRecord::Schema.define(version: 20161003140404) do
     t.boolean  "recurring"
     t.boolean  "transfer_only"
     t.float    "match_required",    limit: 24
+    t.text     "query_string"
     t.boolean  "active",                       null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "all_organizations"
     t.string   "external_id",       limit: 32
   end
 
