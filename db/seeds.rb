@@ -50,7 +50,7 @@ funding_template_types = [
   {:active => 1, :name => 'Other', :description => 'Other Funding Template'},
 ]
 
-bucket_types = [
+funding_bucket_types = [
     {:active => 1, :name => 'Existing Grant', :description => 'Existing Grant'},
     {:active => 1, :name => 'Formula', :description => 'Formula Bucket'},
     {:active => 1, :name => 'Grant Application', :description => 'Grant Application Bucket'},
