@@ -14,7 +14,7 @@
   .tab-pane.fade#desc
     .tab-content
       - if @funding_template.description.present?
-        = @funding_template.description
+        = format_as_text(@funding_template.description)
       - else
         There is no description associated with this template.
 
