@@ -180,9 +180,25 @@
       console.log('The url is: '+url);
       return;
     }
+
+    var template_id = funding_bucket_proxy_template_id.value;
+    var start_year = funding_bucket_proxy_fiscal_year_range_start.value;
+    var end_year = funding_bucket_proxy_fiscal_year_range_end.value;
+    var owner_id = funding_bucket_proxy_owner_id.value;
+
+    console.log('var template_id ='+template_id);
+    console.log('var start_year ='+start_year);
+    console.log('var end_year ='+end_year);
+    console.log('var owner_id ='+owner_id);
+
+
     $.ajax({
       url: url,
-      data: {template_id: funding_bucket_proxy_template_id.value, start_year: funding_bucket_proxy_fiscal_year_range_start, end_year: funding_bucket_proxy_fiscal_year_range_end, owner_id: funding_bucket_proxy_owner_id},
+      data: {
+        template_id: template_id,
+        start_year: start_year,
+        end_year: end_year,
+        owner_id: owner_id},
       success: function(result){
         r = result;
 

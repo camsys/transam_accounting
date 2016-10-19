@@ -133,7 +133,7 @@ class FundingBucketsController < OrganizationAwareController
     end
 
     if bucket_proxy.create_option == 'Update'
-      expected_buckets = find_expected_bucket_count(bucket_proxy)
+      expected_buckets = find_expected_bucket_count_from_bucket_proxy(bucket_proxy)
 
       if expected_buckets > @existing_buckets.length && bucket_proxy.update_conflict_option.blank?
         @update_conflict = true
@@ -243,10 +243,9 @@ class FundingBucketsController < OrganizationAwareController
 
   def find_existing_buckets_for_create
 
-    bucket_proxy = FundingBucketProxy.new(bucket_proxy_params)
-    exisintg_buckets = FundingBucket.find_existing_buckets_from_proxy(bucket_proxy.template_id, bucket_proxy.fiscal_year_range_start, bucket_proxy.fiscal_year_range_end, bucket_proxy.owner_id)
-    expected_buckets = find_expected_bucket_count(bucket_proxy)
-    result = exisintg_buckets.length - expected_buckets
+    existing_buckets = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year], params[:end_year], params[:owner_id])
+    expected_buckets = find_expected_bucket_count(params[:template_id], params[:start_year], params[:end_year], params[:owner_id])
+    result = existing_buckets.length - expected_buckets
 
     respond_to do |format|
       format.json { render json: result.to_json }
@@ -255,8 +254,7 @@ class FundingBucketsController < OrganizationAwareController
   end
 
   def find_number_of_missing_buckets_for_update
-      bucket_proxy = FundingBucketProxy.new(bucket_proxy_params)
-      result = FundingBucket.find_existing_buckets_from_proxy(bucket_proxy.template_id, bucket_proxy.fiscal_year_range_start, bucket_proxy.fiscal_year_range_end, bucket_proxy.owner_id)
+      result = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year], params[:end_year], params[:owner_id])
 
       respond_to do |format|
         format.json { render json: result.to_json }
@@ -357,14 +355,18 @@ class FundingBucketsController < OrganizationAwareController
     return nil
   end
 
-  def find_expected_bucket_count bucket_proxy
+  def find_expected_bucket_count_from_bucket_proxy bucket_proxy
+    find_expected_bucket_count(bucket_proxy.template_id, bucket_proxy.fiscal_year_range_start.to_i, bucket_proxy.fiscal_year_range_end.to_i, bucket_proxy.owner_id.to_i)
+  end
+
+  def find_expected_bucket_count template_id, fiscal_year_range_start, fiscal_year_range_end, owner_id
 
     number_of_organizations = 1
-    if bucket_proxy.owner_id.to_i <= 0
-      number_of_organizations = FundingTemplate.find_by(id: bucket_proxy.template_id).organizations.length
+    if owner_id <= 0
+      number_of_organizations = FundingTemplate.find_by(id: template_id).organizations.length
     end
 
-    (1+bucket_proxy.fiscal_year_range_end.to_i - bucket_proxy.fiscal_year_range_start.to_i) * number_of_organizations
+    (1+fiscal_year_range_end - fiscal_year_range_start) * number_of_organizations
 
   end
 
