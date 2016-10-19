@@ -140,7 +140,7 @@ class FundingTemplatesController < OrganizationAwareController
   protected
 
   def check_filter
-    if current_user.user_organization_filter != current_user.user_organization_filters.system_filters.first || Organization.find_by_sql(current_user.user_organization_filters.system_filters.first.query_string).count != @organization_list.count
+    if current_user.user_organization_filter != current_user.user_organization_filters.system_filters.first || current_user.user_organization_filters.system_filters.first.get_organizations.count != @organization_list.count
       set_current_user_organization_filter_(current_user, current_user.user_organization_filters.system_filters.first)
       notify_user(:filter_warning, "Filter reset to enter funding.")
 
