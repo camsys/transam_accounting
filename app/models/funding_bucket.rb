@@ -75,6 +75,8 @@ class FundingBucket< ActiveRecord::Base
       values << owner_id
     end
 
+    conditions << 'active = true'
+
     puts conditions.inspect
     puts values.inspect
     puts values.inspect

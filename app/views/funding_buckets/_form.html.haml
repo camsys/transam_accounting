@@ -14,11 +14,11 @@
 
   .row
     .col-sm-8
-      = f.input :create_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Update', 'Ignore', 'Cancel' ]
+      = f.input :create_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Create Conflict Option:", :collection => [ 'Update', 'Ignore', 'Cancel' ]
 
   .row
     .col-sm-8
-      = f.input :update_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Create', 'Ignore', 'Cancel' ]
+      = f.input :update_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Update Conflict Option:", :collection => [ 'Create', 'Ignore', 'Cancel' ]
 
   .row
     .col-sm-8

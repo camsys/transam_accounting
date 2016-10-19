@@ -309,12 +309,11 @@ class FundingBucketsController < OrganizationAwareController
         #   DO NOTHING
       elsif !existing_bucket.nil? && create_conflict_option == 'Update'
         existing_bucket.budget_amount = bucket.budget_amount
+        existing_bucket.updator = current_user
         existing_bucket.save
       elsif update_conflict_option == 'Create'
         bucket.save
       end
-
-
 
       while i <= bucket_proxy.fiscal_year_range_end.to_i
         next_year_bucket = new_bucket_from_proxy(bucket_proxy, agency_id)
@@ -325,7 +324,17 @@ class FundingBucketsController < OrganizationAwareController
         end
         next_year_bucket.budget_amount = next_year_budget
 
-        next_year_bucket.save
+
+        existing_bucket = bucket_exists(existing_buckets, next_year_bucket)
+        if !existing_bucket.nil? && create_conflict_option == 'Ignore'
+          #   DO NOTHING
+        elsif !existing_bucket.nil? && create_conflict_option == 'Update'
+          existing_bucket.budget_amount = next_year_bucket.budget_amount
+          existing_bucket.updator = current_user
+          existing_bucket.save
+        elsif update_conflict_option == 'Create'
+          next_year_bucket.save
+        end
 
         i += 1
       end
@@ -347,7 +356,7 @@ class FundingBucketsController < OrganizationAwareController
   def bucket_exists existing_buckets, bucket
     unless existing_buckets.nil?
       buckets = existing_buckets.find {|eb|
-        eb.funding_template == bucket.funding_template && eb.fiscal_year = bucket.fiscal_year && eb.owner == bucket.owner
+        eb.funding_template == bucket.funding_template && eb.fiscal_year == bucket.fiscal_year && eb.owner == bucket.owner
       }
       return buckets
     end
