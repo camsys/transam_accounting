@@ -12,14 +12,13 @@
       - else
         @bucket_proxy.condition
 
-  - if @creat_conflict.present? && @creat_conflict == true
-    .row
-      .col-sm-8
-        = f.input :create_conflict_option, :as => :radio_buttons, :required => true, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Update', 'Ignore', 'Cancel' ]
-  - if @update_conflict.present? && @update_conflict
-    .row
-      .col-sm-8
-        = f.input :update_conflict_option, :as => :radio_buttons, :required => true, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Create', 'Ignore', 'Cancel' ]
+  .row
+    .col-sm-8
+      = f.input :create_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Update', 'Ignore', 'Cancel' ]
+
+  .row
+    .col-sm-8
+      = f.input :update_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Create', 'Ignore', 'Cancel' ]
 
   .row
     .col-sm-8

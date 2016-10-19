@@ -50,6 +50,8 @@ class FundingBucketsController < OrganizationAwareController
       conditions << 'budget_amount > budget_committed'
     end
 
+    conditions << 'active = true'
+
     @buckets = FundingBucket.where(conditions.join(' AND '), *values)
 
     # cache the set of object keys in case we need them later
@@ -147,10 +149,7 @@ class FundingBucketsController < OrganizationAwareController
       if @existing_buckets.length > 0 && (bucket_proxy.create_conflict_option.blank?)
 
         @create_conflict = true
-
         flash.now[:notice] = "Alert: #{@existing_buckets.length} conflicts found. Please select if you want to update existing buckets, ignore existing buckets, or cancel"
-        render :new, @bucket_proxy
-
       elsif @existing_buckets.length > 0 && (bucket_proxy.create_conflict_option == 'Cancel')
         redirect_to funding_buckets_path, notice: 'Bucket creation cancelled because of conflict.'
       elsif @existing_buckets.length > 0
@@ -161,13 +160,37 @@ class FundingBucketsController < OrganizationAwareController
         redirect_to funding_buckets_path, notice: 'Buckets successfully created.'
       end
     end
+
+    if bucket_proxy.create_option == 'Update'
+      expected_buckets = find_expected_bucket_count(bucket_proxy)
+
+      if expected_buckets > @existing_buckets.length && bucket_proxy.update_conflict_option.blank?
+        @update_conflict = true
+
+        flash.now[:notice] = "Some buckets to be updated have not been created. Please select if you want to create new buckets, ignore missing buckets, or cancel"
+      elsif expected_buckets > @existing_buckets.length && bucket_proxy.update_conflict_option  == 'Cancel'
+        redirect_to funding_buckets_path, notice: 'Bucket update cancelled because of conflict.'
+      else
+        update_buckets(bucket_proxy, @existing_buckets, bucket_proxy.update_conflict_option)
+        redirect_to funding_buckets_path, notice: 'Buckets updated.'
+      end
+    end
+
+    if bucket_proxy.create_option == 'Delete'
+      @existing_buckets.each { |eb|
+        eb.active = false
+        eb.updator = current_user
+        eb.save
+      }
+      redirect_to funding_buckets_path, notice: "#{@existing_buckets.length} buckets deleted."
+    end
   end
 
   def create_new_buckets(bucket_proxy, existing_buckets=nil, create_conflict_option=nil)
 
     unless bucket_proxy.owner_id.to_i <= 0
       bucket = new_bucket_from_proxy(bucket_proxy)
-      create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, create_conflict_option)
+      create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, create_conflict_option, 'Create')
     else
       bucket = new_bucket_from_proxy(bucket_proxy)
       agencies = bucket.funding_template.organizations
@@ -177,12 +200,31 @@ class FundingBucketsController < OrganizationAwareController
         bucket = new_bucket_from_proxy(bucket_proxy, aa.id)
         bucket.budget_amount = params["agency_budget_id_#{aa.id}".parameterize.underscore.to_sym].to_d
         # bucket_proxy inflation percentage could be modified the same way
-        create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, create_conflict_option, aa.id,)
+        create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, create_conflict_option, 'Create', aa.id,)
       }
 
     end
   end
 
+  def update_buckets(bucket_proxy, existing_buckets=nil, update_conflict_option=nil )
+
+    unless bucket_proxy.owner_id.to_i <= 0
+      bucket = new_bucket_from_proxy(bucket_proxy)
+      create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, 'Update',  update_conflict_option)
+    else
+      bucket = new_bucket_from_proxy(bucket_proxy)
+      agencies = bucket.funding_template.organizations
+      agencies << Grantor.first
+
+      agencies.each { |aa|
+        bucket = new_bucket_from_proxy(bucket_proxy, aa.id)
+        bucket.budget_amount = params["agency_budget_id_#{aa.id}".parameterize.underscore.to_sym].to_d
+        # bucket_proxy inflation percentage could be modified the same way
+        create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, 'Update', update_conflict_option, aa.id,)
+      }
+
+    end
+  end
 
   # PATCH/PUT /buckets/1
   def update
@@ -228,15 +270,6 @@ class FundingBucketsController < OrganizationAwareController
     end
   end
 
-  def delete_all_buckets
-    buckets = FundingBucket.all
-
-    buckets.each { |b|
-      b.delete
-    }
-
-  end
-
   protected
 
   def check_filter
@@ -264,7 +297,7 @@ class FundingBucketsController < OrganizationAwareController
     bucket
   end
 
-  def create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, create_conflict_option, agency_id=nil)
+  def create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, create_conflict_option, update_conflict_option, agency_id=nil)
 
     unless bucket_proxy.fiscal_year_range_start == bucket_proxy.fiscal_year_range_end
       i = bucket_proxy.fiscal_year_range_start.to_i + 1
@@ -277,7 +310,7 @@ class FundingBucketsController < OrganizationAwareController
       elsif !existing_bucket.nil? && create_conflict_option == 'Update'
         existing_bucket.budget_amount = bucket.budget_amount
         existing_bucket.save
-      else
+      elsif update_conflict_option == 'Create'
         bucket.save
       end
 
@@ -303,6 +336,7 @@ class FundingBucketsController < OrganizationAwareController
         #   DO NOTHING
       elsif !existing_bucket.nil? && create_conflict_option == 'Update'
         existing_bucket.budget_amount = bucket.budget_amount
+        existing_bucket.bucket.updator = current_user
         existing_bucket.save
       else
         bucket.save
@@ -319,6 +353,17 @@ class FundingBucketsController < OrganizationAwareController
     end
 
     return nil
+  end
+
+  def find_expected_bucket_count bucket_proxy
+
+    number_of_organizations = 1
+    if bucket_proxy.owner_id.to_i <= 0
+      number_of_organizations = FundingTemplate.find_by(id: bucket_proxy.template_id).organizations.length
+    end
+
+    (1+bucket_proxy.fiscal_year_range_end.to_i - bucket_proxy.fiscal_year_range_start.to_i) * number_of_organizations
+
   end
 
 end
