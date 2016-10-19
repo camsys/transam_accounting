@@ -8,7 +8,9 @@ class FundingBucketProxy < Proxy
 
   # key for the asset being manipulated
   attr_accessor   :object_key
-  attr_accessor   :option
+  attr_accessor   :create_option
+  attr_accessor   :create_conflict_option
+  attr_accessor   :update_conflict_option
   attr_accessor   :program_id
   attr_accessor   :template_id
   attr_accessor   :owner_id
@@ -33,7 +35,9 @@ class FundingBucketProxy < Proxy
   # List of allowable form param hash keys
   FORM_PARAMS = [
       :object_key,
-      :option,
+      :create_option,
+      :create_conflict_option,
+      :update_conflict_option,
       :program_id,
       :template_id,
       :owner_id,

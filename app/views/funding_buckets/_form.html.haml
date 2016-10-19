@@ -5,7 +5,21 @@
 :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
 
   -#TODO actually get these to appear on the same lin and next to the label Option:
-  -#= f.input :option, :as => :radio_buttons, :required => true, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Create', 'Update' ]
+  .row
+    .col-sm-8
+      - unless(@creat_conflict.present? && @creat_conflict) || (@update_conflict.present? && @update_conflict)
+        = f.input :create_option, :as => :radio_buttons, :required => true, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Create', 'Update', 'Delete' ]
+      - else
+        @bucket_proxy.condition
+
+  - if @creat_conflict.present? && @creat_conflict == true
+    .row
+      .col-sm-8
+        = f.input :create_conflict_option, :as => :radio_buttons, :required => true, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Update', 'Ignore', 'Cancel' ]
+  - if @update_conflict.present? && @update_conflict
+    .row
+      .col-sm-8
+        = f.input :update_conflict_option, :as => :radio_buttons, :required => true, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Create', 'Ignore', 'Cancel' ]
 
   .row
     .col-sm-8
@@ -155,7 +169,6 @@
   $('#funding_bucket_proxy_fiscal_year_range_end').change(function(){
     show_escalate_by(funding_bucket_proxy_fiscal_year_range_start.value, funding_bucket_proxy_fiscal_year_range_end.value)
   });
-
 
   $('#funding_bucket_proxy_template_id').change(function(){
     remove_all_agencies_fields();

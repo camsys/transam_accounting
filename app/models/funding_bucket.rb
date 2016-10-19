@@ -50,6 +50,39 @@ class FundingBucket< ActiveRecord::Base
     FORM_PARAMS
   end
 
+  def self.find_existing_buckets_from_proxy funding_template_id, start_fiscal_year, end_fiscal_year, owner_id
+    # Start to set up the query
+    conditions  = []
+    values      = []
+    existing_buckets = []
+
+    conditions << 'funding_template_id = ?'
+    values << funding_template_id
+
+    conditions << 'fiscal_year >= ?'
+    values << start_fiscal_year
+
+    conditions << 'fiscal_year <= ?'
+    values << end_fiscal_year
+
+    if owner_id.to_i < 0
+      funding_template = FundingTemplate.find_by(id: funding_template_id)
+
+      conditions << 'owner_id IN ?'
+      values << funding_template.organizations
+    else
+      conditions << 'owner_id = ?'
+      values << owner_id
+    end
+
+    puts conditions.inspect
+    puts values.inspect
+    puts values.inspect
+    existing_buckets = FundingBucket.where(conditions.join(' AND '), *values)
+
+    return existing_buckets
+  end
+
   #------------------------------------------------------------------------------
   #
   # Instance Methods

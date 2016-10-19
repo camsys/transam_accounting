@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     collection do
       get 'find_templates_from_program_id'
       get 'find_organizations_from_template_id'
+      get 'confirm'
     end
   end
 

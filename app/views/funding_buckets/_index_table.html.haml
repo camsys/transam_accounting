@@ -2,7 +2,7 @@
   table_dom_id = SecureRandom.hex
 
 #table_actions.btn-group
-- if can? :create, FundingBucket
+- if can?(:create, FundingBucket) && @should_include_add_bucket
   = link_to new_funding_bucket_path, :class => 'btn btn-default' do
     %i.fa.fa-plus.fa-fw
     = "Add Bucket"
