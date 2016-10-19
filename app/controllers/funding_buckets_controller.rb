@@ -242,19 +242,17 @@ class FundingBucketsController < OrganizationAwareController
   end
 
   def find_existing_buckets_for_create
-
-    existing_buckets = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year], params[:end_year], params[:owner_id])
-    expected_buckets = find_expected_bucket_count(params[:template_id], params[:start_year], params[:end_year], params[:owner_id])
-    result = existing_buckets.length - expected_buckets
+    result = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i)
 
     respond_to do |format|
       format.json { render json: result.to_json }
     end
-
   end
 
   def find_number_of_missing_buckets_for_update
-      result = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year], params[:end_year], params[:owner_id])
+      existing_buckets = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year], params[:end_year], params[:owner_id])
+      expected_buckets = find_expected_bucket_count(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i)
+      result = existing_buckets.length - expected_buckets
 
       respond_to do |format|
         format.json { render json: result.to_json }

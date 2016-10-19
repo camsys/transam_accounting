@@ -9,13 +9,15 @@
     .col-sm-8
       = f.input :create_option, :as => :radio_buttons, :required => true, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Create', 'Update', 'Delete' ]
 
-  .row
-    .col-sm-8
-      = f.input :create_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Create Conflict Option:", :collection => [ 'Update', 'Ignore', 'Cancel' ]
+  .create_conflict_option_div{:id => "create_conflict_option_div_id"}
+    .row
+      .col-sm-8
+        = f.input :create_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Create Conflict Option:", :collection => [ 'Update', 'Ignore', 'Cancel' ]
 
-  .row
-    .col-sm-8
-      = f.input :update_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Update Conflict Option:", :collection => [ 'Create', 'Ignore', 'Cancel' ]
+  .update_conflict_option_div{:id => "update_conflict_option_div_id"}
+    .row
+      .col-sm-8
+        = f.input :update_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Update Conflict Option:", :collection => [ 'Create', 'Ignore', 'Cancel' ]
 
   .row
     .col-sm-8
@@ -51,8 +53,9 @@
 
   .row
     .col-sm-8
-      -#= f.button :submit, 'Create/Update', :class => "btn btn-primary"
-      =button_tag 'Create/Update/Delete', :onclick=>"before_submit_bucket_check()", :class =>  'btn btn-primary'
+      = f.button :submit, 'Create/Update', :class => "btn btn-primary"
+      = f.input :description, :required => true, :collection => get_fiscal_years, :include_blank => true, :label => "Change this to test ajaxk"
+      -#=button_tag 'Create/Update/Delete', :onclick=>"before_submit_bucket_check()", :class =>  'btn btn-primary'
 
 -#= render 'form_scripts'
 
@@ -167,6 +170,10 @@
     show_escalate_by(funding_bucket_proxy_fiscal_year_range_start.value, funding_bucket_proxy_fiscal_year_range_end.value)
   });
 
+  $('#funding_bucket_proxy_description').change(function(){
+    before_submit_bucket_check();
+  });
+
   function before_submit_bucket_check(){
     var url = ''
     if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
@@ -186,12 +193,6 @@
     var end_year = funding_bucket_proxy_fiscal_year_range_end.value;
     var owner_id = funding_bucket_proxy_owner_id.value;
 
-    console.log('var template_id ='+template_id);
-    console.log('var start_year ='+start_year);
-    console.log('var end_year ='+end_year);
-    console.log('var owner_id ='+owner_id);
-
-
     $.ajax({
       url: url,
       data: {
@@ -200,33 +201,37 @@
         end_year: end_year,
         owner_id: owner_id},
       success: function(result){
-        r = result;
+
 
         if($('#funding_bucket_proxy_create_option_update').is(':checked')){
-          if (r.length == 0 || (funding_bucket_proxy_create_conflict_option.value != null)) {
-            console.log('Submit r.length = '+r.length);
-            console.log('Submit conflict optiohn value = '+funding_bucket_proxy_create_conflict_option.value);
-            //$('.bucket_form').validate({
-            //  submitHandler: function(form) {
-            //    form.submit();
-            //  }
-            //});
+          if (result == 0 || $('#funding_bucket_proxy_update_conflict_option_create').is(':checked')|| $('#funding_bucket_proxy_update_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_update_conflict_option_cancel').is(':checked')) {
+            console.log('Submit r.length = '+result.length);
+            $('.bucket_form').validate({
+              submitHandler: function(form) {
+                form.submit();
+              }
+            });
           }else{
-            $("#create_conflict_option").show();
-            $("#create_option").hide()
+            console.log('Submit result = ');
+            console.log(result);
+            $("#update_conflict_option_div_id").show();
+
+            $("#create_conflict_option_div_id").hide();
           }
         }else if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
-          if (r != 0 || (funding_bucket_proxy_update_conflict_option.value != null)) {
-            console.log('Submit r = '+r);
-            console.log('Submit conflict optiohn value = '+funding_bucket_proxy_create_conflict_option.value);
-            //$('.bucket_form').validate({
-            //  submitHandler: function(form) {
-            //    form.submit();
-            //  }
-            //});
+          if (result.length == 0 || $('#funding_bucket_proxy_create_conflict_option_update').is(':checked')|| $('#funding_bucket_proxy_create_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_create_conflict_option_cancel').is(':checked')) {
+            console.log('Submit result = '+result);
+            $('.bucket_form').validate({
+              submitHandler: function(form) {
+                form.submit();
+              }
+            });
           }else{
-            $("#update_conflict_option").show();
-            $("#create_option").hide()
+            console.log('Submit result = ');
+            console.log(result);
+            $("#create_conflict_option_div_id").show();
+
+            $("#update_conflict_option_div_id").hide();
           }
         }
       },
