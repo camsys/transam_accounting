@@ -1,12 +1,14 @@
 :ruby
   table_dom_id = SecureRandom.hex
+  show_actions ||= 0
 
-#table_actions.btn-group
-- if can?(:create, FundingBucket) && @should_include_add_bucket
-  = link_to new_funding_bucket_path, :class => 'btn btn-default' do
-    %i.fa.fa-plus.fa-fw
-    = "Add Bucket"
-= render :partial => "funding_buckets/index_actions"
+#buckets_table_actions.btn-group
+  - if can?(:create, FundingBucket)
+    = link_to new_funding_bucket_path, :class => 'btn btn-default' do
+      %i.fa.fa-plus.fa-fw
+      = "Add Bucket"
+  - if show_actions == 1
+    = render :partial => "funding_buckets/index_actions"
 
 %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
   :card_view => "false",
@@ -15,7 +17,7 @@
   :page_list => "[5, 10, 20, 50, 100, 200]",
   :page_size => current_user.num_table_rows,
   :search => 'false',
-  :toolbar => "#table_actions",
+  :toolbar => "#buckets_table_actions",
   :export_types => "['csv', 'txt', 'excel']",
   :show_export => 'true',
   :show_columns => 'true'}, :style => 'width:100%;'}
@@ -23,9 +25,9 @@
   %thead
     %tr
       %th.center{:data => {:visible => 'false'}} Object Key
-      %th.center{:data => {:sortable => 'true'}} ID
       %th.center{:data => {:sortable => 'true'}} FY
-      %th.center{:data => {:sortable => 'true'}} Program (Template)
+      - if @funding_template.nil?
+        %th.center{:data => {:sortable => 'true'}} Program (Template)
       %th.center{:data => {:sortable => 'true'}} Type
       %th.center{:data => {:sortable => 'true'}} Owner
       %th.center{:data => {:sortable => 'true'}} Total
@@ -33,13 +35,15 @@
       %th.center{:data => {:sortable => 'true'}} Available
       %th.center{:data => {:sortable => 'true'}} Expires
 
+      %th
+
   %tbody
     - buckets.each do |b|
       %tr
         %td.left= b.object_key
-        %td.left= b.id
         %td.left= b.fiscal_year
-        %td.left= b.funding_template.name
+        - if @funding_template.nil?
+          %td.left= b.funding_template.name
         %td.left= b.funding_template.funding_source.funding_source_type.name
         -unless b.owner.nil?
           %td.left= b.owner.name
@@ -52,6 +56,16 @@
           %td.left= b.fiscal_year + b.funding_template.funding_source.life_in_years
         -else
           %td.left= 1
+
+        %td
+          = link_to funding_bucket_path(b) do
+            %i.fa.fa-info-circle
+          - if can? :update, b
+            = link_to edit_funding_bucket_path(b), :class => "button btn-xs", :title => "Edit template" do
+              %i.fa.fa-edit.fa-1-5x.text-success
+            - if can? :destroy, b
+              = link_to funding_bucket_path(b), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
+                %i.fa.fa-trash-o.fa-fw.text-danger
 
 
 :javascript

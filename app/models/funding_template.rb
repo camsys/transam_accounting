@@ -20,6 +20,8 @@ class FundingTemplate < ActiveRecord::Base
   has_and_belongs_to_many :funding_template_types,  :join_table => :funding_templates_funding_template_types
   has_and_belongs_to_many :organizations
 
+  has_many :funding_buckets
+
 
   #------------------------------------------------------------------------------
   # Validations

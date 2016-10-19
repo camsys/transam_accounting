@@ -1,0 +1,9 @@
+%ul.nav.nav-tabs
+  %li
+    %a{:href => "#tagged", :data =>{:toggle => 'tab'}}
+      %span.badge.pull-right= "TBD"
+      = "Tagged Assets"
+
+.tab-content{:style => 'max-height:400px;overflow-y: auto;'}
+  .tab-pane.fade#tagged
+    .tab-content
