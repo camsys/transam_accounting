@@ -7,28 +7,30 @@
   -#TODO actually get these to appear on the same lin and next to the label Option:
   .row
     .col-sm-8
-      - unless(@creat_conflict.present? && @creat_conflict) || (@update_conflict.present? && @update_conflict)
-        = f.input :create_option, :as => :radio_buttons, :required => true, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Create', 'Update', 'Delete' ]
-      - else
-        @bucket_proxy.condition
+      = f.input :create_option, :as => :radio_buttons, :required => true, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Create', 'Update', 'Delete' ]
 
-  .row
-    .col-sm-8
-      = f.input :create_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Create Conflict Option:", :collection => [ 'Update', 'Ignore', 'Cancel' ]
+  .create_conflict_option_div{:id => "create_conflict_option_div_id"}
+    .row
+      .col-sm-8
+        = f.input :create_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Create Conflict Option:", :collection => [ 'Update', 'Ignore', 'Cancel' ]
 
-  .row
-    .col-sm-8
-      = f.input :update_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Update Conflict Option:", :collection => [ 'Create', 'Ignore', 'Cancel' ]
+  .update_conflict_option_div{:id => "update_conflict_option_div_id"}
+    .row
+      .col-sm-8
+        = f.input :update_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Update Conflict Option:", :collection => [ 'Create', 'Ignore', 'Cancel' ]
 
   .row
     .col-sm-8
       = f.input :program_id, :required => true, :collection => FundingSource.all, :include_blank => true, :label => "Program"
-  .row
-    .col-sm-8
-      = f.input :template_id, :required => true, :collection => [], :include_blank => true, :label => "Template"
-  .row
-    .col-sm-8
-      = f.input :owner_id, :required => true, :collection => [], :include_blank => true, :label => "Owner"
+
+  .template_id_div{:id => "template_id_div_id"}
+    .row
+      .col-sm-8
+        = f.input :template_id, :required => true, :collection => [], :include_blank => true, :label => "Template"
+  .owner_id_div{:id => "owner_id_div_id"}
+    .row
+      .col-sm-8
+        = f.input :owner_id, :required => true, :collection => [], :include_blank => true, :label => "Owner"
 
   .row
     .col-sm-4
@@ -54,18 +56,20 @@
 
   .row
     .col-sm-8
-      = f.button :submit, 'Create/Update', :class => "btn btn-primary"
+      -#= f.button :submit, 'Create/Update', :class => "btn btn-primary"
+      -#= f.input :description, :required => true, :collection => get_fiscal_years, :include_blank => true, :label => "Change this to test ajaxk"
+      =button_tag 'BETTER Create/Update/Delete', :onclick=>"before_submit_bucket_check()", :class =>  'btn btn-primary'
 
 -#= render 'form_scripts'
 
 :javascript
 
-  // jquery validations
-  $('.bucket_form').validate({
-    submitHandler: function(form) {
-      form.submit();
-    }
-  });
+  $("#create_conflict_option_div_id").hide();
+  $("#update_conflict_option_div_id").hide();
+  $("#state_or_single_agency_budget_id").hide();
+  $("#escalate_by_div_id").hide();
+  $('#template_id_div_id').hide();
+  $('#owner_id_div_id').hide();
 
   $( "#funding_bucket_proxy_fiscal_year_range_start" ).rules( "add", {
     FYRange: true
@@ -136,18 +140,21 @@
 
 
   $('#funding_bucket_proxy_owner_id').change(function(){
-    if (funding_bucket_proxy_owner_id.value == -1){
-      $("#state_or_single_agency_budget_id").hide();
-      funding_bucket_proxy_total_amount.value = null;
-      $("#all_agencies_covered_by_template_id").show()
-      populate_all_agencies_fields()
+    if( !$('#funding_bucket_proxy_create_option_delete').is(':checked')) {
+      if (funding_bucket_proxy_owner_id.value == -1){
+        $("#state_or_single_agency_budget_id").hide();
+        funding_bucket_proxy_total_amount.value = null;
+        $("#all_agencies_covered_by_template_id").show()
+        populate_all_agencies_fields()
+      }
+      else{
+        remove_all_agencies_fields()
+        $("#state_or_single_agency_budget_id").show();
+        $("#all_agencies_covered_by_template_id").hide()
+        $('#all_agencies_covered_by_template_id').empty();
+      }
     }
-    else{
-      remove_all_agencies_fields()
-      $("#state_or_single_agency_budget_id").show();
-      $("#all_agencies_covered_by_template_id").hide()
-      $('#all_agencies_covered_by_template_id').empty();
-    }
+
 
   })
 
@@ -169,6 +176,68 @@
     show_escalate_by(funding_bucket_proxy_fiscal_year_range_start.value, funding_bucket_proxy_fiscal_year_range_end.value)
   });
 
+  $('#funding_bucket_proxy_description').change(function(){
+    before_submit_bucket_check();
+  });
+
+  function before_submit_bucket_check(){
+    event.preventDefault();
+
+    var url = ''
+    if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
+      url = '#{find_existing_buckets_for_create_funding_buckets_path}'
+      console.log('The url is: '+url);
+    }else if ($('#funding_bucket_proxy_create_option_update').is(':checked')) {
+      url = '#{find_number_of_missing_buckets_for_update_funding_buckets_path}'
+      console.log('The url is: '+url);
+    }
+    else {
+      console.log('The url is: '+url);
+      return;
+    }
+
+    var template_id = funding_bucket_proxy_template_id.value;
+    var start_year = funding_bucket_proxy_fiscal_year_range_start.value;
+    var end_year = funding_bucket_proxy_fiscal_year_range_end.value;
+    var owner_id = funding_bucket_proxy_owner_id.value;
+
+    $.ajax({
+      url: url,
+      data: {
+        template_id: template_id,
+        start_year: start_year,
+        end_year: end_year,
+        owner_id: owner_id},
+      success: function(result){
+
+
+        if($('#funding_bucket_proxy_create_option_update').is(':checked')){
+          if (result == 0 || $('#funding_bucket_proxy_update_conflict_option_create').is(':checked')|| $('#funding_bucket_proxy_update_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_update_conflict_option_cancel').is(':checked')) {
+            console.log('Submit r.length = '+result.length);
+            $('.bucket_form').validate();
+            $('.bucket_form').submit();
+          }else{
+            $("#update_conflict_option_div_id").show();
+            $("#create_conflict_option_div_id").hide();
+          }
+        }else if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
+          if (result.length == 0 || $('#funding_bucket_proxy_create_conflict_option_update').is(':checked')|| $('#funding_bucket_proxy_create_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_create_conflict_option_cancel').is(':checked')) {
+            console.log('Submit result = '+result);
+            $('.bucket_form').validate();
+            $('.bucket_form').submit();
+          }else{
+            $("#create_conflict_option_div_id").show();
+            $("#update_conflict_option_div_id").hide();
+          }
+        }
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+        }
+      });
+  }
+
+
   $('#funding_bucket_proxy_template_id').change(function(){
     remove_all_agencies_fields();
     var url = '#{find_organizations_from_template_id_funding_buckets_path}';
@@ -178,6 +247,7 @@
       success: function(result){
         agencies = result
         $('#funding_bucket_proxy_owner_id').empty();
+        $('#owner_id_div_id').show();
         //Add a blank entry to the list.
         $("#funding_bucket_proxy_owner_id").append( $("<option></option>").attr("value", "").text(''));
         for(i = 0;i<result.length;i++){
@@ -200,6 +270,7 @@
       url: url,
       data: {program_id: funding_bucket_proxy_program_id.value},
       success: function(result){
+        $('#template_id_div_id').show();
         $('#funding_bucket_proxy_template_id').empty();
         //Add a blank entry to the list
         $("#funding_bucket_proxy_template_id").append( $("<option></option>").attr("value", -1).text(''));

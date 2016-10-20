@@ -4,7 +4,8 @@ Rails.application.routes.draw do
     collection do
       get 'find_templates_from_program_id'
       get 'find_organizations_from_template_id'
-      get 'confirm'
+      get 'find_existing_buckets_for_create'
+      get 'find_number_of_missing_buckets_for_update'
     end
   end
 

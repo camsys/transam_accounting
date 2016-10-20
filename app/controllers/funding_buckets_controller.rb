@@ -104,35 +104,6 @@ class FundingBucketsController < OrganizationAwareController
     end
   end
 
-  # GET /buckets/confirm
-  def confirm
-    authorize! :create, FundingBucket
-
-    add_breadcrumb 'New', new_funding_bucket_path
-
-    if @bucket_proxy.present?
-      @bucket_proxy = @bucket_proxy
-    else
-      @bucket_proxy = FundingBucketProxy.new
-      @bucket_proxy.set_defaults
-    end
-    if @programs.present?
-      @programs = @programs
-    else
-      @programs = FundingSource.all
-    end
-    if @templates.present?
-      @templates = @templates
-    else
-      @templates = []
-    end
-    if @template_organizations.present?
-      @template_organizations = @template_organizations
-    else
-      @template_organizations = []
-    end
-  end
-
   # GET /buckets/1/edit
   def edit
     authorize! :edit, FundingBucket
@@ -165,7 +136,7 @@ class FundingBucketsController < OrganizationAwareController
     end
 
     if bucket_proxy.create_option == 'Update'
-      expected_buckets = find_expected_bucket_count(bucket_proxy)
+      expected_buckets = find_expected_bucket_count_from_bucket_proxy(bucket_proxy)
 
       if expected_buckets > @existing_buckets.length && bucket_proxy.update_conflict_option.blank?
         @update_conflict = true
@@ -273,6 +244,24 @@ class FundingBucketsController < OrganizationAwareController
     end
   end
 
+  def find_existing_buckets_for_create
+    result = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i)
+
+    respond_to do |format|
+      format.json { render json: result.to_json }
+    end
+  end
+
+  def find_number_of_missing_buckets_for_update
+      existing_buckets = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year], params[:end_year], params[:owner_id])
+      expected_buckets = find_expected_bucket_count(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i)
+      result = existing_buckets.length - expected_buckets
+
+      respond_to do |format|
+        format.json { render json: result.to_json }
+      end
+  end
+
   protected
 
   def check_filter
@@ -367,14 +356,18 @@ class FundingBucketsController < OrganizationAwareController
     return nil
   end
 
-  def find_expected_bucket_count bucket_proxy
+  def find_expected_bucket_count_from_bucket_proxy bucket_proxy
+    find_expected_bucket_count(bucket_proxy.template_id, bucket_proxy.fiscal_year_range_start.to_i, bucket_proxy.fiscal_year_range_end.to_i, bucket_proxy.owner_id.to_i)
+  end
+
+  def find_expected_bucket_count template_id, fiscal_year_range_start, fiscal_year_range_end, owner_id
 
     number_of_organizations = 1
-    if bucket_proxy.owner_id.to_i <= 0
-      number_of_organizations = FundingTemplate.find_by(id: bucket_proxy.template_id).organizations.length
+    if owner_id <= 0
+      number_of_organizations = FundingTemplate.find_by(id: template_id).organizations.length
     end
 
-    (1+bucket_proxy.fiscal_year_range_end.to_i - bucket_proxy.fiscal_year_range_start.to_i) * number_of_organizations
+    (1+fiscal_year_range_end - fiscal_year_range_start) * number_of_organizations
 
   end
 
