@@ -56,9 +56,9 @@
 
   .row
     .col-sm-8
-      = f.button :submit, 'Create/Update', :class => "btn btn-primary"
-      = f.input :description, :required => true, :collection => get_fiscal_years, :include_blank => true, :label => "Change this to test ajaxk"
-      -#=button_tag 'Create/Update/Delete', :onclick=>"before_submit_bucket_check()", :class =>  'btn btn-primary'
+      -#= f.button :submit, 'Create/Update', :class => "btn btn-primary"
+      -#= f.input :description, :required => true, :collection => get_fiscal_years, :include_blank => true, :label => "Change this to test ajaxk"
+      =button_tag 'BETTER Create/Update/Delete', :onclick=>"before_submit_bucket_check()", :class =>  'btn btn-primary'
 
 -#= render 'form_scripts'
 
@@ -189,6 +189,8 @@
   });
 
   function before_submit_bucket_check(){
+    event.preventDefault();
+
     var url = ''
     if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
       url = '#{find_existing_buckets_for_create_funding_buckets_path}'
