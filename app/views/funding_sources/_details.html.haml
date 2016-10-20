@@ -9,7 +9,7 @@
         = "Templates"
     %li
       %a{:href => "#bckts", :data =>{:toggle => 'tab'}}
-        %span.badge.pull-right= "TBD"
+        %span.badge.pull-right= @funding_source.funding_buckets.count
         = "Buckets"
   %li
     %a{:href => "#docs", :data =>{:toggle => 'tab'}}
@@ -32,6 +32,7 @@
 
     .tab-pane.fade#bckts
       .tab-content
+        = render :partial => 'funding_buckets/index_table', :locals => {:buckets => @funding_source.funding_buckets, :show_actions => 0}
 
   .tab-pane.fade#docs
     .tab-content

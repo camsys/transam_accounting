@@ -1,0 +1,5 @@
+- buckets = FundingBucket.where(owner_id: @org.id)
+- unless buckets.empty?
+  .tab-pane.fade#buckets
+    .tab-content
+      = render :partial => 'funding_buckets/index_table', :locals => {:buckets => buckets, :show_actions => 0}

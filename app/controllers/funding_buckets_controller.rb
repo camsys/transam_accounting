@@ -17,8 +17,6 @@ class FundingBucketsController < OrganizationAwareController
     conditions  = []
     values      = []
 
-    @should_include_add_bucket = true
-
     if params[:template_id].present?
       @organizations =  Organization.where("id in (Select organization_id FROM funding_templates_organizations where funding_template_id = #{template_id}}").pluck(:name, :id)
     else
@@ -65,9 +63,14 @@ class FundingBucketsController < OrganizationAwareController
 
   # GET /buckets/1
   def show
-    authorize! :read, FundingBucket
 
+    @funding_bucket = FundingBucket.find_by(object_key: params[:id])
 
+    authorize! :read, @funding_bucket
+
+    add_breadcrumb @funding_bucket.funding_template.funding_source.name, funding_source_path(@funding_bucket.funding_template.funding_source)
+    add_breadcrumb @funding_bucket.funding_template.name, funding_template_path(@funding_bucket.funding_template)
+    add_breadcrumb 'Bucket', funding_bucket_path(@funding_bucket)
 
 
   end
