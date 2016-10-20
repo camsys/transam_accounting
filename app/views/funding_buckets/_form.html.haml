@@ -48,7 +48,7 @@
   .state_or_single_agency_budget{:id => "state_or_single_agency_budget_id"}
     .row
       .col-sm-8
-        = f.input :total_amount, :label => 'Budget'
+        = f.input :total_amount, :label => 'Budget', :required => true
 
   .all_agencies_covered_by_template{:id => "all_agencies_covered_by_template_id"}
     .row
@@ -58,7 +58,7 @@
     .col-sm-8
       -#= f.button :submit, 'Create/Update', :class => "btn btn-primary"
       -#= f.input :description, :required => true, :collection => get_fiscal_years, :include_blank => true, :label => "Change this to test ajaxk"
-      =button_tag 'BETTER Create/Update/Delete', :onclick=>"before_submit_bucket_check()", :class =>  'btn btn-primary'
+      =button_tag 'Submit', :onclick=>"before_submit_bucket_check()", :class =>  'btn btn-primary'
 
 -#= render 'form_scripts'
 
@@ -70,6 +70,10 @@
   $("#escalate_by_div_id").hide();
   $('#template_id_div_id').hide();
   $('#owner_id_div_id').hide();
+
+  $('.bucket_form').validate({
+    debug: true
+  });
 
   $( "#funding_bucket_proxy_fiscal_year_range_start" ).rules( "add", {
     FYRange: true
@@ -183,6 +187,8 @@
   function before_submit_bucket_check(){
     event.preventDefault();
 
+    $('.bucket_form').valid();
+
     var url = ''
     if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
       url = '#{find_existing_buckets_for_create_funding_buckets_path}'
@@ -214,7 +220,6 @@
         if($('#funding_bucket_proxy_create_option_update').is(':checked')){
           if (result == 0 || $('#funding_bucket_proxy_update_conflict_option_create').is(':checked')|| $('#funding_bucket_proxy_update_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_update_conflict_option_cancel').is(':checked')) {
             console.log('Submit r.length = '+result.length);
-            $('.bucket_form').validate();
             $('.bucket_form').submit();
           }else{
             $("#update_conflict_option_div_id").show();
@@ -223,7 +228,6 @@
         }else if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
           if (result.length == 0 || $('#funding_bucket_proxy_create_conflict_option_update').is(':checked')|| $('#funding_bucket_proxy_create_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_create_conflict_option_cancel').is(':checked')) {
             console.log('Submit result = '+result);
-            $('.bucket_form').validate();
             $('.bucket_form').submit();
           }else{
             $("#create_conflict_option_div_id").show();
