@@ -1,8 +1,10 @@
 class FundingTemplatesController < OrganizationAwareController
-  before_action :set_funding_template, only: [:show, :edit, :update, :destroy]
+
+  authorize_resource
 
   add_breadcrumb 'Funding Programs', :funding_sources_path
 
+  before_action :set_funding_template, only: [:show, :edit, :update, :destroy]
   before_action :check_filter,      :only => [:index, :show, :new, :edit]
 
   INDEX_KEY_LIST_VAR    = "funding_template_key_list_cache_var"
