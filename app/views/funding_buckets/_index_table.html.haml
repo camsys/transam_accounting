@@ -3,11 +3,11 @@
   show_actions ||= 0
 
 #buckets_table_actions.btn-group
-  - if can?(:create, FundingBucket)
-    = link_to new_funding_bucket_path, :class => 'btn btn-default' do
-      %i.fa.fa-plus.fa-fw
-      = "Add Bucket"
   - if show_actions == 1
+    - if can?(:create, FundingBucket)
+      = link_to new_funding_bucket_path, :class => 'btn btn-default' do
+        %i.fa.fa-edit.fa-fw
+        = "Modify Buckets"
     = render :partial => "funding_buckets/index_actions"
 
 %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
@@ -35,11 +35,9 @@
       %th.center{:data => {:sortable => 'true'}} Available
       %th.center{:data => {:sortable => 'true'}} Expires
 
-      %th
-
   %tbody
     - buckets.each do |b|
-      %tr
+      %tr{:id => b.object_key, :class => 'action-path'}
         %td.left= b.object_key
         %td.left= b.fiscal_year
         - if @funding_template.nil?
@@ -57,23 +55,12 @@
         -else
           %td.left= 1
 
-        %td
-          = link_to funding_bucket_path(b) do
-            %i.fa.fa-info-circle
-          - if can? :update, b
-            = link_to edit_funding_bucket_path(b), :class => "button btn-xs", :title => "Edit template" do
-              %i.fa.fa-edit.fa-1-5x.text-success
-            - if can? :destroy, b
-              = link_to funding_bucket_path(b), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
-                %i.fa.fa-trash-o.fa-fw.text-danger
-
+= render :partial => 'shared/table_scripts', :locals => {:table_id => table_dom_id, :path_pattern => funding_bucket_path("xxx")}
 
 :javascript
-
   $('#' + '#{table_dom_id}').on('post-body.bs.table', function () {
     $('.transam-popover').popover({
       trigger: 'hover'
     });
-
     $('.transam-tooltip').tooltip();
   });

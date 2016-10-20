@@ -1,18 +1,1 @@
-- if (can? :update, @funding_bucket) || (can? :destroy, @funding_bucket)
-  .btn-group.pull-right.panel-action
-    %button.btn.btn-primary.btn-sm.dropdown-toggle{:data => {:toggle => 'dropdown'}}
-      %i.fa.fa-cog
-      = " Actions"
-      %span.caret
-    %ul.dropdown-menu{:role => 'menu'}
-      - if can? :update, @funding_bucket
-        %li
-          = link_to edit_funding_bucket_path(@funding_bucket) do
-            %i.fa.fa-edit.fa-fw
-            = " Update this bucket"
-      - if (can? :destroy, @funding_bucket)
-        %li.divider
-        %li
-          = link_to funding_bucket_path(@funding_bucket), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
-            %i.fa.fa-trash-o.fa-fw
-            = " Remove this bucket"
+
