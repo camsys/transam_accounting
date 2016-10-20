@@ -54,9 +54,11 @@
       .col-sm-8
         = f.input :total_amount, :label => 'Budget', :required => true
 
-  .all_agencies_covered_by_template{:id => "all_agencies_covered_by_template_id"}
-    .row
-      .col-sm-3
+  .all_agencies_covered_by_template_group{:id => "all_agencies_covered_by_template_group_id"}
+    .col-sm-8
+      .all_agencies_covered_by_template{:id => "all_agencies_covered_by_template_id"}
+        .row
+          .col-sm-8
 
   .row
     .col-sm-8
@@ -67,6 +69,57 @@
 -#= render 'form_scripts'
 
 :javascript
+
+  var display_budget = false;
+  var display_all_orgs_budget = false;
+
+  $('#funding_bucket_proxy_create_option_create').change(function(){
+    console.log("funding_bucket_proxy_create_option_create");
+    console.log("display_budget = "+display_budget);
+    console.log("display_all_orgs_budget = "+display_all_orgs_budget);
+
+    if($('#funding_bucket_proxy_create_option_create').is(':checked')){
+      if(display_budget == true){
+        $("#state_or_single_agency_budget_id").show();
+      };
+      if(display_all_orgs_budget = true){
+        $("#all_agencies_covered_by_template_group_id").show();
+      };
+    };
+  });
+
+  $('#funding_bucket_proxy_create_option_update').change(function(){
+    console.log("funding_bucket_proxy_create_option_update");
+    console.log("display_budget = "+display_budget);
+    console.log("display_all_orgs_budget = "+display_all_orgs_budget);
+
+    if($('#funding_bucket_proxy_create_option_update').is(':checked')){
+      if(display_budget == true){
+        $("#state_or_single_agency_budget_id").show();
+      };
+      if(display_all_orgs_budget = true){
+        $("#all_agencies_covered_by_template_group_id").show();
+      };
+    };
+  });
+
+  $('#funding_bucket_proxy_create_option_delete').change(function(){
+    console.log("funding_bucket_proxy_create_option_delete");
+    console.log("display_budget = "+display_budget);
+    console.log("display_all_orgs_budget = "+display_all_orgs_budget);
+
+    if($('#funding_bucket_proxy_create_option_delete').is(':checked')){
+      $("#state_or_single_agency_budget_id").hide();
+      $("#all_agencies_covered_by_template_group_id").hide();
+    }else{
+      if(display_budget == true){
+        $("#state_or_single_agency_budget_id").show();
+      };
+      if(display_all_orgs_budget = true){
+        $("#all_agencies_covered_by_template_group_id").show();
+      };
+    };
+  });
 
   $("#create_conflict_option_div_id").hide();
   $("#update_conflict_option_div_id").hide();
@@ -148,22 +201,26 @@
 
 
   $('#funding_bucket_proxy_owner_id').change(function(){
-    if( !$('#funding_bucket_proxy_create_option_delete').is(':checked')) {
-      if (funding_bucket_proxy_owner_id.value == -1){
-        $("#state_or_single_agency_budget_id").hide();
-        funding_bucket_proxy_total_amount.value = null;
-        $("#all_agencies_covered_by_template_id").show()
-        populate_all_agencies_fields()
+    if (funding_bucket_proxy_owner_id.value == -1){
+      $("#state_or_single_agency_budget_id").hide();
+      funding_bucket_proxy_total_amount.value = null;
+      if( !$('#funding_bucket_proxy_create_option_delete').is(':checked')) {
+        $("#all_agencies_covered_by_template_group_id").show()
       }
-      else{
-        remove_all_agencies_fields()
-        $("#state_or_single_agency_budget_id").show();
-        $("#all_agencies_covered_by_template_id").hide()
-        $('#all_agencies_covered_by_template_id').empty();
-      }
+      display_budget = false;
+      display_all_orgs_budget = true;
+      populate_all_agencies_fields()
     }
-
-
+    else{
+      remove_all_agencies_fields()
+      if( !$('#funding_bucket_proxy_create_option_delete').is(':checked')) {
+        $("#state_or_single_agency_budget_id").show();
+      }
+      display_budget = true;
+      display_all_orgs_budget = false;
+      $("#all_agencies_covered_by_template_group_id").hide()
+      //$('#all_agencies_covered_by_template_id').empty();
+    }
   })
 
   function show_escalate_by(start_fy, end_fy){
