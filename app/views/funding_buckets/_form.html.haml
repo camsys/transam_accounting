@@ -22,12 +22,15 @@
   .row
     .col-sm-8
       = f.input :program_id, :required => true, :collection => FundingSource.all, :include_blank => true, :label => "Program"
-  .row
-    .col-sm-8
-      = f.input :template_id, :required => true, :collection => [], :include_blank => true, :label => "Template"
-  .row
-    .col-sm-8
-      = f.input :owner_id, :required => true, :collection => [], :include_blank => true, :label => "Owner"
+
+  .template_id_div{:id => "template_id_div_id"}
+    .row
+      .col-sm-8
+        = f.input :template_id, :required => true, :collection => [], :include_blank => true, :label => "Template"
+  .owner_id_div{:id => "owner_id_div_id"}
+    .row
+      .col-sm-8
+        = f.input :owner_id, :required => true, :collection => [], :include_blank => true, :label => "Owner"
 
   .row
     .col-sm-4
@@ -60,6 +63,14 @@
 -#= render 'form_scripts'
 
 :javascript
+
+  $("#create_conflict_option_div_id").hide();
+  $("#update_conflict_option_div_id").hide();
+  $("#state_or_single_agency_budget_id").hide();
+  $("#escalate_by_div_id").hide();
+  $('#template_id_div_id').hide();
+  $('#owner_id_div_id').hide();
+
 
   // jquery validations
   $('.bucket_form').validate({
@@ -137,18 +148,21 @@
 
 
   $('#funding_bucket_proxy_owner_id').change(function(){
-    if (funding_bucket_proxy_owner_id.value == -1){
-      $("#state_or_single_agency_budget_id").hide();
-      funding_bucket_proxy_total_amount.value = null;
-      $("#all_agencies_covered_by_template_id").show()
-      populate_all_agencies_fields()
+    if( !$('#funding_bucket_proxy_create_option_delete').is(':checked')) {
+      if (funding_bucket_proxy_owner_id.value == -1){
+        $("#state_or_single_agency_budget_id").hide();
+        funding_bucket_proxy_total_amount.value = null;
+        $("#all_agencies_covered_by_template_id").show()
+        populate_all_agencies_fields()
+      }
+      else{
+        remove_all_agencies_fields()
+        $("#state_or_single_agency_budget_id").show();
+        $("#all_agencies_covered_by_template_id").hide()
+        $('#all_agencies_covered_by_template_id').empty();
+      }
     }
-    else{
-      remove_all_agencies_fields()
-      $("#state_or_single_agency_budget_id").show();
-      $("#all_agencies_covered_by_template_id").hide()
-      $('#all_agencies_covered_by_template_id').empty();
-    }
+
 
   })
 
@@ -251,6 +265,7 @@
       success: function(result){
         agencies = result
         $('#funding_bucket_proxy_owner_id').empty();
+        $('#owner_id_div_id').show();
         //Add a blank entry to the list.
         $("#funding_bucket_proxy_owner_id").append( $("<option></option>").attr("value", "").text(''));
         for(i = 0;i<result.length;i++){
@@ -273,6 +288,7 @@
       url: url,
       data: {program_id: funding_bucket_proxy_program_id.value},
       success: function(result){
+        $('#template_id_div_id').show();
         $('#funding_bucket_proxy_template_id').empty();
         //Add a blank entry to the list
         $("#funding_bucket_proxy_template_id").append( $("<option></option>").attr("value", -1).text(''));
