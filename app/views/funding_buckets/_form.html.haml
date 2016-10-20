@@ -71,14 +71,6 @@
   $('#template_id_div_id').hide();
   $('#owner_id_div_id').hide();
 
-
-  // jquery validations
-  $('.bucket_form').validate({
-    submitHandler: function(form) {
-      form.submit();
-    }
-  });
-
   $( "#funding_bucket_proxy_fiscal_year_range_start" ).rules( "add", {
     FYRange: true
   });
@@ -237,11 +229,8 @@
         }else if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
           if (result.length == 0 || $('#funding_bucket_proxy_create_conflict_option_update').is(':checked')|| $('#funding_bucket_proxy_create_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_create_conflict_option_cancel').is(':checked')) {
             console.log('Submit result = '+result);
-            $('.bucket_form').validate({
-              submitHandler: function(form) {
-                form.submit();
-              }
-            });
+            $('.bucket_form').validate();
+            $('.bucket_form').submit();
           }else{
             console.log('Submit result = ');
             console.log(result);
