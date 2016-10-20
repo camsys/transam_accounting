@@ -3,6 +3,8 @@ class FundingSourcesController < OrganizationAwareController
   # Include the fiscal year mixin
   include FiscalYear
 
+  authorize_resource :except => :details
+
   add_breadcrumb "Home", :root_path
   add_breadcrumb "Funding Programs", :funding_sources_path
 
