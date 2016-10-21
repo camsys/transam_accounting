@@ -1,5 +1,6 @@
 = simple_form_for(@bucket_proxy,
 :url => funding_buckets_path,
+:method => :post,
 :html => {:class => 'form-vertical bucket_form' },
 :wrapper => :vertical_form,
 :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
@@ -280,14 +281,14 @@
 
         if($('#funding_bucket_proxy_create_option_update').is(':checked')){
           if (result == 0 || $('#funding_bucket_proxy_update_conflict_option_create').is(':checked')|| $('#funding_bucket_proxy_update_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_update_conflict_option_cancel').is(':checked')) {
-            $('.bucket_form').submit();
+            document.getElementById('new_funding_bucket_proxy').submit();
           }else{
             $("#update_conflict_option_div_id").show();
             $("#create_conflict_option_div_id").hide();
           }
         }else if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
           if (result.length == 0 || $('#funding_bucket_proxy_create_conflict_option_update').is(':checked')|| $('#funding_bucket_proxy_create_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_create_conflict_option_cancel').is(':checked')) {
-            $('.bucket_form').submit();
+            document.getElementById('new_funding_bucket_proxy').submit();
           }else{
             $("#create_conflict_option_div_id").show();
             $("#update_conflict_option_div_id").hide();
