@@ -73,6 +73,7 @@
 
   var display_budget = false;
   var display_all_orgs_budget = false;
+  var display_escalate_by = false;
 
   $('#funding_bucket_proxy_create_option_create').change(function(){
      $("#update_conflict_option_div_id").hide();
@@ -105,6 +106,7 @@
     $("#update_conflict_option_div_id").hide();
 
     if($('#funding_bucket_proxy_create_option_delete').is(':checked')){
+      $("#escalate_by_div_id").hide();
       $("#state_or_single_agency_budget_id").hide();
       $("#all_agencies_covered_by_template_group_id").hide();
     }else{
@@ -114,6 +116,9 @@
       if(display_all_orgs_budget = true){
         $("#all_agencies_covered_by_template_group_id").show();
       };
+      if(display_escalate_by = true){
+        $("#escalate_by_div_id").hide();
+      }
     };
   });
 
@@ -224,8 +229,10 @@
     {
       $("#escalate_by_div_id").hide();
       funding_bucket_proxy_inflation_percentage.value = null;
-    } else {
+      display_escalate_by = false;
+    } else if($('#funding_bucket_proxy_create_option_delete').is(':checked') == false) {
       $("#escalate_by_div_id").show();
+      display_escalate_by = true;
     }
 
   };
@@ -248,14 +255,12 @@
 
     var url = ''
     if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
-      url = '#{find_existing_buckets_for_create_funding_buckets_path}'
-      console.log('The url is: '+url);
+      url = '{find_existing_buckets_for_create_funding_buckets_path}'
     }else if ($('#funding_bucket_proxy_create_option_update').is(':checked')) {
-      url = '#{find_number_of_missing_buckets_for_update_funding_buckets_path}'
-      console.log('The url is: '+url);
-    }
-    else {
-      console.log('The url is: '+url);
+      url = '{find_number_of_missing_buckets_for_update_funding_buckets_path}'
+    }else if($('#funding_bucket_proxy_create_option_delete').is(':checked')) {
+          document.getElementById('new_funding_bucket_proxy').submit();
+    }else {
       return;
     }
 
@@ -292,7 +297,7 @@
             $('.bucket_form').valid();
             alert(result.length + " of the Buckets you are creating already exist. Do you want to leave these Buckets untouched, change the dollar amount, or cancel this action?");
           }
-        }
+        };
       },
       error: function (xhr, ajaxOptions, thrownError) {
         alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
@@ -335,6 +340,7 @@
       success: function(result){
         $('#template_id_div_id').show();
         $('#funding_bucket_proxy_template_id').empty();
+        $('#funding_bucket_proxy_owner_id').empty();
         //Add a blank entry to the list
         $("#funding_bucket_proxy_template_id").append( $("<option></option>").attr("value", -1).text(''));
         for(i = 0;i<result.length;i++){
