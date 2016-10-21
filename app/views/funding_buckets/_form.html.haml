@@ -255,9 +255,9 @@
 
     var url = ''
     if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
-      url = '{find_existing_buckets_for_create_funding_buckets_path}'
+      url = '#{find_existing_buckets_for_create_funding_buckets_path}'
     }else if ($('#funding_bucket_proxy_create_option_update').is(':checked')) {
-      url = '{find_number_of_missing_buckets_for_update_funding_buckets_path}'
+      url = '#{find_number_of_missing_buckets_for_update_funding_buckets_path}'
     }else if($('#funding_bucket_proxy_create_option_delete').is(':checked')) {
           document.getElementById('new_funding_bucket_proxy').submit();
     }else {
