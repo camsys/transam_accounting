@@ -335,7 +335,7 @@ class FundingBucketsController < OrganizationAwareController
         #   DO NOTHING
       elsif !existing_bucket.nil? && create_conflict_option == 'Update'
         existing_bucket.budget_amount = bucket.budget_amount
-        existing_bucket.bucket.updator = current_user
+        existing_bucket.updator = current_user
         existing_bucket.save
       else
         bucket.save
