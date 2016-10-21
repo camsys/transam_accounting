@@ -280,7 +280,6 @@
 
         if($('#funding_bucket_proxy_create_option_update').is(':checked')){
           if (result == 0 || $('#funding_bucket_proxy_update_conflict_option_create').is(':checked')|| $('#funding_bucket_proxy_update_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_update_conflict_option_cancel').is(':checked')) {
-            console.log('Submit r.length = '+result.length);
             $('.bucket_form').submit();
           }else{
             $("#update_conflict_option_div_id").show();
@@ -288,7 +287,6 @@
           }
         }else if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
           if (result.length == 0 || $('#funding_bucket_proxy_create_conflict_option_update').is(':checked')|| $('#funding_bucket_proxy_create_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_create_conflict_option_cancel').is(':checked')) {
-            console.log('Submit result = '+result);
             $('.bucket_form').submit();
           }else{
             $("#create_conflict_option_div_id").show();
