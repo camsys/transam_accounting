@@ -123,7 +123,6 @@ class FundingBucketsController < OrganizationAwareController
       if @existing_buckets.length > 0 && (bucket_proxy.create_conflict_option.blank?)
 
         @create_conflict = true
-        flash.now[:notice] = "Alert: #{@existing_buckets.length} conflicts found. Please select if you want to update existing buckets, ignore existing buckets, or cancel"
       elsif @existing_buckets.length > 0 && (bucket_proxy.create_conflict_option == 'Cancel')
         redirect_to funding_buckets_path, notice: 'Bucket creation cancelled because of conflict.'
       elsif @existing_buckets.length > 0
@@ -141,7 +140,6 @@ class FundingBucketsController < OrganizationAwareController
       if expected_buckets > @existing_buckets.length && bucket_proxy.update_conflict_option.blank?
         @update_conflict = true
 
-        flash.now[:notice] = "Some buckets to be updated have not been created. Please select if you want to create new buckets, ignore missing buckets, or cancel"
       elsif expected_buckets > @existing_buckets.length && bucket_proxy.update_conflict_option  == 'Cancel'
         redirect_to funding_buckets_path, notice: 'Bucket update cancelled because of conflict.'
       else

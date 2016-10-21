@@ -75,9 +75,7 @@
   var display_all_orgs_budget = false;
 
   $('#funding_bucket_proxy_create_option_create').change(function(){
-    console.log("funding_bucket_proxy_create_option_create");
-    console.log("display_budget = "+display_budget);
-    console.log("display_all_orgs_budget = "+display_all_orgs_budget);
+     $("#update_conflict_option_div_id").hide();
 
     if($('#funding_bucket_proxy_create_option_create').is(':checked')){
       if(display_budget == true){
@@ -90,9 +88,7 @@
   });
 
   $('#funding_bucket_proxy_create_option_update').change(function(){
-    console.log("funding_bucket_proxy_create_option_update");
-    console.log("display_budget = "+display_budget);
-    console.log("display_all_orgs_budget = "+display_all_orgs_budget);
+    $("#create_conflict_option_div_id").hide();
 
     if($('#funding_bucket_proxy_create_option_update').is(':checked')){
       if(display_budget == true){
@@ -105,9 +101,8 @@
   });
 
   $('#funding_bucket_proxy_create_option_delete').change(function(){
-    console.log("funding_bucket_proxy_create_option_delete");
-    console.log("display_budget = "+display_budget);
-    console.log("display_all_orgs_budget = "+display_all_orgs_budget);
+    $("#create_conflict_option_div_id").hide();
+    $("#update_conflict_option_div_id").hide();
 
     if($('#funding_bucket_proxy_create_option_delete').is(':checked')){
       $("#state_or_single_agency_budget_id").hide();
@@ -285,6 +280,8 @@
           }else{
             $("#update_conflict_option_div_id").show();
             $("#create_conflict_option_div_id").hide();
+            $('.bucket_form').valid();
+            alert(-1*result + " Buckets you are updating do not yet exist. Do you want to create these Buckets, skip these Buckets, or cancel this action?");
           }
         }else if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
           if (result.length == 0 || $('#funding_bucket_proxy_create_conflict_option_update').is(':checked')|| $('#funding_bucket_proxy_create_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_create_conflict_option_cancel').is(':checked')) {
@@ -292,6 +289,8 @@
           }else{
             $("#create_conflict_option_div_id").show();
             $("#update_conflict_option_div_id").hide();
+            $('.bucket_form').valid();
+            alert(result.length + " of the Buckets you are creating already exist. Do you want to leave these Buckets untouched, change the dollar amount, or cancel this action?");
           }
         }
       },

@@ -68,8 +68,12 @@ class FundingBucket< ActiveRecord::Base
     if owner_id.to_i < 0
       funding_template = FundingTemplate.find_by(id: funding_template_id)
 
-      conditions << 'owner_id IN ?'
-      values << funding_template.organizations
+      conditions << 'owner_id IN (?)'
+      org_ids = []
+      funding_template.organizations.each { |o| org_ids << o.id }
+
+
+      values << org_ids
     else
       conditions << 'owner_id = ?'
       values << owner_id
