@@ -217,7 +217,6 @@ class FundingBucketsController < OrganizationAwareController
       grantors.each { |g|
         result << [g.id, g.name]
       }
-
     else
       orgs = template.organizations
       organizations = []
@@ -230,8 +229,6 @@ class FundingBucketsController < OrganizationAwareController
         grantor = Grantor.first
         organizations =  Organization.where(" id <> #{grantor.id} AND active = true").pluck(:id, :name)
       end
-
-
 
       result = [[-1,'All Agencies For This Template']] + organizations
     end
@@ -274,6 +271,17 @@ class FundingBucketsController < OrganizationAwareController
     program_id = params[:program_id]
     result = FundingSource.find_by(id: program_id).inflation_rate
     @templates = result
+
+    respond_to do |format|
+      format.json { render json: result.to_json }
+    end
+  end
+
+  def find_template_based_fiscal_year_range
+    program_id = params[:program_id]
+    program = FundingSource.find_by(id: program_id)
+
+    result = program.find_all_valid_fiscal_years
 
     respond_to do |format|
       format.json { render json: result.to_json }

@@ -248,6 +248,35 @@
     before_submit_bucket_check();
   });
 
+  function update_fiscal_year_range()
+  {
+    $('#funding_bucket_proxy_fiscal_year_range_start').empty();
+    $('#funding_bucket_proxy_fiscal_year_range_end').empty();
+    var url = '#{find_template_based_fiscal_year_range_funding_buckets_path}';
+
+    $.ajax({
+      url: url,
+      data: {program_id: funding_bucket_proxy_program_id.value},
+      success: function(result){
+        //Add a blank entry to the list.
+        $("#funding_bucket_proxy_fiscal_year_range_start").append( $("<option></option>").attr("value", "").text(''));
+        $("#funding_bucket_proxy_fiscal_year_range_end").append( $("<option></option>").attr("value", "").text(''));
+        for(i = 0;i<result.length;i++){
+          //add an option for each organizations available to the tempalte
+          $("#funding_bucket_proxy_fiscal_year_range_start").append(
+              $("<option></option>").attr("value", result[i][1]).text(result[i][0])
+          );
+          $("#funding_bucket_proxy_fiscal_year_range_end").append(
+              $("<option></option>").attr("value", result[i][1]).text(result[i][0])
+          );
+        }
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+        }
+      });
+  }
+
   function update_expected_escalation_percent()
   {
     var url = '#{find_expected_escalation_percent_funding_buckets_path}';
@@ -348,6 +377,7 @@
 
   $('#funding_bucket_proxy_program_id').change(function(){
     remove_all_agencies_fields();
+    update_fiscal_year_range();
     var url = '#{find_templates_from_program_id_funding_buckets_path}';
     $.ajax({
       url: url,

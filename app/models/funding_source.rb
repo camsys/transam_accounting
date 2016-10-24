@@ -97,6 +97,18 @@ class FundingSource < ActiveRecord::Base
     FundingSource.new.current_planning_year_year
   end
 
+  def find_all_valid_fiscal_years
+    unless self.fy_start.nil?
+      program_start = start_of_fiscal_year(self.fy_start)
+      program_years_to_end = self.fy_end - self.fy_start
+    else
+      program_start = nil
+      program_years_to_end = nil
+    end
+
+    get_fiscal_years(program_start, program_years_to_end)
+  end
+
   #------------------------------------------------------------------------------
   #
   # Instance Methods
