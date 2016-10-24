@@ -13,7 +13,7 @@ class FundingSourceType < ActiveRecord::Base
   # All types that are available
   scope :active, -> { where(:active => true) }
   scope :funding_program, -> { where("name != 'Agency'") }
-  scope :contributor, -> { where("name NOT IN ('Local', 'Agency')") }
+  scope :contributor, -> { where("name IN ('State', 'Agency')") }
   scope :owner, -> { where("name IN ('State', 'Agency')") }
  
   def to_s
