@@ -295,8 +295,8 @@ class FundingBucketsController < OrganizationAwareController
       inflation_percentage = bucket_proxy.inflation_percentage.blank? ? 0 : bucket_proxy.inflation_percentage.to_d/100
 
       existing_bucket = bucket_exists(existing_buckets, bucket)
-      if !existing_bucket.nil? && create_conflict_option == 'Ignore'
-        #   DO NOTHING
+      if !existing_bucket.nil? && (create_conflict_option == 'Ignore' || update_conflict_option == 'Ignore')
+          # DO NOTHING
       elsif !existing_bucket.nil? && create_conflict_option == 'Update'
         existing_bucket.budget_amount = bucket.budget_amount
         existing_bucket.updator = current_user
@@ -316,7 +316,7 @@ class FundingBucketsController < OrganizationAwareController
 
 
         existing_bucket = bucket_exists(existing_buckets, next_year_bucket)
-        if !existing_bucket.nil? && create_conflict_option == 'Ignore'
+        if !existing_bucket.nil? && (create_conflict_option == 'Ignore' || update_conflict_option == 'Ignore')
           #   DO NOTHING
         elsif !existing_bucket.nil? && create_conflict_option == 'Update'
           existing_bucket.budget_amount = next_year_bucket.budget_amount
@@ -331,7 +331,7 @@ class FundingBucketsController < OrganizationAwareController
 
     else
       existing_bucket = bucket_exists(existing_buckets, bucket)
-      if !existing_bucket.nil? && create_conflict_option == 'Ignore'
+      if !existing_bucket.nil? && (create_conflict_option == 'Ignore' || update_conflict_option == 'Ignore')
         #   DO NOTHING
       elsif !existing_bucket.nil? && create_conflict_option == 'Update'
         existing_bucket.budget_amount = bucket.budget_amount
