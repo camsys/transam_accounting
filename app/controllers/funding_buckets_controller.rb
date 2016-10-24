@@ -166,7 +166,6 @@ class FundingBucketsController < OrganizationAwareController
     else
       bucket = new_bucket_from_proxy(bucket_proxy)
       agencies = bucket.funding_template.organizations
-      agencies << Grantor.first
 
       agencies.each { |aa|
         bucket = new_bucket_from_proxy(bucket_proxy, aa.id)
@@ -186,7 +185,6 @@ class FundingBucketsController < OrganizationAwareController
     else
       bucket = new_bucket_from_proxy(bucket_proxy)
       agencies = bucket.funding_template.organizations
-      agencies << Grantor.first
 
       agencies.each { |aa|
         bucket = new_bucket_from_proxy(bucket_proxy, aa.id)
@@ -221,9 +219,8 @@ class FundingBucketsController < OrganizationAwareController
       }
 
     else
-      grantor = Grantor.first
-      organizations =  Organization.where("id in (Select organization_id FROM funding_templates_organizations where funding_template_id = #{template_id}) and id <> #{grantor.id}").pluck(:id, :name)
-      result = [[-1,'All Agencies For This Template']] + [[grantor.id, grantor.name]] + organizations
+      organizations =  Organization.where("id in (Select organization_id FROM funding_templates_organizations where funding_template_id = #{template_id})").pluck(:id, :name)
+      result = [[-1,'All Agencies For This Template']] + organizations
     end
 
     @template_organizations = result
