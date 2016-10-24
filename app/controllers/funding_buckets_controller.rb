@@ -24,6 +24,9 @@ class FundingBucketsController < OrganizationAwareController
     else
       @organizations =  Organization.where(id: @organization_list).pluck(:name, :id)
     end
+
+    @templates =  FundingTemplate.all.pluck(:name, :id)
+
     if params[:agency_id].present?
       @searched_agency_id =  params[:agency_id]
     end
@@ -33,11 +36,20 @@ class FundingBucketsController < OrganizationAwareController
     if params[:funds_available].present?
       @show_funds_available_only =  params[:funds_available]
     end
+    if params[:searched_template].present?
+      @searched_template = params[:searched_template]
+    end
 
     unless @searched_agency_id.blank?
       agency_filter_id = @searched_agency_id.to_i
       conditions << 'owner_id = ?'
       values << agency_filter_id
+    end
+
+    unless @searched_template.blank?
+      funding_template_id = @searched_template.to_i
+      conditions << 'funding_template_id = ?'
+      values << funding_template_id
     end
 
     unless @searched_fiscal_year.blank?
