@@ -41,7 +41,7 @@
         %td.left= b.object_key
         %td.left= format_as_fiscal_year(b.fiscal_year)
         - if @funding_template.nil?
-          %td.left= b.funding_template.name
+          %td.left= "#{b.funding_template.name} (#{b.funding_template.funding_source.name})"
         %td.left= b.funding_template.funding_source.funding_source_type.name
         -unless b.owner.nil?
           %td.left= b.owner.name
