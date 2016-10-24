@@ -257,6 +257,16 @@ class FundingBucketsController < OrganizationAwareController
       end
   end
 
+  def find_expected_escalation_percent
+    program_id = params[:program_id]
+    result = FundingSource.find_by(id: program_id).inflation_rate
+    @templates = result
+
+    respond_to do |format|
+      format.json { render json: result.to_json }
+    end
+  end
+
   protected
 
   def check_filter
@@ -365,5 +375,4 @@ class FundingBucketsController < OrganizationAwareController
     (1+fiscal_year_range_end - fiscal_year_range_start) * number_of_organizations
 
   end
-
 end

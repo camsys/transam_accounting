@@ -181,7 +181,6 @@
   }
 
   function populate_all_agencies_fields(){
-    console.log(agencies);
     //There should be an entry before the first agency. the empty space and the all agencies option
     i = 1;
 
@@ -232,6 +231,7 @@
       display_escalate_by = false;
     } else if($('#funding_bucket_proxy_create_option_delete').is(':checked') == false) {
       $("#escalate_by_div_id").show();
+      update_expected_escalation_percent();
       display_escalate_by = true;
     }
 
@@ -248,6 +248,21 @@
     before_submit_bucket_check();
   });
 
+  function update_expected_escalation_percent()
+  {
+    var url = '#{find_expected_escalation_percent_funding_buckets_path}';
+    $.ajax({
+      url: url,
+      data: {program_id: funding_bucket_proxy_program_id.value},
+      success: function(result){
+        funding_bucket_proxy_inflation_percentage.value = result;
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+        }
+      });
+
+  }
   function before_submit_bucket_check(){
     event.preventDefault();
 
