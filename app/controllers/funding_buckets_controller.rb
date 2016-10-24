@@ -219,7 +219,20 @@ class FundingBucketsController < OrganizationAwareController
       }
 
     else
-      organizations =  Organization.where("id in (Select organization_id FROM funding_templates_organizations where funding_template_id = #{template_id})").pluck(:id, :name)
+      orgs = template.organizations
+      organizations = []
+      if orgs.length > 0
+        orgs.each { |o|
+          item = [o.id, o.name]
+          organizations << item
+        }
+      else
+        grantor = Grantor.first
+        organizations =  Organization.where(" id <> #{grantor.id} AND active = true").pluck(:id, :name)
+      end
+
+
+
       result = [[-1,'All Agencies For This Template']] + organizations
     end
 
