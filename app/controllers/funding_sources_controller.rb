@@ -71,7 +71,6 @@ class FundingSourcesController < OrganizationAwareController
   # GET /funding_sources/1.json
   def show
 
-    add_breadcrumb @funding_source.funding_source_type, funding_sources_path(:funding_source_type_id => @funding_source.funding_source_type)
     add_breadcrumb @funding_source.name, funding_source_path(@funding_source)
 
     # Set the funding line items
@@ -101,7 +100,6 @@ class FundingSourcesController < OrganizationAwareController
   # GET /funding_sources/1/edit
   def edit
 
-    add_breadcrumb @funding_source.funding_source_type, funding_sources_path(:funding_source_type_id => @funding_source.funding_source_type)
     add_breadcrumb @funding_source.name, funding_source_path(@funding_source)
     add_breadcrumb "Update"
 

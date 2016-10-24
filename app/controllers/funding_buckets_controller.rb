@@ -1,7 +1,7 @@
 class FundingBucketsController < OrganizationAwareController
   # before_action :set_funding_template, only: [:show, :edit, :update, :destroy]
 
-  add_breadcrumb 'Funding Buckets', :funding_buckets_path
+  add_breadcrumb "Home", :root_path
 
   before_action :check_filter,      :only => [:index, :show, :new, :edit]
 
@@ -11,7 +11,9 @@ class FundingBucketsController < OrganizationAwareController
   def index
     authorize! :read, FundingBucket
 
-    add_breadcrumb 'All Buckets', funding_buckets_path
+    add_breadcrumb 'Funding Programs', funding_sources_path
+    add_breadcrumb 'Templates', funding_templates_path
+    add_breadcrumb 'Buckets', funding_buckets_path
 
     # Start to set up the query
     conditions  = []
@@ -70,7 +72,7 @@ class FundingBucketsController < OrganizationAwareController
 
     add_breadcrumb @funding_bucket.funding_template.funding_source.name, funding_source_path(@funding_bucket.funding_template.funding_source)
     add_breadcrumb @funding_bucket.funding_template.name, funding_template_path(@funding_bucket.funding_template)
-    add_breadcrumb 'Bucket', funding_bucket_path(@funding_bucket)
+    add_breadcrumb @funding_bucket.to_s, funding_bucket_path(@funding_bucket)
 
 
   end
@@ -79,6 +81,9 @@ class FundingBucketsController < OrganizationAwareController
   def new
     authorize! :create, FundingBucket
 
+    add_breadcrumb 'Funding Programs', funding_sources_path
+    add_breadcrumb 'Templates', funding_templates_path
+    add_breadcrumb 'Buckets', funding_buckets_path
     add_breadcrumb 'New', new_funding_bucket_path
 
     if @bucket_proxy.present?
@@ -106,9 +111,6 @@ class FundingBucketsController < OrganizationAwareController
 
   # GET /buckets/1/edit
   def edit
-    authorize! :edit, FundingBucket
-
-    @programs = FundingSource.all
   end
 
   # POST /buckets
@@ -198,12 +200,10 @@ class FundingBucketsController < OrganizationAwareController
 
   # PATCH/PUT /buckets/1
   def update
-    @programs = FundingSource.all
   end
 
   # DELETE /buckets/1
   def destroy
-    @programs = FundingSource.all
   end
 
   def find_organizations_from_template_id
@@ -345,7 +345,8 @@ class FundingBucketsController < OrganizationAwareController
         existing_bucket.updator = current_user
         existing_bucket.save
       else
-        bucket.save
+        puts bucket.inspect
+        bucket.save!
       end
     end
   end

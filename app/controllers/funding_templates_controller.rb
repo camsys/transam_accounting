@@ -2,7 +2,7 @@ class FundingTemplatesController < OrganizationAwareController
 
   authorize_resource
 
-  add_breadcrumb 'Funding Programs', :funding_sources_path
+  add_breadcrumb "Home", :root_path
 
   before_action :set_funding_template, only: [:show, :edit, :update, :destroy]
   before_action :check_filter,      :only => [:index, :show, :new, :edit]
@@ -12,6 +12,7 @@ class FundingTemplatesController < OrganizationAwareController
   # GET /funding_templates
   def index
 
+    add_breadcrumb 'Funding Programs', funding_sources_path
     add_breadcrumb 'Templates', funding_templates_path
 
 
@@ -60,6 +61,11 @@ class FundingTemplatesController < OrganizationAwareController
 
   # GET /funding_templates/new
   def new
+
+    add_breadcrumb 'Funding Programs', funding_sources_path
+    add_breadcrumb 'Templates', funding_templates_path
+    add_breadcrumb 'New', new_funding_template_path
+
     @funding_template = FundingTemplate.new(:funding_source_id => params[:funding_source_id])
 
     if @funding_template.funding_source.present?
