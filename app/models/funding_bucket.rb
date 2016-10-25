@@ -75,7 +75,7 @@ class FundingBucket< ActiveRecord::Base
         orgs = funding_template.organizations
       else
         grantor = Grantor.first
-        orgs =  Organization.where(" id <> #{grantor.id} AND active = true").pluck(:id, :name)
+        orgs =  Organization.where(" id <> #{grantor.id} AND active = true")
       end
       orgs.each { |o| org_ids << o.id }
       values << org_ids
