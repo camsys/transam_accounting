@@ -69,10 +69,15 @@ class FundingBucket< ActiveRecord::Base
       funding_template = FundingTemplate.find_by(id: funding_template_id)
 
       conditions << 'owner_id IN (?)'
+      orgs = []
       org_ids = []
-      funding_template.organizations.each { |o| org_ids << o.id }
-
-
+      if(funding_template.organizations.length > 0)
+        orgs = funding_template.organizations
+      else
+        grantor = Grantor.first
+        orgs =  Organization.where(" id <> #{grantor.id} AND active = true").pluck(:id, :name)
+      end
+      orgs.each { |o| org_ids << o.id }
       values << org_ids
     else
       conditions << 'owner_id = ?'
