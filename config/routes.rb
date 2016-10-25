@@ -20,7 +20,11 @@ Rails.application.routes.draw do
     resources :documents
   end
 
-  resources :funding_templates
+  resources :funding_templates do
+    collection do
+      get 'find_match_required_from_funding_source_id'
+    end
+  end
 
   resources :grants do
     member do

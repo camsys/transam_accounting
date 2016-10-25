@@ -78,3 +78,23 @@
   $.validator.addMethod('PercentThreeDigits', function(value, element) {
       return this.optional(element) || /^\d*(\.\d{0,3})?$/.test(value);
   }, "Please enter a correct percent up to three decimal places.");
+
+  $('#funding_template_funding_source_id').change(function(){
+    console.log("funding_template_funding_source_id.value =");
+    console.log(funding_template_funding_source_id.value);
+
+    if (funding_template_funding_source_id.value > 0)
+    {
+      var url = '#{find_match_required_from_funding_source_id_funding_templates_path}';
+      $.ajax({
+        url: url,
+        data: {funding_source_id: funding_template_funding_source_id.value},
+        success: function(result){
+         funding_template_funding_source_id.value = result;
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+          }
+        });
+    };
+  });

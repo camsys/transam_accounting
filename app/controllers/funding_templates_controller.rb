@@ -69,6 +69,8 @@ class FundingTemplatesController < OrganizationAwareController
     @funding_template = FundingTemplate.new(:funding_source_id => params[:funding_source_id])
 
     if @funding_template.funding_source.present?
+      # @funding_template.match_required = @funding_template.funding_source.match_required
+
       add_breadcrumb @funding_template.funding_source.to_s, funding_source_path(@funding_template.funding_source)
       add_breadcrumb "#{@funding_template.funding_source} Templates", funding_templates_path(:funding_source_id => params[:funding_source_id])
     else
@@ -143,6 +145,15 @@ class FundingTemplatesController < OrganizationAwareController
     funding_source = @funding_template.funding_source
     @funding_template.destroy
     redirect_to funding_source_path(funding_source), notice: 'Template was successfully destroyed.'
+  end
+
+  def find_match_required_from_funding_source_id
+    funding_source_id = params[:funding_source_id]
+    result = FundingSource.find_by(id: funding_source_id).match_required
+
+    respond_to do |format|
+      format.json { render json: result.to_json }
+    end
   end
 
   protected
