@@ -253,52 +253,59 @@
     $('#funding_bucket_proxy_fiscal_year_range_start').empty();
     $('#funding_bucket_proxy_fiscal_year_range_end').empty();
     var url = '#{find_template_based_fiscal_year_range_funding_buckets_path}';
-
-    $.ajax({
-      url: url,
-      data: {program_id: funding_bucket_proxy_program_id.value},
-      success: function(result){
-        //Add a blank entry to the list.
-        $("#funding_bucket_proxy_fiscal_year_range_start").append( $("<option></option>").attr("value", "").text(''));
-        $("#funding_bucket_proxy_fiscal_year_range_end").append( $("<option></option>").attr("value", "").text(''));
-        for(i = 0;i<result.length;i++){
-          //add an option for each organizations available to the tempalte
-          $("#funding_bucket_proxy_fiscal_year_range_start").append(
-              $("<option></option>").attr("value", result[i][1]).text(result[i][0])
-          );
-          $("#funding_bucket_proxy_fiscal_year_range_end").append(
-              $("<option></option>").attr("value", result[i][1]).text(result[i][0])
-          );
-        }
-      },
-      error: function (xhr, ajaxOptions, thrownError) {
-        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
-        }
-      });
+    if (funding_bucket_proxy_program_id.value > 0)
+    {
+      $.ajax({
+        url: url,
+        data: {program_id: funding_bucket_proxy_program_id.value},
+        success: function(result){
+          //Add a blank entry to the list.
+          $("#funding_bucket_proxy_fiscal_year_range_start").append( $("<option></option>").attr("value", "").text(''));
+          $("#funding_bucket_proxy_fiscal_year_range_end").append( $("<option></option>").attr("value", "").text(''));
+          for(i = 0;i<result.length;i++){
+            //add an option for each organizations available to the tempalte
+            $("#funding_bucket_proxy_fiscal_year_range_start").append(
+                $("<option></option>").attr("value", result[i][1]).text(result[i][0])
+            );
+            $("#funding_bucket_proxy_fiscal_year_range_end").append(
+                $("<option></option>").attr("value", result[i][1]).text(result[i][0])
+            );
+          }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+          }
+        });
+    }
   }
 
   function update_expected_escalation_percent()
   {
-    var url = '#{find_expected_escalation_percent_funding_buckets_path}';
-    $.ajax({
-      url: url,
-      data: {program_id: funding_bucket_proxy_program_id.value},
-      success: function(result){
-        funding_bucket_proxy_inflation_percentage.value = result;
-      },
-      error: function (xhr, ajaxOptions, thrownError) {
-        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
-        }
-      });
-
+    if (funding_bucket_proxy_program_id.value > 0)
+    {
+      var url = '#{find_expected_escalation_percent_funding_buckets_path}';
+      $.ajax({
+        url: url,
+        data: {program_id: funding_bucket_proxy_program_id.value},
+        success: function(result){
+          funding_bucket_proxy_inflation_percentage.value = result;
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+          }
+        });
+    }else{
+      funding_bucket_proxy_inflation_percentage.value = 0;
+    }
   }
+
   function before_submit_bucket_check(){
     event.preventDefault();
 
     $('.bucket_form').valid();
 
     var url = ''
-    if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
+    if($('funding_bucket_proxy_create_option_create').is(':checked')) {
       url = '#{find_existing_buckets_for_create_funding_buckets_path}'
     }else if ($('#funding_bucket_proxy_create_option_update').is(':checked')) {
       url = '#{find_number_of_missing_buckets_for_update_funding_buckets_path}'
@@ -352,51 +359,67 @@
 
   $('#funding_bucket_proxy_template_id').change(function(){
     remove_all_agencies_fields();
-    var url = '#{find_organizations_from_template_id_funding_buckets_path}';
-    $.ajax({
-      url: url,
-      data: {template_id: funding_bucket_proxy_template_id.value},
-      success: function(result){
-        agencies = result
-        $('#funding_bucket_proxy_owner_id').empty();
-        $('#owner_id_div_id').show();
-        //Add a blank entry to the list.
-        $("#funding_bucket_proxy_owner_id").append( $("<option></option>").attr("value", "").text(''));
-        for(i = 0;i<result.length;i++){
-          //add an option for each organizations available to the tempalte
-          $("#funding_bucket_proxy_owner_id").append(
-              $("<option></option>").attr("value", result[i][0]).text(result[i][1])
-          );
-        }
-      },
-      error: function (xhr, ajaxOptions, thrownError) {
-        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
-        }
-      });
+
+    if (funding_bucket_proxy_template_id.value > 0)
+    {
+      var url = '#{find_organizations_from_template_id_funding_buckets_path}';
+      $.ajax({
+        url: url,
+        data: {template_id: funding_bucket_proxy_template_id.value},
+        success: function(result){
+          agencies = result
+          $('#funding_bucket_proxy_owner_id').empty();
+          $('#owner_id_div_id').show();
+          //Add a blank entry to the list.
+          $("#funding_bucket_proxy_owner_id").append( $("<option></option>").attr("value", "").text(''));
+          for(i = 0;i<result.length;i++){
+            //add an option for each organizations available to the tempalte
+            $("#funding_bucket_proxy_owner_id").append(
+                $("<option></option>").attr("value", result[i][0]).text(result[i][1])
+            );
+          }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+          }
+        });
+    }else{
+      $('#funding_bucket_proxy_owner_id').empty();
+      $('#owner_id_div_id').hide();
+    }
   });
 
   $('#funding_bucket_proxy_program_id').change(function(){
     remove_all_agencies_fields();
     update_fiscal_year_range();
-    var url = '#{find_templates_from_program_id_funding_buckets_path}';
-    $.ajax({
-      url: url,
-      data: {program_id: funding_bucket_proxy_program_id.value},
-      success: function(result){
-        $('#template_id_div_id').show();
-        $('#funding_bucket_proxy_template_id').empty();
-        $('#funding_bucket_proxy_owner_id').empty();
-        //Add a blank entry to the list
-        $("#funding_bucket_proxy_template_id").append( $("<option></option>").attr("value", -1).text(''));
-        for(i = 0;i<result.length;i++){
-          //add in option for each template available to the program
-          $("#funding_bucket_proxy_template_id").append(
-              $("<option></option>").attr("value", result[i][0]).text(result[i][1])
-          );
-        }
-      },
-      error: function (xhr, ajaxOptions, thrownError) {
-        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
-        }
-      });
+    $("#escalate_by_div_id").hide();
+    if (funding_bucket_proxy_program_id.value > 0)
+    {
+      var url = '#{find_templates_from_program_id_funding_buckets_path}';
+      $.ajax({
+        url: url,
+        data: {program_id: funding_bucket_proxy_program_id.value},
+        success: function(result){
+          $('#template_id_div_id').show();
+          $('#funding_bucket_proxy_template_id').empty();
+          $('#funding_bucket_proxy_owner_id').empty();
+          //Add a blank entry to the list
+          $("#funding_bucket_proxy_template_id").append( $("<option></option>").attr("value", -1).text(''));
+          for(i = 0;i<result.length;i++){
+            //add in option for each template available to the program
+            $("#funding_bucket_proxy_template_id").append(
+                $("<option></option>").attr("value", result[i][0]).text(result[i][1])
+            );
+          }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+          }
+        });
+    }else{
+      $('#template_id_div_id').hide();
+      $('#funding_bucket_proxy_template_id').empty();
+      $('#funding_bucket_proxy_owner_id').empty();
+    }
+
   });

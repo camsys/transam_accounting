@@ -77,16 +77,15 @@ class FundingBucketsController < OrganizationAwareController
 
   # GET /buckets/1
   def show
+    if params[:id].present?
+      @funding_bucket = FundingBucket.find_by(object_key: params[:id])
 
-    @funding_bucket = FundingBucket.find_by(object_key: params[:id])
+      authorize! :read, @funding_bucket
 
-    authorize! :read, @funding_bucket
-
-    add_breadcrumb @funding_bucket.funding_template.funding_source.name, funding_source_path(@funding_bucket.funding_template.funding_source)
-    add_breadcrumb @funding_bucket.funding_template.name, funding_template_path(@funding_bucket.funding_template)
-    add_breadcrumb @funding_bucket.to_s, funding_bucket_path(@funding_bucket)
-
-
+      add_breadcrumb @funding_bucket.funding_template.funding_source.name, funding_source_path(@funding_bucket.funding_template.funding_source)
+      add_breadcrumb @funding_bucket.funding_template.name, funding_template_path(@funding_bucket.funding_template)
+      add_breadcrumb @funding_bucket.to_s, funding_bucket_path(@funding_bucket)
+    end
   end
 
   # GET /buckets/new
