@@ -85,10 +85,6 @@ class FundingBucket< ActiveRecord::Base
     end
 
     conditions << 'active = true'
-
-    puts conditions.inspect
-    puts values.inspect
-    puts values.inspect
     existing_buckets = FundingBucket.where(conditions.join(' AND '), *values)
 
     return existing_buckets
