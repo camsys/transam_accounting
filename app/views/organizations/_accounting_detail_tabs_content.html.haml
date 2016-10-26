@@ -1,4 +1,4 @@
-- buckets = FundingBucket.where(owner_id: @org.id)
+- buckets = FundingBucket.active.where(owner_id: @org.id)
 - unless buckets.empty?
   .tab-pane.fade#buckets
     .tab-content

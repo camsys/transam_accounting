@@ -1,4 +1,4 @@
 %li
   %a{:href => "#buckets", :data =>{:toggle => 'tab'}}
-    %span.badge.pull-right= FundingBucket.where(owner_id: @org.id).count
+    %span.badge.pull-right= FundingBucket.active.where(owner_id: @org.id).count
     = "Buckets"
