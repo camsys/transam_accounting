@@ -30,9 +30,9 @@
         %th.center{:data => {:sortable => 'true'}} Program (Template)
       %th.center{:data => {:sortable => 'true'}} Type
       %th.center{:data => {:sortable => 'true'}} Owner
-      %th.center{:data => {:sortable => 'true'}} Total
-      %th.center{:data => {:sortable => 'true'}} Committed
-      %th.center{:data => {:sortable => 'true'}} Available
+      %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Total
+      %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Committed
+      %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Available
       %th.center{:data => {:sortable => 'true'}} Expires
 
   %tbody
@@ -47,9 +47,9 @@
           %td.left= b.owner.name
         -else
           %td.left= state
-        %td.left= format_as_currency(b.budget_amount)
-        %td.left= format_as_currency(b.budget_committed)
-        %td.left= format_as_currency(b.budget_remaining)
+        %td.left= b.budget_amount
+        %td.left= b.budget_committed
+        %td.left= b.budget_remaining
         -unless b.funding_template.funding_source.life_in_years.nil?
           %td.left= b.fiscal_year + b.funding_template.funding_source.life_in_years
         -else
@@ -58,9 +58,18 @@
 = render :partial => 'shared/table_scripts', :locals => {:table_id => table_dom_id, :path_pattern => funding_bucket_path("xxx")}
 
 :javascript
+  function percentage_formatter(value) {
+    if (value == "") {
+      return value;
+    } else {
+      return format("$"+"##0.00", value);
+    }
+  };
+
   $('#' + '#{table_dom_id}').on('post-body.bs.table', function () {
     $('.transam-popover').popover({
       trigger: 'hover'
     });
     $('.transam-tooltip').tooltip();
   });
+
