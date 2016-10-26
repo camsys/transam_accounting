@@ -38,7 +38,7 @@ class FundingBucket< ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   # Allow selection of active instances
-  scope :active, -> { where(bucket_id: FundingSource.active.ids) }
+  scope :active, -> { where(:active => true) }
 
   #------------------------------------------------------------------------------
   #
