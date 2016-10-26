@@ -178,13 +178,16 @@ class FundingBucketsController < OrganizationAwareController
       create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, create_conflict_option, 'Create')
     else
       bucket = new_bucket_from_proxy(bucket_proxy)
-      agencies = bucket.funding_template.organizations
+      organizations = find_organizations(bucket_proxy.template_id)
 
-      agencies.each { |aa|
-        bucket = new_bucket_from_proxy(bucket_proxy, aa.id)
-        bucket.budget_amount = params["agency_budget_id_#{aa.id}".parameterize.underscore.to_sym].to_d
-        # bucket_proxy inflation percentage could be modified the same way
-        create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, create_conflict_option, 'Create', aa.id,)
+
+      organizations.each { |org|
+        unless org[0] < 0
+          bucket = new_bucket_from_proxy(bucket_proxy, org[0])
+          bucket.budget_amount = params["agency_budget_id_#{org[0]}".parameterize.underscore.to_sym].to_d
+          # bucket_proxy inflation percentage could be modified the same way
+          create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, create_conflict_option, 'Create', org[0],)
+        end
       }
 
     end
@@ -197,13 +200,15 @@ class FundingBucketsController < OrganizationAwareController
       create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, 'Update',  update_conflict_option)
     else
       bucket = new_bucket_from_proxy(bucket_proxy)
-      agencies = bucket.funding_template.organizations
+      organizations = find_organizations(bucket_proxy.template_id)
 
-      agencies.each { |aa|
-        bucket = new_bucket_from_proxy(bucket_proxy, aa.id)
-        bucket.budget_amount = params["agency_budget_id_#{aa.id}".parameterize.underscore.to_sym].to_d
-        # bucket_proxy inflation percentage could be modified the same way
-        create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, 'Update', update_conflict_option, aa.id,)
+      organizations.each { |org|
+        unless org[0] < 0
+          bucket = new_bucket_from_proxy(bucket_proxy, org[0])
+          bucket.budget_amount = params["agency_budget_id_#{org[0]}".parameterize.underscore.to_sym].to_d
+          # bucket_proxy inflation percentage could be modified the same way
+          create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, 'Update', update_conflict_option, org[0],)
+        end
       }
 
     end
@@ -218,9 +223,18 @@ class FundingBucketsController < OrganizationAwareController
   end
 
   def find_organizations_from_template_id
+    template_id = params[:template_id]
+    result = [[-1,'All Agencies For This Template']] + find_organizations(template_id)
+
+    @template_organizations = result
+    respond_to do |format|
+      format.json { render json: result.to_json }
+    end
+  end
+
+  def find_organizations(template_id)
     result = []
     @bucket_agency_allocations = []
-    template_id = params[:template_id]
 
     template = FundingTemplate.find_by(id: template_id)
     if template.owner == FundingSourceType.find_by(name: 'State')
@@ -241,13 +255,10 @@ class FundingBucketsController < OrganizationAwareController
         organizations =  Organization.where(" id <> #{grantor.id} AND active = true").pluck(:id, :name)
       end
 
-      result = [[-1,'All Agencies For This Template']] + organizations
+      result = organizations
     end
 
-    @template_organizations = result
-    respond_to do |format|
-      format.json { render json: result.to_json }
-    end
+    result
   end
 
   def find_templates_from_program_id
