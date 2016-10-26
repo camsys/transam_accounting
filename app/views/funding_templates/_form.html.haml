@@ -58,10 +58,7 @@
 
   // jquery validations
   $('.funding_template_form').validate({
-    ignore: '#funding_template_organization_ids, .filter-input, .filtered',
-    submitHandler: function(form) {
-      form.submit();
-    }
+    ignore: '#funding_template_organization_ids, .filter-input, .filtered'
   });
 
   $( "#funding_template_match_required" ).rules( "add", {
