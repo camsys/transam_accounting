@@ -69,7 +69,7 @@ class FundingTemplatesController < OrganizationAwareController
     @funding_template = FundingTemplate.new(:funding_source_id => params[:funding_source_id])
 
     if @funding_template.funding_source.present?
-      # @funding_template.match_required = @funding_template.funding_source.match_required
+      @funding_template.match_required = @funding_template.funding_source.match_required
 
       add_breadcrumb @funding_template.funding_source.to_s, funding_source_path(@funding_template.funding_source)
       add_breadcrumb "#{@funding_template.funding_source} Templates", funding_templates_path(:funding_source_id => params[:funding_source_id])

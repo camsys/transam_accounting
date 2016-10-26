@@ -90,7 +90,7 @@
         url: url,
         data: {funding_source_id: funding_template_funding_source_id.value},
         success: function(result){
-         funding_template_funding_source_id.value = result;
+         funding_template_match_required.value = result;
         },
         error: function (xhr, ajaxOptions, thrownError) {
           alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
