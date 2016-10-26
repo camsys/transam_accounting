@@ -292,7 +292,6 @@ class FundingBucketsController < OrganizationAwareController
   def find_expected_escalation_percent
     program_id = params[:program_id]
     result = FundingSource.find_by(id: program_id).inflation_rate
-    @templates = result
 
     respond_to do |format|
       format.json { render json: result.to_json }
