@@ -50,7 +50,8 @@
       %tr
         %td.left= f.object_key
         - if show_actions == 1
-          %td.left= f.funding_source.to_s
+          %td.left{data: {tableexport: {msonumberformat: "\\@"}}}
+            = f.funding_source.to_s
         %td.left{data: {tableexport: {value: "#{f.name}"}}}
           %span.hidden= f.name
           = link_to(f.name, funding_template_path(f))
