@@ -1,6 +1,6 @@
 class FundingTemplatesController < OrganizationAwareController
 
-  authorize_resource
+  authorize_resource :except => :find_match_required_from_funding_source_id
 
   add_breadcrumb "Home", :root_path
 
