@@ -57,6 +57,11 @@ class FundingTemplatesController < OrganizationAwareController
     add_breadcrumb @funding_template.funding_source.to_s, funding_source_path(@funding_template.funding_source)
     add_breadcrumb @funding_template.to_s, funding_template_path(@funding_template)
 
+    # get the @prev_record_path and @next_record_path view vars
+    get_next_and_prev_object_keys(@funding_template, INDEX_KEY_LIST_VAR)
+    @prev_record_path = @prev_record_key.nil? ? "#" : funding_template_path(@prev_record_key)
+    @next_record_path = @next_record_key.nil? ? "#" : funding_template_path(@next_record_key)
+
   end
 
   # GET /funding_templates/new
