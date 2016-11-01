@@ -51,7 +51,7 @@
         %td.left= b.budget_committed
         %td.left= b.budget_remaining
         -unless b.funding_template.funding_source.life_in_years.nil?
-          %td.left= b.fiscal_year + b.funding_template.funding_source.life_in_years
+          %td.left= format_as_fiscal_year(b.fiscal_year + b.funding_template.funding_source.life_in_years)
         -else
           %td.left= 1
 
