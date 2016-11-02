@@ -10,7 +10,7 @@ class RemoveAllOrganizationsColumnsAndAddSqlQueryColumn < ActiveRecord::Migratio
 
       all_templates.each { |t|
         if t.all_organizations
-          t.query_string = 'id > 0'
+          t.query_string = TransitOperator.all.to_sql
           t.save
         end
       }
