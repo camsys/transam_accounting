@@ -41,7 +41,7 @@
         %th.center{:data => {:sortable => 'true'}}= type.name
 
       %th.center{:data => {:sortable => 'true'}} Recurring
-      %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Pcnt Match
+      %th.center{:data => {:sortable => 'true', :formatter => 'pcnt_formatter'}} Pcnt Match
 
       %th
 
@@ -86,7 +86,7 @@
     $('.transam-tooltip').tooltip();
   });
 
-  function percentage_formatter(value) {
+  function pcnt_formatter(value) {
     if (value == "") {
       return value;
     } else {
