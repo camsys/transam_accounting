@@ -53,7 +53,7 @@
   .state_or_single_agency_budget{:id => "state_or_single_agency_budget_id"}
     .row
       .col-sm-8
-        = f.input :total_amount, :label => 'Budget', :required => true
+        = f.input :total_amount, :label => 'Budget ($)', :required => true
 
   .all_agencies_covered_by_template_group{:id => "all_agencies_covered_by_template_group_id"}
     .col-sm-8
@@ -189,7 +189,7 @@
         var add_to = "#all_agencies_covered_by_template_id"
         id = agencies[i][0];
         name = agencies[i][1]
-        var new_label = '<label id="agency_label_' + id + '" name="agency_label' + name + '" type="text">'+name;
+        var new_label = '<label id="agency_label_' + id + '" name="agency_label' + name + '" type="text">'+name+' Budget ($)';
         var new_in = '<input autocomplete="off" class="input form-control agency_budget" id="' + id + '" name="agency_budget_id_' + id + '" label="' + id + '" type="text">';
         var new_input = $(new_in);
         $(add_to).before(new_label)
