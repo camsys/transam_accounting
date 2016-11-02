@@ -57,7 +57,7 @@
         -unless b.funding_template.funding_source.life_in_years.nil?
           %td.left= format_as_fiscal_year(b.fiscal_year + b.funding_template.funding_source.life_in_years)
         -else
-          %td.left= 1
+          %td.left= '&infin;'.html_safe
 
         %td.center.nowrap
           = link_to funding_bucket_path(b) do
