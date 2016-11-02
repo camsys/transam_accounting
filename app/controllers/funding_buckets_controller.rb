@@ -3,6 +3,7 @@ class FundingBucketsController < OrganizationAwareController
 
   add_breadcrumb "Home", :root_path
 
+  before_action :set_funding_bucket, only: [:show, :edit, :update]
   before_action :check_filter,      :only => [:index, :show, :new, :edit]
 
   INDEX_KEY_LIST_VAR    = "funding_buckets_key_list_cache_var"
@@ -77,15 +78,11 @@ class FundingBucketsController < OrganizationAwareController
 
   # GET /buckets/1
   def show
-    if params[:id].present?
-      @funding_bucket = FundingBucket.find_by(object_key: params[:id])
+    authorize! :read, @funding_bucket
 
-      authorize! :read, @funding_bucket
-
-      add_breadcrumb @funding_bucket.funding_template.funding_source.name, funding_source_path(@funding_bucket.funding_template.funding_source)
-      add_breadcrumb @funding_bucket.funding_template.name, funding_template_path(@funding_bucket.funding_template)
-      add_breadcrumb @funding_bucket.to_s, funding_bucket_path(@funding_bucket)
-    end
+    add_breadcrumb @funding_bucket.funding_template.funding_source.name, funding_source_path(@funding_bucket.funding_template.funding_source)
+    add_breadcrumb @funding_bucket.funding_template.name, funding_template_path(@funding_bucket.funding_template)
+    add_breadcrumb @funding_bucket.to_s, funding_bucket_path(@funding_bucket)
   end
 
   # GET /buckets/new
@@ -122,6 +119,8 @@ class FundingBucketsController < OrganizationAwareController
 
   # GET /buckets/1/edit
   def edit
+    authorize! :update, @funding_bucket
+
   end
 
   # POST /buckets
@@ -216,6 +215,18 @@ class FundingBucketsController < OrganizationAwareController
 
   # PATCH/PUT /buckets/1
   def update
+    authorize! :update, @funding_bucket
+
+    respond_to do |format|
+      if @funding_bucket.update(bucket_params)
+        notify_user(:notice, "The bucket was successfully updated.")
+        format.html { redirect_to :back }
+        format.json { head :no_content }
+      else
+        format.html { render action: 'edit' }
+        format.json { render json: @funding_bucket.errors, status: :unprocessable_entity }
+      end
+    end
   end
 
   # DELETE /buckets/1
@@ -322,6 +333,13 @@ class FundingBucketsController < OrganizationAwareController
 
   private
   # Use callbacks to share common setup or constraints between actions.
+  def set_funding_bucket
+    @funding_bucket = FundingBucket.find_by(object_key: params[:id])
+  end
+
+  def bucket_params
+    params.require(:funding_bucket).permit(FundingBucket.allowable_params)
+  end
 
   # Only allow a trusted parameter "white list" through.
   def bucket_proxy_params

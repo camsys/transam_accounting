@@ -35,6 +35,10 @@
       %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Available
       %th.center{:data => {:sortable => 'true'}} Expires
 
+      %th
+      - if can? :update, FundingBucket
+        %th
+
   %tbody
     - buckets.each do |b|
       %tr{:id => b.object_key, :class => 'action-path'}
@@ -55,7 +59,15 @@
         -else
           %td.left= 1
 
-= render :partial => 'shared/table_scripts', :locals => {:table_id => table_dom_id, :path_pattern => funding_bucket_path("xxx")}
+        %td.center.nowrap
+          = link_to funding_bucket_path(b) do
+            %i.fa.fa-info-circle.fa-1-5x
+        - if can? :update, b
+          %td.center.nowrap
+            = link_to edit_funding_bucket_path(b), :remote => true do
+              %i.fa.fa-edit.fa-1-5x.text-success
+
+= render 'shared/table_formatters'
 
 :javascript
   function percentage_formatter(value) {

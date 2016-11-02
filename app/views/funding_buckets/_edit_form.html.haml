@@ -1,0 +1,22 @@
+= simple_form_for(@funding_bucket,
+  :html => {:class => 'form-vertical funding_bucket_form' },
+  :wrapper => :vertical_form,
+  :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
+
+  .row
+    .col-sm-6
+      = f.input :budget_amount, :wrapper=> :vertical_prepend, :label => "Budget ($)" do
+        %span.input-group-addon
+          %i.fa.fa-usd
+        = f.input_field :budget_amount, :required => true, :input_html => {:min => 0, :integer => true}, :class => "form-control"
+
+  = f.button :submit, 'Save', :class => "btn btn-primary"
+
+:javascript
+
+  // jquery validations
+  $('.funding_bucket_form').validate({
+    submitHandler: function(form) {
+      form.submit();
+    }
+  });

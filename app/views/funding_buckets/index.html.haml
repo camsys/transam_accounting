@@ -1,3 +1,5 @@
 .row
   .col-md-12
     = render :partial => 'index_table', :locals => {:buckets => @buckets, :show_actions => 1}
+
+.modal.fade#form-modal{:tabindex => -1, :role => 'dialog', :aria => {:hidden => true}}
