@@ -96,20 +96,17 @@ class FundingTemplatesController < OrganizationAwareController
   def create
     @funding_template = FundingTemplate.new(funding_template_params.except(:organization_ids))
 
-    all_organizations = params[:all_organizations]
-
-    if all_organizations
-      @funding_template.query_string = 'id > 0'
-    else
-      # TODO one day this may not be the desired behavior when editing a template because there will be other suery_strings that could apply
-      @funding_template.query_string = nil
-    end
-
     if @funding_template.save
 
-      org_list = funding_template_params[:organization_ids].split(',').uniq
-      org_list.each do |id|
-        @funding_template.organizations << Organization.find(id)
+      if params[:query].to_i > 0
+        @funding_template.query_string = QueryParam.find(params[:query].to_i).try(:query_string)
+      else
+        @funding_template.query_string = nil
+
+        org_list = funding_template_params[:organization_ids].split(',').uniq
+        org_list.each do |id|
+          @funding_template.organizations << Organization.find(id)
+        end
       end
 
       redirect_to @funding_template, notice: 'Funding template was successfully created.'
@@ -122,21 +119,21 @@ class FundingTemplatesController < OrganizationAwareController
   def update
     if @funding_template.update(funding_template_params.except(:organization_ids))
 
-      all_organizations = params[:all_organizations]
+      if params[:query].to_i > 0
+        @funding_template.query_string = QueryParam.find(params[:query].to_i).try(:query_string)
 
-      if all_organizations
-        @funding_template.query_string = 'id > 0'
+        # clear the existing list of organizations
+        @funding_template.organizations.clear
       else
-        # TODO one day this may not be the desired behavior when editing a template because there will be other suery_strings that could apply
         @funding_template.query_string = nil
-      end
 
-      # clear the existing list of organizations
-      @funding_template.organizations.clear
-      # Add the (possibly) new organizations into the object
-      org_list = funding_template_params[:organization_ids].split(',')
-      org_list.each do |id|
-        @funding_template.organizations << Organization.find(id)
+        # clear the existing list of organizations
+        @funding_template.organizations.clear
+        # Add the (possibly) new organizations into the object
+        org_list = funding_template_params[:organization_ids].split(',')
+        org_list.each do |id|
+          @funding_template.organizations << Organization.find(id)
+        end
       end
 
       redirect_to @funding_template, notice: 'Funding template was successfully updated.'

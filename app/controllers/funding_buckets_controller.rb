@@ -252,7 +252,7 @@ class FundingBucketsController < OrganizationAwareController
         }
       else
         grantor = Grantor.first
-        organizations =  Organization.where(" id <> #{grantor.id} AND active = true").pluck(:id, :name)
+        organizations =  Organization.find_by_sql(template.query_string).map{|x| [x.id, x.name]}
       end
 
       result = organizations
