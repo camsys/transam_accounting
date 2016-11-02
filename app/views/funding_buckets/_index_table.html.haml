@@ -20,16 +20,18 @@
   :toolbar => "#buckets_table_actions",
   :export_types => "['csv', 'txt', 'excel']",
   :show_export => 'true',
-  :show_columns => 'true'}, :style => 'width:100%;'}
+  :show_columns => 'true',
+  :show_multi_sort => 'true',
+  :sort_priority => '[{"sortName": "bucket_fy","sortOrder":"asc"},{"sortName":"bucket_owner","sortOrder":"asc"}]'}, :style => 'width:100%;'}
 
   %thead
     %tr
       %th.center{:data => {:visible => 'false'}} Object Key
-      %th.center{:data => {:sortable => 'true'}} FY
+      %th.center{:data => {:field => 'bucket_fy', :sortable => 'true'}} FY
       - if @funding_template.nil?
         %th.center{:data => {:sortable => 'true'}} Program (Template)
       %th.center{:data => {:sortable => 'true'}} Type
-      %th.center{:data => {:sortable => 'true'}} Owner
+      %th.center{:data => {:field => 'bucket_owner', :sortable => 'true'}} Owner
       %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Total
       %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Committed
       %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Available
