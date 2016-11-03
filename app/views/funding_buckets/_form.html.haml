@@ -289,7 +289,9 @@
               $("#update_conflict_option_div_id").show();
               $("#create_conflict_option_div_id").hide();
               $('.bucket_form').valid();
-              alert(-1*result + " Buckets you are updating do not yet exist. Do you want to create these Buckets, skip these Buckets, or cancel this action?");
+
+              $('#form-modal').html(result.new_html);
+              $('#form-modal').modal('show');
             }
           }else if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
             if (result.length == 0 || $('#funding_bucket_proxy_create_conflict_option_update').is(':checked')|| $('#funding_bucket_proxy_create_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_create_conflict_option_cancel').is(':checked')) {
@@ -298,7 +300,9 @@
               $("#create_conflict_option_div_id").show();
               $("#update_conflict_option_div_id").hide();
               $('.bucket_form').valid();
-              alert(result.length + " of the Buckets you are creating already exist. Do you want to leave these Buckets untouched, change the dollar amount, or cancel this action?");
+
+              $('#form-modal').html(result.new_html);
+              $('#form-modal').modal('show');
             }
           };
         },
