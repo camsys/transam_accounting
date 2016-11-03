@@ -146,8 +146,8 @@
   });
 
   $.validator.addClassRules("agency_budget", {
-    required: true,
-    min: 0
+    require_from_group: [1, ".agency_budget"],
+    min: 1
   });
 
   $.validator.addMethod("FYRange", function(value, element) {
