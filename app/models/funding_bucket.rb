@@ -40,6 +40,12 @@ class FundingBucket< ActiveRecord::Base
   # Allow selection of active instances
   scope :active, -> { where(:active => true) }
 
+  # List of hash parameters allowed by the controller
+  FORM_PARAMS = [
+      :object_key,
+      :budget_amount
+  ]
+
   #------------------------------------------------------------------------------
   #
   # Class Methods

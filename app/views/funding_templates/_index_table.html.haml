@@ -41,7 +41,7 @@
         %th.center{:data => {:sortable => 'true'}}= type.name
 
       %th.center{:data => {:sortable => 'true'}} Recurring
-      %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Pcnt Match
+      %th.center{:data => {:sortable => 'true', :formatter => 'pcnt_formatter'}} Pcnt Match
 
       %th
 
@@ -50,7 +50,8 @@
       %tr
         %td.left= f.object_key
         - if show_actions == 1
-          %td.left= f.funding_source.to_s
+          %td.left{data: {tableexport: {msonumberformat: "\\@"}}}
+            = f.funding_source.to_s
         %td.left{data: {tableexport: {value: "#{f.name}"}}}
           %span.hidden= f.name
           = link_to(f.name, funding_template_path(f))
@@ -85,7 +86,7 @@
     $('.transam-tooltip').tooltip();
   });
 
-  function percentage_formatter(value) {
+  function pcnt_formatter(value) {
     if (value == "") {
       return value;
     } else {

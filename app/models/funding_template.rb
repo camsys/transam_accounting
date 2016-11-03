@@ -93,6 +93,6 @@ class FundingTemplate < ActiveRecord::Base
 
   def check_orgs_list
     # clear out orgs list if template is applicable to all orgs
-    self.organizations = [] if self.query_string == 'id > 0'
+    self.organizations = [] if self.query_string.present?
   end
 end

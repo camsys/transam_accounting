@@ -16,8 +16,8 @@
 
   = f.input :organization_ids, :as => :hidden
 
-  = check_box_tag(:all_organizations, 1,  @funding_template.query_string=='id > 0')
-  Available to All Agencies?
+  .form-group
+    = select_tag(:query, options_for_select(QueryParam.active.where(class_name: f.object.class.name).map{|x| [x.to_s,x.id]}), :class => "form-control", :prompt => "Choose Organizations")
 
   #org_select.input-large
 
@@ -42,26 +42,28 @@
 
 :javascript
 
-  if($('#all_organizations').prop('checked')) {
-      $("#org_select").hide();
-    } else {
-      $("#org_select").show();
-    }
+  // check if using query or selecting orgs
 
-  $('#all_organizations').change(function() {
-    if($(this).prop('checked')) {
-      $("#org_select").hide();
-    } else {
-      $("#org_select").show();
+  if (parseInt($('#query').val()) > 0) { // if query
+    $('#org_select').data().bootstrapTransfer.move_all(true, false); // clear out all selected values
+    $('#org_select').hide();
+  }  else {
+    $('#org_select').show();
+  }
+
+  $('#query').on('change', function(e) {
+    var val = $(this).val();
+    if (parseInt(val) > 0) { // if query
+      $('#org_select').data().bootstrapTransfer.move_all(true, false); // clear out all selected values
+      $('#org_select').hide();
+    }  else {
+      $('#org_select').show();
     }
   });
 
   // jquery validations
   $('.funding_template_form').validate({
-    ignore: '#funding_template_organization_ids, .filter-input, .filtered',
-    submitHandler: function(form) {
-      form.submit();
-    }
+    ignore: '#funding_template_organization_ids, .filter-input, .filtered'
   });
 
   $( "#funding_template_match_required" ).rules( "add", {

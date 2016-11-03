@@ -6,7 +6,7 @@
   - if can?(:create, FundingBucket)
     = link_to new_funding_bucket_path, :class => 'btn btn-default' do
       %i.fa.fa-edit.fa-fw
-      = "Modify Buckets"
+      = "Manage Buckets"
   - if show_actions == 1
     = render :partial => "funding_buckets/index_actions"
 
@@ -20,20 +20,26 @@
   :toolbar => "#buckets_table_actions",
   :export_types => "['csv', 'txt', 'excel']",
   :show_export => 'true',
-  :show_columns => 'true'}, :style => 'width:100%;'}
+  :show_columns => 'true',
+  :show_multi_sort => 'true',
+  :sort_priority => '[{"sortName": "bucket_fy","sortOrder":"asc"},{"sortName":"bucket_owner","sortOrder":"asc"}]'}, :style => 'width:100%;'}
 
   %thead
     %tr
       %th.center{:data => {:visible => 'false'}} Object Key
-      %th.center{:data => {:sortable => 'true'}} FY
+      %th.center{:data => {:field => 'bucket_fy', :sortable => 'true'}} FY
       - if @funding_template.nil?
         %th.center{:data => {:sortable => 'true'}} Program (Template)
       %th.center{:data => {:sortable => 'true'}} Type
-      %th.center{:data => {:sortable => 'true'}} Owner
+      %th.center{:data => {:field => 'bucket_owner', :sortable => 'true'}} Owner
       %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Total
       %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Committed
       %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Available
       %th.center{:data => {:sortable => 'true'}} Expires
+
+      %th
+      - if can? :update, FundingBucket
+        %th
 
   %tbody
     - buckets.each do |b|
@@ -51,11 +57,19 @@
         %td.left= b.budget_committed
         %td.left= b.budget_remaining
         -unless b.funding_template.funding_source.life_in_years.nil?
-          %td.left= b.fiscal_year + b.funding_template.funding_source.life_in_years
+          %td.left= format_as_fiscal_year(b.fiscal_year + b.funding_template.funding_source.life_in_years)
         -else
-          %td.left= 1
+          %td.left= '&infin;'.html_safe
 
-= render :partial => 'shared/table_scripts', :locals => {:table_id => table_dom_id, :path_pattern => funding_bucket_path("xxx")}
+        %td.center.nowrap
+          = link_to funding_bucket_path(b) do
+            %i.fa.fa-info-circle.fa-1-5x
+        - if can? :update, b
+          %td.center.nowrap
+            = link_to edit_funding_bucket_path(b), :remote => true do
+              %i.fa.fa-edit.fa-1-5x.text-success
+
+= render 'shared/table_formatters'
 
 :javascript
   function percentage_formatter(value) {

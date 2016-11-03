@@ -1,6 +1,6 @@
 class FundingTemplatesController < OrganizationAwareController
 
-  authorize_resource
+  authorize_resource :except => :find_match_required_from_funding_source_id
 
   add_breadcrumb "Home", :root_path
 
@@ -57,6 +57,11 @@ class FundingTemplatesController < OrganizationAwareController
     add_breadcrumb @funding_template.funding_source.to_s, funding_source_path(@funding_template.funding_source)
     add_breadcrumb @funding_template.to_s, funding_template_path(@funding_template)
 
+    # get the @prev_record_path and @next_record_path view vars
+    get_next_and_prev_object_keys(@funding_template, INDEX_KEY_LIST_VAR)
+    @prev_record_path = @prev_record_key.nil? ? "#" : funding_template_path(@prev_record_key)
+    @next_record_path = @next_record_key.nil? ? "#" : funding_template_path(@next_record_key)
+
   end
 
   # GET /funding_templates/new
@@ -91,20 +96,17 @@ class FundingTemplatesController < OrganizationAwareController
   def create
     @funding_template = FundingTemplate.new(funding_template_params.except(:organization_ids))
 
-    all_organizations = params[:all_organizations]
-
-    if all_organizations
-      @funding_template.query_string = 'id > 0'
-    else
-      # TODO one day this may not be the desired behavior when editing a template because there will be other suery_strings that could apply
-      @funding_template.query_string = nil
-    end
-
     if @funding_template.save
 
-      org_list = funding_template_params[:organization_ids].split(',').uniq
-      org_list.each do |id|
-        @funding_template.organizations << Organization.find(id)
+      if params[:query].to_i > 0
+        @funding_template.query_string = QueryParam.find(params[:query].to_i).try(:query_string)
+      else
+        @funding_template.query_string = nil
+
+        org_list = funding_template_params[:organization_ids].split(',').uniq
+        org_list.each do |id|
+          @funding_template.organizations << Organization.find(id)
+        end
       end
 
       redirect_to @funding_template, notice: 'Funding template was successfully created.'
@@ -117,21 +119,21 @@ class FundingTemplatesController < OrganizationAwareController
   def update
     if @funding_template.update(funding_template_params.except(:organization_ids))
 
-      all_organizations = params[:all_organizations]
+      if params[:query].to_i > 0
+        @funding_template.query_string = QueryParam.find(params[:query].to_i).try(:query_string)
 
-      if all_organizations
-        @funding_template.query_string = 'id > 0'
+        # clear the existing list of organizations
+        @funding_template.organizations.clear
       else
-        # TODO one day this may not be the desired behavior when editing a template because there will be other suery_strings that could apply
         @funding_template.query_string = nil
-      end
 
-      # clear the existing list of organizations
-      @funding_template.organizations.clear
-      # Add the (possibly) new organizations into the object
-      org_list = funding_template_params[:organization_ids].split(',')
-      org_list.each do |id|
-        @funding_template.organizations << Organization.find(id)
+        # clear the existing list of organizations
+        @funding_template.organizations.clear
+        # Add the (possibly) new organizations into the object
+        org_list = funding_template_params[:organization_ids].split(',')
+        org_list.each do |id|
+          @funding_template.organizations << Organization.find(id)
+        end
       end
 
       redirect_to @funding_template, notice: 'Funding template was successfully updated.'
