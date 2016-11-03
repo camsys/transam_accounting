@@ -13,17 +13,6 @@
       -elsif can? :update, FundingBucket
         = f.input :create_option, :as => :radio_buttons, :required => true, item_wrapper_class: 'inline', :label => "Option:", :collection => [ 'Create', 'Update']
 
-
-  .create_conflict_option_div{:id => "create_conflict_option_div_id"}
-    .row
-      .col-sm-8
-        = f.input :create_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Create Conflict Option:", :collection => [ 'Update', 'Ignore', 'Cancel' ]
-
-  .update_conflict_option_div{:id => "update_conflict_option_div_id"}
-    .row
-      .col-sm-8
-        = f.input :update_conflict_option, :as => :radio_buttons, :required => false, item_wrapper_class: 'inline', :label => "Update Conflict Option:", :collection => [ 'Create', 'Ignore', 'Cancel' ]
-
   .row
     .col-sm-8
       = f.input :program_id, :required => true, :collection => FundingSource.all, :include_blank => true, :label => "Program"
@@ -60,6 +49,8 @@
       .all_agencies_covered_by_template{:id => "all_agencies_covered_by_template_id"}
         .row
           .col-sm-8
+
+  .modal.fade#form-modal{:tabindex => -1, :role => 'dialog', :aria => {:hidden => true}}
 
   .row
     .col-sm-8
@@ -122,12 +113,14 @@
     };
   });
 
-  $("#create_conflict_option_div_id").hide();
-  $("#update_conflict_option_div_id").hide();
   $("#state_or_single_agency_budget_id").hide();
   $("#escalate_by_div_id").hide();
   $('#template_id_div_id').hide();
   $('#owner_id_div_id').hide();
+
+  $('#form-modal').on('hidden.bs.modal', function (e) {
+    $('#form-modal input').prop('checked', false);
+  })
 
   $('.bucket_form').validate({
     debug: true
@@ -286,8 +279,6 @@
             if (result.result_count == 0 || $('#funding_bucket_proxy_update_conflict_option_create').is(':checked')|| $('#funding_bucket_proxy_update_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_update_conflict_option_cancel').is(':checked')) {
               document.getElementById('new_funding_bucket_proxy').submit();
             }else{
-              $("#update_conflict_option_div_id").show();
-              $("#create_conflict_option_div_id").hide();
               $('.bucket_form').valid();
 
               $('#form-modal').html(result.new_html);
@@ -297,8 +288,6 @@
             if (result.result_count == 0 || $('#funding_bucket_proxy_create_conflict_option_update').is(':checked')|| $('#funding_bucket_proxy_create_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_create_conflict_option_cancel').is(':checked')) {
               document.getElementById('new_funding_bucket_proxy').submit();
             }else{
-              $("#create_conflict_option_div_id").show();
-              $("#update_conflict_option_div_id").hide();
               $('.bucket_form').valid();
 
               $('#form-modal').html(result.new_html);

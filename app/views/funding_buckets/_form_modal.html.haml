@@ -8,4 +8,24 @@
     .modal-body
       %div{:class => "alert alert-danger fade in #{bootstrap_class_for('danger')}"}
         = content_tag :div, msg, :id => "flash_danger"
+
+      .create_conflict_option_div{:id => "create_conflict_option_div_id", :style => (action == 'create' ? "" : "display:none;")}
+        .row
+          .col-sm-8
+            .form-group.radio_buttons
+
+              = collection_radio_buttons(:funding_bucket_proxy, :create_conflict_option, [ ['Update'], ['Ignore'], ['Cancel'] ], :first, :first) do |b|
+                .radio.inline
+                  = b.label { b.radio_button + b.text }
+
+      .update_conflict_option_div{:id => "update_conflict_option_div_id", :style => (action == 'update' ? "" : "display:none;")}
+        .row
+          .col-sm-8
+            .form-group.radio_buttons
+              = collection_radio_buttons(:funding_bucket_proxy, :update_conflict_option, [ ['Create'], ['Ignore'], ['Cancel'] ], :first, :first) do |b|
+                .radio.inline
+                  = b.label { b.radio_button + b.text }
+
       = render :partial => 'buckets_table', :locals => {:buckets => result, :compact_columns => 1}
+
+      = button_tag 'Submit', :type => 'button', :name => 'submit_conflict', :class=>"btn btn-primary", :onclick => "document.getElementById('new_funding_bucket_proxy').submit();"

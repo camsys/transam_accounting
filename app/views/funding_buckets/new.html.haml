@@ -5,5 +5,3 @@
       = render(:partial => 'shared/form_errors', :locals => {:obj => @bucket_proxy}) unless @bucket_proxy.errors.empty?
 
       = render 'form'
-
-.modal.fade#form-modal{:tabindex => -1, :role => 'dialog', :aria => {:hidden => true}}
