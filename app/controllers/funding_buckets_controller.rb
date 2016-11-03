@@ -203,10 +203,12 @@ class FundingBucketsController < OrganizationAwareController
 
       organizations.each { |org|
         unless org[0] < 0
-          bucket = new_bucket_from_proxy(bucket_proxy, org[0])
-          bucket.budget_amount = params["agency_budget_id_#{org[0]}".parameterize.underscore.to_sym].to_d
-          # bucket_proxy inflation percentage could be modified the same way
-          create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, 'Update', update_conflict_option, org[0],)
+          unless params["agency_budget_id_#{org[0]}"].blank?
+            bucket = new_bucket_from_proxy(bucket_proxy, org[0])
+            bucket.budget_amount = params["agency_budget_id_#{org[0]}".parameterize.underscore.to_sym].to_d
+            # bucket_proxy inflation percentage could be modified the same way
+            create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, 'Update', update_conflict_option, org[0],)
+          end
         end
       }
 
