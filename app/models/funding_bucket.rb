@@ -108,7 +108,7 @@ class FundingBucket< ActiveRecord::Base
   end
 
   def budget_remaining
-    self.budget_amount - self.budget_committed
+    self.budget_amount - self.budget_committed if self.budget_amount.present? && self.budget_committed.present?
   end
 
   def set_values_from_proxy bucket_proxy, agency_id=nil

@@ -297,12 +297,17 @@ class FundingBucketsController < OrganizationAwareController
   def find_number_of_missing_buckets_for_update
       existing_buckets = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year], params[:end_year], params[:owner_id]).pluck(:fiscal_year, :owner_id)
       expected_buckets = find_expected_buckets(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i)
-      result = expected_buckets - existing_buckets
+      not_created_buckets = expected_buckets - existing_buckets
+      template = FundingTemplate.find_by(id: params[:template_id])
+      result = []
+      not_created_buckets.each do |b|
+        result << FundingBucket.new(funding_template: template, fiscal_year: b[0], owner_id: b[1])
+      end
 
       msg = "#{result.length} Buckets you are updating do not yet exist. Do you want to create these Buckets, skip these Buckets, or cancel this action?"
 
       respond_to do |format|
-        format.json { render json: {:result_count => result.length, :new_html => (render_to_string :partial => 'form_modal', :formats => [:html], :locals => {:result => [], :msg => msg}) }}
+        format.json { render json: {:result_count => result.length, :new_html => (render_to_string :partial => 'form_modal', :formats => [:html], :locals => {:result => result, :msg => msg}) }}
       end
   end
 

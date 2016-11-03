@@ -54,9 +54,10 @@
         -else
           %td.left= '&infin;'.html_safe
 
-        %td.center.nowrap
-          = link_to funding_bucket_path(b) do
-            %i.fa.fa-info-circle.fa-1-5x
+        - unless b.new_record?
+          %td.center.nowrap
+            = link_to funding_bucket_path(b) do
+              %i.fa.fa-info-circle.fa-1-5x
         - if compact_columns == 0 && (can? :update, b)
           %td.center.nowrap
             = link_to edit_funding_bucket_path(b), :remote => true do
