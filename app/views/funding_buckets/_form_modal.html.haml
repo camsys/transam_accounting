@@ -1,4 +1,4 @@
-.modal-dialog
+.modal-dialog.modal-lg
   .modal-content
     .modal-header
       %button.close{:data => {:dismiss => "modal"}}
@@ -6,4 +6,7 @@
       %h3.modal-title
         = "Conflict"
     .modal-body
-      = text
+      %div{:class => "alert alert-danger fade in #{bootstrap_class_for('danger')}"}
+        %a.close{"data-dismiss" => "alert"} ×
+        = content_tag :div, msg, :id => "flash_danger"
+      = render :partial => 'buckets_table', :locals => {:buckets => result, :compact_columns => 1}

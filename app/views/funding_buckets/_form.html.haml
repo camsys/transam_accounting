@@ -283,7 +283,7 @@
 
 
           if($('#funding_bucket_proxy_create_option_update').is(':checked')){
-            if (result == 0 || $('#funding_bucket_proxy_update_conflict_option_create').is(':checked')|| $('#funding_bucket_proxy_update_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_update_conflict_option_cancel').is(':checked')) {
+            if (result.result_count == 0 || $('#funding_bucket_proxy_update_conflict_option_create').is(':checked')|| $('#funding_bucket_proxy_update_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_update_conflict_option_cancel').is(':checked')) {
               document.getElementById('new_funding_bucket_proxy').submit();
             }else{
               $("#update_conflict_option_div_id").show();
@@ -294,7 +294,7 @@
               $('#form-modal').modal('show');
             }
           }else if($('#funding_bucket_proxy_create_option_create').is(':checked')) {
-            if (result.length == 0 || $('#funding_bucket_proxy_create_conflict_option_update').is(':checked')|| $('#funding_bucket_proxy_create_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_create_conflict_option_cancel').is(':checked')) {
+            if (result.result_count == 0 || $('#funding_bucket_proxy_create_conflict_option_update').is(':checked')|| $('#funding_bucket_proxy_create_conflict_option_ignore').is(':checked') || $('#funding_bucket_proxy_create_conflict_option_cancel').is(':checked')) {
               document.getElementById('new_funding_bucket_proxy').submit();
             }else{
               $("#create_conflict_option_div_id").show();

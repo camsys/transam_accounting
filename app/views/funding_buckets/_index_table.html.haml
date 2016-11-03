@@ -1,6 +1,6 @@
 :ruby
-  table_dom_id = SecureRandom.hex
   show_actions ||= 0
+  compact_colmuns ||= 0
 
 #buckets_table_actions.btn-group
   - if can?(:create, FundingBucket)
@@ -10,80 +10,4 @@
   - if show_actions == 1
     = render :partial => "funding_buckets/index_actions"
 
-%table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
-  :card_view => "false",
-  :pagination => 'true',
-  :show_pagination_switch => 'true',
-  :page_list => "[5, 10, 20, 50, 100, 200]",
-  :page_size => current_user.num_table_rows,
-  :search => 'false',
-  :toolbar => "#buckets_table_actions",
-  :export_types => "['csv', 'txt', 'excel']",
-  :show_export => 'true',
-  :show_columns => 'true',
-  :show_multi_sort => 'true',
-  :sort_priority => '[{"sortName": "bucket_fy","sortOrder":"asc"},{"sortName":"bucket_owner","sortOrder":"asc"}]'}, :style => 'width:100%;'}
-
-  %thead
-    %tr
-      %th.center{:data => {:visible => 'false'}} Object Key
-      %th.center{:data => {:field => 'bucket_fy', :sortable => 'true'}} FY
-      - if @funding_template.nil?
-        %th.center{:data => {:sortable => 'true'}} Program (Template)
-      %th.center{:data => {:sortable => 'true'}} Type
-      %th.center{:data => {:field => 'bucket_owner', :sortable => 'true'}} Owner
-      %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Total
-      %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Committed
-      %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Available
-      %th.center{:data => {:sortable => 'true'}} Expires
-
-      %th
-      - if can? :update, FundingBucket
-        %th
-
-  %tbody
-    - buckets.each do |b|
-      %tr{:id => b.object_key, :class => 'action-path'}
-        %td.left= b.object_key
-        %td.left= format_as_fiscal_year(b.fiscal_year)
-        - if @funding_template.nil?
-          %td.left= "#{b.funding_template.funding_source.name} (#{b.funding_template.name})"
-        %td.left= b.funding_template.funding_source.funding_source_type.name
-        -unless b.owner.nil?
-          %td.left= b.owner.name
-        -else
-          %td.left= state
-        %td.left= b.budget_amount
-        %td.left= b.budget_committed
-        %td.left= b.budget_remaining
-        -unless b.funding_template.funding_source.life_in_years.nil?
-          %td.left= format_as_fiscal_year(b.fiscal_year + b.funding_template.funding_source.life_in_years)
-        -else
-          %td.left= '&infin;'.html_safe
-
-        %td.center.nowrap
-          = link_to funding_bucket_path(b) do
-            %i.fa.fa-info-circle.fa-1-5x
-        - if can? :update, b
-          %td.center.nowrap
-            = link_to edit_funding_bucket_path(b), :remote => true do
-              %i.fa.fa-edit.fa-1-5x.text-success
-
-= render 'shared/table_formatters'
-
-:javascript
-  function percentage_formatter(value) {
-    if (value == "") {
-      return value;
-    } else {
-      return format("$"+"##0", value);
-    }
-  };
-
-  $('#' + '#{table_dom_id}').on('post-body.bs.table', function () {
-    $('.transam-popover').popover({
-      trigger: 'hover'
-    });
-    $('.transam-tooltip').tooltip();
-  });
-
+= render :partial => 'funding_buckets/buckets_table', :locals => {:buckets => buckets, :compact_columns => compact_colmuns}
