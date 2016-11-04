@@ -10,7 +10,6 @@ class FundingBucketsController < OrganizationAwareController
 
   # GET /buckets
   def index
-    authorize! :read, FundingBucket
 
     add_breadcrumb 'Funding Programs', funding_sources_path
     add_breadcrumb 'Templates', funding_templates_path
@@ -19,14 +18,6 @@ class FundingBucketsController < OrganizationAwareController
     # Start to set up the query
     conditions  = []
     values      = []
-
-    if params[:template_id].present?
-      @organizations =  Organization.where("id in (Select organization_id FROM funding_templates_organizations where funding_template_id = #{template_id}}").pluck(:name, :id)
-    else
-      @organizations =  Organization.where(id: @organization_list).pluck(:name, :id)
-    end
-
-    @templates =  FundingTemplate.all.pluck(:name, :id)
 
     if params[:agency_id].present?
       @searched_agency_id =  params[:agency_id]
@@ -41,16 +32,12 @@ class FundingBucketsController < OrganizationAwareController
       @searched_template = params[:searched_template]
     end
 
+    # this is a search of the owner not a search on the eligibility
+    # a search on the eligiblity follows the overall system filter -- not set for a super manager
     unless @searched_agency_id.blank?
       agency_filter_id = @searched_agency_id.to_i
       conditions << 'owner_id = ?'
       values << agency_filter_id
-    end
-
-    unless @searched_template.blank?
-      funding_template_id = @searched_template.to_i
-      conditions << 'funding_template_id = ?'
-      values << funding_template_id
     end
 
     unless @searched_fiscal_year.blank?
@@ -63,9 +50,33 @@ class FundingBucketsController < OrganizationAwareController
       conditions << 'budget_amount > budget_committed'
     end
 
+    # on My Funds - templates must be ones you are eligible for
+    # on buckets index page you can search by template
+    if params[:my_funds]
+      templates = FundingTemplate.joins(:organizations).where('funding_templates.owner_id = ? AND funding_templates_organizations.organization_id IN (?)', FundingSourceType.find_by(name: 'State').id, @organization_list)
+      buckets = FundingBucket.where('(funding_template_id IN (?) OR owner_id IN (?))',templates.ids, @organization_list)
+    elsif @searched_template.present?
+      funding_template_id = @searched_template.to_i
+      conditions << 'funding_template_id = ?'
+      values << funding_template_id
+    end
+
     conditions << 'active = true'
 
-    @buckets = FundingBucket.where(conditions.join(' AND '), *values)
+    if buckets
+      @buckets = buckets.where(conditions.join(' AND '), *values)
+    else
+      @buckets = FundingBucket.where(conditions.join(' AND '), *values)
+    end
+
+
+    if params[:my_funds]
+      @organizations = Organization.where('organization_type_id = 1 OR id IN (?)', @organization_list).pluck(:name, :id)
+    else
+      @organizations =  Organization.where(id: @organization_list).pluck(:name, :id)
+      @templates =  FundingTemplate.all.pluck(:name, :id)
+    end
+
 
     # cache the set of object keys in case we need them later
     cache_list(@buckets, INDEX_KEY_LIST_VAR)
