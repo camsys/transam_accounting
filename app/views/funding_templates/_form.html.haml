@@ -17,7 +17,7 @@
   = f.input :organization_ids, :as => :hidden
 
   .form-group
-    = select_tag(:query, options_for_select(QueryParam.active.where(class_name: f.object.class.name).map{|x| [x.to_s,x.id]}), :class => "form-control", :prompt => "Choose Organizations")
+    = select_tag(:query, options_for_select(QueryParam.active.where(class_name: f.object.class.name).map{|x| [x.to_s,x.id]}, :selected => QueryParam.find_by(class_name: f.object.class.name, query_string: f.object.query_string).try(:id)), :class => "form-control", :prompt => "Choose Organizations")
 
   #org_select.input-large
 
@@ -45,7 +45,6 @@
   // check if using query or selecting orgs
 
   if (parseInt($('#query').val()) > 0) { // if query
-    $('#org_select').data().bootstrapTransfer.move_all(true, false); // clear out all selected values
     $('#org_select').hide();
   }  else {
     $('#org_select').show();

@@ -1,9 +1,12 @@
+- orgs = @funding_template.get_organizations
+
 %ul.nav.nav-tabs
   %li
     %a{:href => "#desc", :data =>{:toggle => 'tab'}}
       = "Description"
   %li
     %a{:href => "#elgby", :data =>{:toggle => 'tab'}}
+      %span.badge.pull-right= orgs.count
       = "Eligiblity"
   %li
     %a{:href => "#bckts", :data =>{:toggle => 'tab'}}
@@ -21,9 +24,8 @@
   .tab-pane.fade#elgby
     .tab-content
       - if @funding_template.query_string.present?
-        = format_field("Agencies", "All")
-      - else
-        = render :partial => 'organizations/index_table', :locals => {:organizations => @funding_template.organizations, :show_actions => 0}
+        = format_field("Agencies", QueryParam.find_by(class_name: 'FundingTemplate', query_string: @funding_template.query_string).to_s)
+      = render :partial => 'organizations/index_table', :locals => {:organizations => orgs, :show_actions => 0}
 
 
   .tab-pane.fade#bckts

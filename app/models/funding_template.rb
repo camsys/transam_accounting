@@ -78,6 +78,10 @@ class FundingTemplate < ActiveRecord::Base
     name
   end
 
+  def get_organizations
+    self.query_string.present? ? Organization.find_by_sql(self.query_string) : self.organizations
+  end
+
 
   #------------------------------------------------------------------------------
   #

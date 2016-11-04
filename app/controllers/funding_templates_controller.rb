@@ -96,18 +96,18 @@ class FundingTemplatesController < OrganizationAwareController
   def create
     @funding_template = FundingTemplate.new(funding_template_params.except(:organization_ids))
 
-    if @funding_template.save
+    if params[:query].to_i > 0
+      @funding_template.query_string = QueryParam.find(params[:query].to_i).try(:query_string)
+    else
+      @funding_template.query_string = nil
 
-      if params[:query].to_i > 0
-        @funding_template.query_string = QueryParam.find(params[:query].to_i).try(:query_string)
-      else
-        @funding_template.query_string = nil
-
-        org_list = funding_template_params[:organization_ids].split(',').uniq
-        org_list.each do |id|
-          @funding_template.organizations << Organization.find(id)
-        end
+      org_list = funding_template_params[:organization_ids].split(',').uniq
+      org_list.each do |id|
+        @funding_template.organizations << Organization.find(id)
       end
+    end
+
+    if @funding_template.save
 
       redirect_to @funding_template, notice: 'Funding template was successfully created.'
     else
@@ -135,6 +135,8 @@ class FundingTemplatesController < OrganizationAwareController
           @funding_template.organizations << Organization.find(id)
         end
       end
+
+      @funding_template.save
 
       redirect_to @funding_template, notice: 'Funding template was successfully updated.'
     else

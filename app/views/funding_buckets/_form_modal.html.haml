@@ -28,4 +28,4 @@
 
       = render :partial => 'buckets_table', :locals => {:buckets => result, :compact_columns => 1}
 
-      = button_tag 'Submit', :type => 'button', :name => 'submit_conflict', :class=>"btn btn-primary", :onclick => "document.getElementById('new_funding_bucket_proxy').submit();"
+      = button_tag 'Submit', :type => 'button', :name => 'submit_conflict', :class=>"btn btn-primary", :onclick => "before_submit_bucket_check()"
