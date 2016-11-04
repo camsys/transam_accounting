@@ -45,10 +45,7 @@
         = f.input :total_amount, :label => 'Budget ($)', :required => true
 
   .all_agencies_covered_by_template_group{:id => "all_agencies_covered_by_template_group_id"}
-    .col-sm-8
-      .all_agencies_covered_by_template{:id => "all_agencies_covered_by_template_id"}
-        .row
-          .col-sm-8
+    .all_agencies_covered_by_template{:id => "all_agencies_covered_by_template_id"}
 
   .modal.fade#form-modal{:tabindex => -1, :role => 'dialog', :aria => {:hidden => true}}
 
@@ -182,10 +179,10 @@
         var add_to = "#all_agencies_covered_by_template_id"
         id = agencies[i][0];
         name = agencies[i][1]
-        var new_label = '<label id="agency_label_' + id + '" name="agency_label' + name + '" type="text">'+name+' Budget ($)';
-        var new_in = '<input autocomplete="off" class="input form-control agency_budget" id="' + id + '" name="agency_budget_id_' + id + '" label="' + id + '" type="text">';
-        var new_input = $(new_in);
-        $(add_to).before(new_label)
+        var new_input =
+          '<div class="row"><div class="col-sm-8"><div class="form-group"><label class="control-label" id="agency_label_' + id + '" name="agency_label_' + name + '" type="text">'+name+' Budget ($)</label>' +
+          '<div><input autocomplete="off" class="input form-control agency_budget" id="' + id + '" name="agency_budget_id_' + id + '" label="' + id + '" type="text"></div>' +
+           '</div></div></div>';
         $(add_to).before(new_input);
         $("#field" + id).attr('data-source',$(add_to).attr('data-source'));
       i++;
