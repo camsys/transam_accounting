@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     member do
       get 'edit_bucket_app'
       patch 'update_bucket_app'
+      delete 'destroy_bucket_app'
     end
   end
 

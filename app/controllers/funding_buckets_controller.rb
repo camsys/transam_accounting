@@ -3,7 +3,7 @@ class FundingBucketsController < OrganizationAwareController
 
   add_breadcrumb "Home", :root_path
 
-  before_action :set_funding_bucket, only: [:show, :edit, :update, :edit_bucket_app, :update_bucket_app]
+  before_action :set_funding_bucket, only: [:show, :edit, :update, :edit_bucket_app, :update_bucket_app, :destroy_bucket_app]
   before_action :check_filter,      :only => [:index, :show, :new, :edit]
 
   INDEX_KEY_LIST_VAR    = "funding_buckets_key_list_cache_var"
@@ -262,6 +262,16 @@ class FundingBucketsController < OrganizationAwareController
   # DELETE /buckets/1
   def destroy
     # currently not used
+  end
+
+  def destroy_bucket_app
+    if @funding_bucket.destroy
+      notify_user(:notice, "The grant application was successfully removed.")
+      respond_to do |format|
+        format.html { redirect_to funding_buckets_url }
+        format.json { head :no_content }
+      end
+    end
   end
 
   def find_organizations_from_template_id
