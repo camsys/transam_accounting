@@ -5,11 +5,11 @@
   - if can? :read, FundingTemplate
     %li
       %a{:href => "#templates", :data =>{:toggle => 'tab'}}
-        %span.badge.pull-right= @funding_source.funding_templates.count
+        %span.badge.pull-right= @funding_source.funding_templates.active.count
         = "Templates"
     %li
       %a{:href => "#bckts", :data =>{:toggle => 'tab'}}
-        %span.badge.pull-right= @funding_source.funding_buckets.count
+        %span.badge.pull-right= @funding_source.funding_buckets.active.count
         = "Buckets"
   %li
     %a{:href => "#docs", :data =>{:toggle => 'tab'}}
@@ -28,11 +28,11 @@
   - if can? :read, FundingTemplate
     .tab-pane.fade#templates
       .tab-content
-        = render :partial => 'funding_templates/index_table', :locals => {:funding_templates => @funding_source.funding_templates, :show_actions => 0}
+        = render :partial => 'funding_templates/index_table', :locals => {:funding_templates => @funding_source.funding_templates.active, :show_actions => 0}
 
     .tab-pane.fade#bckts
       .tab-content
-        = render :partial => 'funding_buckets/index_table', :locals => {:buckets => @funding_source.funding_buckets, :show_actions => 0}
+        = render :partial => 'funding_buckets/index_table', :locals => {:buckets => @funding_source.funding_buckets.active, :show_actions => 0, :funding_source_id => @funding_source.id}
 
   .tab-pane.fade#docs
     .tab-content

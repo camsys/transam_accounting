@@ -1,12 +1,24 @@
 :ruby
   show_actions ||= 0
   compact_colmuns ||= 0
+  funding_source_id ||= nil
+  funding_template_id ||= nil
+
+  if funding_source_id.present? || funding_template_id.present?
+    url = new_funding_bucket_path(funding_source_id: funding_source_id, funding_template_id: funding_template_id)
+  else
+    url = new_funding_bucket_path
+  end
 
 #buckets_table_actions.btn-group
   - if can?(:create, FundingBucket)
-    = link_to new_funding_bucket_path, :class => 'btn btn-default' do
+    = link_to url, :class => 'btn btn-default' do
       %i.fa.fa-edit.fa-fw
       = "Manage Buckets"
+  - elsif can? :new_bucket_app, FundingBucket
+    = link_to new_bucket_app_funding_buckets_path, :class => 'btn btn-default' do
+      %i.fa.fa-edit.fa-fw
+      = "New Grant Application"
   - if show_actions == 1
     = render :partial => "funding_buckets/index_actions"
 

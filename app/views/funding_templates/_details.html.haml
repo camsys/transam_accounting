@@ -10,7 +10,7 @@
       = "Eligiblity"
   %li
     %a{:href => "#bckts", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @funding_template.funding_buckets.count
+      %span.badge.pull-right= @funding_template.funding_buckets.active.count
       = "Buckets"
 
 .tab-content{:style => 'max-height:400px;overflow-y: auto;'}
@@ -30,4 +30,4 @@
 
   .tab-pane.fade#bckts
     .tab-content
-      = render :partial => 'funding_buckets/index_table', :locals => {:buckets => @funding_template.funding_buckets, :show_actions => 0}
+      = render :partial => 'funding_buckets/index_table', :locals => {:buckets => @funding_template.funding_buckets.active, :show_actions => 0, :funding_source_id => @funding_template.funding_source.id, :funding_template_id => @funding_template.id}

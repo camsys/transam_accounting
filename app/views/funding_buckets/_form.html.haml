@@ -15,7 +15,7 @@
 
   .row
     .col-sm-8
-      = f.input :program_id, :required => true, :collection => FundingSource.all, :include_blank => true, :label => "Program"
+      = f.input :program_id, :required => true, :collection => FundingSource.all, :include_blank => true, :label => "Program", :selected => params[:funding_source_id]
 
   .template_id_div{:id => "template_id_div_id"}
     .row
@@ -42,7 +42,7 @@
   .state_or_single_agency_budget{:id => "state_or_single_agency_budget_id"}
     .row
       .col-sm-8
-        = f.input :total_amount, :label => 'Budget ($)', :required => true
+        = f.input :total_amount, :label => 'Budget ($)', :required => true, :input_html => { :min => 1  }
 
   .all_agencies_covered_by_template_group{:id => "all_agencies_covered_by_template_group_id"}
     .all_agencies_covered_by_template{:id => "all_agencies_covered_by_template_id"}
@@ -62,6 +62,12 @@
   var display_budget = false;
   var display_all_orgs_budget = false;
   var display_escalate_by = false;
+
+  // if defaults set
+  $(document).ready(function() {
+    $('#funding_bucket_proxy_program_id').change();
+  });
+
 
   $('#funding_bucket_proxy_create_option_create').change(function(){
      $("#update_conflict_option_div_id").hide();
@@ -117,7 +123,7 @@
 
   $('#form-modal').on('hidden.bs.modal', function (e) {
     $('#form-modal input').prop('checked', false);
-  })
+  });
 
   $('.bucket_form').validate({
     debug: true
@@ -365,6 +371,8 @@
           $('#owner_id_div_id').show();
           //Add a blank entry to the list.
           $("#funding_bucket_proxy_owner_id").append( $("<option></option>").attr("value", "").text(''));
+          // Add an All Agencies
+          $("#funding_bucket_proxy_owner_id").append( $("<option></option>").attr("value", "-1").text('All Agencies For This Template'));
           for(i = 0;i<result.length;i++){
             //add an option for each organizations available to the tempalte
             $("#funding_bucket_proxy_owner_id").append(
@@ -400,9 +408,20 @@
           $("#funding_bucket_proxy_template_id").append( $("<option></option>").attr("value", "").text(''));
           for(i = 0;i<result.length;i++){
             //add in option for each template available to the program
-            $("#funding_bucket_proxy_template_id").append(
+            if (parseInt('#{params[:funding_template_id]}') > 0) {
+              $("#funding_bucket_proxy_template_id").append(
+                $("<option></option>").attr("value", result[i][0]).attr("selected", 'selected').text(result[i][1])
+              );
+            } else {
+              $("#funding_bucket_proxy_template_id").append(
                 $("<option></option>").attr("value", result[i][0]).text(result[i][1])
-            );
+              );
+            }
+
+            if (parseInt('#{params[:funding_template_id]}') > 0) {
+              $('#funding_bucket_proxy_template_id').change();
+            }
+
           }
         },
         error: function (xhr, ajaxOptions, thrownError) {

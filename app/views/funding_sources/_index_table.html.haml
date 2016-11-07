@@ -43,7 +43,8 @@
       %tr
         %td.left= f.object_key
         %td.left= f.external_id
-        %td.left{data: {tableexport: {value: "#{f.name}"}}}
+        =# add whitespace so always read as text and not number. JS plugin trims later
+        %td.left{data: {tableexport: {msonumberformat: "\\@", value: "#{f.name}   "}}}
           %span.hidden= f.name
           = link_to(f.name, funding_source_path(f))
         %td.left= f.funding_source_type

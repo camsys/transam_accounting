@@ -24,9 +24,9 @@
         %th.center{:data => {:sortable => 'true'}} Program (Template)
       %th.center{:data => {:sortable => 'true'}} Type
       %th.center{:data => {:field => 'bucket_owner', :sortable => 'true'}} Owner
-      %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Total
-      %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Committed
-      %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Available
+      %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Total
+      %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Committed
+      %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Available
       %th.center{:data => {:sortable => 'true'}} Expires
 
       %th
@@ -52,16 +52,20 @@
         -unless b.funding_template.funding_source.life_in_years.nil?
           %td.left= format_as_fiscal_year(b.fiscal_year + b.funding_template.funding_source.life_in_years)
         -else
-          %td.left= '&infin;'.html_safe
+          %td.left
 
         - unless b.new_record?
           %td.center.nowrap
             = link_to funding_bucket_path(b) do
               %i.fa.fa-info-circle.fa-1-5x
-        - if compact_columns == 0 && (can? :update, b)
+        - if compact_columns == 0
           %td.center.nowrap
-            = link_to edit_funding_bucket_path(b), :remote => true do
-              %i.fa.fa-edit.fa-1-5x.text-success
+            - if (can? :edit_bucket_app, b) && b.is_bucket_app?
+              = link_to edit_bucket_app_funding_bucket_path(b) do
+                %i.fa.fa-edit.fa-1-5x.text-success
+            - elsif (can? :update, b)
+              = link_to edit_funding_bucket_path(b), :remote => true do
+                %i.fa.fa-edit.fa-1-5x.text-success
 
 = render 'shared/table_formatters'
 

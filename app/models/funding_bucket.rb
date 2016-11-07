@@ -6,7 +6,7 @@ class FundingBucket< ActiveRecord::Base
   #------------------------------------------------------------------------------
   # Callbacks
   #------------------------------------------------------------------------------
-  # after_initialize  :set_defaults
+  after_initialize  :set_defaults
   # before_save        :check_orgs_list
 
 
@@ -43,7 +43,11 @@ class FundingBucket< ActiveRecord::Base
   # List of hash parameters allowed by the controller
   FORM_PARAMS = [
       :object_key,
-      :budget_amount
+      :funding_template_id,
+      :owner_id,
+      :fiscal_year,
+      :budget_amount,
+      :description
   ]
 
   #------------------------------------------------------------------------------
@@ -111,6 +115,10 @@ class FundingBucket< ActiveRecord::Base
     self.budget_amount - self.budget_committed if self.budget_amount.present? && self.budget_committed.present?
   end
 
+  def is_bucket_app?
+    self.funding_template.contributor == FundingSourceType.find_by(name: 'Agency')
+  end
+
   def set_values_from_proxy bucket_proxy, agency_id=nil
     self.funding_template_id = bucket_proxy.template_id
     self.fiscal_year = bucket_proxy.fiscal_year_range_start
@@ -128,6 +136,7 @@ class FundingBucket< ActiveRecord::Base
   protected
 
   def set_defaults
+    self.budget_committed ||= 0
     self.active = self.active.nil? ? true : self.active
   end
 end

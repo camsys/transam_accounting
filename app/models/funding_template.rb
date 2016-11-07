@@ -68,6 +68,16 @@ class FundingTemplate < ActiveRecord::Base
     FORM_PARAMS
   end
 
+  def self.get_templates_for_agencies org_ids
+    templates = []
+
+    self.active.where(contributor: FundingSourceType.find_by(name: 'Agency')).each do |t|
+      templates << t if (t.get_organizations.map{|x| x.id} & org_ids).count > 0 # add template to list if one of orgs is in eligibility
+    end
+
+    templates
+  end
+
   #------------------------------------------------------------------------------
   #
   # Instance Methods

@@ -57,13 +57,13 @@
           = link_to(f.name, funding_template_path(f))
 
         %td.left= f.contributor.to_s
-        %td.center= format_as_boolean(f.transfer_only)
+        %td.center{data: {tableexport: {value: "#{f.transfer_only ? 'Yes' : 'No'}"}}}= format_as_boolean(f.transfer_only)
         %td.left= f.owner.to_s
 
         - FundingTemplateType.active.each do |type|
-          %td.center= f.funding_template_types.include?(type) ? format_as_boolean(true) : ''
+          %td.center{data: {tableexport: {value: "#{f.funding_template_types.include?(type) ? 'Yes' : 'No'}"}}}= f.funding_template_types.include?(type) ? format_as_boolean(true) : ''
 
-        %td.center= format_as_boolean(f.recurring)
+        %td.center{data: {tableexport: {value: "#{f.recurring ? 'Yes' : 'No'}"}}}= format_as_boolean(f.recurring)
         %td.right= f.match_required.present? ? f.match_required : ''
 
         %td.center.nowrap

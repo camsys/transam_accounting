@@ -3,13 +3,19 @@ class FundingBucketsController < OrganizationAwareController
 
   add_breadcrumb "Home", :root_path
 
-  before_action :set_funding_bucket, only: [:show, :edit, :update]
+  before_action :set_funding_bucket, only: [:show, :edit, :update, :edit_bucket_app, :update_bucket_app]
   before_action :check_filter,      :only => [:index, :show, :new, :edit]
 
   INDEX_KEY_LIST_VAR    = "funding_buckets_key_list_cache_var"
 
   # GET /buckets
   def index
+
+    if params[:my_funds]
+      authorize! :my_funds, FundingBucket
+    else
+      authorize! :read, FundingBucket
+    end
 
     add_breadcrumb 'Funding Programs', funding_sources_path
     add_breadcrumb 'Templates', funding_templates_path
@@ -34,7 +40,15 @@ class FundingBucketsController < OrganizationAwareController
 
     # this is a search of the owner not a search on the eligibility
     # a search on the eligiblity follows the overall system filter -- not set for a super manager
-    unless @searched_agency_id.blank?
+    if @searched_agency_id.blank?
+      if params[:my_funds]
+        conditions << 'owner_id IN (?)'
+        # should use organization list but organizations that the user actually belongs to
+        # so bpt can see all orgs but only belong to BPT
+        # transit agencies obviously belongs to all their transit agencies
+        values << (current_user.organizations.ids & @organization_list)
+      end
+    else
       agency_filter_id = @searched_agency_id.to_i
       conditions << 'owner_id = ?'
       values << agency_filter_id
@@ -46,29 +60,27 @@ class FundingBucketsController < OrganizationAwareController
       values << fiscal_year_filter
     end
 
+    unless @searched_template.nil?
+      funding_template_id = @searched_template.to_i
+      conditions << 'funding_template_id = ?'
+      values << funding_template_id
+    end
+
     if @show_funds_available_only
       conditions << 'budget_amount > budget_committed'
     end
 
     # on My Funds - templates must be ones you are eligible for
     # on buckets index page you can search by template
-    if params[:my_funds]
-      templates = FundingTemplate.joins(:organizations).where('funding_templates.owner_id = ? AND funding_templates_organizations.organization_id IN (?)', FundingSourceType.find_by(name: 'State').id, @organization_list)
-      buckets = FundingBucket.where('(funding_template_id IN (?) OR owner_id IN (?))',templates.ids, @organization_list)
-    elsif @searched_template.present?
-      funding_template_id = @searched_template.to_i
-      conditions << 'funding_template_id = ?'
-      values << funding_template_id
-    end
+    #if params[:my_funds]
+      #@templates = FundingTemplate.joins(:organizations).where('funding_templates.owner_id = ? AND funding_templates_organizations.organization_id IN (?)', FundingSourceType.find_by(name: 'State').id, @organization_list)
+      #buckets = FundingBucket.where('(funding_template_id IN (?) OR owner_id IN (?))',templates.ids, @organization_list)
+      #@buckets = buckets.where(conditions.join(' AND '), *values)
+    #end
 
     conditions << 'active = true'
 
-    if buckets
-      @buckets = buckets.where(conditions.join(' AND '), *values)
-    else
-      @buckets = FundingBucket.where(conditions.join(' AND '), *values)
-    end
-
+    @buckets = FundingBucket.where(conditions.join(' AND '), *values)
 
     if params[:my_funds]
       @organizations = Organization.where('organization_type_id = 1 OR id IN (?)', @organization_list).pluck(:name, :id)
@@ -128,10 +140,21 @@ class FundingBucketsController < OrganizationAwareController
     end
   end
 
+  def new_bucket_app
+
+    authorize! :new_bucket_app, FundingBucket
+
+    @funding_bucket = FundingBucket.new
+  end
+
   # GET /buckets/1/edit
   def edit
     authorize! :update, @funding_bucket
 
+  end
+
+  def edit_bucket_app
+    authorize! :edit_bucket_app, @funding_bucket
   end
 
   # POST /buckets
@@ -181,48 +204,26 @@ class FundingBucketsController < OrganizationAwareController
     end
   end
 
-  def create_new_buckets(bucket_proxy, existing_buckets=nil, create_conflict_option=nil)
+  def create_bucket_app
+    authorize! :new_bucket_app, FundingBucket
 
-    unless bucket_proxy.owner_id.to_i <= 0
-      bucket = new_bucket_from_proxy(bucket_proxy)
-      create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, create_conflict_option, 'Create')
-    else
-      bucket = new_bucket_from_proxy(bucket_proxy)
-      organizations = find_organizations(bucket_proxy.template_id)
+    @funding_bucket = FundingBucket.new(bucket_params)
+    @funding_bucket.creator = current_user
+    @funding_bucket.updator = current_user
 
-
-      organizations.each { |org|
-        unless org[0] < 0
-          bucket = new_bucket_from_proxy(bucket_proxy, org[0])
-          bucket.budget_amount = params["agency_budget_id_#{org[0]}".parameterize.underscore.to_sym].to_d
-          # bucket_proxy inflation percentage could be modified the same way
-          create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, create_conflict_option, 'Create', org[0],)
-        end
-      }
-
+    if @organization_list.count == 1
+      @funding_bucket.owner_id = @organization_list.first
     end
-  end
 
-  def update_buckets(bucket_proxy, existing_buckets=nil, update_conflict_option=nil )
-
-    unless bucket_proxy.owner_id.to_i <= 0
-      bucket = new_bucket_from_proxy(bucket_proxy)
-      create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, 'Update',  update_conflict_option)
-    else
-      bucket = new_bucket_from_proxy(bucket_proxy)
-      organizations = find_organizations(bucket_proxy.template_id)
-
-      organizations.each { |org|
-        unless org[0] < 0
-          unless params["agency_budget_id_#{org[0]}"].blank?
-            bucket = new_bucket_from_proxy(bucket_proxy, org[0])
-            bucket.budget_amount = params["agency_budget_id_#{org[0]}".parameterize.underscore.to_sym].to_d
-            # bucket_proxy inflation percentage could be modified the same way
-            create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, 'Update', update_conflict_option, org[0],)
-          end
-        end
-      }
-
+    respond_to do |format|
+      if @funding_bucket.save
+        notify_user(:notice, "The grant application was successfully saved.")
+        format.html { redirect_to funding_buckets_path(my_funds: 1) }
+        format.json { render action: 'show', status: :created, location: @funding_bucket }
+      else
+        format.html { render action: 'new_grant' }
+        format.json { render json: @funding_bucket.errors, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -231,7 +232,7 @@ class FundingBucketsController < OrganizationAwareController
     authorize! :update, @funding_bucket
 
     respond_to do |format|
-      if @funding_bucket.update(bucket_params)
+      if @funding_bucket.update(params[:funding_bucket][:budget_amount])
         notify_user(:notice, "The bucket was successfully updated.")
         format.html { redirect_to :back }
         format.json { head :no_content }
@@ -242,47 +243,35 @@ class FundingBucketsController < OrganizationAwareController
     end
   end
 
+  def update_bucket_app
+
+    authorize! :edit_bucket_app, @funding_bucket
+
+    respond_to do |format|
+      if @funding_bucket.update(bucket_params)
+        notify_user(:notice, "The grant application was successfully updated.")
+        format.html { redirect_to funding_buckets_path(my_funds: 1) }
+        format.json { head :no_content }
+      else
+        format.html { render action: 'edit_bucket_app' }
+        format.json { render json: @funding_bucket.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
   # DELETE /buckets/1
   def destroy
+    # currently not used
   end
 
   def find_organizations_from_template_id
     template_id = params[:template_id]
-    result = [[-1,'All Agencies For This Template']] + find_organizations(template_id)
+    result = find_organizations(template_id)
 
     @template_organizations = result
     respond_to do |format|
       format.json { render json: result.to_json }
     end
-  end
-
-  def find_organizations(template_id)
-    result = []
-    @bucket_agency_allocations = []
-
-    template = FundingTemplate.find_by(id: template_id)
-    if template.owner == FundingSourceType.find_by(name: 'State')
-      grantors = Grantor.where(id: @organization_list)
-      grantors.each { |g|
-        result << [g.id, g.name]
-      }
-    else
-      orgs = template.organizations
-      organizations = []
-      if orgs.length > 0
-        orgs.each { |o|
-          item = [o.id, o.name]
-          organizations << item
-        }
-      else
-        grantor = Grantor.first
-        organizations =  Organization.find_by_sql(template.query_string).map{|x| [x.id, x.name]}
-      end
-
-      result = organizations
-    end
-
-    result
   end
 
   def find_templates_from_program_id
@@ -350,6 +339,79 @@ class FundingBucketsController < OrganizationAwareController
       notify_user(:filter_warning, "Filter reset to enter funding.")
 
       get_organization_selections
+    end
+  end
+
+  def find_organizations(template_id)
+    result = []
+    @bucket_agency_allocations = []
+
+    template = FundingTemplate.find_by(id: template_id)
+    if template.owner == FundingSourceType.find_by(name: 'State')
+      grantors = Grantor.where(id: @organization_list)
+      grantors.each { |g|
+        result << [g.id, g.name]
+      }
+    else
+      orgs = template.organizations.where(id: @organization_list)
+      organizations = []
+      if orgs.length > 0
+        orgs.each { |o|
+          item = [o.id, o.name]
+          organizations << item
+        }
+      else
+        organizations =  Organization.find_by_sql(template.query_string).reduce([]) { |a, n| a.push([n.id, n.name]) if @organization_list.include? n.id; a }
+      end
+
+      result = organizations
+    end
+
+    result
+  end
+
+  def create_new_buckets(bucket_proxy, existing_buckets=nil, create_conflict_option=nil)
+
+    unless bucket_proxy.owner_id.to_i <= 0
+      bucket = new_bucket_from_proxy(bucket_proxy)
+      create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, create_conflict_option, 'Create')
+    else
+      bucket = new_bucket_from_proxy(bucket_proxy)
+      organizations = find_organizations(bucket_proxy.template_id)
+
+
+      organizations.each { |org|
+        unless org[0] < 0 || params["agency_budget_id_#{org[0]}"].blank?
+          bucket = new_bucket_from_proxy(bucket_proxy, org[0])
+          bucket.budget_amount = params["agency_budget_id_#{org[0]}".parameterize.underscore.to_sym].to_d
+          # bucket_proxy inflation percentage could be modified the same way
+          create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, create_conflict_option, 'Create', org[0],)
+        end
+      }
+
+    end
+  end
+
+  def update_buckets(bucket_proxy, existing_buckets=nil, update_conflict_option=nil )
+
+    unless bucket_proxy.owner_id.to_i <= 0
+      bucket = new_bucket_from_proxy(bucket_proxy)
+      create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, 'Update',  update_conflict_option)
+    else
+      bucket = new_bucket_from_proxy(bucket_proxy)
+      organizations = find_organizations(bucket_proxy.template_id)
+
+      organizations.each { |org|
+        unless org[0] < 0
+          unless params["agency_budget_id_#{org[0]}"].blank?
+            bucket = new_bucket_from_proxy(bucket_proxy, org[0])
+            bucket.budget_amount = params["agency_budget_id_#{org[0]}".parameterize.underscore.to_sym].to_d
+            # bucket_proxy inflation percentage could be modified the same way
+            create_single_organization_buckets(bucket, bucket_proxy, existing_buckets, 'Update', update_conflict_option, org[0],)
+          end
+        end
+      }
+
     end
   end
 
