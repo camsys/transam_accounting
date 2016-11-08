@@ -4,7 +4,7 @@ class FundingBucketsController < OrganizationAwareController
   add_breadcrumb "Home", :root_path
 
   before_action :set_funding_bucket, only: [:show, :edit, :update, :edit_bucket_app, :update_bucket_app, :destroy_bucket_app]
-  before_action :check_filter,      :only => [:index, :show, :new, :edit]
+  before_action :check_filter,      :only => [:index, :show, :new, :edit, :new_bucket_app, :edit_bucket_app]
 
   INDEX_KEY_LIST_VAR    = "funding_buckets_key_list_cache_var"
 
@@ -13,13 +13,18 @@ class FundingBucketsController < OrganizationAwareController
 
     if params[:my_funds]
       authorize! :my_funds, FundingBucket
+
+      add_breadcrumb 'Funding Programs', funding_sources_path
+      add_breadcrumb 'My Funds', funding_buckets_path(my_funds: 1)
     else
       authorize! :read, FundingBucket
+
+      add_breadcrumb 'Funding Programs', funding_sources_path
+      add_breadcrumb 'Templates', funding_templates_path
+      add_breadcrumb 'Buckets', funding_buckets_path
     end
 
-    add_breadcrumb 'Funding Programs', funding_sources_path
-    add_breadcrumb 'Templates', funding_templates_path
-    add_breadcrumb 'Buckets', funding_buckets_path
+
 
     # Start to set up the query
     conditions  = []
@@ -232,7 +237,7 @@ class FundingBucketsController < OrganizationAwareController
     authorize! :update, @funding_bucket
 
     respond_to do |format|
-      if @funding_bucket.update(params[:funding_bucket][:budget_amount])
+      if @funding_bucket.update(bucket_params)
         notify_user(:notice, "The bucket was successfully updated.")
         format.html { redirect_to :back }
         format.json { head :no_content }
@@ -344,11 +349,14 @@ class FundingBucketsController < OrganizationAwareController
   protected
 
   def check_filter
-    if current_user.user_organization_filter != current_user.user_organization_filters.system_filters.first || current_user.user_organization_filters.system_filters.first.get_organizations.count != @organization_list.count
-      set_current_user_organization_filter_(current_user, current_user.user_organization_filters.system_filters.first)
-      notify_user(:filter_warning, "Filter reset to enter funding.")
+    # only need to reset filter for users in super manager role who can supervise/see all organizations
+    if current_user.user_organization_filters.include? UserOrganizationFilter.system_filters.first
+      if current_user.user_organization_filter != current_user.user_organization_filters.system_filters.first || current_user.user_organization_filters.system_filters.first.get_organizations.count != @organization_list.count
+        set_current_user_organization_filter_(current_user, current_user.user_organization_filters.system_filters.first)
+        notify_user(:filter_warning, "Filter reset to enter funding.")
 
-      get_organization_selections
+        get_organization_selections
+      end
     end
   end
 

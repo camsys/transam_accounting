@@ -42,7 +42,7 @@
   .state_or_single_agency_budget{:id => "state_or_single_agency_budget_id"}
     .row
       .col-sm-8
-        = f.input :total_amount, :label => 'Budget ($)', :required => true, :input_html => { :min => 1  }
+        = f.input :total_amount, :as => :integer, :label => 'Budget ($)', :required => true, :input_html => { :min => 1  }
 
   .all_agencies_covered_by_template_group{:id => "all_agencies_covered_by_template_group_id"}
     .all_agencies_covered_by_template{:id => "all_agencies_covered_by_template_id"}
@@ -143,7 +143,13 @@
 
   $.validator.addClassRules("agency_budget", {
     require_from_group: [1, ".agency_budget"],
+    integer: true,
     min: 1
+  });
+
+  $.extend($.validator.messages, {
+    integer: 'Please enter an integer greater than or equal to 1.',
+    min: 'Please enter an integer greater than or equal to 1.'
   });
 
   $.validator.addMethod("FYRange", function(value, element) {
@@ -178,7 +184,7 @@
 
   function populate_all_agencies_fields(){
     //There should be an entry before the first agency. the empty space and the all agencies option
-    i = 1;
+    i = 0;
 
     while(i < agencies.length)
     {
@@ -366,6 +372,7 @@
         url: url,
         data: {template_id: funding_bucket_proxy_template_id.value},
         success: function(result){
+          console.log(result);
           agencies = result
           $('#funding_bucket_proxy_owner_id').empty();
           $('#owner_id_div_id').show();

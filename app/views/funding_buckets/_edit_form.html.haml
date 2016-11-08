@@ -8,7 +8,7 @@
       = f.input :budget_amount, :wrapper=> :vertical_prepend, :label => "Budget ($)" do
         %span.input-group-addon
           %i.fa.fa-usd
-        = f.input_field :budget_amount, :required => true, :input_html => {:min => 0, :integer => true}, :class => "form-control"
+        = f.input_field :budget_amount, :required => true, :min => 1, :integer => true, :value => @funding_bucket.budget_amount.to_i, :class => "form-control"
 
   = f.button :submit, 'Save', :class => "btn btn-primary"
 
@@ -19,4 +19,9 @@
     submitHandler: function(form) {
       form.submit();
     }
+  });
+
+  $.extend($.validator.messages, {
+    integer: 'Please enter an integer greater than or equal to 1.',
+    min: 'Please enter an integer greater than or equal to 1.'
   });

@@ -28,7 +28,7 @@
   - if can? :read, FundingTemplate
     .tab-pane.fade#templates
       .tab-content
-        = render :partial => 'funding_templates/index_table', :locals => {:funding_templates => @funding_source.funding_templates.active, :show_actions => 0}
+        = render :partial => 'funding_templates/index_table', :locals => {:funding_templates => @funding_source.funding_templates, :show_actions => 0}
 
     .tab-pane.fade#bckts
       .tab-content
