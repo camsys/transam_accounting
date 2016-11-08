@@ -5,7 +5,7 @@
   - if can? :read, FundingTemplate
     %li
       %a{:href => "#templates", :data =>{:toggle => 'tab'}}
-        %span.badge.pull-right= @funding_source.funding_templates.active.count
+        %span.badge.pull-right= @funding_source.funding_templates.count
         = "Templates"
     %li
       %a{:href => "#bckts", :data =>{:toggle => 'tab'}}
