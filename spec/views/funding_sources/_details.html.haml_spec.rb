@@ -8,6 +8,7 @@ describe "funding_sources/_details.html.haml", :type => :view do
     test_fund = create(:funding_source)
     assign(:funding_source, test_fund)
     assign(:grants, [])
+    assign(:organization_list, Organization.ids)
     render
 
     expect(rendered).to have_content(test_fund.description)
