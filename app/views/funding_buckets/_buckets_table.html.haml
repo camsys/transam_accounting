@@ -23,7 +23,7 @@
       - if @funding_template.nil?
         %th.center{:data => {:sortable => 'true'}} Program (Template)
       %th.center{:data => {:sortable => 'true'}} Type
-      - if @organization_list.count > 1
+      - if (current_user.organizations.ids & @organization_list).count > 1 || !@my_funds
         %th.center{:data => {:field => 'bucket_owner', :sortable => 'true'}} Owner
       %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Total
       %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Committed
@@ -42,17 +42,17 @@
         %td.left= format_as_fiscal_year(b.fiscal_year)
         - if @funding_template.nil?
           %td.left= "#{b.funding_template.funding_source.name} (#{b.funding_template.name})"
-        - if params[:my_funds]
+        - if @my_funds
           %td.left= b.is_bucket_app? ? 'Grant Application' : (b.funding_template.funding_source.formula_fund ? 'Formula' : 'Discretionary')
         - else
           %td.left= b.funding_template.funding_source.funding_source_type.name
-        - if @organization_list.count > 1
+        - if (current_user.organizations.ids & @organization_list).count > 1 || !@my_funds
           %td.left= b.owner.name
         %td.right= b.budget_amount
         %td.right= b.budget_committed
         %td.right= b.budget_remaining
         -unless b.funding_template.funding_source.life_in_years.nil?
-          %td.left= format_as_fiscal_year(b.fiscal_year + b.funding_template.funding_source.life_in_years)
+          %td.left= format_as_fiscal_year(b.fiscal_year + b.funding_template.funding_source.life_in_years - 1)
         -else
           %td.left
 

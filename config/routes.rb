@@ -2,6 +2,8 @@ Rails.application.routes.draw do
 
   resources :funding_buckets do
     collection do
+      get 'my_funds'
+
       get 'find_templates_from_program_id'
       get 'find_organizations_from_template_id'
       get 'find_existing_buckets_for_create'

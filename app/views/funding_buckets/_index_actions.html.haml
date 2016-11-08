@@ -1,6 +1,5 @@
-= form_tag funding_buckets_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
+= form_tag (@my_funds ? my_funds_funding_buckets_path : funding_buckets_path), :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
   .form-group
-    = hidden_field_tag :my_funds, params[:my_funds]
     = select_tag(:agency_id, options_for_select(@organizations, :selected => @searched_agency_id), :class => "form-control bucket-filter", :style => "width: 400px;", :prompt => "All Organizations")
     - if @templates
       = select_tag(:searched_template, options_for_select(@templates, :selected => @searched_template), :class => "form-control bucket-filter", :style => "width: 300px;", :prompt => "All Templates")

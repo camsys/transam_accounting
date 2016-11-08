@@ -10,21 +10,78 @@ class FundingBucketsController < OrganizationAwareController
 
   # GET /buckets
   def index
+    authorize! :read, FundingBucket
 
-    if params[:my_funds]
-      authorize! :my_funds, FundingBucket
+    add_breadcrumb 'Funding Programs', funding_sources_path
+    add_breadcrumb 'Templates', funding_templates_path
+    add_breadcrumb 'Buckets', funding_buckets_path
 
-      add_breadcrumb 'Funding Programs', funding_sources_path
-      add_breadcrumb 'My Funds', funding_buckets_path(my_funds: 1)
-    else
-      authorize! :read, FundingBucket
+    @templates =  FundingTemplate.all.pluck(:name, :id)
+    @organizations = Organization.where(id: @organization_list).pluck(:name, :id)
 
-      add_breadcrumb 'Funding Programs', funding_sources_path
-      add_breadcrumb 'Templates', funding_templates_path
-      add_breadcrumb 'Buckets', funding_buckets_path
+    # Start to set up the query
+    conditions  = []
+    values      = []
 
-      @templates =  FundingTemplate.all.pluck(:name, :id)
+    if params[:agency_id].present?
+      @searched_agency_id =  params[:agency_id]
     end
+    if params[:fiscal_year].present?
+      @searched_fiscal_year =  params[:fiscal_year]
+    end
+    if params[:funds_available].present?
+      @show_funds_available_only =  params[:funds_available]
+    end
+    if params[:searched_template].present?
+      @searched_template = params[:searched_template]
+    end
+
+    # this is a search of the owner not a search on the eligibility
+    # a search on the eligiblity follows the overall system filter -- not set for a super manager
+    unless @searched_agency_id.blank?
+      agency_filter_id = @searched_agency_id.to_i
+      conditions << 'funding_buckets.owner_id = ?'
+      values << agency_filter_id
+    end
+
+    unless @searched_fiscal_year.blank?
+      fiscal_year_filter = @searched_fiscal_year.to_i
+      conditions << 'fiscal_year = ?'
+      values << fiscal_year_filter
+    end
+
+    unless @searched_template.nil?
+      funding_template_id = @searched_template.to_i
+      conditions << 'funding_template_id = ?'
+      values << funding_template_id
+    end
+
+    if @show_funds_available_only
+      conditions << 'budget_amount > budget_committed'
+    end
+
+    conditions << 'funding_buckets.active = true'
+
+    @buckets = FundingBucket.where(conditions.join(' AND '), *values)
+
+
+    # cache the set of object keys in case we need them later
+    cache_list(@buckets, INDEX_KEY_LIST_VAR)
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render :json => @buckets }
+    end
+  end
+
+  def my_funds
+
+    @my_funds = true # so partial can use main index table with some tweaks
+
+    authorize! :my_funds, FundingBucket
+
+    add_breadcrumb 'Funding Programs', funding_sources_path
+    add_breadcrumb 'My Funds', my_funds_funding_buckets_path
 
     @organizations = Organization.where(id: @organization_list).pluck(:name, :id)
 
@@ -48,22 +105,22 @@ class FundingBucketsController < OrganizationAwareController
     # this is a search of the owner not a search on the eligibility
     # a search on the eligiblity follows the overall system filter -- not set for a super manager
     if @searched_agency_id.blank?
-      if params[:my_funds]
-        conditions << 'owner_id IN (?)'
-        # should use organization list but organizations that the user actually belongs to
-        # so bpt can see all orgs but only belong to BPT
-        # transit agencies obviously belongs to all their transit agencies
-        values << (current_user.organizations.ids & @organization_list)
-      end
+      conditions << 'funding_buckets.owner_id IN (?)'
+      # should use organization list but organizations that the user actually belongs to
+      # so bpt can see all orgs but only belong to BPT
+      # transit agencies obviously belongs to all their transit agencies
+      values << (current_user.organizations.ids & @organization_list)
     else
       agency_filter_id = @searched_agency_id.to_i
-      conditions << 'owner_id = ?'
+      conditions << 'funding_buckets.owner_id = ?'
       values << agency_filter_id
     end
 
     unless @searched_fiscal_year.blank?
       fiscal_year_filter = @searched_fiscal_year.to_i
-      conditions << 'fiscal_year = ?'
+      conditions << 'funding_buckets.fiscal_year <= ?'
+      values << fiscal_year_filter
+      conditions << '(((funding_buckets.fiscal_year + funding_sources.life_in_years) >= ?) OR (funding_sources.life_in_years IS NULL))'
       values << fiscal_year_filter
     end
 
@@ -80,14 +137,14 @@ class FundingBucketsController < OrganizationAwareController
     # on My Funds - templates must be ones you are eligible for
     # on buckets index page you can search by template
     #if params[:my_funds]
-      #@templates = FundingTemplate.joins(:organizations).where('funding_templates.owner_id = ? AND funding_templates_organizations.organization_id IN (?)', FundingSourceType.find_by(name: 'State').id, @organization_list)
-      #buckets = FundingBucket.where('(funding_template_id IN (?) OR owner_id IN (?))',templates.ids, @organization_list)
-      #@buckets = buckets.where(conditions.join(' AND '), *values)
+    #@templates = FundingTemplate.joins(:organizations).where('funding_templates.owner_id = ? AND funding_templates_organizations.organization_id IN (?)', FundingSourceType.find_by(name: 'State').id, @organization_list)
+    #buckets = FundingBucket.where('(funding_template_id IN (?) OR owner_id IN (?))',templates.ids, @organization_list)
+    #@buckets = buckets.where(conditions.join(' AND '), *values)
     #end
 
-    conditions << 'active = true'
+    conditions << 'funding_buckets.active = true'
 
-    @buckets = FundingBucket.where(conditions.join(' AND '), *values)
+    @buckets = FundingBucket.joins(:funding_source).where(conditions.join(' AND '), *values)
 
 
     # cache the set of object keys in case we need them later
@@ -218,7 +275,7 @@ class FundingBucketsController < OrganizationAwareController
     respond_to do |format|
       if @funding_bucket.save
         notify_user(:notice, "The grant application was successfully saved.")
-        format.html { redirect_to funding_buckets_path(my_funds: 1) }
+        format.html { redirect_to my_funds_funding_buckets_path }
         format.json { render action: 'show', status: :created, location: @funding_bucket }
       else
         format.html { render action: 'new_grant' }
@@ -250,7 +307,7 @@ class FundingBucketsController < OrganizationAwareController
     respond_to do |format|
       if @funding_bucket.update(bucket_params)
         notify_user(:notice, "The grant application was successfully updated.")
-        format.html { redirect_to funding_buckets_path(my_funds: 1) }
+        format.html { redirect_to my_funds_funding_buckets_path }
         format.json { head :no_content }
       else
         format.html { render action: 'edit_bucket_app' }

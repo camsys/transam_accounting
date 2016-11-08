@@ -19,6 +19,7 @@ class FundingBucket< ActiveRecord::Base
   belongs_to :updator, :class_name => "User", :foreign_key => :updated_by_id
 
   belongs_to :funding_template
+  has_one    :funding_source, :through => :funding_template
   belongs_to :owner, :class_name => "Organization"
 
   #------------------------------------------------------------------------------
