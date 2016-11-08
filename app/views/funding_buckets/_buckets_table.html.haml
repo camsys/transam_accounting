@@ -23,7 +23,8 @@
       - if @funding_template.nil?
         %th.center{:data => {:sortable => 'true'}} Program (Template)
       %th.center{:data => {:sortable => 'true'}} Type
-      %th.center{:data => {:field => 'bucket_owner', :sortable => 'true'}} Owner
+      - if @organization_list.count > 1
+        %th.center{:data => {:field => 'bucket_owner', :sortable => 'true'}} Owner
       %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Total
       %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Committed
       %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Available
@@ -45,10 +46,8 @@
           %td.left= b.is_bucket_app? ? 'Grant Application' : (b.funding_template.funding_source.formula_fund ? 'Formula' : 'Discretionary')
         - else
           %td.left= b.funding_template.funding_source.funding_source_type.name
-        - if b.owner.present? && @organization_list.count > 1
+        - if @organization_list.count > 1
           %td.left= b.owner.name
-        -else
-          %td.left= state
         %td.right= b.budget_amount
         %td.right= b.budget_committed
         %td.right= b.budget_remaining
