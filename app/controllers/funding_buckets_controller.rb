@@ -22,9 +22,11 @@ class FundingBucketsController < OrganizationAwareController
       add_breadcrumb 'Funding Programs', funding_sources_path
       add_breadcrumb 'Templates', funding_templates_path
       add_breadcrumb 'Buckets', funding_buckets_path
+
+      @templates =  FundingTemplate.all.pluck(:name, :id)
     end
 
-
+    @organizations = Organization.where(id: @organization_list).pluck(:name, :id)
 
     # Start to set up the query
     conditions  = []
@@ -86,13 +88,6 @@ class FundingBucketsController < OrganizationAwareController
     conditions << 'active = true'
 
     @buckets = FundingBucket.where(conditions.join(' AND '), *values)
-
-    if params[:my_funds]
-      @organizations = Organization.where('organization_type_id = 1 OR id IN (?)', @organization_list).pluck(:name, :id)
-    else
-      @organizations =  Organization.where(id: @organization_list).pluck(:name, :id)
-      @templates =  FundingTemplate.all.pluck(:name, :id)
-    end
 
 
     # cache the set of object keys in case we need them later
