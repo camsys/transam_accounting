@@ -19,12 +19,12 @@ ActiveRecord::Schema.define(version: 20161014201011) do
     t.string   "name",                 limit: 64
     t.text     "description"
     t.boolean  "show_in_dashboard"
-    t.string   "start",                limit: 64
-    t.string   "due",                  limit: 64
-    t.string   "notify",               limit: 64
-    t.string   "warn",                 limit: 64
-    t.string   "alert",                limit: 64
-    t.string   "escalate",             limit: 64
+    t.boolean  "system_activity"
+    t.date     "start_date"
+    t.date     "end_date"
+    t.integer  "frequency_quantity",              null: false
+    t.integer  "frequency_type_id",               null: false
+    t.string   "execution_time",       limit: 32, null: false
     t.string   "job_name",             limit: 64
     t.datetime "last_run"
     t.boolean  "active"
