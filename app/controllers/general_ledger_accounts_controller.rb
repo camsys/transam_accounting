@@ -142,12 +142,18 @@ class GeneralLedgerAccountsController < OrganizationAwareController
 
   def get_ledger_account
     # See if it is our chart of accounts
-    @ledger_account = @chart_of_accounts.general_ledger_accounts.find_by_object_key(params[:id]) unless params[:id].nil?
+    if @chart_of_accounts && params[:id].present?
+      @ledger_account = @chart_of_accounts.general_ledger_accounts.find_by_object_key(params[:id])
+    end
     # if not found or the object does not belong to the users
     # send them back to index.html.erb
     if @ledger_account.nil?
-      notify_user(:alert, 'Record not found!')
-      redirect_to general_ledger_accounts_url
+      if GeneralLedgerAccount.find_by(object_key: params[:id], organization_id: current_user.user_organization_filters.system_filters.first.get_organizations.map{|x| x.id}).nil?
+        redirect_to '/404'
+      else
+        notify_user(:warning, 'This record is outside your filter. Change your filter if you want to access it.')
+        redirect_to general_ledger_accounts_path
+      end
       return
     end
 
