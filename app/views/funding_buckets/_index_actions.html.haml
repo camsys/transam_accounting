@@ -1,6 +1,7 @@
 = form_tag (@my_funds ? my_funds_funding_buckets_path : funding_buckets_path), :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
   .form-group
-    = select_tag(:agency_id, options_for_select(@organizations, :selected => @searched_agency_id), :class => "form-control bucket-filter", :style => "width: 400px;", :prompt => "All Organizations")
+    - if @organizations.count > 1
+      = select_tag(:agency_id, options_for_select(@organizations, :selected => @searched_agency_id), :class => "form-control bucket-filter", :style => "width: 400px;", :prompt => "All Organizations")
     - if @templates
       = select_tag(:searched_template, options_for_select(@templates, :selected => @searched_template), :class => "form-control bucket-filter", :style => "width: 300px;", :prompt => "All Templates")
     = select_tag(:fiscal_year, options_for_select(get_fiscal_years, :selected => @searched_fiscal_year), :class => "form-control bucket-filter", :style => "width: 150px;", :prompt => "All Years")
