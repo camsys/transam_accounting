@@ -163,6 +163,9 @@ class FundingBucketsController < OrganizationAwareController
     add_breadcrumb @funding_bucket.funding_template.funding_source.name, funding_source_path(@funding_bucket.funding_template.funding_source)
     add_breadcrumb @funding_bucket.funding_template.name, funding_template_path(@funding_bucket.funding_template)
     add_breadcrumb @funding_bucket.to_s, funding_bucket_path(@funding_bucket)
+
+    @funding_template = @funding_bucket.funding_template
+
   end
 
   # GET /buckets/new
