@@ -172,6 +172,8 @@
   }
 
   function populate_all_agencies_fields(){
+    //Always best to be sure that this isn't double populating agencies
+    remove_all_agencies_fields();
 
     //There should be an entry before the first agency. the empty space and the all agencies option
     i = 0;
@@ -196,20 +198,21 @@
       $("#state_or_single_agency_budget_id").hide();
       funding_bucket_proxy_total_amount.value = null;
       if( !$('#funding_bucket_proxy_create_option_delete').is(':checked')) {
-        $("#all_agencies_covered_by_template_group_id").show()
+        $("#all_agencies_covered_by_template_group_id").show();
       }
       display_budget = false;
       display_all_orgs_budget = true;
-      populate_all_agencies_fields()
+      populate_all_agencies_fields();
     }
     else{
-      remove_all_agencies_fields()
+      //We don't need all the agencies fields so remove them
+      remove_all_agencies_fields();
       if( !$('#funding_bucket_proxy_create_option_delete').is(':checked')) {
         $("#state_or_single_agency_budget_id").show();
       }
       display_budget = true;
       display_all_orgs_budget = false;
-      $("#all_agencies_covered_by_template_group_id").hide()
+      $("#all_agencies_covered_by_template_group_id").hide();
       //$('#all_agencies_covered_by_template_id').empty();
     }
   })
