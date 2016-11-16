@@ -63,6 +63,7 @@
   var display_all_orgs_budget = false;
   var display_escalate_by = false;
 
+
   // if defaults set
   $(document).ready(function() {
     $('#funding_bucket_proxy_program_id').change();
@@ -167,22 +168,11 @@
   var agencies = []
 
   function remove_all_agencies_fields(){
-    i=1;
-
-    while(i < agencies.length)
-    {
-        var id = agencies[i][0];
-        var label_id = 'agency_label_' + id
-        var field_id = id
-
-        $('#'+label_id).remove();
-        $('#'+field_id).remove();
-
-      i++;
-    }
+    $("div.row_agencies").remove();
   }
 
   function populate_all_agencies_fields(){
+
     //There should be an entry before the first agency. the empty space and the all agencies option
     i = 0;
 
@@ -192,7 +182,7 @@
         id = agencies[i][0];
         name = agencies[i][1]
         var new_input =
-          '<div class="row"><div class="col-sm-8"><div class="form-group"><label class="control-label" id="agency_label_' + id + '" name="agency_label_' + name + '" type="text">'+name+' Budget ($)</label>' +
+          '<div class="row_agencies"><div class="col-sm-8"><div class="form-group"><label class="control-label" id="agency_label_' + id + '" name="agency_label_' + name + '" type="text">'+name+' Budget ($)</label>' +
           '<div><input autocomplete="off" class="input form-control agency_budget" id="' + id + '" name="agency_budget_id_' + id + '" label="' + id + '" type="text"></div>' +
            '</div></div></div>';
         $(add_to).before(new_input);
@@ -200,7 +190,6 @@
       i++;
     }
   }
-
 
   $('#funding_bucket_proxy_owner_id').change(function(){
     if (funding_bucket_proxy_owner_id.value == -1){
