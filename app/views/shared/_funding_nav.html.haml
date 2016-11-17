@@ -33,8 +33,9 @@
           %i.fa.fa-fw.fa-legal
           = ' Buckets'
 
-    %li.divider
-    %li.text-left
-      = link_to my_funds_funding_buckets_path do
-        %i.fa.fa-fw.fa-usd
-        = 'My Funds'
+    - if can? :my_funds, FundingBucket
+      %li.divider
+      %li.text-left
+        = link_to my_funds_funding_buckets_path do
+          %i.fa.fa-fw.fa-usd
+          = 'My Funds'
