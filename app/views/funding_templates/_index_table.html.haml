@@ -73,7 +73,8 @@
             = link_to edit_funding_template_path(f), :class => "button btn-xs", :title => "Edit template" do
               %i.fa.fa-edit.fa-1-5x.text-success
             - if can? :destroy, f
-              = link_to funding_template_path(f), :method => :delete, :data => {:confirm => "This template is associated with #{f.funding_buckets.active.count} buckets, which are tagged to YYY projects. Are you sure? The action cannot be undone."}  do
+              -# link_to funding_template_path(f), :method => :delete, :data => {:confirm => "This template is associated with #{f.funding_buckets.active.count} buckets, which are tagged to YYY projects. Are you sure? The action cannot be undone."}  do
+              = link_to funding_template_path(f), :method => :delete, :data => {:confirm => "This template is associated with #{f.funding_buckets.active.count} buckets. Are you sure? The action cannot be undone."}  do
                 %i.fa.fa-trash-o.fa-fw.text-danger
 
 :javascript
