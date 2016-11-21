@@ -330,8 +330,12 @@ class FundingBucketsController < OrganizationAwareController
       respond_to do |format|
         format.html {
           # check where to redirect to
-          if URI(request.referer || '').path.include? 'funding_buckets'
-            redirect_to funding_buckets_path
+          if URI(request.referer || '').path.include? "funding_buckets/#{@funding_bucket.object_key}"
+            if current_user.organization_ids.include? @funding_bucket.owner_id
+              redirect_to my_funds_funding_buckets_path
+            else
+              redirect_to funding_buckets_path
+            end
           else
             redirect_to :back
           end

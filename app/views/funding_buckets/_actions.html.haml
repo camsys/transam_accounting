@@ -1,4 +1,4 @@
-- if (can? :update, @funding_bucket) || (can? :edit_bucket_app, @funding_bucket)
+- if (can? :update, @funding_bucket) || ((can? :edit_bucket_app, @funding_bucket) && @funding_bucket.is_bucket_app?)
   .btn-group.pull-right.panel-action
     %button.btn.btn-primary.btn-sm.dropdown-toggle{:data => {:toggle => 'dropdown'}}
       %i.fa.fa-cog
