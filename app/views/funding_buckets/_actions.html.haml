@@ -17,7 +17,8 @@
             = " Update this bucket's budget"
 
       - if (can? :destroy_bucket_app, @funding_bucket) && @funding_bucket.is_bucket_app?
-        = link_to destroy_bucket_app_funding_bucket_path(@funding_bucket), :method => :delete, :data => {:confirm => "Are you sure you want to remove this grant application? The action can't be undone."} do
-          %i.fa.fa-trash-o.fa-fw
+        %li
+          = link_to destroy_bucket_app_funding_bucket_path(@funding_bucket), :method => :delete, :data => {:confirm => "Are you sure you want to remove this grant application? The action can't be undone."} do
+            %i.fa.fa-trash-o.fa-fw
             = " Remove this grant application"
 
