@@ -4,8 +4,8 @@ module Abilities
 
     def initialize(user)
 
-      can [:create, :update], FundingSource
-      can [:create, :update], FundingTemplate
+      can :manage, FundingSource
+      can :manage, FundingTemplate
       can :manage, FundingBucket
 
     end
