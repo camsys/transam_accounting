@@ -162,15 +162,6 @@ class FundingTemplatesController < OrganizationAwareController
 
   protected
 
-  def check_filter
-    if current_user.user_organization_filter != current_user.user_organization_filters.system_filters.first || current_user.user_organization_filters.system_filters.first.get_organizations.count != @organization_list.count
-      set_current_user_organization_filter_(current_user, current_user.user_organization_filters.system_filters.first)
-      notify_user(:filter_warning, "Filter reset to enter funding.")
-
-      get_organization_selections
-    end
-  end
-
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_funding_template

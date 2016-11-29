@@ -4,7 +4,7 @@ class FundingBucketsController < OrganizationAwareController
   add_breadcrumb "Home", :root_path
 
   before_action :set_funding_bucket, only: [:show, :edit, :update, :edit_bucket_app, :update_bucket_app, :destroy_bucket_app]
-  before_action :check_filter,      :only => [:index, :show, :new, :edit, :new_bucket_app, :edit_bucket_app]
+  before_action :check_filter,      :only => [:index, :new, :edit]
 
   INDEX_KEY_LIST_VAR    = "funding_buckets_key_list_cache_var"
 
@@ -158,6 +158,12 @@ class FundingBucketsController < OrganizationAwareController
 
   # GET /buckets/1
   def show
+
+    # only need to reset filter for users in super manager role who can supervise/see all organizations
+    if current_user.user_organization_filters.include? UserOrganizationFilter.system_filters.first
+      check_filter
+    end
+
     authorize! :read, @funding_bucket
 
     add_breadcrumb @funding_bucket.funding_template.funding_source.name, funding_source_path(@funding_bucket.funding_template.funding_source)
@@ -413,18 +419,6 @@ class FundingBucketsController < OrganizationAwareController
   end
 
   protected
-
-  def check_filter
-    # only need to reset filter for users in super manager role who can supervise/see all organizations
-    if current_user.user_organization_filters.include? UserOrganizationFilter.system_filters.first
-      if current_user.user_organization_filter != current_user.user_organization_filters.system_filters.first || current_user.user_organization_filters.system_filters.first.get_organizations.count != @organization_list.count
-        set_current_user_organization_filter_(current_user, current_user.user_organization_filters.system_filters.first)
-        notify_user(:filter_warning, "Filter reset to enter funding.")
-
-        get_organization_selections
-      end
-    end
-  end
 
   def find_organizations(template_id)
     result = []
