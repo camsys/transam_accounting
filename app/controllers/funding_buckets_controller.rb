@@ -17,7 +17,7 @@ class FundingBucketsController < OrganizationAwareController
     add_breadcrumb 'Buckets', funding_buckets_path
 
     @templates =  FundingTemplate.all.pluck(:name, :id)
-    @organizations = Organization.where(id: @organization_list).pluck(:name, :id)
+    @organizations = Organization.where(id: @organization_list).map{|o| [o.coded_name, o.id]}
 
     # Start to set up the query
     conditions  = []
@@ -83,7 +83,7 @@ class FundingBucketsController < OrganizationAwareController
     add_breadcrumb 'Funding Programs', funding_sources_path
     add_breadcrumb 'My Funds', my_funds_funding_buckets_path
 
-    @organizations = Organization.where(id: @organization_list).pluck(:name, :id)
+    @organizations = Organization.where(id: @organization_list).map{|o| [o.coded_name, o.id]}
 
     # Start to set up the query
     conditions  = []
@@ -428,18 +428,18 @@ class FundingBucketsController < OrganizationAwareController
     if template.owner == FundingSourceType.find_by(name: 'State')
       grantors = Grantor.where(id: @organization_list)
       grantors.each { |g|
-        result << [g.id, g.name]
+        result << [g.id, g.coded_name]
       }
     else
       orgs = template.organizations.where(id: @organization_list)
       organizations = []
       if orgs.length > 0
         orgs.each { |o|
-          item = [o.id, o.name]
+          item = [o.id, o.coded_name]
           organizations << item
         }
       else
-        organizations =  Organization.find_by_sql(template.query_string).reduce([]) { |a, n| a.push([n.id, n.name]) if @organization_list.include? n.id; a }
+        organizations =  Organization.find_by_sql(template.query_string).reduce([]) { |a, n| a.push([n.id, n.coded_name]) if @organization_list.include? n.id; a }
       end
 
       result = organizations
