@@ -31,7 +31,6 @@
         %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Available
         %th.center{:data => {:sortable => 'true'}} Expires
 
-        %th
         - if compact_columns == 0
           %th
 
@@ -57,12 +56,8 @@
           -else
             %td.left
 
-          - unless b.new_record?
-            %td.center.nowrap
-              = link_to funding_bucket_path(b) do
-                %i.fa.fa-info-circle.fa-1-5x
           - if compact_columns == 0
-            %td.center.nowrap
+            %td.center.nowrap{:data => {:field => 'action-cell'}}
               - if (can? :edit_bucket_app, b) && b.is_bucket_app?
                 = link_to edit_bucket_app_funding_bucket_path(b) do
                   %i.fa.fa-edit.fa-1-5x.text-success
@@ -92,5 +87,16 @@
       trigger: 'hover'
     });
     $('.transam-tooltip').tooltip();
+  });
+
+  var path = "#{funding_bucket_path('xxx')}";
+
+  $('#' + '#{table_dom_id}').on('click', 'td', function () {
+    var row = $(this).parent('tr').attr('id');
+
+    if ($(this).attr('data-field') != 'action-cell') {
+      var url = path.replace("xxx", row);
+      document.location.href = url;
+    }
   });
 

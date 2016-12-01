@@ -49,14 +49,13 @@
 
     %tbody
       - funding_templates.each do |f|
-        %tr
+        %tr{:id => f.object_key, :class => 'action-path'}
           %td.left= f.object_key
           - if show_actions == 1
             %td.left{data: {tableexport: {msonumberformat: "\\@"}}}
               = f.funding_source.to_s
           %td.left{data: {tableexport: {value: "#{f.name}"}}}
-            %span.hidden= f.name
-            = link_to(f.name, funding_template_path(f))
+            = f.name
 
           %td.left= f.contributor.to_s
           %td.center{data: {tableexport: {value: "#{f.transfer_only ? 'Yes' : 'No'}"}}}= format_as_boolean(f.transfer_only)
@@ -68,7 +67,7 @@
           %td.center{data: {tableexport: {value: "#{f.recurring ? 'Yes' : 'No'}"}}}= format_as_boolean(f.recurring)
           %td.right= f.match_required.present? ? f.match_required : ''
 
-          %td.center.nowrap
+          %td.center.nowrap{:data => {:field => 'action-cell'}}
             %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: f.description}, title: 'Description', tabindex: '0'}
               %i.fa.fa-info-circle
             - if can? :update, f
@@ -96,3 +95,14 @@
       return format("##0.000", value) + "%";
     }
   };
+
+  var path = "#{funding_template_path('xxx')}";
+
+  $('#' + '#{table_dom_id}').on('click', 'td', function () {
+    var row = $(this).parent('tr').attr('id');
+
+    if ($(this).attr('data-field') != 'action-cell') {
+      var url = path.replace("xxx", row);
+      document.location.href = url;
+    }
+  });
