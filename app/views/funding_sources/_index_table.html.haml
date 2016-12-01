@@ -3,70 +3,71 @@
   show_actions ||= 0
 
 - if show_actions == 1
-  #table_actions.btn-group
+  #table_actions.btn-toolbar
     = render :partial => "funding_sources/index_actions"
 
-%table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
-  :pagination => 'true',
-  :show_pagination_switch => 'true',
-  :page_list => "[5, 10, 20, 50, 100, 200]",
-  :page_size => current_user.num_table_rows,
-  :search => 'false',
-  :toolbar => "#table_actions",
-  :export_types => "['csv', 'txt', 'excel']",
-  :show_export => 'true',
-  :show_columns => 'true',
-  :state_save => 'true',
-  :state_save_id_table => "funding_source_id",
-  :state_save_expire => "1y"}}
+.table-responsive
+  %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
+    :pagination => 'true',
+    :show_pagination_switch => 'true',
+    :page_list => "[5, 10, 20, 50, 100, 200]",
+    :page_size => current_user.num_table_rows,
+    :search => 'false',
+    :toolbar => "#table_actions",
+    :export_types => "['csv', 'txt', 'excel']",
+    :show_export => 'true',
+    :show_columns => 'true',
+    :state_save => 'true',
+    :state_save_id_table => "funding_source_id",
+    :state_save_expire => "1y"}}
 
-  %thead
-    %tr
-      %th.center{:data => {:visible => 'false'}} Object Key
-      %th.center{:data => {:visible => 'false', :sortable => 'true'}} External ID
-      %th.center{:data => {:sortable => 'true'}} Name
-      %th.center{:data => {:sortable => 'true'}} Source
-
-      %th.center{:data => {:sortable => 'true'}} Type
-      %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Inflation Rate
-
-      %th.center{:data => {:sortable => 'true'}} Life of $ (yrs)
-      %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Pcnt Match
-
-      %th.center{:data => {:sortable => 'true'}} Valid From
-      %th.center{:data => {:sortable => 'true'}} Valid To
-
-      %th
-
-  %tbody
-    - funding_sources.each do |f|
+    %thead
       %tr
-        %td.left= f.object_key
-        %td.left= f.external_id
-        =# add whitespace so always read as text and not number. JS plugin trims later
-        %td.left{data: {tableexport: {msonumberformat: "\\@", value: "#{f.name}   "}}}
-          %span.hidden= f.name
-          = link_to(f.name, funding_source_path(f))
-        %td.left= f.funding_source_type
+        %th.center{:data => {:visible => 'false'}} Object Key
+        %th.center{:data => {:visible => 'false', :sortable => 'true'}} External ID
+        %th.center{:data => {:sortable => 'true'}} Name
+        %th.center{:data => {:sortable => 'true'}} Source
 
-        %td.center= f.formula_fund.present? ? 'Formula' : (f.discretionary_fund.present? ? 'Discretionary' : 'Unknown')
-        %td.right= f.inflation_rate.present? ? f.inflation_rate : ''
+        %th.center{:data => {:sortable => 'true'}} Type
+        %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Inflation Rate
 
-        %td.center= format_as_integer(f.life_in_years)
-        %td.right= f.match_required
+        %th.center{:data => {:sortable => 'true'}} Life of $ (yrs)
+        %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Pcnt Match
 
-        %td.center= format_as_fiscal_year(f.fy_start)
-        %td.center= format_as_fiscal_year(f.fy_end)
+        %th.center{:data => {:sortable => 'true'}} Valid From
+        %th.center{:data => {:sortable => 'true'}} Valid To
 
-        %td.center.nowrap
-          %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: "#{f.description}<br>#{f.details}"}, title: 'Details', tabindex: '0'}
-            %i.fa.fa-info-circle
-          - if can? :update, f
-            = link_to edit_funding_source_path(f), :class => "button btn-xs", :title => "Edit program" do
-              %i.fa.fa-edit.fa-1-5x.text-success
-            - if (can? :destroy, f) && f.deleteable?
-              = link_to funding_source_path(f), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
-                %i.fa.fa-trash-o.fa-fw.text-danger
+        %th
+
+    %tbody
+      - funding_sources.each do |f|
+        %tr
+          %td.left= f.object_key
+          %td.left= f.external_id
+          =# add whitespace so always read as text and not number. JS plugin trims later
+          %td.left{data: {tableexport: {msonumberformat: "\\@", value: "#{f.name}   "}}}
+            %span.hidden= f.name
+            = link_to(f.name, funding_source_path(f))
+          %td.left= f.funding_source_type
+
+          %td.center= f.formula_fund.present? ? 'Formula' : (f.discretionary_fund.present? ? 'Discretionary' : 'Unknown')
+          %td.right= f.inflation_rate.present? ? f.inflation_rate : ''
+
+          %td.center= format_as_integer(f.life_in_years)
+          %td.right= f.match_required
+
+          %td.center= format_as_fiscal_year(f.fy_start)
+          %td.center= format_as_fiscal_year(f.fy_end)
+
+          %td.center.nowrap
+            %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: "#{f.description}<br>#{f.details}"}, title: 'Details', tabindex: '0'}
+              %i.fa.fa-info-circle
+            - if can? :update, f
+              = link_to edit_funding_source_path(f), :class => "button btn-xs", :title => "Edit program" do
+                %i.fa.fa-edit.fa-1-5x.text-success
+              - if (can? :destroy, f) && f.deleteable?
+                = link_to funding_source_path(f), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
+                  %i.fa.fa-trash-o.fa-fw.text-danger
 
 :javascript
 

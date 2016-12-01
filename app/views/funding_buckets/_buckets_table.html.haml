@@ -1,77 +1,78 @@
 :ruby
   table_dom_id = SecureRandom.hex
 
-%table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
-  :card_view => "false",
-  :pagination => 'true',
-  :show_pagination_switch => 'true',
-  :page_list => "[5, 10, 20, 50, 100, 200]",
-  :page_size => current_user.num_table_rows,
-  :search => 'false',
-  :toolbar => "#buckets_table_actions",
-  :export_types => "['csv', 'txt', 'excel']",
-  :show_export => 'true',
-  :show_columns => 'true',
-  :show_multi_sort => 'true',
-  :sort_priority => '[{"sortName": "bucket_fy","sortOrder":"asc"},{"sortName":"bucket_owner","sortOrder":"asc"}]'}}
+.table-responsive
+  %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
+    :card_view => "false",
+    :pagination => 'true',
+    :show_pagination_switch => 'true',
+    :page_list => "[5, 10, 20, 50, 100, 200]",
+    :page_size => current_user.num_table_rows,
+    :search => 'false',
+    :toolbar => "#buckets_table_actions",
+    :export_types => "['csv', 'txt', 'excel']",
+    :show_export => 'true',
+    :show_columns => 'true',
+    :show_multi_sort => 'true',
+    :sort_priority => '[{"sortName": "bucket_fy","sortOrder":"asc"},{"sortName":"bucket_owner","sortOrder":"asc"}]'}}
 
-  %thead
-    %tr
-      - if compact_columns == 0
-        %th.center{:data => {:visible => 'false'}} Object Key
-      %th.center{:data => {:field => 'bucket_fy', :sortable => 'true'}} FY
-      - if @funding_template.nil?
-        %th.center{:data => {:sortable => 'true'}} Program (Template)
-      %th.center{:data => {:sortable => 'true'}} Type
-      - if (current_user.organizations.ids & @organization_list).count > 1 || !@my_funds
-        %th.center{:data => {:field => 'bucket_owner', :sortable => 'true'}} Owner
-      %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Total
-      %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Committed
-      %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Available
-      %th.center{:data => {:sortable => 'true'}} Expires
-
-      %th
-      - if compact_columns == 0
-        %th
-
-  %tbody
-    - buckets.each do |b|
-      %tr{:id => b.object_key, :class => 'action-path'}
+    %thead
+      %tr
         - if compact_columns == 0
-          %td.left= b.object_key
-        %td.left= format_as_fiscal_year(b.fiscal_year)
+          %th.center{:data => {:visible => 'false'}} Object Key
+        %th.center{:data => {:field => 'bucket_fy', :sortable => 'true'}} FY
         - if @funding_template.nil?
-          %td.left= "#{b.funding_template.funding_source.name} (#{b.funding_template.name})"
-        - if @my_funds
-          %td.left= b.is_bucket_app? ? 'Grant Application' : (b.funding_template.funding_source.formula_fund ? 'Formula' : 'Discretionary')
-        - else
-          %td.left= b.funding_template.funding_source.funding_source_type.name
+          %th.center{:data => {:sortable => 'true'}} Program (Template)
+        %th.center{:data => {:sortable => 'true'}} Type
         - if (current_user.organizations.ids & @organization_list).count > 1 || !@my_funds
-          %td.left= b.owner.name
-        %td.right= b.budget_amount
-        %td.right= b.budget_committed
-        %td.right= b.budget_remaining
-        -unless b.funding_template.funding_source.life_in_years.nil?
-          %td.left= format_as_fiscal_year(b.fiscal_year + b.funding_template.funding_source.life_in_years - 1)
-        -else
-          %td.left
+          %th.center{:data => {:field => 'bucket_owner', :sortable => 'true'}} Owner
+        %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Total
+        %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Committed
+        %th.center{:data => {:sortable => 'true', :formatter => 'currency_formatter'}} Available
+        %th.center{:data => {:sortable => 'true'}} Expires
 
-        - unless b.new_record?
-          %td.center.nowrap
-            = link_to funding_bucket_path(b) do
-              %i.fa.fa-info-circle.fa-1-5x
+        %th
         - if compact_columns == 0
-          %td.center.nowrap
-            - if (can? :edit_bucket_app, b) && b.is_bucket_app?
-              = link_to edit_bucket_app_funding_bucket_path(b) do
-                %i.fa.fa-edit.fa-1-5x.text-success
-            - elsif (can? :update, b)
-              = link_to edit_funding_bucket_path(b), :remote => true do
-                %i.fa.fa-edit.fa-1-5x.text-success
+          %th
 
-            - if (can? :destroy_bucket_app, b) && b.is_bucket_app?
-              = link_to destroy_bucket_app_funding_bucket_path(b), :method => :delete, :data => {:confirm => "Are you sure you want to remove this grant application? The action can't be undone."} do
-                %i.fa.fa-trash-o.fa-1-5x.text-danger
+    %tbody
+      - buckets.each do |b|
+        %tr{:id => b.object_key, :class => 'action-path'}
+          - if compact_columns == 0
+            %td.left= b.object_key
+          %td.left= format_as_fiscal_year(b.fiscal_year)
+          - if @funding_template.nil?
+            %td.left= "#{b.funding_template.funding_source.name} (#{b.funding_template.name})"
+          - if @my_funds
+            %td.left= b.is_bucket_app? ? 'Grant Application' : (b.funding_template.funding_source.formula_fund ? 'Formula' : 'Discretionary')
+          - else
+            %td.left= b.funding_template.funding_source.funding_source_type.name
+          - if (current_user.organizations.ids & @organization_list).count > 1 || !@my_funds
+            %td.left= b.owner.name
+          %td.right= b.budget_amount
+          %td.right= b.budget_committed
+          %td.right= b.budget_remaining
+          -unless b.funding_template.funding_source.life_in_years.nil?
+            %td.left= format_as_fiscal_year(b.fiscal_year + b.funding_template.funding_source.life_in_years - 1)
+          -else
+            %td.left
+
+          - unless b.new_record?
+            %td.center.nowrap
+              = link_to funding_bucket_path(b) do
+                %i.fa.fa-info-circle.fa-1-5x
+          - if compact_columns == 0
+            %td.center.nowrap
+              - if (can? :edit_bucket_app, b) && b.is_bucket_app?
+                = link_to edit_bucket_app_funding_bucket_path(b) do
+                  %i.fa.fa-edit.fa-1-5x.text-success
+              - elsif (can? :update, b)
+                = link_to edit_funding_bucket_path(b), :remote => true do
+                  %i.fa.fa-edit.fa-1-5x.text-success
+
+              - if (can? :destroy_bucket_app, b) && b.is_bucket_app?
+                = link_to destroy_bucket_app_funding_bucket_path(b), :method => :delete, :data => {:confirm => "Are you sure you want to remove this grant application? The action can't be undone."} do
+                  %i.fa.fa-trash-o.fa-1-5x.text-danger
 
 
 

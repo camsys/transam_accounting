@@ -3,79 +3,81 @@
   show_actions ||= 0
 
 
-#table_actions.btn-group
+#table_actions.btn-toolbar
   - if can? :create, FundingTemplate
-    = link_to new_funding_template_path(:funding_source_id => @funding_source.try(:id)), :class => 'btn btn-default' do
-      %i.fa.fa-plus.fa-fw
-      = "Add Template"
+    .btn-group
+      = link_to new_funding_template_path(:funding_source_id => @funding_source.try(:id)), :class => 'btn btn-default' do
+        %i.fa.fa-plus.fa-fw
+        = "Add Template"
   - if show_actions == 1
     = render :partial => "funding_templates/index_actions"
 
-%table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
-  :card_view => "false",
-  :pagination => 'true',
-  :show_pagination_switch => 'true',
-  :page_list => "[5, 10, 20, 50, 100, 200]",
-  :page_size => current_user.num_table_rows,
-  :search => 'false',
-  :toolbar => "#table_actions",
-  :export_types => "['csv', 'txt', 'excel']",
-  :show_export => 'true',
-  :show_columns => 'true',
-  :state_save => 'true',
-  :state_save_id_table => "funding_template_id",
-  :state_save_expire => "1y"}, :style => 'width:100%;'}
+.table-responsive
+  %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
+    :card_view => "false",
+    :pagination => 'true',
+    :show_pagination_switch => 'true',
+    :page_list => "[5, 10, 20, 50, 100, 200]",
+    :page_size => current_user.num_table_rows,
+    :search => 'false',
+    :toolbar => "#table_actions",
+    :export_types => "['csv', 'txt', 'excel']",
+    :show_export => 'true',
+    :show_columns => 'true',
+    :state_save => 'true',
+    :state_save_id_table => "funding_template_id",
+    :state_save_expire => "1y"}, :style => 'width:100%;'}
 
-  %thead
-    %tr
-      %th.center{:data => {:visible => 'false'}} Object Key
-      - if show_actions == 1
-        %th.center{:data => {:sortable => 'true'}} Program
-      %th.center{:data => {:sortable => 'true'}} Name
-
-      %th.center{:data => {:sortable => 'true'}} Contributor
-      %th.center{:data => {:sortable => 'true'}} Transfer
-      %th.center{:data => {:sortable => 'true'}} Owner
-
-      - FundingTemplateType.active.each do |type|
-        %th.center{:data => {:sortable => 'true'}}= type.name
-
-      %th.center{:data => {:sortable => 'true'}} Recurring
-      %th.center{:data => {:sortable => 'true', :formatter => 'pcnt_formatter'}} Pcnt Match
-
-      %th
-
-  %tbody
-    - funding_templates.each do |f|
+    %thead
       %tr
-        %td.left= f.object_key
+        %th.center{:data => {:visible => 'false'}} Object Key
         - if show_actions == 1
-          %td.left{data: {tableexport: {msonumberformat: "\\@"}}}
-            = f.funding_source.to_s
-        %td.left{data: {tableexport: {value: "#{f.name}"}}}
-          %span.hidden= f.name
-          = link_to(f.name, funding_template_path(f))
+          %th.center{:data => {:sortable => 'true'}} Program
+        %th.center{:data => {:sortable => 'true'}} Name
 
-        %td.left= f.contributor.to_s
-        %td.center{data: {tableexport: {value: "#{f.transfer_only ? 'Yes' : 'No'}"}}}= format_as_boolean(f.transfer_only)
-        %td.left= f.owner.to_s
+        %th.center{:data => {:sortable => 'true'}} Contributor
+        %th.center{:data => {:sortable => 'true'}} Transfer
+        %th.center{:data => {:sortable => 'true'}} Owner
 
         - FundingTemplateType.active.each do |type|
-          %td.center{data: {tableexport: {value: "#{f.funding_template_types.include?(type) ? 'Yes' : 'No'}"}}}= f.funding_template_types.include?(type) ? format_as_boolean(true) : ''
+          %th.center{:data => {:sortable => 'true'}}= type.name
 
-        %td.center{data: {tableexport: {value: "#{f.recurring ? 'Yes' : 'No'}"}}}= format_as_boolean(f.recurring)
-        %td.right= f.match_required.present? ? f.match_required : ''
+        %th.center{:data => {:sortable => 'true'}} Recurring
+        %th.center{:data => {:sortable => 'true', :formatter => 'pcnt_formatter'}} Pcnt Match
 
-        %td.center.nowrap
-          %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: f.description}, title: 'Description', tabindex: '0'}
-            %i.fa.fa-info-circle
-          - if can? :update, f
-            = link_to edit_funding_template_path(f), :class => "button btn-xs", :title => "Edit template" do
-              %i.fa.fa-edit.fa-1-5x.text-success
-            - if can? :destroy, f
-              -# link_to funding_template_path(f), :method => :delete, :data => {:confirm => "This template is associated with #{f.funding_buckets.active.count} buckets, which are tagged to YYY projects. Are you sure? The action cannot be undone."}  do
-              = link_to funding_template_path(f), :method => :delete, :data => {:confirm => "This template is associated with #{f.funding_buckets.active.count} buckets. Are you sure? The action cannot be undone."}  do
-                %i.fa.fa-trash-o.fa-fw.text-danger
+        %th
+
+    %tbody
+      - funding_templates.each do |f|
+        %tr
+          %td.left= f.object_key
+          - if show_actions == 1
+            %td.left{data: {tableexport: {msonumberformat: "\\@"}}}
+              = f.funding_source.to_s
+          %td.left{data: {tableexport: {value: "#{f.name}"}}}
+            %span.hidden= f.name
+            = link_to(f.name, funding_template_path(f))
+
+          %td.left= f.contributor.to_s
+          %td.center{data: {tableexport: {value: "#{f.transfer_only ? 'Yes' : 'No'}"}}}= format_as_boolean(f.transfer_only)
+          %td.left= f.owner.to_s
+
+          - FundingTemplateType.active.each do |type|
+            %td.center{data: {tableexport: {value: "#{f.funding_template_types.include?(type) ? 'Yes' : 'No'}"}}}= f.funding_template_types.include?(type) ? format_as_boolean(true) : ''
+
+          %td.center{data: {tableexport: {value: "#{f.recurring ? 'Yes' : 'No'}"}}}= format_as_boolean(f.recurring)
+          %td.right= f.match_required.present? ? f.match_required : ''
+
+          %td.center.nowrap
+            %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: f.description}, title: 'Description', tabindex: '0'}
+              %i.fa.fa-info-circle
+            - if can? :update, f
+              = link_to edit_funding_template_path(f), :class => "button btn-xs", :title => "Edit template" do
+                %i.fa.fa-edit.fa-1-5x.text-success
+              - if can? :destroy, f
+                -# link_to funding_template_path(f), :method => :delete, :data => {:confirm => "This template is associated with #{f.funding_buckets.active.count} buckets, which are tagged to YYY projects. Are you sure? The action cannot be undone."}  do
+                = link_to funding_template_path(f), :method => :delete, :data => {:confirm => "This template is associated with #{f.funding_buckets.active.count} buckets. Are you sure? The action cannot be undone."}  do
+                  %i.fa.fa-trash-o.fa-fw.text-danger
 
 :javascript
 
