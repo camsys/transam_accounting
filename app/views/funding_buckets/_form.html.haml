@@ -406,7 +406,7 @@
           $("#funding_bucket_proxy_template_id").append( $("<option></option>").attr("value", "").text(''));
           for(i = 0;i<result.length;i++){
             //add in option for each template available to the program
-            if (parseInt('#{params[:funding_template_id]}') > 0) {
+            if (parseInt('#{params[:funding_template_id]}') == i) {
               $("#funding_bucket_proxy_template_id").append(
                 $("<option></option>").attr("value", result[i][0]).attr("selected", 'selected').text(result[i][1])
               );
