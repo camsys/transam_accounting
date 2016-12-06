@@ -89,9 +89,8 @@
     $('.transam-tooltip').tooltip();
   });
 
-  var path = "#{funding_bucket_path('xxx')}";
-
   $('#' + '#{table_dom_id}').on('click', 'td', function () {
+    var path = "#{funding_bucket_path('xxx')}";
     var row = $(this).parent('tr').attr('id');
 
     if ($(this).attr('data-field') != 'action-cell') {
