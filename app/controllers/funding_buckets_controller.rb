@@ -592,7 +592,7 @@ class FundingBucketsController < OrganizationAwareController
 
     number_of_organizations = 1
     if owner_id <= 0
-      number_of_organizations = FundingTemplate.find_by(id: template_id).organizations.length
+      number_of_organizations = find_organizations(template_id).length
     end
 
     (1+fiscal_year_range_end - fiscal_year_range_start) * number_of_organizations
@@ -604,7 +604,7 @@ class FundingBucketsController < OrganizationAwareController
 
     orgs = [owner_id]
     if owner_id <= 0
-      orgs = FundingTemplate.find_by(id: template_id).organizations.pluck(:id)
+      orgs = find_organizations(template_id).pluck(:id)
     end
 
     fiscal_years.product(orgs)
