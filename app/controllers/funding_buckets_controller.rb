@@ -604,8 +604,14 @@ class FundingBucketsController < OrganizationAwareController
 
     orgs = [owner_id]
     if owner_id <= 0
-      orgs = find_organizations(template_id).pluck(:id)
+      orgs = []
+      organizations = find_organizations(template_id)
     end
+
+    organizations.each {|o|
+      orgs << o[0]
+    }
+
 
     fiscal_years.product(orgs)
   end
