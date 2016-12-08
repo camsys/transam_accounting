@@ -593,9 +593,13 @@ class FundingBucketsController < OrganizationAwareController
     number_of_organizations = 1
     if owner_id <= 0
       orgs_with_budgets = params[:orgs_with_budgets]
-      if (orgs_with_budgets.length == 0 ||  orgs_with_budgets.include?(o[0]))
-        number_of_organizations+=1
-      end
+
+      organizations = find_organizations(template_id)
+      organizations.each {|o|
+        if (orgs_with_budgets.length == 0 ||  orgs_with_budgets.include?(o[0]))
+          number_of_organizations+=1
+        end
+      }
     end
 
     (1+fiscal_year_range_end - fiscal_year_range_start) * number_of_organizations
@@ -609,9 +613,8 @@ class FundingBucketsController < OrganizationAwareController
     if owner_id <= 0
       orgs = []
       organizations = find_organizations(template_id)
+      orgs_with_budgets = params[:orgs_with_budgets]
       organizations.each {|o|
-        orgs_with_budgets = params[:orgs_with_budgets]
-
         if (orgs_with_budgets.length == 0 ||  orgs_with_budgets.include?(o[0]))
           orgs << o[0]
         end
