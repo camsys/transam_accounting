@@ -5,20 +5,25 @@
   - if can? :read, FundingTemplate
     %li
       %a{:href => "#templates", :data =>{:toggle => 'tab'}}
-        %span.badge.pull-right= @funding_source.funding_templates.count
-        = "Templates"
+        %span{:style => 'white-space: nowrap !important;'}
+          = "Templates"
+          %span.badge= @funding_source.funding_templates.count
     %li
       %a{:href => "#bckts", :data =>{:toggle => 'tab'}}
-        %span.badge.pull-right= @funding_source.funding_buckets.active.count
-        = "Buckets"
+        %span{:style => 'white-space: nowrap !important;'}
+          = "Buckets"
+          %span.badge= @funding_source.funding_buckets.active.count
+
   %li
     %a{:href => "#docs", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @funding_source.documents.count
-      = "Documents"
+      %span{:style => 'white-space: nowrap !important;'}
+        = "Documents"
+        %span.badge= @funding_source.documents.count
   %li
     %a{:href => "#comments", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @funding_source.comments.count
-      = "Comments"
+      %span{:style => 'white-space: nowrap !important;'}
+        = "Comments"
+        %span.badge= @funding_source.comments.count
 
 .tab-content{:style => 'max-height:400px;overflow-y: auto;'}
   .tab-pane.fade#desc

@@ -6,12 +6,14 @@
       = "Description"
   %li
     %a{:href => "#elgby", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= orgs.count
-      = "Eligiblity"
+      %span{:style => 'white-space: nowrap !important;'}
+        Eligiblity
+        %span.badge= orgs.count
   %li
     %a{:href => "#bckts", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @funding_template.funding_buckets.active.count
-      = "Buckets"
+      %span{:style => 'white-space: nowrap !important;'}
+        Buckets
+        %span.badge= @funding_template.funding_buckets.active.count
 
 .tab-content{:style => 'max-height:400px;overflow-y: auto;'}
   .tab-pane.fade#desc
