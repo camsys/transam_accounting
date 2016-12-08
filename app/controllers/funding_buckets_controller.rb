@@ -606,12 +606,10 @@ class FundingBucketsController < OrganizationAwareController
     if owner_id <= 0
       orgs = []
       organizations = find_organizations(template_id)
+      organizations.each {|o|
+        orgs << o[0]
+      }
     end
-
-    organizations.each {|o|
-      orgs << o[0]
-    }
-
 
     fiscal_years.product(orgs)
   end
