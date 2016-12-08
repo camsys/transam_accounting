@@ -593,8 +593,7 @@ class FundingBucketsController < OrganizationAwareController
     number_of_organizations = 1
     if owner_id <= 0
       orgs_with_budgets = params[:orgs_with_budgets]
-
-      if orgs_with_budgets.contains(o[0])
+      if (orgs_with_budgets.length == 0 ||  orgs_with_budgets.include?(o[0]))
         number_of_organizations+=1
       end
     end
@@ -613,7 +612,7 @@ class FundingBucketsController < OrganizationAwareController
       organizations.each {|o|
         orgs_with_budgets = params[:orgs_with_budgets]
 
-        if orgs_with_budgets.contains(o[0])
+        if (orgs_with_budgets.length == 0 ||  orgs_with_budgets.include?(o[0]))
           orgs << o[0]
         end
       }
