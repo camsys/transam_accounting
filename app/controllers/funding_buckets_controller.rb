@@ -229,7 +229,7 @@ class FundingBucketsController < OrganizationAwareController
 
     bucket_proxy = FundingBucketProxy.new(bucket_proxy_params)
     @bucket_proxy = bucket_proxy
-    @existing_buckets = FundingBucket.find_existing_buckets_from_proxy(bucket_proxy.template_id, bucket_proxy.fiscal_year_range_start, bucket_proxy.fiscal_year_range_end, bucket_proxy.owner_id)
+    @existing_buckets = FundingBucket.find_existing_buckets_from_proxy(bucket_proxy.template_id, bucket_proxy.fiscal_year_range_start, bucket_proxy.fiscal_year_range_end, bucket_proxy.owner_id, nil)
 
     if bucket_proxy.create_option == 'Create'
       if @existing_buckets.length > 0 && (bucket_proxy.create_conflict_option.blank?)
