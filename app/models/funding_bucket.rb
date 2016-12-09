@@ -61,7 +61,7 @@ class FundingBucket< ActiveRecord::Base
     FORM_PARAMS
   end
 
-  def self.find_existing_buckets_from_proxy funding_template_id, start_fiscal_year, end_fiscal_year, owner_id
+  def self.find_existing_buckets_from_proxy funding_template_id, start_fiscal_year, end_fiscal_year, owner_id,  organizations_with_budgets
     # Start to set up the query
     conditions  = []
     values      = []
@@ -83,7 +83,17 @@ class FundingBucket< ActiveRecord::Base
       orgs = []
       org_ids = []
       if(funding_template.organizations.length > 0)
-        orgs = funding_template.organizations
+
+        oragnizations = funding_template.organizations
+        if !organizations_with_budgets.nil? && organizations_with_budgets.length > 0
+          oragnizations.each { |o|
+            if organizations_with_budgets.include?(o.id.to_s)
+              orgs << o
+            end
+          }
+        else
+          orgs = funding_template.organizations
+        end
       else
         grantor = Grantor.first
         orgs =  Organization.where(" id <> #{grantor.id} AND active = true")
@@ -94,6 +104,7 @@ class FundingBucket< ActiveRecord::Base
       conditions << 'owner_id = ?'
       values << owner_id
     end
+
 
     conditions << 'active = true'
     existing_buckets = FundingBucket.where(conditions.join(' AND '), *values)

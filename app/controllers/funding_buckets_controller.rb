@@ -372,7 +372,7 @@ class FundingBucketsController < OrganizationAwareController
   end
 
   def find_existing_buckets_for_create
-    result = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i)
+    result = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i, params[:specific_organizations_with_budgets])
 
     msg = "#{result.length} of the Buckets you are creating already exist. Do you want to update these Buckets' budget, ignore these Buckets, or cancel this action?"
 
