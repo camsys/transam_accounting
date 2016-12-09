@@ -382,8 +382,9 @@ class FundingBucketsController < OrganizationAwareController
   end
 
   def find_number_of_missing_buckets_for_update
+
       existing_buckets = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year], params[:end_year], params[:owner_id]).pluck(:fiscal_year, :owner_id)
-      expected_buckets = find_expected_buckets(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i)
+      expected_buckets = find_expected_buckets(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i, params[:orgs_with_budgets])
       not_created_buckets = expected_buckets - existing_buckets
       template = FundingTemplate.find_by(id: params[:template_id])
       result = []
@@ -585,15 +586,23 @@ class FundingBucketsController < OrganizationAwareController
   end
 
   def find_expected_bucket_count_from_bucket_proxy bucket_proxy
-    find_expected_bucket_count(bucket_proxy.template_id, bucket_proxy.fiscal_year_range_start.to_i, bucket_proxy.fiscal_year_range_end.to_i, bucket_proxy.owner_id.to_i)
+    orgs = find_organizations(bucket_proxy.template_id)
+    orgs_with_budgets =  []
+    organizations.each { |org|
+      unless org[0] < 0
+        unless params["agency_budget_id_#{org[0]}"].blank?
+          orgs_with_budgets << org[0]
+        end
+      end
+    }
+
+    find_expected_bucket_count(bucket_proxy.template_id, bucket_proxy.fiscal_year_range_start.to_i, bucket_proxy.fiscal_year_range_end.to_i, bucket_proxy.owner_id.to_i, orgs_with_budgets)
   end
 
-  def find_expected_bucket_count template_id, fiscal_year_range_start, fiscal_year_range_end, owner_id
+  def find_expected_bucket_count template_id, fiscal_year_range_start, fiscal_year_range_end, owner_id, orgs_with_budgets
 
     number_of_organizations = 1
     if owner_id <= 0
-      orgs_with_budgets = params[:orgs_with_budgets]
-
       organizations = find_organizations(template_id)
       organizations.each {|o|
         if (orgs_with_budgets.length == 0 ||  orgs_with_budgets.include?(o[0]))
@@ -606,16 +615,19 @@ class FundingBucketsController < OrganizationAwareController
 
   end
 
-  def find_expected_buckets template_id, fiscal_year_range_start, fiscal_year_range_end, owner_id
+  def find_expected_buckets template_id, fiscal_year_range_start, fiscal_year_range_end, owner_id, orgs_with_budgets
     fiscal_years = (fiscal_year_range_start..fiscal_year_range_end).to_a
 
     orgs = [owner_id]
     if owner_id <= 0
       orgs = []
       organizations = find_organizations(template_id)
-      orgs_with_budgets = params[:orgs_with_budgets]
       organizations.each {|o|
-        if (orgs_with_budgets.length == 0 ||  orgs_with_budgets.include?(o[0]))
+        if !orgs_with_budgets.nil?
+          if orgs_with_budgets.length == 0 || orgs_with_budgets.include?(o[0])
+            orgs << o[0]
+          end
+        else
           orgs << o[0]
         end
       }
