@@ -588,7 +588,7 @@ class FundingBucketsController < OrganizationAwareController
   def find_expected_bucket_count_from_bucket_proxy bucket_proxy
     orgs = find_organizations(bucket_proxy.template_id)
     orgs_with_budgets =  []
-    organizations.each { |org|
+    orgs.each { |org|
       unless org[0] < 0
         unless params["agency_budget_id_#{org[0]}"].blank?
           orgs_with_budgets << org[0]
