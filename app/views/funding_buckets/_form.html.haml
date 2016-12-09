@@ -263,6 +263,23 @@
         var start_year = funding_bucket_proxy_fiscal_year_range_start.value;
         var end_year = funding_bucket_proxy_fiscal_year_range_end.value;
         var owner_id = funding_bucket_proxy_owner_id.value;
+        var specific_organizations_with_budgets = [];
+
+        var i = 0;
+        while(i<funding_bucket_proxy_owner_id.options.length){
+          var val = funding_bucket_proxy_owner_id.options[i].value;
+          var input_name = 'agency_budget_id_'+val
+          var input_value = $('input:text[name='+input_name+']').val();
+
+          if (input_value>0)
+          {
+            specific_organizations_with_budgets.push(val);
+          }
+
+          i++;
+        }
+        console.log(specific_organizations_with_budgets);
+
 
         $.ajax({
           url: url,
@@ -270,7 +287,8 @@
             template_id: template_id,
             start_year: start_year,
             end_year: end_year,
-            owner_id: owner_id},
+            owner_id: owner_id,
+            specific_organizations_with_budgets},
           success: function(result){
 
 
@@ -363,6 +381,7 @@
         url: url,
         data: {template_id: funding_bucket_proxy_template_id.value},
         success: function(result){
+          console.log(result);
           agencies = result
           $('#funding_bucket_proxy_owner_id').empty();
           $('#owner_id_div_id').show();
