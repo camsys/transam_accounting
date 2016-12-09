@@ -384,7 +384,7 @@ class FundingBucketsController < OrganizationAwareController
   def find_number_of_missing_buckets_for_update
 
       existing_buckets = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year], params[:end_year], params[:owner_id]).pluck(:fiscal_year, :owner_id)
-      expected_buckets = find_expected_buckets(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i, params[:orgs_with_budgets])
+      expected_buckets = find_expected_buckets(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i, params[:specific_organizations_with_budgets])
       not_created_buckets = expected_buckets - existing_buckets
       template = FundingTemplate.find_by(id: params[:template_id])
       result = []
@@ -624,7 +624,7 @@ class FundingBucketsController < OrganizationAwareController
       organizations = find_organizations(template_id)
       organizations.each {|o|
         if !orgs_with_budgets.nil?
-          if orgs_with_budgets.length == 0 || orgs_with_budgets.include?(o[0])
+          if orgs_with_budgets.length == 0 || orgs_with_budgets.include?(o[0].to_s)
             orgs << o[0]
           end
         else
