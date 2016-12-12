@@ -229,7 +229,19 @@ class FundingBucketsController < OrganizationAwareController
 
     bucket_proxy = FundingBucketProxy.new(bucket_proxy_params)
     @bucket_proxy = bucket_proxy
-    @existing_buckets = FundingBucket.find_existing_buckets_from_proxy(bucket_proxy.template_id, bucket_proxy.fiscal_year_range_start, bucket_proxy.fiscal_year_range_end, bucket_proxy.owner_id, nil)
+
+    all_orgs_for_template = find_organizations(bucket_proxy.template_id)
+    organizations_with_budgets= []
+
+    all_orgs_for_template.each { |org|
+      unless org[0] < 0
+        unless params["agency_budget_id_#{org[0]}"].blank?
+          organizations_with_budgets << org[0].to_s
+        end
+      end
+    }
+
+    @existing_buckets = FundingBucket.find_existing_buckets_from_proxy(bucket_proxy.template_id, bucket_proxy.fiscal_year_range_start, bucket_proxy.fiscal_year_range_end, bucket_proxy.owner_id, organizations_with_budgets)
 
     if bucket_proxy.create_option == 'Create'
       if @existing_buckets.length > 0 && (bucket_proxy.create_conflict_option.blank?)
@@ -603,6 +615,7 @@ class FundingBucketsController < OrganizationAwareController
 
     number_of_organizations = 1
     if owner_id <= 0
+      number_of_organizations = 0
       organizations = find_organizations(template_id)
       organizations.each {|o|
         if (orgs_with_budgets.length == 0 ||  orgs_with_budgets.include?(o[0]))
