@@ -83,8 +83,7 @@ class FundingBucket< ActiveRecord::Base
       orgs = []
       org_ids = []
       if funding_template.owner == FundingSourceType.find_by(name: 'State')
-        grantor = Grantor.first
-        orgs =  Organization.where(" id <> #{grantor.id} AND active = true")
+        orgs =  Grantor.active
       else
 
         organizations = funding_template.get_organizations
