@@ -82,21 +82,22 @@ class FundingBucket< ActiveRecord::Base
       conditions << 'owner_id IN (?)'
       orgs = []
       org_ids = []
-      if(funding_template.organizations.length > 0)
+      if funding_template.owner == FundingSourceType.find_by(name: 'State')
+        grantor = Grantor.first
+        orgs =  Organization.where(" id <> #{grantor.id} AND active = true")
+      else
 
-        oragnizations = funding_template.organizations
+        organizations = funding_template.get_organizations
         if !organizations_with_budgets.nil? && organizations_with_budgets.length > 0
-          oragnizations.each { |o|
+          organizations.each { |o|
             if organizations_with_budgets.include?(o.id.to_s)
               orgs << o
             end
           }
         else
-          orgs = funding_template.organizations
+          orgs = funding_template.get_organizations
         end
-      else
-        grantor = Grantor.first
-        orgs =  Organization.where(" id <> #{grantor.id} AND active = true")
+
       end
       orgs.each { |o| org_ids << o.id }
       values << org_ids
