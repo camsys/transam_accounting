@@ -238,13 +238,12 @@
     show_escalate_by(funding_bucket_proxy_fiscal_year_range_start.value, funding_bucket_proxy_fiscal_year_range_end.value)
   });
 
-  $('#funding_bucket_proxy_description').change(function(){
+  $('#funding_bucket_proxy_description').change(function(event){
+    event.preventDefault();
     before_submit_bucket_check();
   });
 
   function before_submit_bucket_check(){
-    event.preventDefault();
-
     if ($('.bucket_form').valid())
     {
       var url = ''
