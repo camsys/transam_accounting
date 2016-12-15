@@ -53,7 +53,7 @@
     .col-sm-8
       -#= f.button :submit, 'Create/Update', :class => "btn btn-primary"
       -#= f.input :description, :required => true, :collection => get_fiscal_years, :include_blank => true, :label => "Change this to test ajaxk"
-      =button_tag 'Submit', :onclick=>"before_submit_bucket_check()", :class =>  'btn btn-primary'
+      =button_tag 'Submit', :onclick=>"before_submit_bucket_check(); return false;", :class =>  'btn btn-primary'
 
 -#= render 'form_scripts'
 
@@ -238,12 +238,7 @@
     show_escalate_by(funding_bucket_proxy_fiscal_year_range_start.value, funding_bucket_proxy_fiscal_year_range_end.value)
   });
 
-  $('#funding_bucket_proxy_description').change(function(){
-    before_submit_bucket_check();
-  });
-
   function before_submit_bucket_check(){
-    event.preventDefault();
 
     if ($('.bucket_form').valid())
     {
