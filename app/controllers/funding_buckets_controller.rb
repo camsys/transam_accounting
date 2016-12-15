@@ -159,15 +159,20 @@ class FundingBucketsController < OrganizationAwareController
   # GET /buckets/1
   def show
 
-    # only need to reset filter for users in super manager role who can supervise/see all organizations
+
+    # users in super manager role who can supervise/see all organizations ad all funding
     if current_user.user_organization_filters.include? UserOrganizationFilter.system_filters.first
       check_filter
+
+      add_breadcrumb @funding_bucket.funding_template.funding_source.name, funding_source_path(@funding_bucket.funding_template.funding_source)
+      add_breadcrumb @funding_bucket.funding_template.name, funding_template_path(@funding_bucket.funding_template)
+    else
+      add_breadcrumb 'Funding Programs', funding_sources_path
+      add_breadcrumb 'My Funds', my_funds_funding_buckets_path
     end
 
     authorize! :read, @funding_bucket
 
-    add_breadcrumb @funding_bucket.funding_template.funding_source.name, funding_source_path(@funding_bucket.funding_template.funding_source)
-    add_breadcrumb @funding_bucket.funding_template.name, funding_template_path(@funding_bucket.funding_template)
     add_breadcrumb @funding_bucket.to_s, funding_bucket_path(@funding_bucket)
 
     @funding_template = @funding_bucket.funding_template
@@ -210,6 +215,10 @@ class FundingBucketsController < OrganizationAwareController
 
     authorize! :new_bucket_app, FundingBucket
 
+    add_breadcrumb 'Funding Programs', funding_sources_path
+    add_breadcrumb 'My Funds', my_funds_funding_buckets_path
+    add_breadcrumb 'New Grant Application', new_bucket_app_funding_buckets_path
+
     @funding_bucket = FundingBucket.new
   end
 
@@ -220,7 +229,14 @@ class FundingBucketsController < OrganizationAwareController
   end
 
   def edit_bucket_app
+
     authorize! :edit_bucket_app, @funding_bucket
+
+    add_breadcrumb 'Funding Programs', funding_sources_path
+    add_breadcrumb 'My Funds', my_funds_funding_buckets_path
+    add_breadcrumb @funding_bucket.to_s, funding_bucket_path(@funding_bucket)
+    add_breadcrumb 'Edit Grant Application', edit_bucket_app_funding_buckets_path(@funding_bucket)
+
   end
 
   # POST /buckets
