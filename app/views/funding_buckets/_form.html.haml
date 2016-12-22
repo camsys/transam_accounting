@@ -194,7 +194,7 @@
   }
 
   $('#funding_bucket_proxy_owner_id').change(function(){
-    if (funding_bucket_proxy_owner_id.value == -1){
+    if ($('#funding_bucket_proxy_owner_id').val() == -1){
       $("#state_or_single_agency_budget_id").hide();
       funding_bucket_proxy_total_amount.value = null;
       if( !$('#funding_bucket_proxy_create_option_delete').is(':checked')) {
@@ -254,10 +254,10 @@
           return;
         }
 
-        var template_id = funding_bucket_proxy_template_id.value;
+        var template_id = $('#funding_bucket_proxy_template_id').val();
         var start_year = funding_bucket_proxy_fiscal_year_range_start.value;
         var end_year = funding_bucket_proxy_fiscal_year_range_end.value;
-        var owner_id = funding_bucket_proxy_owner_id.value;
+        var owner_id = $('#funding_bucket_proxy_owner_id').val();
         var specific_organizations_with_budgets = [];
 
         var i = 0;
@@ -283,7 +283,7 @@
             start_year: start_year,
             end_year: end_year,
             owner_id: owner_id,
-            specific_organizations_with_budgets},
+            specific_organizations_with_budgets: specific_organizations_with_budgets},
           success: function(result){
 
 
@@ -320,11 +320,11 @@
     $('#funding_bucket_proxy_fiscal_year_range_start').empty();
     $('#funding_bucket_proxy_fiscal_year_range_end').empty();
     var url = '#{find_template_based_fiscal_year_range_funding_buckets_path}';
-    if (funding_bucket_proxy_program_id.value > 0)
+    if ( $('#funding_bucket_proxy_program_id').val() > 0)
     {
       $.ajax({
         url: url,
-        data: {program_id: funding_bucket_proxy_program_id.value},
+        data: {program_id: $('#funding_bucket_proxy_program_id').val()},
         success: function(result){
           //Add a blank entry to the list.
           $("#funding_bucket_proxy_fiscal_year_range_start").append( $("<option></option>").attr("value", "").text(''));
@@ -369,12 +369,12 @@
   $('#funding_bucket_proxy_template_id').change(function(){
     remove_all_agencies_fields();
 
-    if (funding_bucket_proxy_template_id.value > 0)
+    if ($('#funding_bucket_proxy_template_id').val() > 0)
     {
       var url = '#{find_organizations_from_template_id_funding_buckets_path}';
       $.ajax({
         url: url,
-        data: {template_id: funding_bucket_proxy_template_id.value},
+        data: {template_id: $('#funding_bucket_proxy_template_id').val()},
         success: function(result){
           console.log(result);
           agencies = result
@@ -405,12 +405,12 @@
     remove_all_agencies_fields();
     update_fiscal_year_range();
     $("#escalate_by_div_id").hide();
-    if (funding_bucket_proxy_program_id.value > 0)
+    if ($('#funding_bucket_proxy_program_id').val() > 0)
     {
       var url = '#{find_templates_from_program_id_funding_buckets_path}';
       $.ajax({
         url: url,
-        data: {program_id: funding_bucket_proxy_program_id.value},
+        data: {program_id: $('#funding_bucket_proxy_program_id').val()},
         success: function(result){
           $('#template_id_div_id').show();
           $('#funding_bucket_proxy_template_id').empty();
