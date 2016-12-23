@@ -14,7 +14,7 @@
           .col-sm-8
             .form-group.radio_buttons
 
-              = collection_radio_buttons(:funding_bucket_proxy, :create_conflict_option, [ ['Update'], ['Ignore'], ['Cancel'] ], :first, :first) do |b|
+              = collection_radio_buttons(:funding_bucket_proxy, :create_conflict_option, [ ['Replace'], ['Ignore'], ['Cancel'] ], :first, :first) do |b|
                 .radio.inline
                   = b.label { b.radio_button + b.text }
 

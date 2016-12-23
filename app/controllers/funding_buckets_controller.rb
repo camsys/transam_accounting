@@ -555,7 +555,7 @@ class FundingBucketsController < OrganizationAwareController
       existing_bucket = bucket_exists(existing_buckets, bucket)
       if (!existing_bucket.nil? && (create_conflict_option == 'Ignore')) || (existing_bucket.nil? && update_conflict_option == 'Ignore')
           # DO NOTHING
-      elsif !existing_bucket.nil? && create_conflict_option == 'Update'
+      elsif !existing_bucket.nil? && create_conflict_option == 'Replace'
         existing_bucket.budget_amount = bucket.budget_amount
         existing_bucket.updator = current_user
         existing_bucket.save
@@ -576,7 +576,7 @@ class FundingBucketsController < OrganizationAwareController
         existing_bucket = bucket_exists(existing_buckets, next_year_bucket)
         if (!existing_bucket.nil? && (create_conflict_option == 'Ignore')) || (existing_bucket.nil? && update_conflict_option == 'Ignore')
           #   DO NOTHING
-        elsif !existing_bucket.nil? && create_conflict_option == 'Update'
+        elsif !existing_bucket.nil? && create_conflict_option == 'Replace'
           existing_bucket.budget_amount = next_year_bucket.budget_amount
           existing_bucket.updator = current_user
           existing_bucket.save
@@ -591,7 +591,7 @@ class FundingBucketsController < OrganizationAwareController
       existing_bucket = bucket_exists(existing_buckets, bucket)
       if (!existing_bucket.nil? && (create_conflict_option == 'Ignore')) || (existing_bucket.nil? && update_conflict_option == 'Ignore')
         #   DO NOTHING
-      elsif !existing_bucket.nil? && create_conflict_option == 'Update'
+      elsif !existing_bucket.nil? && create_conflict_option == 'Replace'
         existing_bucket.budget_amount = bucket.budget_amount
         existing_bucket.updator = current_user
         existing_bucket.save
