@@ -22,10 +22,14 @@
   #org_select.input-large
 
   .row
-    .col-sm-3
-      = f.input :recurring
-    .col-sm-3
-      = f.input :transfer_only
+    .col-sm-4
+      = f.input :recurring, :label => 'Create multiple years'
+    .col-sm-4
+      = f.input :create_multiple_agencies
+    .col-sm-4
+      = f.input :create_multiple_buckets_for_agency_year
+
+
 
   .row
     .col-sm-6
@@ -42,8 +46,22 @@
 
 :javascript
 
-  // check if using query or selecting orgs
+  function control_template_booleans(){
+  if ($('#funding_template_create_multiple_buckets_for_agency_year').is(':checked')) {
+      $('#funding_template_recurring').attr('checked', false);
+      $('#funding_template_create_multiple_agencies').attr('checked', false);
+      $('#funding_template_recurring').attr("disabled", true);
+      $('#funding_template_create_multiple_agencies').attr("disabled", true);
+    }
+    else{
+      $('#funding_template_recurring').removeAttr("disabled");
+      $('#funding_template_create_multiple_agencies').removeAttr("disabled");
+    };
+  }
 
+  control_template_booleans();
+
+  // check if using query or selecting orgs
   if (parseInt($('#query').val()) > 0) { // if query
     $('#org_select').hide();
   }  else {
@@ -60,6 +78,10 @@
     }
   });
 
+  $('#funding_template_create_multiple_buckets_for_agency_year').on('change', function(e) {
+    control_template_booleans()
+  });
+
   // jquery validations
   $('.funding_template_form').validate({
     ignore: '#funding_template_organization_ids, .filter-input, .filtered'
@@ -70,8 +92,6 @@
     PercentThreeDigits: true
   });
 
-
-
   $.validator.addMethod('greaterThan', function(value, element, params) {
       return this.optional(element) || parseFloat(value) > params;
   }, "Please enter a value greater than {0}.");
@@ -81,8 +101,6 @@
   }, "Please enter a correct percent up to three decimal places.");
 
   $('#funding_template_funding_source_id').change(function(){
-    console.log("funding_template_funding_source_id.value =");
-    console.log(funding_template_funding_source_id.value);
 
     if (funding_template_funding_source_id.value > 0)
     {
