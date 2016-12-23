@@ -259,43 +259,18 @@ class FundingBucketsController < OrganizationAwareController
 
     @existing_buckets = FundingBucket.find_existing_buckets_from_proxy(bucket_proxy.template_id, bucket_proxy.fiscal_year_range_start, bucket_proxy.fiscal_year_range_end, bucket_proxy.owner_id, organizations_with_budgets)
 
-    if bucket_proxy.create_option == 'Create'
-      if @existing_buckets.length > 0 && (bucket_proxy.create_conflict_option.blank?)
-
-        @create_conflict = true
-      elsif @existing_buckets.length > 0 && (bucket_proxy.create_conflict_option == 'Cancel')
-        redirect_to funding_buckets_path, notice: 'Bucket creation cancelled because of conflict.'
-      elsif @existing_buckets.length > 0
-        create_new_buckets(bucket_proxy, @existing_buckets, bucket_proxy.create_conflict_option)
-        redirect_to funding_buckets_path, notice: 'Buckets successfully created.'
-      else
-        create_new_buckets(bucket_proxy)
-        redirect_to funding_buckets_path, notice: 'Buckets successfully created.'
-      end
+    if @existing_buckets.length > 0 && (bucket_proxy.create_conflict_option.blank?)
+      @create_conflict = true
+    elsif @existing_buckets.length > 0 && (bucket_proxy.create_conflict_option == 'Cancel')
+      redirect_to funding_buckets_path, notice: 'Bucket creation cancelled because of conflict.'
+    elsif @existing_buckets.length > 0
+      create_new_buckets(bucket_proxy, @existing_buckets, bucket_proxy.create_conflict_option)
+      redirect_to funding_buckets_path, notice: 'Buckets successfully created.'
+    else
+      create_new_buckets(bucket_proxy)
+      redirect_to funding_buckets_path, notice: 'Buckets successfully created.'
     end
 
-    if bucket_proxy.create_option == 'Update'
-      expected_buckets = find_expected_bucket_count_from_bucket_proxy(bucket_proxy)
-
-      if expected_buckets > @existing_buckets.length && bucket_proxy.update_conflict_option.blank?
-        @update_conflict = true
-
-      elsif expected_buckets > @existing_buckets.length && bucket_proxy.update_conflict_option  == 'Cancel'
-        redirect_to funding_buckets_path, notice: 'Bucket update cancelled because of conflict.'
-      else
-        update_buckets(bucket_proxy, @existing_buckets, bucket_proxy.update_conflict_option)
-        redirect_to funding_buckets_path, notice: 'Buckets updated.'
-      end
-    end
-
-    if bucket_proxy.create_option == 'Delete'
-      @existing_buckets.each { |eb|
-        eb.active = false
-        eb.updator = current_user
-        eb.save
-      }
-      redirect_to funding_buckets_path, notice: "#{@existing_buckets.length} buckets deleted."
-    end
   end
 
   def create_bucket_app
