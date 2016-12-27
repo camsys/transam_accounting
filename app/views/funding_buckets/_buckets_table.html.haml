@@ -26,6 +26,7 @@
         %th.center{:data => {:field => 'bucket_fy', :sortable => 'true'}} FY
         - if @funding_template.nil?
           %th.center{:data => {:sortable => 'true'}} Program (Template)
+        %th.center{:data => {:sortable => 'true'}} Name
         %th.center{:data => {:sortable => 'true'}} Type
         - if (current_user.organizations.ids & @organization_list).count > 1 || !@my_funds
           %th.center{:data => {:field => 'bucket_owner', :sortable => 'true'}} Owner
@@ -45,6 +46,7 @@
           %td.left= format_as_fiscal_year(b.fiscal_year)
           - if @funding_template.nil?
             %td.left= "#{b.funding_template.funding_source.name} (#{b.funding_template.name})"
+          %td.left= "#{b.name}"
           - if @my_funds
             %td.left= b.is_bucket_app? ? 'Grant Application' : (b.funding_template.funding_source.formula_fund ? 'Formula' : 'Discretionary')
           - else
