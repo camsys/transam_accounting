@@ -138,6 +138,28 @@ class FundingBucket< ActiveRecord::Base
     self.budget_committed = 0
     self.owner_id = agency_id.nil? ? bucket_proxy.owner_id : agency_id
     self.active=true
+
+    funding_template = FundingTemplate.find_by(id: self.funding_template_id)
+    owner = Organization.find_by(id: self.owner_id)
+
+    if bucket_proxy.name.blank?
+      self.name = "#{funding_template.funding_source.name}-#{funding_template.name}-#{owner.coded_name}-#{fiscal_year_for_name(self.fiscal_year)}"
+    else
+      self.name = "#{funding_template.funding_source.name}-#{funding_template.name}-#{owner.coded_name}-#{fiscal_year_for_name(self.fiscal_year)}-#{bucket_proxy.name}"
+    end
+  end
+
+  def fiscal_year_for_name(year)
+    yr = year - 2000
+    first = "%.2d" % yr
+    if yr == 99 # when yr == 99, yr + 1 would be 100, which causes: "FY 99-100"
+      next_yr = 00
+    else
+      next_yr = (yr + 1)
+    end
+    last = "%.2d" % next_yr
+
+    "FY#{first}/#{last}"
   end
 
   #------------------------------------------------------------------------------
@@ -151,4 +173,5 @@ class FundingBucket< ActiveRecord::Base
     self.budget_committed ||= 0
     self.active = self.active.nil? ? true : self.active
   end
+
 end

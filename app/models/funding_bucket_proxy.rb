@@ -16,6 +16,7 @@ class FundingBucketProxy < Proxy
   attr_accessor   :owner_id
   attr_accessor   :fiscal_year_range_start
   attr_accessor   :fiscal_year_range_end
+  attr_accessor   :name
   attr_accessor   :total_amount
   # attr_accessor   :bucket_type_id
   attr_accessor   :inflation_percentage
@@ -43,6 +44,7 @@ class FundingBucketProxy < Proxy
       :owner_id,
       :fiscal_year_range_start,
       :fiscal_year_range_end,
+      :name,
       :total_amount,
       # :bucket_type_id,
       :inflation_percentage,

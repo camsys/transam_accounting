@@ -41,6 +41,8 @@
             %i.fa.fa-percent
   .state_or_single_agency_budget{:id => "state_or_single_agency_budget_id"}
     .row
+      .col-sm-12
+        %span.funding_bucket_name{:id => "funding_bucket_name"}
       .col-sm-8
         = f.input :total_amount, :as => :integer, :label => 'Budget ($)', :required => true, :input_html => { :min => 1  }
 
@@ -133,12 +135,19 @@
     while(i < agencies.length)
     {
         var add_to = "#all_agencies_covered_by_template_id"
-        id = agencies[i][0];
-        name = agencies[i][1]
+        var id = agencies[i][0];
+        var name = agencies[i][1];
+
+        var program = $('#funding_bucket_proxy_program_id option:selected').text();
+        var template = $('#funding_bucket_proxy_template_id option:selected').text();
+        var bucket_name =program+'-'+template+'-'+name+'-FYXX/ZZ';
+
         var new_input =
-          '<div class="row_agencies"><div class="col-sm-8"><div class="form-group"><label class="control-label" id="agency_label_' + id + '" name="agency_label_' + name + '" type="text">'+name+' Budget ($)</label>' +
+          '<div class="row_agencies"><div class="col-sm-12">' +
+          '<div><span class="control-label" id="row_agencies_name' + id + '" name="row_agencies_name' + name + '" type="text">'+bucket_name+'</div>' +
+          '<div class="form-group"><label class="control-label" id="agency_label_' + id + '" name="agency_label_' + name + '" type="text">'+name+' Budget ($)</label>' +
           '<div><input autocomplete="off" class="input form-control agency_budget" id="' + id + '" name="agency_budget_id_' + id + '" label="' + id + '" type="text"></div>' +
-           '</div></div></div>';
+          '</div></div></div>';
         $(add_to).before(new_input);
         $("#field" + id).attr('data-source',$(add_to).attr('data-source'));
       i++;
@@ -186,6 +195,15 @@
   $('#funding_bucket_proxy_fiscal_year_range_end').change(function(){
     show_escalate_by(funding_bucket_proxy_fiscal_year_range_start.value, funding_bucket_proxy_fiscal_year_range_end.value)
   });
+  $('#funding_bucket_proxy_owner_id').change(function(){
+    var program = $('#funding_bucket_proxy_program_id option:selected').text();
+    var template = $('#funding_bucket_proxy_template_id option:selected').text();
+    var owner = $('#funding_bucket_proxy_owner_id option:selected').text();
+    var bucket_name =program+'-'+template+'-'+owner+'-FYXX/ZZ';
+
+    $('#funding_bucket_name').text(bucket_name);
+  });
+
 
   function before_submit_bucket_check(){
 
