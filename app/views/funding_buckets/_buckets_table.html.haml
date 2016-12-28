@@ -70,7 +70,8 @@
                 = link_to edit_funding_bucket_path(b), :remote => true do
                   %i.fa.fa-edit.fa-1-5x.text-success
 
-              - if can? :destroy, b
+              -#We want to display different text based on what the user is deleting. If it is a regular bucket then we want to make it clear that it isn't a grant application.
+              - if (can? :destroy_bucket_app, b) && !b.is_bucket_app?
                 = link_to destroy_bucket_app_funding_bucket_path(b), :method => :delete, :data => {:confirm => "Are you sure you want to remove this bucket? The action can't be undone."}  do
                   %i.fa.fa-trash-o.fa-1-5x.text-danger
               - elsif (can? :destroy_bucket_app, b) && b.is_bucket_app?
