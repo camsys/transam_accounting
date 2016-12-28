@@ -22,6 +22,7 @@ class FundingBucketProxy < Proxy
   attr_accessor   :inflation_percentage
   attr_accessor   :description
   attr_accessor   :bucket_agency_allocations
+  attr_accessor   :return_to_bucket_index
 
 
 
@@ -49,7 +50,8 @@ class FundingBucketProxy < Proxy
       # :bucket_type_id,
       :inflation_percentage,
       :description,
-      :bucket_agency_allocations
+      :bucket_agency_allocations,
+      :return_to_bucket_index
   ]
 
   #------------------------------------------------------------------------------

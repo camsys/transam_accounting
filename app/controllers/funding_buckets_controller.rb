@@ -201,13 +201,27 @@ class FundingBucketsController < OrganizationAwareController
     end
     if @templates.present?
       @templates = @templates
+    elsif params[:funding_source_id]
+      @bucket_proxy.program_id = params[:funding_source_id]
+      @templates = FundingTemplate.where(funding_source_id: @bucket_proxy.program_id).pluck(:id, :name)
     else
       @templates = []
     end
     if @template_organizations.present?
       @template_organizations = @template_organizations
+    elsif params[:template_id]
+      @bucket_proxy.template_id = params[:template_id]
+      @template_organizations = find_organizations(@bucket_proxy.template_id)
+
+      @bucket_proxy.fiscal_year_range_start = params[:fiscal_year_range_start].to_i
+      @bucket_proxy.fiscal_year_range_end = params[:fiscal_year_range_end].to_i
+      @bucket_proxy.name = params[:name]
+      @bucket_proxy.total_amount = params[:total_amount]
+      program = FundingSource.find_by(id: @bucket_proxy.program_id)
+      @fiscal_years = program.find_all_valid_fiscal_years
     else
       @template_organizations = []
+      @fiscal_years = []
     end
   end
 
@@ -257,7 +271,7 @@ class FundingBucketsController < OrganizationAwareController
       end
     }
 
-    @existing_buckets = FundingBucket.find_existing_buckets_from_proxy(bucket_proxy.template_id, bucket_proxy.fiscal_year_range_start, bucket_proxy.fiscal_year_range_end, bucket_proxy.owner_id, organizations_with_budgets)
+    @existing_buckets = FundingBucket.find_existing_buckets_from_proxy(bucket_proxy.template_id, bucket_proxy.fiscal_year_range_start, bucket_proxy.fiscal_year_range_end, bucket_proxy.owner_id, organizations_with_budgets, bucket_proxy.name)
 
     if @existing_buckets.length > 0 && (bucket_proxy.create_conflict_option.blank?)
       @create_conflict = true
@@ -265,10 +279,18 @@ class FundingBucketsController < OrganizationAwareController
       redirect_to funding_buckets_path, notice: 'Bucket creation cancelled because of conflict.'
     elsif @existing_buckets.length > 0
       create_new_buckets(bucket_proxy, @existing_buckets, bucket_proxy.create_conflict_option)
-      redirect_to funding_buckets_path, notice: 'Buckets successfully created.'
+      unless @bucket_proxy.return_to_bucket_index == 'false'
+        redirect_to funding_buckets_path, notice: 'Buckets successfully created.'
+      else
+        redirect_to new_funding_bucket_path(program_id: @bucket_proxy.program_id, template_id: @bucket_proxy.template_id, owner_id: @bucket_proxy.owner_id, fiscal_year_range_start: @bucket_proxy.fiscal_year_range_start, fiscal_year_range_end: @bucket_proxy.fiscal_year_range_end, name: @bucket_proxy.name, total_amount: @bucket_proxy.total_amount  ), notice: 'Buckets successfully created.'
+      end
     else
       create_new_buckets(bucket_proxy)
-      redirect_to funding_buckets_path, notice: 'Buckets successfully created.'
+      unless @bucket_proxy.return_to_bucket_index == 'false'
+        redirect_to funding_buckets_path, notice: 'Buckets successfully created.'
+      else
+        redirect_to new_funding_bucket_path(funding_source_id: @bucket_proxy.program_id, template_id: @bucket_proxy.template_id, owner_id: @bucket_proxy.owner_id, fiscal_year_range_start: @bucket_proxy.fiscal_year_range_start, fiscal_year_range_end: @bucket_proxy.fiscal_year_range_end, name: @bucket_proxy.name, total_amount: @bucket_proxy.total_amount  ), notice: 'Buckets successfully created.'
+      end
     end
 
   end
@@ -364,6 +386,15 @@ class FundingBucketsController < OrganizationAwareController
     end
   end
 
+  def find_configuration_options_from_template_id
+    template_id = params[:template_id]
+    result = FundingTemplate.find_by(id: template_id)
+
+    respond_to do |format|
+      format.json { render json: result.to_json }
+    end
+  end
+
   def find_templates_from_program_id
     program_id = params[:program_id]
     result = FundingTemplate.where(funding_source_id: program_id).pluck(:id, :name)
@@ -375,7 +406,7 @@ class FundingBucketsController < OrganizationAwareController
   end
 
   def find_existing_buckets_for_create
-    result = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i, params[:specific_organizations_with_budgets])
+    result = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i, params[:specific_organizations_with_budgets], params[:name])
 
     msg = "#{result.length} of the Buckets you are creating already exist. Do you want to update these Buckets' budget, ignore these Buckets, or cancel this action?"
 
@@ -386,7 +417,7 @@ class FundingBucketsController < OrganizationAwareController
 
   def find_number_of_missing_buckets_for_update
 
-      existing_buckets = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year], params[:end_year], params[:owner_id], nil).pluck(:fiscal_year, :owner_id)
+      existing_buckets = FundingBucket.find_existing_buckets_from_proxy(params[:template_id], params[:start_year], params[:end_year], params[:owner_id], nil, params[:name]).pluck(:fiscal_year, :owner_id)
       expected_buckets = find_expected_buckets(params[:template_id], params[:start_year].to_i, params[:end_year].to_i, params[:owner_id].to_i, params[:specific_organizations_with_budgets])
       not_created_buckets = expected_buckets - existing_buckets
       template = FundingTemplate.find_by(id: params[:template_id])
@@ -573,7 +604,7 @@ class FundingBucketsController < OrganizationAwareController
         if bucket_proxy.name.blank?
           existing_bucket.name = "#{existing_bucket.funding_source.name}-#{existing_bucket.funding_template.name}-#{existing_bucket.owner.coded_name}-#{existing_bucket.fiscal_year_for_name(existing_bucket.fiscal_year)}"
         else
-          existing_bucket.name = "#{existing_bucket.funding_source.name}-#{existing_bucket.funding_template.name}-#{existing_bucket.owner.coded_name}-#{existing_bucket.fiscal_year_for_name(existing_bucket.fiscal_year)}-#{bucket_proxy.name}"
+          existing_bucket.name = bucket_proxy.name
         end
         existing_bucket.save
       else
@@ -586,7 +617,7 @@ class FundingBucketsController < OrganizationAwareController
   def bucket_exists existing_buckets, bucket
     unless existing_buckets.nil?
       buckets = existing_buckets.find {|eb|
-        eb.funding_template == bucket.funding_template && eb.fiscal_year == bucket.fiscal_year && eb.owner == bucket.owner
+        eb.funding_template == bucket.funding_template && eb.fiscal_year == bucket.fiscal_year && eb.owner == bucket.owner && eb.name == bucket.name
       }
       return buckets
     end
