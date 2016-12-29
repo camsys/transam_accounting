@@ -249,7 +249,7 @@ class FundingBucketsController < OrganizationAwareController
     add_breadcrumb 'Funding Programs', funding_sources_path
     add_breadcrumb 'My Funds', my_funds_funding_buckets_path
     add_breadcrumb @funding_bucket.to_s, funding_bucket_path(@funding_bucket)
-    add_breadcrumb 'Edit Grant Application', edit_bucket_app_funding_buckets_path(@funding_bucket)
+    add_breadcrumb 'Edit Grant Application', edit_bucket_app_funding_bucket_path(@funding_bucket)
 
   end
 
