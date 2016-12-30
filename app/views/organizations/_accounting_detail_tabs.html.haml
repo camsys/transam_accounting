@@ -1,5 +1,0 @@
-%li
-  %a{:href => "#buckets", :data =>{:toggle => 'tab'}}
-    %span{:style => 'white-space: nowrap !important;'}
-      Buckets
-      %span.badge= FundingBucket.active.where(owner_id: @org.id).count
