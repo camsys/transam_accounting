@@ -20,8 +20,4 @@ Rails.configuration.to_prepare do
   Vendor.class_eval do
     include TransamAccountingVendor
   end
-
-  Grant.class_eval do
-    include TransamGlAccountableGrant
-  end
 end
