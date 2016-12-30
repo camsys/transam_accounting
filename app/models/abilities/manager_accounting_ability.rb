@@ -7,12 +7,7 @@ module Abilities
       # create new expense categories
       can :create, ExpenseType
 
-      #-------------------------------------------------------------------------
-      # Funding
-      #-------------------------------------------------------------------------
 
-      can :read, FundingTemplate
-      can [:read, :my_funds], FundingBucket
     end
   end
 end
