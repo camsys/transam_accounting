@@ -3,7 +3,14 @@ require 'rails_helper'
 RSpec.describe AssetDepreciableProxy, :type => :model do
 
   let(:test_proxy) { AssetDepreciableProxy.new }
-  let(:test_asset) { create(:buslike_asset, :expected_useful_miles => 100000) }
+  let(:test_asset) {
+    @organization = create(:organization)
+    @asset_subtype = AssetSubtype.first
+    @policy = create(:policy, :organization => @organization)
+    create(:policy_asset_type_rule, :policy => @policy, :asset_type => @asset_subtype.asset_type)
+    create(:policy_asset_subtype_rule, :policy => @policy, :asset_subtype => @asset_subtype)
+    create(:buslike_asset, :expected_useful_miles => 100000, :organization => @organization, :asset_type => @asset_subtype.asset_type, :asset_subtype => @asset_subtype)
+  }
 
   it '.set_defaults' do
     test_proxy.set_defaults(test_asset)
