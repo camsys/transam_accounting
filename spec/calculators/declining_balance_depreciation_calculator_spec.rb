@@ -13,10 +13,13 @@ RSpec.describe DecliningBalanceDepreciationCalculator, :type => :calculator do
 
   before(:each) do
     @organization = create(:organization)
-    @test_asset = create(:buslike_asset, :organization => @organization)
     @policy = create(:policy, :organization => @organization)
-    create(:policy_asset_type_rule, :policy => @policy, :asset_type => @test_asset.asset_type)
-    create(:policy_asset_subtype_rule, :policy => @policy, :asset_subtype => @test_asset.asset_subtype)
+    asset_type = AssetType.find_by(id: 1)
+    create(:policy_asset_type_rule, :policy => @policy, :asset_type => asset_type)
+    asset_sub_type = AssetSubtype.find_by(id: 1)
+    create(:policy_asset_subtype_rule, :policy => @policy, :asset_subtype => asset_sub_type)
+    @test_asset = create(:buslike_asset, :organization => @organization)
+
   end
 
   let(:test_calculator) { DecliningBalanceDepreciationCalculator.new }
