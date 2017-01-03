@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161014201011) do
+ActiveRecord::Schema.define(version: 20161223153908) do
 
   create_table "activities", force: true do |t|
     t.string   "object_key",           limit: 12
@@ -681,6 +681,7 @@ ActiveRecord::Schema.define(version: 20161014201011) do
     t.string   "object_key",          limit: 12,                          null: false
     t.integer  "funding_template_id",                                     null: false
     t.integer  "fiscal_year",                                             null: false
+    t.string   "name",                                                    null: false
     t.decimal  "budget_amount",                  precision: 15, scale: 2, null: false
     t.decimal  "budget_committed",               precision: 15, scale: 2, null: false
     t.integer  "owner_id"
@@ -731,20 +732,22 @@ ActiveRecord::Schema.define(version: 20161014201011) do
   add_index "funding_template_types", ["funding_source_id"], name: "index_funding_template_types_on_funding_source_id", using: :btree
 
   create_table "funding_templates", force: true do |t|
-    t.string   "object_key",        limit: 12, null: false
+    t.string   "object_key",                              limit: 12, null: false
     t.integer  "funding_source_id"
-    t.string   "name",              limit: 64, null: false
+    t.string   "name",                                    limit: 64, null: false
     t.text     "description"
-    t.integer  "contributor_id",               null: false
-    t.integer  "owner_id",                     null: false
+    t.integer  "contributor_id",                                     null: false
+    t.integer  "owner_id",                                           null: false
     t.boolean  "recurring"
     t.boolean  "transfer_only"
-    t.float    "match_required",    limit: 24
+    t.boolean  "create_multiple_agencies",                           null: false
+    t.boolean  "create_multiple_buckets_for_agency_year",            null: false
+    t.float    "match_required",                          limit: 24
     t.text     "query_string"
-    t.boolean  "active",                       null: false
+    t.boolean  "active",                                             null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "external_id",       limit: 32
+    t.string   "external_id",                             limit: 32
   end
 
   add_index "funding_templates", ["contributor_id"], name: "index_funding_templates_on_contributor_id", using: :btree
@@ -1138,6 +1141,14 @@ ActiveRecord::Schema.define(version: 20161014201011) do
     t.string  "code",        limit: 2,   null: false
     t.string  "description", limit: 254, null: false
     t.boolean "active",                  null: false
+  end
+
+  create_table "query_params", force: true do |t|
+    t.string  "name"
+    t.string  "description"
+    t.text    "query_string"
+    t.string  "class_name"
+    t.boolean "active"
   end
 
   create_table "replacement_reason_types", force: true do |t|
