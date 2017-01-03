@@ -1,0 +1,122 @@
+= simple_form_for(@funding_source,
+  :html => {:class => 'form-vertical funding_source_form' },
+  :wrapper => :vertical_form,
+  :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
+
+  = f.input :name, :placeholder => "Enter a name for this fund...", :input_html => {:maxlength => 64}
+  = f.input :description, :class => 'form-control', :input_html => { :maxlength => 256 }, :placeholder => "Enter a description for this fund..."
+  = f.input :details, :class => 'form-control', :input_html => { :rows => 4 }, :placeholder => "Enter details for this fund..."
+
+  .row
+    .col-sm-6
+      = f.input :formula_fund, :as => :hidden
+      = f.input :discretionary_fund, :as => :hidden
+      .form-group.required
+        %label.required.control-label
+          %abbr{title: 'required'} *
+          = " Type"
+        = radio_button_tag :fund, 'formula', @funding_source.formula_fund, {disabled: !@funding_source.new_record?, style: 'margin-left: 10px;'}
+        Formula
+        = radio_button_tag :fund, 'discretionary', @funding_source.discretionary_fund, {disabled: !@funding_source.new_record?, style: 'margin-left: 10px;'}
+        Discretionary
+    .col-sm-6
+      .inflation-rate
+        = f.input :inflation_rate, :label => 'Inflation Rate', :wrapper => :vertical_append do
+          = f.input_field :inflation_rate, :class => 'form-control', :max => 100, :step => 0.001
+          %span.input-group-addon
+            %i.fa.fa-percent
+
+  .row
+    .col-sm-4
+      = f.association :funding_source_type, :collection => FundingSourceType.funding_program.active, :label => 'Source', :include_blank => false
+    .col-sm-4
+      = f.input :life_in_years, label: 'Life of $', :wrapper => :vertical_append do
+        = f.input_field :life_in_years, :class => 'form-control', :min => 1, :allow_blank => true
+        %span.input-group-addon= "years"
+    .col-sm-4
+      = f.input :match_required, :label => 'Pcnt Match', :wrapper => :vertical_append do
+        = f.input_field :match_required, :class => 'form-control', :max => 100, :step => 0.001
+        %span.input-group-addon
+          %i.fa.fa-percent
+
+  .row
+    .col-sm-4
+      = f.input :fy_start, collection: get_fiscal_years, label: 'Valid From'
+    .col-sm-4
+      = f.input :fy_end, collection: get_fiscal_years, label: 'Valid To'
+
+  = f.button :submit, 'Save', :class => "btn btn-primary"
+
+:javascript
+
+  // Document Ready
+  $(document).ready(function(){
+    transam.make_same_height('.header-part');
+    if ($("input[name='fund']:checked").val() != 'formula') {
+      $(".inflation-rate").hide();
+    }
+  });
+
+  $("input[name='fund']").on("click", function() {
+    if ($(this).val() == 'formula') {
+      $(".inflation-rate").show();
+      $("#funding_source_inflation_rate").val('0');
+      $("#funding_source_formula_fund").val('1');
+      $("#funding_source_discretionary_fund").val('0');
+    } else {
+      $(".inflation-rate").hide();
+      $("#funding_source_inflation_rate").val('');
+      $("#funding_source_formula_fund").val('0');
+      $("#funding_source_discretionary_fund").val('1');
+    }
+  });
+
+  // jquery validations
+  $('.funding_source_form').validate({
+    messages: {
+      'funding_source[life_in_years]': {
+        integer: 'Please enter a whole number greater than or equal to 1.',
+        min: 'Please enter a whole number greater than or equal to 1.'
+      }
+    },
+    submitHandler: function(form) {
+      form.submit();
+    }
+  });
+
+  $( "input[name='fund']" ).rules( "add", {
+    required: true
+  });
+
+  $( "#funding_source_fy_start" ).rules( "add", {
+    FYRange: true
+  });
+
+  $( "#funding_source_fy_end" ).rules( "add", {
+    FYRange: true
+  });
+
+  $( "#funding_source_match_required" ).rules( "add", {
+    greaterThan: 0,
+    PercentThreeDigits: true
+  });
+
+  $( "#funding_source_inflation_rate" ).rules( "add", {
+    PercentThreeDigits: true
+  });
+
+  $.validator.addMethod("FYRange", function(value, element) {
+    if (($('#funding_source_fy_start').val() != "") && ($('#funding_source_fy_end').val() != "")) {
+      return (parseInt($('#funding_source_fy_start').val()) <= parseInt($('#funding_source_fy_end').val()));
+    } else {
+      return true;
+    }
+  }, "Not a valid year range.");
+
+  $.validator.addMethod('greaterThan', function(value, element, params) {
+      return this.optional(element) || parseFloat(value) > params;
+  }, "Please enter a value greater than {0}.");
+
+  $.validator.addMethod('PercentThreeDigits', function(value, element) {
+      return this.optional(element) || /^\d*(\.\d{0,3})?$/.test(value);
+  }, "Please enter a correct percent up to three decimal places.");
