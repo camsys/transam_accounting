@@ -113,9 +113,7 @@ class FundingSource < ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   def deleteable?
-
-    # any bucket/grant must be associated with a template and therefore only need to check template count
-    funding_templates.count == 0
+    true
   end
 
   # Generates a cash forecast for the funding source
