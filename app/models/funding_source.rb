@@ -39,9 +39,6 @@ class FundingSource < ActiveRecord::Base
   # Has many grants
   has_many    :grants, -> { order(:fy_year) }, :dependent => :destroy
 
-  has_many    :funding_templates, :dependent => :destroy
-  has_many    :funding_buckets, :through => :funding_templates
-
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
