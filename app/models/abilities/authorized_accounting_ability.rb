@@ -5,16 +5,6 @@ module Abilities
     def initialize(user)
 
       #-------------------------------------------------------------------------
-      # Funding
-      #-------------------------------------------------------------------------
-
-      cannot :read, FundingTemplate
-      cannot :read, FundingBucket do |b|
-        !(user.organization_ids.include? b.owner_id)
-      end
-      can :my_funds, FundingBucket
-
-      #-------------------------------------------------------------------------
       # Expenditures
       #-------------------------------------------------------------------------
       # User can manage expenditures if the expense is owned by their organization
