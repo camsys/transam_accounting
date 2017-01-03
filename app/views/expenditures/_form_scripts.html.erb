@@ -1,0 +1,52 @@
+<script type="text/javascript">
+  $(document).ready(function() {
+
+    // Formats the dates for the date-picker and makes it read-only
+    $('[data-behavior~=datepicker]').datepicker({
+    });
+
+    // Requires users to select a GLA account before the grant if the organization has a chart of accounts
+    $('#grant-selector-chart-of-accounts-present').hide();
+    $('#pcnt_from_grant-chart-of-accounts-present').hide();
+
+    $('#expenditure_general_ledger_account_id').change(function(){
+      var selection = $(this).find(":selected").text()
+      console.log( selection );
+
+      if (selection.length > 0){
+        $('#pcnt_from_grant-chart-of-accounts-present').fadeIn();
+        $('#grant-selector-chart-of-accounts-present').fadeIn();
+        $('#grant-selector-chart-of-accounts-present').find('optgroup').each(function(index, group){
+            var label = $(group).attr('label')
+            if (label !== selection){
+              $(group).children('option').prop('selected', false);
+              $(group).hide();
+            } else {
+              $(group).fadeIn();
+            };
+          }); // end of each
+      } else{
+        $('#grant-selector-chart-of-accounts-present').fadeOut();
+        $('#pcnt_from_grant-chart-of-accounts-present').fadeOut();
+      }
+
+    });
+
+      // jquery validations
+      $('.expenditure_form').validate({
+        ignore: [], //validate hidden fields
+        submitHandler: function(form) {
+          form.submit();
+        }
+      });
+
+      $('#expenditure_amount').rules("add", {
+        min: 0,
+      });
+
+      $('#expenditure_pcnt_from_grant').rules("add", {
+        min: 0,
+        max: 100
+      });
+  });
+</script>

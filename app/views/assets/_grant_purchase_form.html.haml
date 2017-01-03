@@ -1,0 +1,10 @@
+= i_f.input :id, :as => :hidden
+.row
+  .col-md-7
+    = i_f.input :grant_id, :collection => @organization.grants
+  .col-md-5
+    .form-group
+      %label.control-label Pcnt
+      .input-group
+        = i_f.input :pcnt_purchase_cost, :style => 'text-align:right;', :label => false
+        %span.input-group-addon %

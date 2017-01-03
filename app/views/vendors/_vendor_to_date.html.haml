@@ -1,0 +1,4 @@
+= format_field("Num CapEx YTD", format_as_integer(@vendor.expenditures_ytd.count) )
+= format_field("Total CapEx YTD", format_as_currency(@vendor.expenditures_ytd.sum(:amount)) )
+= format_field("Num of CapEx", format_as_integer(@vendor.expenditures.count) )
+= format_field("Total CapEx", format_as_currency(@vendor.expenditures.sum(:amount)) )

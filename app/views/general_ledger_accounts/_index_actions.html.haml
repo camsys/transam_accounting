@@ -1,0 +1,17 @@
+- if can? :create, GeneralLedgerAccount
+  = link_to new_general_ledger_account_path, :class => 'btn btn-default' do
+    %i.fa.fa-plus.fa-fw
+    = " Add General Ledger Account";
+
+= form_tag general_ledger_accounts_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
+  .form-group
+    = select_tag(:type, options_for_select(GeneralLedgerAccountType.active.collect{|a| [a.name, a.id]}, :selected => @account_type_id), :class => "form-control", :style => "width: 150px;", :prompt => "Any GLA...")
+
+:javascript
+  $(document).ready(function() {
+
+    $('#type').change(function() {
+      $('#filter_form').submit();
+    });
+
+  });

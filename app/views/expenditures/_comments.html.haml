@@ -1,0 +1,16 @@
+.row
+  .col-md-12{:style => 'height:200px;overflow-y:auto;'}
+    - if @expenditure.comments.empty?
+      %p There are no comments for this CapEx.
+    - else
+      = render :partial => 'shared/comments', :locals => {:comments => @expenditure.comments}
+
+- if can? :update, @expenditure
+  .row
+    .col-md-12
+      %fieldset
+        %legend Add Comment
+        = form_for [@expenditure, Comment.new], :role => 'form' do |f|
+          .form-group
+            = f.text_area :comment, :class => 'form-control', :placeholder => 'Enter a new comment...', :required => true, :minlength => 10, :maxlength => 254
+          = f.submit :class => 'btn btn-primary'

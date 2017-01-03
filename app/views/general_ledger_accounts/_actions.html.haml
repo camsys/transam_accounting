@@ -1,0 +1,17 @@
+.btn-group.pull-right.panel-action
+  %button.btn.btn-primary.btn-sm.dropdown-toggle{:data => {:toggle => 'dropdown'}}
+    %i.fa.fa-cog
+    = " Actions"
+    %span.caret
+  %ul.dropdown-menu{:role => 'menu'}
+    - if can? :update, @ledger_account
+      %li
+        = link_to edit_general_ledger_account_path(@ledger_account) do
+          %i.fa.fa-edit.fa-fw
+          = " Update this general ledger account"
+    - if can? :destroy, @ledger_account
+      %li.divider
+      %li
+        = link_to general_ledger_account_path(@ledger_account), :method => :delete, :data => {:confirm => "Are you sure you want to remove this general ledger account? The action can't be undone."} do
+          %i.fa.fa-trash-o.fa-fw
+          = " Remove this general ledger account"

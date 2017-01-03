@@ -1,0 +1,19 @@
+- if can? :create, Grant
+  = link_to new_grant_path, :class => 'btn btn-default' do
+    %i.fa.fa-plus.fa-fw
+    = "Add Grant";
+
+= form_tag grants_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
+  .form-group
+    = select_tag(:funding_source_id, options_for_select(FundingSource.active.collect{|a| [a.name, a.id]}, :selected => @funding_source_id), :class => "form-control", :prompt => "Any Source...")
+  .form-group
+    = select_tag(:fiscal_year, options_for_select(@fiscal_years, :selected => @fiscal_year), :class => "form-control", :prompt => "Any FY...")
+
+:javascript
+  $(document).ready(function() {
+
+    $('#funding_source_id, #fiscal_year').change(function() {
+      $('#filter_form').submit();
+    });
+
+  });

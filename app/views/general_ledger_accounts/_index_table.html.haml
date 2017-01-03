@@ -1,0 +1,34 @@
+:ruby
+  table_dom_id = SecureRandom.hex
+  show_actions ||= 0
+
+- if show_actions == 1
+  #table_actions.btn-group
+    = render :partial => "general_ledger_accounts/index_actions"
+
+%table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
+  :card_view => "false",
+  :pagination => 'true',
+  :page_list => "[5, 10, 20, 50, 100, 200]",
+  :page_size => current_user.num_table_rows,
+  :show_pagination_switch => 'true',
+  :search => 'false',
+  :show_columns => 'true',
+  :show_export => 'true',
+  :show_toggle => 'true',
+  :resizable => 'true',
+  :search => 'false'}}
+  %thead
+    %tr
+      %th.left{:data => {:sortable => 'true', :order => 'desc'}} Name
+      %th.right{:data => {:sortable => 'true', :order => 'desc'}} Account Number
+      %th.right{:data => {:sortable => 'true', :order => 'desc'}} Account Type
+
+  %tbody
+    - gl_accounts.each do |a|
+      %tr.popup-details{:id => a.object_key, :class => 'action-path', :data => {:action_path => general_ledger_account_path(a)}}
+        %td.left= a.name
+        %td.right= a.account_number
+        %td.right= a.general_ledger_account_type.name
+
+= render :partial => 'shared/table_scripts', :locals => {:table_id => table_dom_id, :path_pattern => general_ledger_account_path("xxx")}

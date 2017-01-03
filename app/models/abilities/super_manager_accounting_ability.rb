@@ -4,6 +4,7 @@ module Abilities
 
     def initialize(user)
 
+      can :manage, FundingSource
 
     end
   end

@@ -1,0 +1,25 @@
+:javascript
+
+  $(document).ready(function() {
+    transam.make_same_height('.header-part');
+
+    // Manage the tabs
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+      // save the latest tab
+      var this_tab = $(this).attr('href');
+      //alert(this_tab);
+      transam.set_ui_key_value('fs_tab', this_tab);
+      if (this_tab == '#chrt') {
+        draw_chart();
+      }
+    });
+  });
+  $(function() {
+    var last_tab = transam.get_ui_key_value('fs_tab');
+    if (last_tab) {
+      $('a[href='+last_tab+']').tab('show');
+    } else {
+      // Default to the first tab if no tab is stored
+      $('a[data-toggle="tab"]:first').tab('show');
+    }
+  });

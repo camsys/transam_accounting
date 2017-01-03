@@ -4,6 +4,8 @@ module Abilities
 
     def initialize(user)
 
+      # create new expense categories
+      can :create, ExpenseType
 
     end
   end
