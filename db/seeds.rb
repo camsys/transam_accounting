@@ -43,8 +43,20 @@ depreciation_interval_types = [
   {:active => 1, :name => 'Monthly', :description => 'Depreciation calculated monthly.', :months => 1}
 ]
 
+funding_template_types = [
+  {:active => 1, :name => 'Capital', :description => 'Capital Funding Template'},
+  {:active => 1, :name => 'Operating', :description => 'Operating Funding Template'},
+  {:active => 1, :name => 'Debt Service', :description => 'Debt Service Funding Template'},
+  {:active => 1, :name => 'Other', :description => 'Other Funding Template'},
+]
 
-lookup_tables = %w{ funding_source_types general_ledger_account_types depreciation_calculation_types depreciation_interval_types}
+funding_bucket_types = [
+    {:active => 1, :name => 'Existing Grant', :description => 'Existing Grant'},
+    {:active => 1, :name => 'Formula', :description => 'Formula Bucket'},
+    {:active => 1, :name => 'Grant Application', :description => 'Grant Application Bucket'},
+]
+
+lookup_tables = %w{ funding_source_types general_ledger_account_types depreciation_calculation_types depreciation_interval_types funding_template_types funding_bucket_types}
 
 lookup_tables.each do |table_name|
   puts "  Loading #{table_name}"
