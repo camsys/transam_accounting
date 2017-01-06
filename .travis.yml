@@ -10,6 +10,7 @@ script:
 - bundle exec rake app:transam_accounting:prepare_rspec
 - bundle exec $TEST_SUITE
 before_script:
+- bundle update transam_core transam_transit
 - cp spec/dummy/config/database.travis.yml spec/dummy/config/database.yml
 before_install:
 - mysql -e "create database IF NOT EXISTS transam_accounting_testing;" -uroot
