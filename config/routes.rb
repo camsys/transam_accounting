@@ -22,15 +22,6 @@ Rails.application.routes.draw do
     end
   end
 
-
-  resources :funding_sources, :path => :funding_programs do
-    collection do
-      get 'details'
-    end
-    resources :comments
-    resources :documents
-  end
-
   resources :funding_templates do
     collection do
       get 'find_match_required_from_funding_source_id'
