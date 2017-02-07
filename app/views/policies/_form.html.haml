@@ -8,7 +8,6 @@
   :boolean => :vertical_boolean}) do |f|
 
   = f.input :description, :as => :text, :required => true, :input_html => { :rows => 3 }, :placeholder => "Enter a description for the policy..."
-  = f.association :condition_estimation_type, :required => true, :label => "Condition Estimator", :prompt => "Select..."
   = f.input :condition_threshold, :required => true, :input_html => {:min => ConditionType.min_rating, :max => ConditionType.max_rating}, :label => "Condition Threshold"
   = f.association :depreciation_calculation_type, :required => true, :label => "Depreciation Calculator", :prompt => "Select..."
   = f.association :depreciation_interval_type, :required => true, :label => "Depreciation Interval", :prompt => "Select..."

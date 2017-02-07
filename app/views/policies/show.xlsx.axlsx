@@ -7,8 +7,8 @@ wb.styles do |style|
     currency_cell = style.add_style(:num_fmt => 5)
 
     wb.add_worksheet(name: "Policy") do |sheet|
-        sheet.add_row ['Policy Owner (Agency)', 'Description', 'Current', 'Condition Estimation Method', 'Condition Threshold', 'Depreciation Threshold Interval', 'Depreciation Calculation Method']
-        sheet.add_row [@policy.organization.to_s, @policy.description, @policy.active ? 'Yes' : 'No', @policy.condition_estimation_type.to_s, format_as_decimal(@policy.condition_threshold), @policy.depreciation_interval_type.to_s, @policy.depreciation_calculation_type.to_s], style: [nil, nil, nil, nil, float_cell, nil, nil]
+        sheet.add_row ['Policy Owner (Agency)', 'Description', 'Current', 'Condition Threshold', 'Depreciation Threshold Interval', 'Depreciation Calculation Method']
+        sheet.add_row [@policy.organization.to_s, @policy.description, @policy.active ? 'Yes' : 'No', format_as_decimal(@policy.condition_threshold), @policy.depreciation_interval_type.to_s, @policy.depreciation_calculation_type.to_s], style: [nil, nil, nil, nil, float_cell, nil, nil]
     end
 
     wb.add_worksheet(name: "Asset Type Rules") do |sheet|
