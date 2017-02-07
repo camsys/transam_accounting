@@ -5,7 +5,6 @@
   = format_field("Active", format_as_boolean(@policy.active) )
 
 .col-sm-6
-  = format_field("Condition Estimation Calculation", @policy.condition_estimation_type.name, @policy.condition_estimation_type.description )
   = format_field("Condition Threshold", format_as_decimal(@policy.condition_threshold))
   = format_field("Depreciation Calculation Type", @policy.depreciation_calculation_type.name, @policy.depreciation_calculation_type.description )
   = format_field("Depreciation Interval", @policy.depreciation_interval_type.name, @policy.depreciation_interval_type.description )
