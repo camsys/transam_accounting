@@ -18,8 +18,7 @@ funding_source_types = [
     {:active => 1, :name => 'Federal',  :description => 'Federal Funding Source'},
     {:active => 1, :name => 'State',    :description => 'State Funding Source'},
     {:active => 1, :name => 'Local',    :description => 'Local Funding Source'},
-    {:active => 1, :name => 'Agency',    :description => 'Agency Funding Source'},
-    {:active => 1, :name => 'Other',    :description => 'Other Funding Source'}
+    {:active => 1, :name => 'Agency',    :description => 'Agency Funding Source'}
 ]
 
 
