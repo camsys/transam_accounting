@@ -29,7 +29,7 @@ class Grant < ActiveRecord::Base
   belongs_to  :funding_source
 
   # Has many grant purchases
-  has_many :grant_purchases, :dependent => :destroy
+  has_many :grant_purchases, :foreign_key => 'sourceable_id', :dependent => :destroy
 
   # Has many assets through grant purchases
   has_many :assets, :through => :grant_purchases

@@ -35,6 +35,7 @@ class GrantsController < OrganizationAwareController
       values << @fiscal_year
     end
 
+    # TODO fix for sourceable
     @grants = Grant.where(conditions.join(' AND '), *values).includes(:grant_purchases).order(:grant_number)
 
     # cache the set of object keys in case we need them later

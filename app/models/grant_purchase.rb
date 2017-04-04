@@ -2,11 +2,13 @@
 #
 # GrantPurchase
 #
-# Tracks asset purchases against specific grants. Each purchase tracks the percentage
-# of the asset cost against the grant.
+# Tracks asset purchases against specific funding. Each purchase tracks the percentage
+# of the asset cost against the funding.
 #
 #------------------------------------------------------------------------------
 class GrantPurchase < ActiveRecord::Base
+
+  SOURCEABLE_TYPE = Rails.application.config.asset_purchase_source
 
   # Include the fiscal year mixin
   include FiscalYear
@@ -19,16 +21,14 @@ class GrantPurchase < ActiveRecord::Base
   #------------------------------------------------------------------------------
   # Associations
   #------------------------------------------------------------------------------
-  # Every grant purchase is associated with an asset and a grant
-  belongs_to  :grant
+  # Every grant purchase is associated with an asset and some form of funding (sourceable)
+  belongs_to  :sourceable, :polymorphic => true
   belongs_to  :asset
-
-  #accepts_nested_attributes_for :grant
 
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
-  validates_presence_of :grant
+  validates_presence_of :sourceable
   validates_presence_of :asset
   validates :pcnt_purchase_cost,  :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
 
@@ -41,10 +41,11 @@ class GrantPurchase < ActiveRecord::Base
   # List of hash parameters allowed by the controller
   FORM_PARAMS = [
     :id,
-    :asset,
-    :grant,
-    :grant_id,
-    :pcnt_purchase_cost
+    :asset_id,
+    :sourceable_type,
+    :sourceable_id,
+    :pcnt_purchase_cost,
+    :_destroy
   ]
 
   #------------------------------------------------------------------------------
@@ -57,6 +58,14 @@ class GrantPurchase < ActiveRecord::Base
     FORM_PARAMS
   end
 
+  def self.sources(params=nil)
+    if params
+      SOURCEABLE_TYPE.constantize.where(params)
+    else
+      SOURCEABLE_TYPE.constantize.active
+    end
+  end
+
   #------------------------------------------------------------------------------
   #
   # Instance Methods
@@ -65,11 +74,11 @@ class GrantPurchase < ActiveRecord::Base
 
   # Virtual attribute for setting a grant by its ID so we can patch around
   # a limitation in the accepts_nested_attributes_for
-  def grant_id=(val)
-    self.grant = Grant.find(val)
+  def sourceable_id=(val)
+    self.sourceable = SOURCEABLE_TYPE.constantize.find(val)
   end
-  def grant_id
-    grant.id if grant
+  def sourceable_id
+    sourceable.try(:id)
   end
 
   def to_s
@@ -77,7 +86,7 @@ class GrantPurchase < ActiveRecord::Base
   end
 
   def name
-    grant.blank? ? '' : "#{grant}: #{pcnt_purchase_cost}%"
+    "#{sourceable}: #{pcnt_purchase_cost}%"
   end
 
   #------------------------------------------------------------------------------

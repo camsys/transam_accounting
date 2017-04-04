@@ -1,10 +1,10 @@
-:ruby
-  # Add one or two grant purchases to the builder
-  if @asset.grant_purchases.blank?
-    2.times { @asset.grant_purchases.build }
-  else
-    @asset.grant_purchases.build
-  end
+#grant_purchases.well.well-sm{style: "overflow-y:scroll; max-height:250px;"}
+  %label.control-label
+    %i.fa.fa-usd.fa-1-5x
+    Funding Info
+  .links.pull-right
+    = link_to_add_association f, :grant_purchases, :class => 'btn btn-xs btn-info', data: {association_insertion_method: 'after'} do
+      %i.fa.fa-plus
+  = f.simple_fields_for :grant_purchases do |grant_purchase|
+    = render 'grant_purchase_fields', f: grant_purchase
 
-= f.simple_fields_for :grant_purchases do |i_f|
-  = render 'grant_purchase_form', :i_f => i_f
