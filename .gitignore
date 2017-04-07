@@ -10,3 +10,4 @@ spec/tmp/*
 tmp/*
 Gemfile.lock
 .idea/
+.DS_Store

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "assets/_grant_purchases.html.haml", :type => :view do
+describe "assets/_accounting_purchase.html.haml", :type => :view do
   it 'grant purchases' do
     test_asset = create(:buslike_asset)
     test_source = create(:funding_source)

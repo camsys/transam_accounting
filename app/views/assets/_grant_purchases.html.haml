@@ -1,2 +1,0 @@
-- if @asset.grant_purchases.count > 0
-  = format_field("Grant Purchases", format_as_list(@asset.grant_purchases.map{|g| "#{link_to(g.grant.grant_number, grant_path(g.grant))} (#{format_as_percentage(g.pcnt_purchase_cost)})"}))
