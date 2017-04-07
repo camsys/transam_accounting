@@ -5,8 +5,8 @@ RSpec.describe GrantPurchase, :type => :model do
   let(:test_purchase) { create(:grant_purchase) }
 
   describe 'associations' do
-    it 'has a grant' do
-      expect(test_purchase).to belong_to(:grant)
+    it 'has a source' do
+      expect(test_purchase).to belong_to(:sourceable)
     end
     it 'has an asset' do
       expect(test_purchase).to belong_to(:asset)
@@ -14,8 +14,8 @@ RSpec.describe GrantPurchase, :type => :model do
   end
 
   describe 'validations' do
-    it 'must have a grant' do
-      test_purchase.grant = nil
+    it 'must have a source' do
+      test_purchase.sourceable = nil
       expect(test_purchase.valid?).to be false
     end
     it 'must have an asset' do
@@ -34,16 +34,17 @@ RSpec.describe GrantPurchase, :type => :model do
       :asset,
       :grant,
       :grant_id,
-      :pcnt_purchase_cost
+      :pcnt_purchase_cost,
+      :_destroy
     ])
   end
 
   it '.to_s' do
     expect(test_purchase.to_s).to eq(test_purchase.name)
-    expect(test_purchase.to_s).to eq("#{test_purchase.grant.to_s}: #{test_purchase.pcnt_purchase_cost}%")
+    expect(test_purchase.to_s).to eq("#{test_purchase.sourceable.to_s}: #{test_purchase.pcnt_purchase_cost}%")
   end
   it '.name' do
-    expect(test_purchase.name).to eq("#{test_purchase.grant.to_s}: #{test_purchase.pcnt_purchase_cost}%")
+    expect(test_purchase.name).to eq("#{test_purchase.sourceable.to_s}: #{test_purchase.pcnt_purchase_cost}%")
   end
 
   it '.set_defaults' do
