@@ -32,8 +32,8 @@ RSpec.describe GrantPurchase, :type => :model do
     expect(GrantPurchase.allowable_params).to eq([
       :id,
       :asset,
-      :grant,
-      :grant_id,
+      :sourceable_type,
+      :sourceable_id,
       :pcnt_purchase_cost,
       :_destroy
     ])
