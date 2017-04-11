@@ -5,6 +5,24 @@
   .links.pull-right
     = link_to_add_association f, :grant_purchases, :class => 'btn btn-xs btn-info', data: {association_insertion_method: 'after'} do
       %i.fa.fa-plus
+  %label#grant_purchases-error.error
   = f.simple_fields_for :grant_purchases do |grant_purchase|
     = render 'grant_purchase_fields', f: grant_purchase
 
+:javascript
+  $("#grant_purchases").on("change", ".funding-pcnt", function() {
+    var sum = 0;
+    $('.funding-pcnt').each(function() {
+        sum += Number($(this).val());
+    });
+
+    if ((sum < 100) && (sum > 0)) {
+    $('#grant_purchases-error').show();
+      $('#grant_purchases-error').html('Entries sum to less than 100%.')
+    } else if (sum > 100) {
+      $('#grant_purchases-error').show();
+      $('#grant_purchases-error').html('Entries sum to more than 100%.')
+    } else {
+      $('#grant_purchases-error').hide();
+    }
+  });
