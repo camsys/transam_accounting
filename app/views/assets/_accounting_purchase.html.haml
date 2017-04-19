@@ -1,2 +1,2 @@
 - if @asset.grant_purchases.count > 0
-  = format_field("Grant Purchases", format_as_list(@asset.grant_purchases.map{|g| "#{link_to(g.sourceable.to_s, eval("#{g.sourceable.class.name.underscore}_path(id: '#{g.sourceable.object_key}')"))} (#{format_as_percentage(g.pcnt_purchase_cost)})"}))
+  = format_field(GrantPurchase.label.pluralize, format_as_list(@asset.grant_purchases.map{|g| "#{link_to(g.sourceable.to_s, eval("#{g.sourceable.class.name.underscore}_path(id: '#{g.sourceable.object_key}')"))} (#{format_as_percentage(g.pcnt_purchase_cost)})"}))

@@ -66,6 +66,14 @@ class GrantPurchase < ActiveRecord::Base
     end
   end
 
+  def self.label
+    if SOURCEABLE_TYPE == 'FundingSource'
+      'Funding Program'
+    else
+      SOURCEABLE_TYPE.constantize.model_name.human.titleize
+    end
+  end
+
   #------------------------------------------------------------------------------
   #
   # Instance Methods
