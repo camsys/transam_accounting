@@ -10,3 +10,7 @@
   %hr
   = format_field("Valid From", format_as_fiscal_year(@funding_source.fy_start))
   = format_field("Valid To", format_as_fiscal_year(@funding_source.fy_end))
+
+%hr
+= format_field("Created On", format_as_date(@funding_source.created_at))
+= format_field("Last Updated", format_as_date(@funding_source.updated_at))
