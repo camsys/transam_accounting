@@ -71,6 +71,14 @@
     }
   });
 
+  $('#funding_source_funding_source_type_id').change(function(){
+    var selected_source_type = $('#funding_source_funding_source_type_id option:selected').text();
+    if(selected_source_type === 'Local')
+    {
+      $('#funding_source_match_required').val(100);
+    }
+  });
+
   // jquery validations
   $('.funding_source_form').validate({
     messages: {
