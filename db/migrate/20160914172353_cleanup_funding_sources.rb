@@ -7,6 +7,8 @@ class CleanupFundingSources < ActiveRecord::Migration
     add_column :funding_sources, :fy_end, :integer, after: :fy_start
     rename_column :funding_sources, :federal_match_required, :match_required
 
+    change_column :funding_sources, :description, :string, :limit => 256
+
 
   end
 end
