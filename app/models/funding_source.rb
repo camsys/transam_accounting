@@ -39,6 +39,7 @@ class FundingSource < ActiveRecord::Base
   # Has many grants
   has_many    :grants, -> { order(:fy_year) }, :dependent => :destroy
 
+  has_many :grant_purchases, :as => :sourceable, :dependent => :destroy
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
