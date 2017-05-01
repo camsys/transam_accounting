@@ -7,6 +7,10 @@ RSpec.describe Vendor, :type => :model do
 
   let(:test_vendor) { create(:vendor) }
 
+  # New but duplicate code to trigger travis
+  it 'has many expenditures (duplicate)' do
+    expect(test_vendor).to have_many(:expenditures)
+  end
   it 'has many expenditures' do
     expect(test_vendor).to have_many(:expenditures)
   end
