@@ -10,19 +10,17 @@
     = render 'grant_purchase_fields', f: grant_purchase
 
 :javascript
-  $("#grant_purchases").on("change", ".funding-pcnt", function() {
-    var sum = 0;
+  $('form').on('submit', function(event) {
+    $('#grant_purchases .funding-pcnt').rules("add", {
+      pcntSumsHundred: true
+    });
+  });
+
+  $.validator.addMethod("pcntSumsHundred", function(value, element) {
+      var sum = 0;
     $('.funding-pcnt').each(function() {
         sum += Number($(this).val());
     });
 
-    if ((sum < 100) && (sum > 0)) {
-    $('#grant_purchases-error').show();
-      $('#grant_purchases-error').html('Entries sum to less than 100%.')
-    } else if (sum > 100) {
-      $('#grant_purchases-error').show();
-      $('#grant_purchases-error').html('Entries sum to more than 100%.')
-    } else {
-      $('#grant_purchases-error').hide();
-    }
-  });
+    return sum == 100;
+  }, "Entries do not sum to 100%.");
