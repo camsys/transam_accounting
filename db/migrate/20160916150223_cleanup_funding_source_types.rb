@@ -5,7 +5,6 @@ class CleanupFundingSourceTypes < ActiveRecord::Migration
         {:id => 2, :active => 1, :name => 'State',    :description => 'State Funding Source'},
         {:id => 3, :active => 1, :name => 'Local',    :description => 'Local Funding Source'},
         {:id => 4, :active => 1, :name => 'Agency',    :description => 'Agency Funding Source'},
-        {:id => 5, :active => 1, :name => 'Other',    :description => 'Other Funding Source'}
     ]
 
     FundingSourceType.destroy_all
