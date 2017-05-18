@@ -28,7 +28,7 @@ general_ledger_account_types = [
   {:active => 1, :name => 'Equity Account',     :description => 'Accounts representing the residual equity the business.'},
   {:active => 1, :name => 'Revenue Account',    :description => 'Accounts representing the businesses gross earnings.'},
   {:active => 1, :name => 'Expense Account',    :description => 'Accounts representing the expenditures for the business.'},
-  {:active => 1, :name => 'Contra Account',     :description => 'Accounts representing negative balances due to accu,ulated depreciation etc.'}
+  {:active => 1, :name => 'Contra Account',     :description => 'Accounts representing negative balances due to accumulated depreciation etc.'}
 ]
 
 depreciation_calculation_types = [
