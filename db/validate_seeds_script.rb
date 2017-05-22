@@ -1,5 +1,5 @@
 # Validates that engine seed data has loaded as expected
-# Added to the dynamically generated tmp/validate_seeds_data.rb file
+# Added to a dynamically generated validate_seeds_data.rb file
 # Via the transam_{engine_name}:validate_engine_seeds rake task
 # Which should only be called from an app-level validate_engine_seeds rake task
 
