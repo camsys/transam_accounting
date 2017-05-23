@@ -7,7 +7,7 @@ branches:
 env:
 - TEST_SUITE=rspec RAILS_VERSION=4.1.9
 script:
-- bundle exec rake app:transam_accounting:prepare_rspec
+- bundle exec rake app:transam_accounting:prepare_rspec_from_canon_schema
 - bundle exec $TEST_SUITE
 before_script:
 - bundle update transam_core transam_transit
