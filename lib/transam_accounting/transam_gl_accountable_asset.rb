@@ -51,6 +51,17 @@ module TransamGlAccountableAsset
   #
   #------------------------------------------------------------------------------
 
+  def allowable_params
+    a = []
+    a << super
+    [
+        :grant_purchases_attributes => [GrantPurchase.allowable_params]
+    ].each do |field|
+      a << field
+    end
+    a.flatten
+  end
+
   protected
 
 end
