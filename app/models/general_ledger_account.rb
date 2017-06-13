@@ -37,16 +37,17 @@ class GeneralLedgerAccount < ActiveRecord::Base
   has_many :grant_budgets
 
   # Allow the form to submit grant purchases
-  accepts_nested_attributes_for :grant_budgets, :reject_if => lambda{|a| a[:sourceable_id].blank?}, :allow_destroy => true
+  accepts_nested_attributes_for :grant_budgets, :reject_if => :all_blank, :allow_destroy => true
 
-  has_many :funding_sources, :as => :sourceable, :through => :grant_budgets
-  has_many :grants, :as => :sourceable, :through => :grant_budgets
+  has_many :funding_sources, :source => :sourceable, :source_type => 'FundingSource', :through => :grant_budgets
+  has_many :grants, :source => :sourceable, :source_type => 'Grant', :through => :grant_budgets
 
   # Each GLA has 0 or more expenditures
   has_many :expenditures
 
   # Every GLA has and belongs to many assets
-  has_and_belongs_to_many :assets
+  has_many :grant_purchases, :through => :grant_budgets
+  has_many :assets, :through => :grant_purchases
 
   #------------------------------------------------------------------------------
   # Validations

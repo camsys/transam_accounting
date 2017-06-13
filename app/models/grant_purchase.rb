@@ -101,6 +101,10 @@ class GrantPurchase < ActiveRecord::Base
     "#{sourceable}: #{pcnt_purchase_cost}%"
   end
 
+  def sourceable_path
+    "#{sourceable_type.underscore}_path(id: '#{sourceable.object_key}')"
+  end
+
   #------------------------------------------------------------------------------
   #
   # Protected Methods

@@ -2,11 +2,12 @@
   %li
     %a{:href => "#grants_table", :data =>{:toggle => 'tab'}}
       %span.badge.pull-right= @ledger_account.grant_budgets.count
-      = "Grants"
-  %li
-    %a{:href => "#assets", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @ledger_account.assets.count
-      = "Assets"
+      = GrantBudget.label.pluralize
+  - if GrantPurchase.sourceable_type == 'GrantBudget'
+    %li
+      %a{:href => "#assets", :data =>{:toggle => 'tab'}}
+        %span.badge.pull-right= @ledger_account.assets.count
+        = "Assets"
   %li
     %a{:href => "#expenditures", :data =>{:toggle => 'tab'}}
       %span.badge.pull-right= @ledger_account.expenditures.count
@@ -16,12 +17,13 @@
   .tab-pane.fade#grants_table
     .tab-content
       = render :partial => 'gla_budgets', :locals => {:gla_budgets => @ledger_account.grant_budgets}
-  .tab-pane.fade#assets
-    .tab-content
-      - if @ledger_account.assets.empty?
-        %p There are no assets associated with this general ledger account.
-      - else
-        = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => @ledger_account.assets}
+  - if GrantPurchase.sourceable_type == 'GrantBudget'
+    .tab-pane.fade#assets
+      .tab-content
+        - if @ledger_account.assets.empty?
+          %p There are no assets associated with this general ledger account.
+        - else
+          = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => @ledger_account.assets}
 
   .tab-pane.fade#expenditures
     .tab-content

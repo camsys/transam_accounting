@@ -1,2 +1,15 @@
+:ruby
+  formatted_grant_purchases = []
+  @asset.grant_purchases.each do |g|
+    if g.sourceable.present?
+      if GrantPurchase.sourceable_type == 'GrantBudget'
+        sourceable_path = "#{g.sourceable.sourceable.class.name.underscore}_path(id: '#{g.sourceable.sourceable.object_key}')"
+        formatted_grant_purchases << "#{link_to(g.sourceable.sourceable.to_s, eval(sourceable_path))} #{link_to(g.sourceable.general_ledger_account.to_s, general_ledger_account_path(g.sourceable.general_ledger_account))} (#{format_as_percentage(g.pcnt_purchase_cost)})"
+      else
+        formatted_grant_purchases << "#{link_to(g.sourceable.to_s, eval(g.sourceable_path))} (#{format_as_percentage(g.pcnt_purchase_cost)})"
+      end
+    end
+  end
+
 - if @asset.grant_purchases.count > 0
-  = format_field(GrantPurchase.label.pluralize, format_as_list(@asset.grant_purchases.map{|g| "#{link_to(g.sourceable.to_s, eval("#{g.sourceable.class.name.underscore}_path(id: '#{g.sourceable.object_key}')"))} (#{format_as_percentage(g.pcnt_purchase_cost)})" if g.sourceable.present?}.compact))
+  = format_field(GrantPurchase.label.pluralize, format_as_list(formatted_grant_purchases))
