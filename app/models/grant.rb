@@ -58,6 +58,8 @@ class Grant < ActiveRecord::Base
   # Scopes
   #------------------------------------------------------------------------------
 
+  scope :active, -> { where(:active => true) }
+
   # default scope
 
   # List of hash parameters allowed by the controller
@@ -179,6 +181,7 @@ class Grant < ActiveRecord::Base
     # Set the fiscal year to the current fiscal year
     self.fy_year ||= current_fiscal_year_year
     self.amount ||= 0
+    self.active = self.active.nil? ? true : self.active
   end
 
 end

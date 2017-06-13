@@ -102,7 +102,7 @@ class GeneralLedgerAccountsController < OrganizationAwareController
     @ledger_account = GeneralLedgerAccount.new(form_params)
 
     respond_to do |format|
-      if @ledger_account.save
+      if @ledger_account.save!
         notify_user(:notice, "The general ledger account was successfully saved.")
         format.html { redirect_to general_ledger_account_url(@ledger_account) }
         format.json { render action: 'show', status: :created, location: @ledger_account }

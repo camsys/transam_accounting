@@ -12,7 +12,7 @@
   - if GrantPurchase.sourceable_type.include? 'Grant'
     %li
       %a{:href => "#asst", :data =>{:toggle => 'tab'}}
-        - assets = GrantPurchase.sourceable_type == 'Grant' ? @grant.assets : @grant.grant_budgets.map{|g| g.assets}.flatten!.uniq
+        - assets = GrantPurchase.sourceable_type == 'Grant' ? @grant.assets : @grant.grant_budgets.map{|g| g.assets}.flatten.uniq
         %span.badge.pull-right= assets.count
         = "Assets"
 

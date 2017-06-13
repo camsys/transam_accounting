@@ -34,7 +34,7 @@ class GeneralLedgerAccount < ActiveRecord::Base
   # Every GLA has 0 or more grants. This is not a strictly HABTM relationship
   # but it allows us to relate GLAs to grants without modifying the grants table
   # which is in the transit engine
-  has_many :grant_budgets
+  has_many :grant_budgets, :dependent => :destroy, :inverse_of => :general_ledger_account
 
   # Allow the form to submit grant purchases
   accepts_nested_attributes_for :grant_budgets, :reject_if => :all_blank, :allow_destroy => true
@@ -94,7 +94,7 @@ class GeneralLedgerAccount < ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   def to_s
-    name
+    "#{account_number} - #{name}"
   end
 
   #------------------------------------------------------------------------------

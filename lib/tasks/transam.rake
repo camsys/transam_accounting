@@ -21,4 +21,10 @@ namespace :transam do
     existing_bucket_type.save
     grant_application_bucket_type.save
   end
+
+
+  desc "create chart of account for orgs"
+  task create_chart_of_accounts: :environment do
+    ChartOfAccount.create!(Organization.pluck(:id).map{|o|{organization_id: o}})
+  end
 end

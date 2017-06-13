@@ -15,11 +15,11 @@
           Chart of Accounts
 
         %ul.dropdown-menu
-          - @organization_list.each do |org_id|
+          - Organization.where(id: @organization_list).each do |org|
             %li.text-left
-              = link_to general_ledger_accounts_path(:organization_id => org_id) do
+              = link_to general_ledger_accounts_path(:organization_id => org.id) do
                 %i.fa.fa-fw.fa-book
-                = ChartOfAccount.find_by(organization_id: org_id)
+                = org.short_name
 
     %li.divider
 

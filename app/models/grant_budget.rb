@@ -7,14 +7,19 @@
 #------------------------------------------------------------------------------
 class GrantBudget < ActiveRecord::Base
 
-  SOURCEABLE_TYPE = Rails.application.config.asset_purchase_source
+  SOURCEABLE_TYPE = Rails.application.config.grant_budget_source
+
+  #------------------------------------------------------------------------------
+  # Callbacks
+  #------------------------------------------------------------------------------
+  after_initialize                  :set_defaults
 
   #------------------------------------------------------------------------------
   # Associations
   #------------------------------------------------------------------------------
 
-  belongs_to  :general_ledger_account
   belongs_to  :sourceable, :polymorphic => true
+  belongs_to  :general_ledger_account
 
   # Has many grant purchases
   has_many :grant_purchases, :as => :sourceable, :dependent => :destroy
@@ -24,8 +29,9 @@ class GrantBudget < ActiveRecord::Base
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
-  validates :general_ledger_account,    :presence => true
-  validates :sourceable,                     :presence => true
+
+  validates_presence_of :sourceable
+  validates_presence_of :general_ledger_account
   validates :amount,                    :allow_nil => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
 
   # List of hash parameters specific to this class that are allowed by the controller
@@ -37,6 +43,8 @@ class GrantBudget < ActiveRecord::Base
     :amount,
     :_destroy
   ]
+
+  scope :active, -> { where(:active => true) }
 
   #------------------------------------------------------------------------------
   #
@@ -54,7 +62,7 @@ class GrantBudget < ActiveRecord::Base
 
   def self.sources(params=nil)
     if params
-      SOURCEABLE_TYPE.constantize.where(params)
+      SOURCEABLE_TYPE.constantize.active.where(params)
     else
       SOURCEABLE_TYPE.constantize.active
     end
@@ -74,12 +82,25 @@ class GrantBudget < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
+  # Virtual attribute for setting a grant by its ID so we can patch around
+  # a limitation in the accepts_nested_attributes_for
+  def sourceable_id=(val)
+    self.sourceable = SOURCEABLE_TYPE.constantize.find(val)
+  end
+  def sourceable_id
+    sourceable.try(:id)
+  end
+
   def to_s
     name
   end
   
   def name
-    "#{sourceable} - #{general ledger_account}"
+    "#{sourceable} #{general_ledger_account}"
+  end
+
+  def sourceable_path
+    "#{sourceable_type.underscore}_path(:id => '#{sourceable.object_key}')"
   end
 
   #------------------------------------------------------------------------------
@@ -88,5 +109,10 @@ class GrantBudget < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
   protected
+
+  # Set resonable defaults for a new grant
+  def set_defaults
+    self.active = self.active.nil? ? true : self.active
+  end
 
 end
