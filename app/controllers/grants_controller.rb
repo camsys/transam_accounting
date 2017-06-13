@@ -18,14 +18,14 @@ class GrantsController < OrganizationAwareController
     conditions  = []
     values      = []
 
-    conditions << 'organization_id = ?'
-    values << @organization.id
+    conditions << 'organization_id IN (?)'
+    values << @organization_list
 
-    @funding_source_id = params[:funding_source_id]
-    unless @funding_source_id.blank?
-      @funding_source_id = @funding_source_id.to_i
-      conditions << 'funding_source_id = ?'
-      values << @funding_source_id
+    @sourceable_id = params[:sourceable_id]
+    unless @sourceable_id.blank?
+      @sourceable_id = @sourceable_id.to_i
+      conditions << 'sourceable_id = ?'
+      values << @sourceable_id
     end
 
     @fiscal_year = params[:fiscal_year]
@@ -36,15 +36,15 @@ class GrantsController < OrganizationAwareController
     end
 
     # TODO fix for sourceable
-    @grants = Grant.where(conditions.join(' AND '), *values).includes(:grant_purchases).order(:grant_number)
+    @grants = Grant.where(conditions.join(' AND '), *values)
 
     # cache the set of object keys in case we need them later
     cache_list(@grants, INDEX_KEY_LIST_VAR)
 
-    if @funding_source_id.blank?
+    if @sourceable_id.blank?
       add_breadcrumb "All"
     else
-      add_breadcrumb FundingSource.find_by(:id => @funding_source_id)
+      add_breadcrumb Grant::SOURCEABLE_TYPE.constantize.find_by(id: @sourceable_id)
     end
 
     respond_to do |format|
@@ -67,8 +67,8 @@ class GrantsController < OrganizationAwareController
   # GET /grants/1.json
   def show
 
-    add_breadcrumb @grant.funding_source.name, funding_source_path(@grant.funding_source)
-    add_breadcrumb @grant.name, grant_path(@grant)
+    add_breadcrumb @grant.sourceable, eval(@grant.sourceable_path)
+    add_breadcrumb @grant.to_s, grant_path(@grant)
 
     @assets = @grant.assets.where('organization_id in (?)', @organization_list)
 
@@ -114,11 +114,9 @@ class GrantsController < OrganizationAwareController
 
     add_breadcrumb "New", new_grant_path
 
-    @grant = Grant.new(grant_params)
-    @grant.organization = @organization
-
-    # get fiscal years up to planning year + 3 years
-    @fiscal_years = fiscal_year_range(4)
+    @grant = Grant.new(grant_params.except(:sourceable_id))
+    @grant.sourceable = Grant::SOURCEABLE_TYPE.constantize.find_by(id: params[:grant][:sourceable_id])
+    @grant.organization_id = @organization_list.first if @grant.organization_id.nil?
 
     respond_to do |format|
       if @grant.save

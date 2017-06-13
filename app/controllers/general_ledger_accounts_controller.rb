@@ -1,11 +1,8 @@
 class GeneralLedgerAccountsController < OrganizationAwareController
 
   add_breadcrumb "Home", :root_path
-  add_breadcrumb "Chart of Accounts", :general_ledger_accounts_path
 
-  # Set the @chart_of_accounts variable
-  before_filter :get_chart_of_accounts
-  # Set the @ledger_account variable
+  # Set the @chart_of_accounts and @ledger_account variable
   before_filter :get_ledger_account, :only => [:show, :edit, :update, :destroy]
 
   # Protect the controller
@@ -15,6 +12,26 @@ class GeneralLedgerAccountsController < OrganizationAwareController
   INDEX_KEY_LIST_VAR        = "general_ledger_accounts_list_cache_var"
 
   def index
+
+    if params[:organization_id].present?
+      @organization_id = params[:organization_id].to_i
+    end
+    if @organization_id.nil? || @organization_list.index(@organization_id).nil?
+      @organization_id = @organization_list.first
+    end
+
+    @chart_of_accounts = Organization.find_by(id: @organization_id).chart_of_accounts
+
+    if @organization_list.count > 1
+      @total_rows = @organization_list.count
+      org_idx = @organization_list.index(@organization_id)
+      @row_number = org_idx+1
+      @prev_record_key = Organization.find_by(id: @organization_list[org_idx-1]).chart_of_accounts.object_key if org_idx > 0
+      @next_record_key = Organization.find_by(id: @organization_list[org_idx+1]).chart_of_accounts.object_key if org_idx < @organization_list.count - 1
+
+      @prev_record_path = @prev_record_key.nil? ? "#" : capital_plan_path(@prev_record_key)
+      @next_record_path = @next_record_key.nil? ? "#" : capital_plan_path(@next_record_key)
+    end
 
      # Start to set up the query
     conditions  = []
@@ -31,12 +48,10 @@ class GeneralLedgerAccountsController < OrganizationAwareController
 
     end
 
-    if @chart_of_accounts
-      @ledger_accounts = @chart_of_accounts.general_ledger_accounts.where(conditions.join(' AND '), *values).order(:name)
-    else
-      Rails.logger.warn "No chart of accounts found for org #{@organization.short_name}"
-      @ledger_accounts = []
-    end
+    @ledger_accounts = @chart_of_accounts.general_ledger_accounts.where(conditions.join(' AND '), *values).order(:name)
+
+    add_breadcrumb @chart_of_accounts, general_ledger_accounts_path(organization_id: @chart_of_accounts.organization_id)
+
     # cache the set of accounts ids in case we need them later
     cache_list(@ledger_accounts, INDEX_KEY_LIST_VAR)
 
@@ -48,7 +63,7 @@ class GeneralLedgerAccountsController < OrganizationAwareController
 
   def show
 
-    add_breadcrumb @ledger_account.general_ledger_account_type, general_ledger_accounts_path(:type => @ledger_account.general_ledger_account_type)
+    add_breadcrumb @chart_of_accounts, general_ledger_accounts_path(organization_id: @chart_of_accounts.organization_id)
     add_breadcrumb @ledger_account
 
     # get the @prev_record_path and @next_record_path view vars
@@ -74,8 +89,8 @@ class GeneralLedgerAccountsController < OrganizationAwareController
 
   # GET /general_ledger_accounts/1/edit
   def edit
-
-    add_breadcrumb @ledger_account.name, general_ledger_account_path(@ledger_account)
+    add_breadcrumb @chart_of_accounts, general_ledger_accounts_path(organization_id: @chart_of_accounts.organization_id)
+    add_breadcrumb @ledger_account
     add_breadcrumb "Update"
 
   end
@@ -84,10 +99,7 @@ class GeneralLedgerAccountsController < OrganizationAwareController
   # POST /general_ledger_accounts.json
   def create
 
-    add_breadcrumb "New", new_general_ledger_account_path
-
     @ledger_account = GeneralLedgerAccount.new(form_params)
-    @ledger_account.chart_of_account = @chart_of_accounts
 
     respond_to do |format|
       if @ledger_account.save
@@ -104,9 +116,6 @@ class GeneralLedgerAccountsController < OrganizationAwareController
   # PATCH/PUT /general_ledger_accounts/1
   # PATCH/PUT /general_ledger_accounts/1.json
   def update
-
-    add_breadcrumb @ledger_account.name, general_ledger_account_path(@ledger_account)
-    add_breadcrumb "Update"
 
     respond_to do |format|
       if @ledger_account.update(form_params)
@@ -136,25 +145,23 @@ class GeneralLedgerAccountsController < OrganizationAwareController
     params.require(:general_ledger_account).permit(GeneralLedgerAccount.allowable_params)
   end
 
-  def get_chart_of_accounts
-    @chart_of_accounts = @organization.chart_of_accounts
-  end
-
   def get_ledger_account
-    # See if it is our chart of accounts
-    if @chart_of_accounts && params[:id].present?
-      @ledger_account = @chart_of_accounts.general_ledger_accounts.find_by_object_key(params[:id])
-    end
+    chart_of_account_ids = ChartOfAccount.where(organization_id: @organization_list).ids
+    @ledger_account = GeneralLedgerAccount.find_by(object_key: params[:id], chart_of_account_id: chart_of_account_ids)
+
     # if not found or the object does not belong to the users
     # send them back to index.html.erb
     if @ledger_account.nil?
-      if GeneralLedgerAccount.find_by(object_key: params[:id], organization_id: current_user.user_organization_filters.system_filters.first.get_organizations.map{|x| x.id}).nil?
+      chart_of_account_ids = ChartOfAccount.where(organization_id: current_user.user_organization_filters.system_filters.first.get_organizations.map{|x| x.id}).ids
+      if GeneralLedgerAccount.find_by(object_key: params[:id], chart_of_account_id: chart_of_account_ids).nil?
         redirect_to '/404'
       else
         notify_user(:warning, 'This record is outside your filter. Change your filter if you want to access it.')
         redirect_to general_ledger_accounts_path
       end
       return
+    else
+      @chart_of_accounts = @ledger_account.chart_of_account
     end
 
   end

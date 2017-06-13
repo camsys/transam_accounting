@@ -66,7 +66,7 @@ class ChartOfAccount < ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   def name
-    "Chart of Accounts"
+    "#{organization} Chart of Accounts"
   end
   def to_s
     name

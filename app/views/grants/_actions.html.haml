@@ -12,6 +12,6 @@
     - if can? :update, @grant
       %li.divider
       %li
-        = link_to grant_path(@grant), :method => :delete, :data => {:confirm => "Are you sure you want to remove this Grant? The action cannot be undone."}  do
+        = link_to grant_path(@grant), :method => :delete, :data => {:confirm => "Are you sure you want to remove this grant? The action cannot be undone."}  do
           %i.fa.fa-trash-o.fa-fw
-          = " Remove this Grant"
+          = " Remove this grant"

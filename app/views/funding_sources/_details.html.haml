@@ -1,4 +1,16 @@
 %ul.nav.nav-tabs
+  - if GrantBudget.sourceable_type == 'FundingSource'
+    %li
+      %a{:href => "#gla", :data =>{:toggle => 'tab'}}
+        %span.badge.pull-right= @funding_source.general_ledger_accounts.count
+        = "GL Accounts"
+
+  - if GrantPurchase.sourceable_type.include? 'FundingSource'
+    %li
+      %a{:href => "#asst", :data =>{:toggle => 'tab'}}
+        %span.badge.pull-right= @funding_source.assets.count
+        = "Assets"
+
   %li
     %a{:href => "#desc", :data =>{:toggle => 'tab'}}
       = "Details"
@@ -15,6 +27,19 @@
         %span.badge= @funding_source.comments.count
 
 .tab-content{:style => 'max-height:400px;overflow-y: auto;'}
+  - if GrantBudget.sourceable_type == 'FundingSource'
+    .tab-pane.fade#gla
+      .tab-content
+        = render :partial => 'gla_table', :locals => {:gla_budgets => @funding_source.grant_budgets}
+
+  - if GrantPurchase.sourceable_type.include? 'FundingSource'
+    .tab-pane.fade#asst
+      .tab-content
+        - if @funding_source.assets.empty?
+          %p There are no assets associated with this grant.
+        - else
+          = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => @funding_source.assets}
+
   .tab-pane.fade#desc
     .tab-content
       = render :partial => 'description', :locals => {:funding_source => @funding_source}

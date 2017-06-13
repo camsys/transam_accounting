@@ -8,6 +8,8 @@
 #------------------------------------------------------------------------------
 class Grant < ActiveRecord::Base
 
+  SOURCEABLE_TYPE = Rails.application.config.grant_source
+
   # Include the object key mixin
   include TransamObjectKey
 
@@ -26,13 +28,17 @@ class Grant < ActiveRecord::Base
   belongs_to  :organization
 
   # Has a single funding source
-  belongs_to  :funding_source
+  belongs_to  :sourceable, :polymorphic => true
 
   # Has many grant purchases
-  has_many :grant_purchases, :foreign_key => 'sourceable_id', :dependent => :destroy
-
-  # Has many assets through grant purchases
+  has_many :grant_purchases, :as => :sourceable, :dependent => :destroy
   has_many :assets, :through => :grant_purchases
+
+  # Has many grant purchases
+  has_many :grant_budgets, :as => :sourceable, :dependent => :destroy
+  has_many :general_ledger_accounts, :through => :grant_budgets
+
+  has_many :expenditures
 
   # Has 0 or more documents. Using a polymorphic association. These will be removed if the Grant is removed
   has_many    :documents,   :as => :documentable, :dependent => :destroy
@@ -44,9 +50,8 @@ class Grant < ActiveRecord::Base
   # Validations
   #------------------------------------------------------------------------------
   validates :organization,                    :presence => true
-  validates :grant_number,                    :presence => true
   validates :fy_year,                         :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 1970}
-  validates :funding_source,                  :presence => true
+  validates :sourceable,                      :presence => true
   validates :amount,                          :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
 
   #------------------------------------------------------------------------------
@@ -58,9 +63,9 @@ class Grant < ActiveRecord::Base
   # List of hash parameters allowed by the controller
   FORM_PARAMS = [
     :organization_id,
-    :funding_source_id,
+    :sourceable_type,
+    :sourceable_id,
     :fy_year,
-    :grant_number,
     :amount,
     :active
   ]
@@ -68,8 +73,7 @@ class Grant < ActiveRecord::Base
   # List of fields which can be searched using a simple text-based search
   SEARCHABLE_FIELDS = [
     :object_key,
-    :grant_number,
-    :funding_source
+    :sourceable
   ]
 
   #------------------------------------------------------------------------------
@@ -80,6 +84,26 @@ class Grant < ActiveRecord::Base
 
   def self.allowable_params
     FORM_PARAMS
+  end
+
+  def self.sourceable_type
+    SOURCEABLE_TYPE
+  end
+
+  def self.sources(params=nil)
+    if params
+      SOURCEABLE_TYPE.constantize.where(params)
+    else
+      SOURCEABLE_TYPE.constantize.active
+    end
+  end
+
+  def self.label
+    if SOURCEABLE_TYPE == 'FundingSource'
+      'Funding Program'
+    else
+      SOURCEABLE_TYPE.constantize.model_name.human.titleize
+    end
   end
 
   #------------------------------------------------------------------------------
@@ -109,28 +133,18 @@ class Grant < ActiveRecord::Base
     [balance, 0].max
   end
 
-  # Returns the amount that is not earmarked for operating assistance
-  def non_operating_funds
-    amount - operating_funds
-  end
-
-  # Returns the amount of the fund that is earmarked for operating assistance
-  def operating_funds
-
-    amount * (pcnt_operating_assistance / 100.0)
-
-  end
-
-  # Returns true if the funding line item is associated with a federal fund, false otherwise
-  def federal?
-
-    if funding_source
-      funding_source.federal?
-    else
-      false
-    end
-
-  end
+  # NOT COMPLETE
+  # # Returns the amount that is not earmarked for operating assistance
+  # def non_operating_funds
+  #   amount - operating_funds
+  # end
+  #
+  # # Returns the amount of the fund that is earmarked for operating assistance
+  # def operating_funds
+  #
+  #   amount * (pcnt_operating_assistance / 100.0)
+  #
+  # end
 
   # Override the mixin method and delegate to it
   def fiscal_year(year = nil)
@@ -142,22 +156,15 @@ class Grant < ActiveRecord::Base
   end
 
   def to_s
-    name
+    sourceable.to_s
   end
 
-  def name
-    grant_number.blank? ? 'N/A' : grant_number
-  end
-
-  def details
-    if project_number.blank?
-      "#{funding_source} #{fiscal_year} ($#{available})"
-    else
-      "#{funding_source} #{fiscal_year}: #{project_number} ($#{available})"
-    end
-  end
   def searchable_fields
     SEARCHABLE_FIELDS
+  end
+
+  def sourceable_path
+    "#{sourceable_type.underscore}_path(:id => '#{sourceable.object_key}')"
   end
 
   #------------------------------------------------------------------------------
@@ -169,9 +176,6 @@ class Grant < ActiveRecord::Base
 
   # Set resonable defaults for a new grant
   def set_defaults
-
-    self.amount ||= 0
-
     # Set the fiscal year to the current fiscal year
     self.fy_year ||= current_fiscal_year_year
     self.amount ||= 0

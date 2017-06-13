@@ -1,0 +1,16 @@
+.nested-fields
+  .row
+    .col-md-6
+      = f.input :sourceable_id, :collection => GrantBudget.sources, :required => true, :label => GrantBudget.label
+    .col-md-5
+      = f.input :amount, :label => 'Amount', :required => true, :wrapper => :vertical_append do
+        %span.input-group-addon
+          %i.fa.fa-usd
+        = f.input_field :amount, :class => 'form-control'
+
+    .col-md-1
+      = link_to_remove_association f, :class => 'btn btn-xs btn-warning', :style => 'margin-top: 27px;' do
+        %i.fa.fa-trash-o
+
+
+

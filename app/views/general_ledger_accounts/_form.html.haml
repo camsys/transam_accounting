@@ -6,9 +6,25 @@
   :file => :vertical_file_input,
   :boolean => :vertical_boolean}) do |f|
 
+  - if !@ledger_account.new_record? || params[:chart_of_account_id]
+    = f.input :chart_of_account_id, :as => :hidden, :input_html => {:value => @ledger_account.chart_of_account_id || params[:chart_of_account_id]}
+  - else
+    = f.association :chart_of_account, :collection => ChartOfAccount.where(organization_id: @organization_list)
+
   = f.association :general_ledger_account_type, :required => true, :collection => GeneralLedgerAccountType.active, :label => 'Account Type'
   = f.input :account_number, :required => true
   = f.input :name, :required => true
+
+  #grant_budgets.well.well-sm{style: "overflow-y:scroll; max-height:250px;"}
+    %label.control-label
+      %i.fa.fa-usd.fa-1-5x
+      = GrantBudget.label.pluralize
+    .links.pull-right
+      = link_to_add_association f, :grant_budgets, :class => 'btn btn-xs btn-info', data: {association_insertion_method: 'after'} do
+        %i.fa.fa-plus
+    %label#grant_budgets-error.error
+    = f.simple_fields_for :grant_budgets do |grant_budget|
+      = render 'grant_budget_fields', f: grant_budget
 
   = f.button :submit, :class => "btn btn-primary"
 

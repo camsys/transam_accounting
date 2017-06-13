@@ -24,12 +24,11 @@
   %thead
     %tr
       %th.left{:data => {:visible => 'false'}} Object Key
-      %th.left{:data => {:visible => 'false', :sortable => 'true'}} Recepient
-      %th.left{:data => {:sortable => 'true'}} Grant
-      %th.left{:data => {:sortable => 'true'}} Fiscal Year
+      %th.left{:data => {:visible => 'false', :sortable => 'true'}} Organization
       %th.left{:data => {:sortable => 'true'}} Source
+      %th.left{:data => {:sortable => 'true'}} Fiscal Year
       %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_amount'}} Amount
-      %th.right{:data => {:sortable => 'true', :formatter => 'integer_formatter', :footer_formatter => 'sum_expenditures'}} CapEx
+      -#%th.right{:data => {:sortable => 'true', :formatter => 'integer_formatter', :footer_formatter => 'sum_expenditures'}} CapEx
       %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_total_spent'}} Total Expended
 
   %tbody
@@ -37,37 +36,36 @@
       %tr{:id => grant.object_key, :class => 'action-path'}
         %td.left= grant.object_key
         %td.left= grant.organization.short_name
-        %td.left= grant.grant_number
+        %td.left= grant.sourceable
         %td.center= format_as_fiscal_year(grant.fy_year)
-        %td.left= grant.funding_source
         %td.right= grant.amount.to_i
-        %td.right= grant.grant_purchases.count
+        -#%td.right= grant.grant_purchases.count
         %td.right= grant.spent.to_i
 
 = render :partial => 'shared/table_scripts', :locals => {:table_id => table_dom_id, :path_pattern => grant_path("xxx")}
 
 :javascript
 
-  function sum_expenditures(col_data) {
-    var sum = 0;
-    for (i = 0; i < col_data.length; i++) {
-      sum += parseInt(col_data[i][6]);
-    }
-    return "<strong>" + integer_formatter(sum) + "</strong>";
-  };
-
   function sum_amount(col_data) {
     var sum = 0;
     for (i = 0; i < col_data.length; i++) {
-      sum += parseInt(col_data[i][5]);
+      sum += parseInt(col_data[i][4]);
     }
     return "<strong>" + currency_formatter(sum) + "</strong>";
+  };
+
+  function sum_expenditures(col_data) {
+    var sum = 0;
+    for (i = 0; i < col_data.length; i++) {
+      sum += parseInt(col_data[i][4]);
+    }
+    return "<strong>" + integer_formatter(sum) + "</strong>";
   };
 
   function sum_total_spent(col_data) {
     var sum = 0;
     for (i = 0; i < col_data.length; i++) {
-      sum += parseInt(col_data[i][7]);
+      sum += parseInt(col_data[i][5]);
     }
     return "<strong>" + currency_formatter(sum) + "</strong>";
   };

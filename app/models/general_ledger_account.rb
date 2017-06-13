@@ -36,7 +36,11 @@ class GeneralLedgerAccount < ActiveRecord::Base
   # which is in the transit engine
   has_many :grant_budgets
 
-  has_many :grants, :through => :grant_budgets
+  # Allow the form to submit grant purchases
+  accepts_nested_attributes_for :grant_budgets, :reject_if => lambda{|a| a[:sourceable_id].blank?}, :allow_destroy => true
+
+  has_many :funding_sources, :as => :sourceable, :through => :grant_budgets
+  has_many :grants, :as => :sourceable, :through => :grant_budgets
 
   # Each GLA has 0 or more expenditures
   has_many :expenditures
@@ -59,7 +63,8 @@ class GeneralLedgerAccount < ActiveRecord::Base
     :general_ledger_account_type_id,
     :name,
     :account_number,
-    :active
+    :active,
+    :grant_budgets_attributes => [GrantBudget.allowable_params]
   ]
 
   #------------------------------------------------------------------------------

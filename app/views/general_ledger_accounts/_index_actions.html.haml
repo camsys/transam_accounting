@@ -1,5 +1,5 @@
 - if can? :create, GeneralLedgerAccount
-  = link_to new_general_ledger_account_path, :class => 'btn btn-default' do
+  = link_to new_general_ledger_account_path(chart_of_account_id: @chart_of_accounts.id), :class => 'btn btn-default' do
     %i.fa.fa-plus.fa-fw
     = " Add General Ledger Account";
 

@@ -58,6 +58,10 @@ class GrantPurchase < ActiveRecord::Base
     FORM_PARAMS
   end
 
+  def self.sourceable_type
+    SOURCEABLE_TYPE
+  end
+
   def self.sources(params=nil)
     if params
       SOURCEABLE_TYPE.constantize.where(params)
