@@ -13,6 +13,8 @@ module TransamAccountable
 
   included do
 
+    after_create :create_chart_of_account
+
     # ----------------------------------------------------
     # Associations
     # ----------------------------------------------------
@@ -60,5 +62,11 @@ module TransamAccountable
   end
 
   protected
+
+  private
+
+  def create_chart_of_account
+    ChartOfAccount.create(organization_id: self.id)
+  end
 
 end
