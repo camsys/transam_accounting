@@ -1,4 +1,14 @@
 %ul.nav.nav-tabs
+  %li
+    %a{:href => "#desc", :data =>{:toggle => 'tab'}}
+      = "Details"
+
+  - if Grant.sourceable_type == 'FundingSource'
+    %li
+      %a{:href => "#grant", :data =>{:toggle => 'tab'}}
+        %span.badge.pull-right= @funding_source.grants.count
+        = "Grants"
+
   - if GrantBudget.sourceable_type == 'FundingSource'
     %li
       %a{:href => "#gla", :data =>{:toggle => 'tab'}}
@@ -12,10 +22,6 @@
         = "Assets"
 
   %li
-    %a{:href => "#desc", :data =>{:toggle => 'tab'}}
-      = "Details"
-
-  %li
     %a{:href => "#docs", :data =>{:toggle => 'tab'}}
       %span{:style => 'white-space: nowrap !important;'}
         = "Documents"
@@ -27,6 +33,15 @@
         %span.badge= @funding_source.comments.count
 
 .tab-content{:style => 'max-height:400px;overflow-y: auto;'}
+  .tab-pane.fade#desc
+    .tab-content
+      = render :partial => 'description', :locals => {:funding_source => @funding_source}
+
+  - if Grant.sourceable_type == 'FundingSource'
+    .tab-pane.fade#grant
+      .tab-content
+        = render :partial => 'grants/index_table', :locals => {:grants => @funding_source.grants}
+
   - if GrantBudget.sourceable_type == 'FundingSource'
     .tab-pane.fade#gla
       .tab-content
@@ -39,10 +54,6 @@
           %p There are no assets associated with this grant.
         - else
           = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => @funding_source.assets}
-
-  .tab-pane.fade#desc
-    .tab-content
-      = render :partial => 'description', :locals => {:funding_source => @funding_source}
 
   .tab-pane.fade#docs
     .tab-content

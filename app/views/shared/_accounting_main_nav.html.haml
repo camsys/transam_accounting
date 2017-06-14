@@ -3,6 +3,27 @@
     %i.fa.fa-usd.fa-2x
     %b.caret
   %ul.dropdown-menu.multi-level{:role => 'menu'}
+    %li.text-left.dropdown-submenu
+      = link_to funding_sources_path do
+        %i.fa.fa-book.fa-fw
+        Programs
+
+      %ul.dropdown-menu
+        - FundingSource.all.each do |program|
+          %li.text-left
+            = link_to funding_source_path(program) do
+              %i.fa.fa-fw.fa-book
+              = program
+
+        - if can? :create, FundingSource
+          %li.divider
+          %li
+            = link_to new_funding_source_path do
+              %i.fa.fa-plus.fa-fw
+              = "Add Funding Program";
+
+    %li.divider
+
     - if @organization_list.count == 1
       %li.text-left
         = link_to general_ledger_accounts_path do
