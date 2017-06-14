@@ -7,7 +7,7 @@ describe "grants/_index_actions.html.haml", :type => :view do
     render
 
     expect(rendered).to have_link('Add Grant')
-    expect(rendered).to have_field('funding_source_id')
+    expect(rendered).to have_field('sourceable_id')
     expect(rendered).to have_field('fiscal_year')
   end
 end

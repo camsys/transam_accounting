@@ -99,8 +99,8 @@ class GrantsController < OrganizationAwareController
   # GET /grants/1/edit
   def edit
 
-    add_breadcrumb @grant.funding_source.name, funding_source_path(@grant.funding_source)
-    add_breadcrumb @grant.name, grant_path(@grant)
+    add_breadcrumb @grant.sourceable, eval(@grant.sourceable_path)
+    add_breadcrumb @grant.to_s, grant_path(@grant)
     add_breadcrumb "Update"
 
     # get fiscal years up to planning year + 3 years
@@ -111,8 +111,6 @@ class GrantsController < OrganizationAwareController
   # POST /grants
   # POST /grants.json
   def create
-
-    add_breadcrumb "New", new_grant_path
 
     @grant = Grant.new(grant_params.except(:sourceable_id))
     @grant.sourceable = Grant::SOURCEABLE_TYPE.constantize.find_by(id: params[:grant][:sourceable_id])
@@ -134,10 +132,6 @@ class GrantsController < OrganizationAwareController
   # PATCH/PUT /grants/1.json
   def update
 
-    add_breadcrumb @grant.funding_source.name, funding_source_path(@grant.funding_source)
-    add_breadcrumb @grant.name, grant_path(@grant)
-    add_breadcrumb "Update"
-
     # get fiscal years up to planning year + 3 years
     @fiscal_years = fiscal_year_range(4)
 
@@ -156,7 +150,7 @@ class GrantsController < OrganizationAwareController
   # DELETE /grant/1
   # DELETE /grant/1.json
   def destroy
-    name = @grant.name
+    name = @grant.to_s
     @grant.destroy
     notify_user(:notice, "Grant #{name} was successfully removed.")
     respond_to do |format|

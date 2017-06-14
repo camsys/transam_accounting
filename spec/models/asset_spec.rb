@@ -20,12 +20,6 @@ RSpec.describe Asset, :type => :model do
   # Rspec for TransaamGlAccountableAsset
   # GLA associations with assets
   # ----------------------------------------------------------------
-  it 'HABTM glas' do
-    test_gla.assets << test_asset
-    test_gla.save!
-
-    expect(test_asset.general_ledger_accounts).to include(test_gla)
-  end
   it 'HABTM expenditures' do
     test_expenditure.assets << test_asset
     test_expenditure.save!

@@ -27,10 +27,10 @@ RSpec.describe ChartOfAccount, :type => :model do
   end
 
   it '.name' do
-    expect(test_chart.name).to eq('Chart of Accounts')
+    expect(test_chart.name).to eq("#{test_chart.organization} Chart of Accounts")
   end
   it '.to_s' do
-    expect(test_chart.to_s).to eq('Chart of Accounts')
+    expect(test_chart.to_s).to eq("#{test_chart.organization} Chart of Accounts")
     expect(test_chart.to_s).to eq(test_chart.name)
   end
 

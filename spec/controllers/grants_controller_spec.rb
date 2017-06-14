@@ -42,10 +42,10 @@ RSpec.describe GrantsController, :type => :controller do
 
       expect(assigns(:grants)).to include(test_grant)
     end
-    it 'funding source' do
-      test_funding_source = test_grant.funding_source
+    it 'sourceable' do
+      test_funding_source = test_grant.sourceable
       test_grant.update!(:organization => subject.current_user.organization)
-      get :index, :funding_source_id => test_funding_source.id
+      get :index, :sourceable_id => test_funding_source.id
 
       expect(assigns(:funding_source_id)).to eq(test_funding_source.id)
       expect(assigns(:grants)).to include(test_grant)
@@ -95,10 +95,9 @@ RSpec.describe GrantsController, :type => :controller do
   end
 
   it 'POST create' do
-    post :create, :grant => {:fy_year => Date.today.year+1, :grant_number => 'GRANT-XX-123456', :amount => 55555}
+    post :create, :grant => {:fy_year => Date.today.year+1, :amount => 55555}
 
     expect(assigns(:grant).fy_year).to eq(Date.today.year+1)
-    expect(assigns(:grant).grant_number).to eq('GRANT-XX-123456')
     expect(assigns(:grant).amount).to eq(55555)
   end
 

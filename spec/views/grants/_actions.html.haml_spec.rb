@@ -7,6 +7,6 @@ describe "grants/_actions.html.haml", :type => :view do
     render
 
     expect(rendered).to have_link('Update this grant')
-    expect(rendered).to have_link('Remove this Grant')
+    expect(rendered).to have_link('Remove this grant')
   end
 end

@@ -4,7 +4,7 @@ describe "grants/_gla_table.html.haml", :type => :view do
   it 'no gla budgets' do
     render 'grants/gla_table', :gla_budgets => []
 
-    expect(rendered).to have_content('There are no grant budgets associated with this account.')
+    expect(rendered).to have_content('There are no associated GLA budgets.')
   end
 
   it 'list' do
