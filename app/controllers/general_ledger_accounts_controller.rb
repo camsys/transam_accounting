@@ -81,9 +81,15 @@ class GeneralLedgerAccountsController < OrganizationAwareController
   # GET /general_ledger_accounts/new
   def new
 
-    add_breadcrumb "New", new_general_ledger_account_path
-
-    @ledger_account = GeneralLedgerAccount.new
+    if params[:chart_of_account_id].nil?
+      notify_user(:warning, 'Cannot create GLA without a chart of account.')
+      redirect_to general_ledger_accounts_path
+    else
+      @chart_of_accounts = ChartOfAccount.find_by(id: params[:chart_of_account_id])
+      add_breadcrumb @chart_of_accounts, general_ledger_accounts_path(organization_id: @chart_of_accounts.organization_id)
+      add_breadcrumb "New", new_general_ledger_account_path
+      @ledger_account = GeneralLedgerAccount.new
+    end
 
   end
 

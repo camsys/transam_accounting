@@ -6,10 +6,7 @@
   :file => :vertical_file_input,
   :boolean => :vertical_boolean}) do |f|
 
-  - if !@ledger_account.new_record? || params[:chart_of_account_id]
-    = f.input :chart_of_account_id, :as => :hidden, :input_html => {:value => @ledger_account.chart_of_account_id || params[:chart_of_account_id]}
-  - else
-    = f.association :chart_of_account, :collection => ChartOfAccount.where(organization_id: @organization_list)
+  = f.input :chart_of_account_id, :as => :hidden, :input_html => {:value => @chart_of_accounts.id}
 
   = f.association :general_ledger_account_type, :required => true, :collection => GeneralLedgerAccountType.active, :label => 'Account Type'
   = f.input :account_number, :required => true
