@@ -28,7 +28,7 @@ RSpec.describe GeneralLedgerAccount, :type => :model do
   end
 
   it '.to_s' do
-    expect(test_gla.to_s).to eq(test_gla.name)
+    expect(test_gla.to_s).to eq("#{test_gla.account_number} - #{test_gla.name}")
   end
 
   it '.set_defaults' do

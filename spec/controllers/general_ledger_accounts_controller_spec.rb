@@ -18,11 +18,10 @@ RSpec.describe GeneralLedgerAccountsController, :type => :controller do
   end
 
   it 'GET index' do
-    test_chart = create(:chart_of_account, :organization => test_user.organization)
-    test_gla = create(:general_ledger_account, :chart_of_account => test_chart)
+    test_gla = create(:general_ledger_account, :chart_of_account => test_user.organization.chart_of_account)
     get :index
 
-    expect(assigns(:chart_of_accounts)).to eq(test_chart)
+    expect(assigns(:chart_of_accounts)).to eq(test_user.organization.chart_of_account)
     expect(assigns(:ledger_accounts)).to include(test_gla)
   end
 
@@ -51,7 +50,7 @@ RSpec.describe GeneralLedgerAccountsController, :type => :controller do
   it 'POST create' do
     test_chart = create(:chart_of_account, :organization => test_user.organization)
 
-    post :create, :general_ledger_account => attributes_for(:general_ledger_account, :chart_of_account_id => nil, :account_number => 'GLA-123123')
+    post :create, :general_ledger_account => attributes_for(:general_ledger_account, :chart_of_account_id => test_chart.id, :account_number => 'GLA-123123')
 
     expect(assigns(:ledger_account).chart_of_account).to eq(test_chart)
     expect(assigns(:ledger_account).account_number).to eq('GLA-123123')

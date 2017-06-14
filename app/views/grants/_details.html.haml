@@ -30,7 +30,7 @@
   - if GrantBudget.sourceable_type == 'Grant'
     .tab-pane.fade#gla
       .tab-content
-        = render :partial => 'gla_table', :locals => {:gla_budgets => @grant.grant_budgets}
+        = render :partial => 'general_ledger_accounts/gla_budgets', :locals => {:gla_budgets => @grant.grant_budgets}
 
   -#.tab-pane.fade#expn
     -#  .tab-content

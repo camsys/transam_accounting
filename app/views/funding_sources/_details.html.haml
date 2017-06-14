@@ -45,7 +45,7 @@
   - if GrantBudget.sourceable_type == 'FundingSource'
     .tab-pane.fade#gla
       .tab-content
-        = render :partial => 'gla_table', :locals => {:gla_budgets => @funding_source.grant_budgets}
+        = render :partial => 'general_ledger_accounts/gla_budgets', :locals => {:gla_budgets => @funding_source.grant_budgets}
 
   - if GrantPurchase.sourceable_type.include? 'FundingSource'
     .tab-pane.fade#asst

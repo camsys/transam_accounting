@@ -47,10 +47,10 @@ RSpec.describe GrantsController, :type => :controller do
       test_grant.update!(:organization => subject.current_user.organization)
       get :index, :sourceable_id => test_funding_source.id
 
-      expect(assigns(:funding_source_id)).to eq(test_funding_source.id)
+      expect(assigns(:sourceable_id)).to eq(test_funding_source.id)
       expect(assigns(:grants)).to include(test_grant)
 
-      get :index, :funding_source_id => test_funding_source.id + 1
+      get :index, :sourceable_id => test_funding_source.id + 1
       expect(assigns(:grants)).not_to include(test_grant)
     end
     it 'fiscal year' do
@@ -61,7 +61,7 @@ RSpec.describe GrantsController, :type => :controller do
       expect(assigns(:fiscal_year)).to eq(test_fy)
       expect(assigns(:grants)).to include(test_grant)
 
-      get :index, :funding_source_id => test_fy + 1
+      get :index, :fiscal_year => test_fy + 1
       expect(assigns(:grants)).not_to include(test_grant)
     end
   end
