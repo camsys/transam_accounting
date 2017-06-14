@@ -49,18 +49,6 @@
         %i.fa.fa-fw.fa-legal
         = ' Grants'
 
-      %ul.dropdown-menu
-        - Grant.where(organization_id: @organization_list).each do |grant|
-          %li.text-left
-            = link_to grant_path(grant) do
-              %i.fa.fa-fw.fa-legal
-              = grant
-        %li.divider
-        %li
-          = link_to new_grant_path do
-            %i.fa.fa-plus.fa-fw
-            = "Add Grant";
-
     %li.divider
     %li.text-left.dropdown-submenu
       = link_to expenditures_path do

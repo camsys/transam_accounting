@@ -121,6 +121,11 @@ class Grant < ActiveRecord::Base
     grant_purchases.includes(:asset).each do |p|
       val += p.asset.purchase_cost * (p.pcnt_purchase_cost / 100.0)
     end
+
+    GrantPurchase.where(sourceable: GrantBudget.where(sourceable: self)).includes(:asset).each do |p|
+      val += p.asset.purchase_cost * (p.pcnt_purchase_cost / 100.0)
+    end
+
     val
   end
 
@@ -158,7 +163,7 @@ class Grant < ActiveRecord::Base
   end
 
   def to_s
-    sourceable.to_s
+    "#{organization.short_name}-#{fiscal_year}-#{sourceable}"
   end
 
   def searchable_fields

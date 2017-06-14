@@ -64,7 +64,18 @@ class GrantPurchase < ActiveRecord::Base
 
   def self.sources(params=nil)
     if params
-      SOURCEABLE_TYPE.constantize.where(params)
+      # check whether params are valid
+      params = params.stringify_keys
+
+      # override special case if sourceable type is GrantBudget
+      if SOURCEABLE_TYPE == 'GrantBudget'
+        clean_params = params.slice(*(params.keys & Grant.column_names))
+        GrantBudget.where(sourceable: Grant.where(clean_params))
+      else
+        clean_params = params.slice(*(params.keys & SOURCEABLE_TYPE.constantize.column_names))
+        SOURCEABLE_TYPE.constantize.where(clean_params)
+      end
+
     else
       SOURCEABLE_TYPE.constantize.active
     end
