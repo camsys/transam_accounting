@@ -34,7 +34,7 @@ RSpec.describe GeneralLedgerAccountsController, :type => :controller do
   end
 
   it 'GET new' do
-    get :new
+    get :new, :chart_of_account_id => create(:chart_of_account).id
 
     expect(assigns(:ledger_account).to_json).to eq(GeneralLedgerAccount.new.to_json)
   end
