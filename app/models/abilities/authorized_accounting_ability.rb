@@ -12,10 +12,6 @@ module Abilities
         e.organization_id == user.organization_id
       end
 
-      can :manage, Grant, :organization_id => user.organization_ids
-
-      can :manage, GeneralLedgerAccount, :organization_id => user.organization_ids
-
     end
   end
 end

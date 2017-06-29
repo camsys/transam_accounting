@@ -4,7 +4,7 @@
   %table.table.table-hover#gla_datatable
     %thead
       %tr
-        %th.left= GrantBudget.label
+        %th.left Grant
         %th.left GLA
         %th.right Amount
 
@@ -13,7 +13,7 @@
       - gla_budgets.each do |gla_budget|
         - total += gla_budget.amount
         %tr.popup-details
-          %td.left= link_to gla_budget.sourceable.to_s, eval(gla_budget.sourceable_path)
+          %td.left= link_to gla_budget.grant
           %td.left= link_to gla_budget.general_ledger_account
           %td.right= format_as_currency(gla_budget.amount)
     %tfoot

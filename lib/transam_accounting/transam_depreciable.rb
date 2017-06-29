@@ -34,6 +34,7 @@ module TransamDepreciable
     #------------------------------------------------------------------------------
     before_validation  :set_depreciation_defaults
     before_update      :clear_depreciation_cache
+    after_create       :set_depreciation_general_ledger_accounts
 
     #----------------------------------------------------
     # Associations
@@ -196,6 +197,26 @@ module TransamDepreciable
       # hard-coded temporarily
       delete_cached_object('depreciation_table')
     end
+
+    def set_depreciation_general_ledger_accounts
+      accumulated_depr = organization.general_ledger_accounts.find_by(name: 'Accumulated Depreciation')
+      depr_expense = organization.general_ledger_accounts.find_by(name: 'Depreciation Expense')
+
+
+
+      # just add depreciation GLAs for now
+      # does not add GLA entries that is done during update_depreciation
+      grant_purchases.each do |grant_purchase|
+        # accumulated depr
+        grant_accumulated_depr_gla = organization.general_ledger_accounts.find_by(account_number: "#{accumulated_depr.account_number}-#{grant_purchase.sourceable}")
+        general_ledger_accounts << grant_accumulated_depr_gla
+
+        grant_depr_expense_gla = organization.general_ledger_accounts.find_by(account_number: "#{depr_expense.account_number}-#{grant_purchase.sourceable}")
+        general_ledger_accounts << grant_depr_expense_gla
+      end
+
+    end
+
 
     #------------------------------------------------------------------------------
     #

@@ -8,14 +8,14 @@
 
   = f.input :chart_of_account_id, :as => :hidden, :input_html => {:value => @chart_of_accounts.id}
 
-  = f.association :general_ledger_account_type, :required => true, :collection => GeneralLedgerAccountType.active, :label => 'Account Type'
+  = f.association :general_ledger_account_type, :required => true, :collection => GeneralLedgerAccountType.active.where(name: 'Fixed Asset Account'), :label => 'Account Type'
   = f.input :account_number, :required => true
   = f.input :name, :required => true
 
   #grant_budgets.well.well-sm{style: "overflow-y:scroll; max-height:250px;"}
     %label.control-label
       %i.fa.fa-usd.fa-1-5x
-      = GrantBudget.label.pluralize
+      Grant
     .links.pull-right
       = link_to_add_association f, :grant_budgets, :class => 'btn btn-xs btn-info', data: {association_insertion_method: 'after'} do
         %i.fa.fa-plus

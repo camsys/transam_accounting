@@ -20,6 +20,7 @@ class Grant < ActiveRecord::Base
   # Callbacks
   #------------------------------------------------------------------------------
   after_initialize                  :set_defaults
+  after_create                      :set_general_ledger_accounts
 
   #------------------------------------------------------------------------------
   # Associations
@@ -35,7 +36,7 @@ class Grant < ActiveRecord::Base
   has_many :assets, :through => :grant_purchases
 
   # Has many grant purchases
-  has_many :grant_budgets, :as => :sourceable, :dependent => :destroy
+  has_many :grant_budgets, :dependent => :destroy
   has_many :general_ledger_accounts, :through => :grant_budgets
 
   has_many :expenditures
@@ -67,6 +68,7 @@ class Grant < ActiveRecord::Base
     :organization_id,
     :sourceable_type,
     :sourceable_id,
+    :name,
     :fy_year,
     :amount,
     :active
@@ -75,7 +77,8 @@ class Grant < ActiveRecord::Base
   # List of fields which can be searched using a simple text-based search
   SEARCHABLE_FIELDS = [
     :object_key,
-    :sourceable
+    :sourceable,
+    :name
   ]
 
   #------------------------------------------------------------------------------
@@ -122,7 +125,7 @@ class Grant < ActiveRecord::Base
       val += p.asset.purchase_cost * (p.pcnt_purchase_cost / 100.0)
     end
 
-    GrantPurchase.where(sourceable: GrantBudget.where(sourceable: self)).includes(:asset).each do |p|
+    GrantPurchase.where(sourceable: GrantBudget.where(grant: self)).includes(:asset).each do |p|
       val += p.asset.purchase_cost * (p.pcnt_purchase_cost / 100.0)
     end
 
@@ -163,7 +166,7 @@ class Grant < ActiveRecord::Base
   end
 
   def to_s
-    "#{organization.short_name}-#{fiscal_year}-#{sourceable}"
+    name
   end
 
   def searchable_fields
@@ -187,6 +190,17 @@ class Grant < ActiveRecord::Base
     self.fy_year ||= current_fiscal_year_year
     self.amount ||= 0
     self.active = self.active.nil? ? true : self.active
+  end
+
+  def set_general_ledger_accounts
+    OrganizationGeneralLedgerAccount.active.each do |general_gla|
+      if general_gla.grant_budget_specific
+        acct_num = "#{general_gla.account_number}-#{self.to_s}"
+        if GeneralLedgerAccount.find_by(chart_of_account_id: ChartOfAccount.find_by(organization: organization).id, account_number: acct_num).nil?
+          gla = GeneralLedgerAccount.create(chart_of_account_id: ChartOfAccount.find_by(organization: organization).id, general_ledger_account_type_id: general_gla.general_ledger_account_type_id, account_number: acct_num, name: "#{general_gla.name} #{self.to_s}")
+        end
+      end
+    end
   end
 
 end

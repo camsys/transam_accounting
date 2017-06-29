@@ -23,12 +23,12 @@ funding_source_types = [
 
 
 general_ledger_account_types = [
-  {:active => 1, :name => 'Asset Account',      :description => 'Accounts representing different types of resources owned or controlled by the business.'},
-  {:active => 1, :name => 'Liability Account',  :description => 'Accounts representing different types of obligations for the business.'},
-  {:active => 1, :name => 'Equity Account',     :description => 'Accounts representing the residual equity the business.'},
-  {:active => 1, :name => 'Revenue Account',    :description => 'Accounts representing the businesses gross earnings.'},
-  {:active => 1, :name => 'Expense Account',    :description => 'Accounts representing the expenditures for the business.'},
-  {:active => 1, :name => 'Contra Account',     :description => 'Accounts representing negative balances due to accumulated depreciation etc.'}
+  {:active => 1, :name => 'Fixed Asset Account', :description => 'Accounts representing transit assets owned or controlled by the business.'},
+  {:active => 1, :name => 'Asset Account',       :description => 'Accounts representing different types of resources owned or controlled by the business.'},
+  {:active => 1, :name => 'Liability Account',   :description => 'Accounts representing different types of obligations for the business.'},
+  {:active => 1, :name => 'Equity Account',      :description => 'Accounts representing the residual equity the business.'},
+  {:active => 1, :name => 'Revenue Account',     :description => 'Accounts representing the businesses gross earnings.'},
+  {:active => 1, :name => 'Expense Account',     :description => 'Accounts representing the expenditures for the business.'}
 ]
 
 depreciation_calculation_types = [

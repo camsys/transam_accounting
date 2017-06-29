@@ -1,9 +1,8 @@
 %ul.nav.nav-tabs
-  - if GrantBudget.sourceable_type == 'Grant'
-    %li
-      %a{:href => "#gla", :data =>{:toggle => 'tab'}}
-        %span.badge.pull-right= @grant.general_ledger_accounts.count
-        = "GL Accounts"
+  %li
+    %a{:href => "#gla", :data =>{:toggle => 'tab'}}
+      %span.badge.pull-right= @grant.general_ledger_accounts.count
+      = "GL Accounts"
   -#%li
     -#  %a{:href => "#expn", :data =>{:toggle => 'tab'}}
     -#    %span.badge.pull-right= @grant.expenditures.count
@@ -27,10 +26,9 @@
       = "Comments "
 
 .tab-content
-  - if GrantBudget.sourceable_type == 'Grant'
-    .tab-pane.fade#gla
-      .tab-content
-        = render :partial => 'general_ledger_accounts/gla_budgets', :locals => {:gla_budgets => @grant.grant_budgets}
+  .tab-pane.fade#gla
+    .tab-content
+      = render :partial => 'general_ledger_accounts/gla_budgets', :locals => {:gla_budgets => @grant.grant_budgets}
 
   -#.tab-pane.fade#expn
     -#  .tab-content

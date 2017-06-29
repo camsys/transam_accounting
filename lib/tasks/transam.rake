@@ -27,4 +27,21 @@ namespace :transam do
   task create_chart_of_accounts: :environment do
     ChartOfAccount.create!(Organization.pluck(:id).map{|o|{organization_id: o}})
   end
+
+  desc "update general ledger account types"
+  task update_general_ledger_account_types: :environment do
+    general_ledger_account_types = [
+        {:active => 1, :name => 'Fixed Asset Account', :description => 'Accounts representing transit assets owned or controlled by the business.'},
+        {:active => 1, :name => 'Asset Account',       :description => 'Accounts representing different types of resources owned or controlled by the business.'},
+        {:active => 1, :name => 'Liability Account',   :description => 'Accounts representing different types of obligations for the business.'},
+        {:active => 1, :name => 'Equity Account',      :description => 'Accounts representing the residual equity the business.'},
+        {:active => 1, :name => 'Revenue Account',     :description => 'Accounts representing the businesses gross earnings.'},
+        {:active => 1, :name => 'Expense Account',     :description => 'Accounts representing the expenditures for the business.'}
+    ]
+
+    GeneralLedgerAccountType.destroy_all
+    general_ledger_account_types.each do |gla_type|
+      GeneralLedgerAccountType.create!(gla_type)
+    end
+  end
 end

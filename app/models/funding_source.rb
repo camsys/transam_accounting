@@ -39,9 +39,6 @@ class FundingSource < ActiveRecord::Base
   # Has many grants
   has_many    :grants, :as => :sourceable, :dependent => :destroy
 
-  has_many    :grant_budgets, :as => :sourceable, :dependent => :destroy
-  has_many    :general_ledger_accounts, :through => :grant_budgets
-
   has_many :grant_purchases, :as => :sourceable, :dependent => :destroy
   has_many :assets, :through => :grant_purchases
 

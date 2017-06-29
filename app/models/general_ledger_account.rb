@@ -18,7 +18,7 @@ class GeneralLedgerAccount < ActiveRecord::Base
   after_initialize  :set_defaults
 
   # Clean up any HABTM associations before the asset is destroyed
-  before_destroy { grants.clear }
+  #before_destroy { grants.clear }
 
 
   #------------------------------------------------------------------------------
@@ -31,6 +31,8 @@ class GeneralLedgerAccount < ActiveRecord::Base
   # Every GLA has an account type
   belongs_to :general_ledger_account_type
 
+  has_many :general_ledger_account_entries, :dependent => :destroy
+
   # Every GLA has 0 or more grants. This is not a strictly HABTM relationship
   # but it allows us to relate GLAs to grants without modifying the grants table
   # which is in the transit engine
@@ -39,15 +41,13 @@ class GeneralLedgerAccount < ActiveRecord::Base
   # Allow the form to submit grant purchases
   accepts_nested_attributes_for :grant_budgets, :reject_if => :all_blank, :allow_destroy => true
 
-  has_many :funding_sources, :source => :sourceable, :source_type => 'FundingSource', :through => :grant_budgets
-  has_many :grants, :source => :sourceable, :source_type => 'Grant', :through => :grant_budgets
+  has_many :grants, :through => :grant_budgets
 
   # Each GLA has 0 or more expenditures
   has_many :expenditures
 
   # Every GLA has and belongs to many assets
-  has_many :grant_purchases, :through => :grant_budgets
-  has_many :assets, :through => :grant_purchases
+  has_many :assets
 
   #------------------------------------------------------------------------------
   # Validations
@@ -76,6 +76,12 @@ class GeneralLedgerAccount < ActiveRecord::Base
 
   # Allow selection of active instances
   scope :active, -> { where(:active => true) }
+  scope :fixed_asset_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Fixed Asset Account')) }
+  scope :asset_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Asset Account')) }
+  scope :liability_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Liability Account')) }
+  scope :equity_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Equity Account')) }
+  scope :revenue_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Revenue Account')) }
+  scope :expense_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Expense Account')) }
 
   #------------------------------------------------------------------------------
   #
