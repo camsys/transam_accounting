@@ -6,7 +6,6 @@ describe "grants/_index_actions.html.haml", :type => :view do
     assign(:fiscal_years, [Date.today.year, Date.today.year+1])
     render
 
-    expect(rendered).to have_link('Add Grant')
     expect(rendered).to have_field('sourceable_id')
     expect(rendered).to have_field('fiscal_year')
   end

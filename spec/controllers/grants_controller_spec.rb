@@ -24,7 +24,7 @@ RSpec.describe GrantsController, :type => :controller do
       subject.instance_variable_set(:@organization, test_user.organization)
       test_grant.update!(:fy_year => 2010, :organization => subject.current_user.organization)
 
-      expect(subject.send(:fiscal_year_range)).to eq(get_fiscal_years(Date.new(2010,7,1),18))
+      expect(subject.send(:fiscal_year_range)).to eq(get_fiscal_years(Date.new(2010,7,1)))
     end
     it 'num forecast years' do
       subject.instance_variable_set(:@organization, test_user.organization)
