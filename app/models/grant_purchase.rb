@@ -153,10 +153,10 @@ class GrantPurchase < ActiveRecord::Base
     # add GLA entries
     amount = asset.purchase_cost * pcnt_purchase_cost / 100.0
 
-    asset_gla_entry = asset_gla.general_ledger_account_entries.find_or_create_by(sourceable_type: 'Asset', sourceable_id: asset.id)
+    asset_gla_entry = asset_gla.general_ledger_account_entries.find_by(sourceable_type: 'Asset', sourceable_id: asset.id, general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Fixed Asset Account'))
     asset_gla_entry.update!(description: "#{asset.organization}: #{asset.to_s}", amount: amount)
 
-    grant_gla_entry = grant_gla.general_ledger_account_entries.find_or_create_by(sourceable_type: 'Asset', sourceable_id: asset.id)
+    grant_gla_entry = grant_gla.general_ledger_account_entries.find_or_create_by(sourceable_type: 'Asset', sourceable_id: asset.id, general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account'))
     grant_gla_entry.update!(description: "#{asset.organization}: #{asset.to_s}", amount: -amount)
   end
 

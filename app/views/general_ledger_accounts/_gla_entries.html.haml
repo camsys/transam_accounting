@@ -1,0 +1,23 @@
+- if gla_entries.empty?
+  %p There are no entries in this GL account.
+-else
+  %table.table.table-hover#gla_datatable
+    %thead
+      %tr
+        %th.left Description
+        %th.right Amount
+
+    %tbody
+      - gla_entries.each do |gla_entry|
+        %tr.popup-details
+          %td.left= gla_entry.description
+          %td.right= format_as_currency(gla_entry.amount)
+
+:javascript
+  $('.popup-details').popover({
+    trigger: 'hover',
+    container: 'body',
+    placement: 'left',
+    animation: 'true',
+    html: 'true'
+  });

@@ -1,4 +1,8 @@
 %ul.nav.nav-tabs
+  %li
+    %a{:href => "#gla_entries", :data =>{:toggle => 'tab'}}
+      %span.badge.pull-right= @ledger_account.general_ledger_account_entries.count
+      = "GL Account Entries"
   - if @ledger_account.grant_budgets.count > 0 || @ledger_account.grant_specific?
     %li
       %a{:href => "#grants_table", :data =>{:toggle => 'tab'}}
@@ -14,6 +18,9 @@
       = "CapEx"
 
 .tab-content
+  .tab-pane.fade#gla_entries
+    .tab-content
+      = render :partial => 'gla_entries', :locals => {:gla_entries => @ledger_account.general_ledger_account_entries}
   - if @ledger_account.grant_budgets.count > 0 || @ledger_account.grant_specific?
     .tab-pane.fade#grants_table
       .tab-content
