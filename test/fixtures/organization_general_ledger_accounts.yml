@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  account_number: MyString
+  general_ledger_account_type_id: 
+  active: 
+
+two:
+  name: MyString
+  account_number: MyString
+  general_ledger_account_type_id: 
+  active: 

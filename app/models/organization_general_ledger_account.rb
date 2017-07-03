@@ -9,12 +9,14 @@ class OrganizationGeneralLedgerAccount < ActiveRecord::Base
   # Associations
   #------------------------------------------------------------------------------
   belongs_to :general_ledger_account_type
+  belongs_to :general_ledger_account_subtype
 
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
 
   validates :general_ledger_account_type,              :presence => true
+  validates :general_ledger_account_subtype,           :presence => true
   validates :name,                                     :presence => true
   validates :account_number,                           :presence => true
 

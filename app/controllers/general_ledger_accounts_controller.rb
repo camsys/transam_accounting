@@ -48,6 +48,17 @@ class GeneralLedgerAccountsController < OrganizationAwareController
 
     end
 
+    @account_subtype_id = params[:subtype]
+    unless @account_subtype_id.blank?
+      @account_subtype_id = @account_subtype_id.to_i
+      conditions << 'general_ledger_account_subtype_id = ?'
+      values << @account_subtype_id
+
+      account_subtype = GeneralLedgerAccountSubtype.find(@account_subtype_id)
+      add_breadcrumb account_subtype, general_ledger_accounts_path(:subtype => account_subtype)
+
+    end
+
     @ledger_accounts = @chart_of_accounts.general_ledger_accounts.where(conditions.join(' AND '), *values).order(:name)
 
     add_breadcrumb @chart_of_accounts, general_ledger_accounts_path(organization_id: @chart_of_accounts.organization_id)
@@ -110,15 +121,6 @@ class GeneralLedgerAccountsController < OrganizationAwareController
     respond_to do |format|
       if @ledger_account.save
         notify_user(:notice, "The general ledger account was successfully saved.")
-
-        @ledger_account.grant_budgets.each do |gb|
-          # for each grant budget, create a funding asset GLA, an accumulated depreciation GLA, and a depr expense GLA
-          asset_account_type = GeneralLedgerAccountType.find_by(name: 'Asset Account')
-
-          # funding GLA
-          grant_funding_gla = GeneralLedgerAccount.create(chart_of_account_id: @ledger_account.chart_of_account_id, general_ledger_account_type_id: asset_account_type.id, account_number: "#{@ledger_account.account_number}-#{gb.grant}", name: "#{@ledger_account.name} #{gb.grant} Funding")
-          grant_funding_gla.general_ledger_account_entries.create(description: 'Grant Funding', amount: gb.amount)
-        end
 
         format.html { redirect_to general_ledger_account_url(@ledger_account) }
         format.json { render action: 'show', status: :created, location: @ledger_account }

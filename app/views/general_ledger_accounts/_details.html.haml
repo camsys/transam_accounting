@@ -1,8 +1,9 @@
 %ul.nav.nav-tabs
-  %li
-    %a{:href => "#grants_table", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @ledger_account.grant_budgets.count
-      = "Grants"
+  - if @ledger_account.grant_budgets.count > 0 || @ledger_account.grant_specific?
+    %li
+      %a{:href => "#grants_table", :data =>{:toggle => 'tab'}}
+        %span.badge.pull-right= @ledger_account.grant_budgets.count > 0 ? @ledger_account.grant_budgets.count : 1
+        = "Grants"
   %li
     %a{:href => "#assets", :data =>{:toggle => 'tab'}}
       %span.badge.pull-right= @ledger_account.assets.count
@@ -13,9 +14,13 @@
       = "CapEx"
 
 .tab-content
-  .tab-pane.fade#grants_table
-    .tab-content
-      = render :partial => 'gla_budgets', :locals => {:gla_budgets => @ledger_account.grant_budgets}
+  - if @ledger_account.grant_budgets.count > 0 || @ledger_account.grant_specific?
+    .tab-pane.fade#grants_table
+      .tab-content
+        - if @ledger_account.grant_budgets.count > 0
+          = render :partial => 'gla_budgets', :locals => {:gla_budgets => @ledger_account.grant_budgets}
+        - elsif @ledger_account.grant_specific?
+          = format_field('Grant', link_to(@ledger_account.grant, grant_path(@ledger_account.grant)))
   .tab-pane.fade#assets
     .tab-content
       - if @ledger_account.assets.empty?

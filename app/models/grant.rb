@@ -37,7 +37,8 @@ class Grant < ActiveRecord::Base
 
   # Has many grant purchases
   has_many :grant_budgets, :dependent => :destroy
-  has_many :general_ledger_accounts, :through => :grant_budgets
+
+  has_many :general_ledger_accounts
 
   has_many :expenditures
 
@@ -196,8 +197,8 @@ class Grant < ActiveRecord::Base
     OrganizationGeneralLedgerAccount.active.each do |general_gla|
       if general_gla.grant_budget_specific
         acct_num = "#{general_gla.account_number}-#{self.to_s}"
-        if GeneralLedgerAccount.find_by(chart_of_account_id: ChartOfAccount.find_by(organization: organization).id, account_number: acct_num).nil?
-          gla = GeneralLedgerAccount.create(chart_of_account_id: ChartOfAccount.find_by(organization: organization).id, general_ledger_account_type_id: general_gla.general_ledger_account_type_id, account_number: acct_num, name: "#{general_gla.name} #{self.to_s}")
+        if GeneralLedgerAccount.find_by(chart_of_account_id: ChartOfAccount.find_by(organization: organization).id, account_number: acct_num, grant_id: self.id).nil?
+          gla = GeneralLedgerAccount.create!(chart_of_account_id: ChartOfAccount.find_by(organization: organization).id, general_ledger_account_type_id: general_gla.general_ledger_account_type_id, general_ledger_account_subtype_id: general_gla.general_ledger_account_subtype_id, account_number: acct_num, name: "#{general_gla.name} #{self.to_s}", grant_id: self.id)
         end
       end
     end

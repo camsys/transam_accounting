@@ -5,13 +5,8 @@
 
 = form_tag general_ledger_accounts_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action', style: 'padding-top: 6px' do
   .form-group
-    = select_tag(:type, options_for_select(GeneralLedgerAccountType.active.collect{|a| [a.name, a.id]}, :selected => @account_type_id), :class => "form-control", :style => "width: 150px;", :prompt => "Any GLA...")
+    = select_tag(:type, options_for_select(GeneralLedgerAccountType.active.collect{|a| [a.name, a.id]}, :selected => @account_type_id), :class => "form-control", :prompt => "Select GLA Type...")
+    = select_tag(:type, options_for_select(GeneralLedgerAccountSubtype.active.collect{|a| [a.name, a.id]}, :selected => @account_subtype_id), :class => "form-control", :prompt => "Select GLA Subtype...")
 
-:javascript
-  $(document).ready(function() {
-
-    $('#type').change(function() {
-      $('#filter_form').submit();
-    });
-
-  });
+    = button_tag :class => 'btn btn-default', :type => 'submit' do
+      %i.fa.fa-filter

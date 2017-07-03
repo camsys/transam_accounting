@@ -1,0 +1,20 @@
+- if glas.empty?
+  %p There are no GLAs associated with this account.
+-else
+  %table.table.table-hover#glas_datatable
+    %thead
+      %tr
+        %th.left Account Type
+        %th.left Account Subtype
+        %th.left Name
+        %th.left Account Number
+        %th.right Subtotal
+
+    %tbody
+      - glas.each do |gla|
+        %tr.popup-details{:data => {:action_path => general_ledger_account_path(gla)}}
+          %td.left= gla.general_ledger_account_type
+          %td.left= gla.general_ledger_account_subtype
+          %td.left= gla.name
+          %td.left= gla.account_number
+          %td.right= format_as_currency(gla.subtotal)

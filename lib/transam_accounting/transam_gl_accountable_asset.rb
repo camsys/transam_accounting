@@ -16,7 +16,6 @@ module TransamGlAccountableAsset
     # Callbacks
     # ----------------------------------------------------
 
-    after_create :set_general_ledger_accounts
 
     # ----------------------------------------------------
     # Associations
@@ -64,40 +63,5 @@ module TransamGlAccountableAsset
   #------------------------------------------------------------------------------
 
   protected
-
-  def set_general_ledger_accounts
-    # ----------------------------------------------------------------------------------- #
-    # Possible GLAs an asset can be associated with:
-    # -- fixed asset account (main association: general_ledger_account_id)
-    # -- grant funding
-    # -- accumulated depr
-    # -- depreciation expensep
-
-    # -- gain/loss on disposal
-    # -- cash
-    # ----------------------------------------------------------------------------------- #
-
-    # fixed asset account
-    general_ledger_accounts << general_ledger_account
-
-    # grant funding
-    grant_purchases.each do |grant_purchase|
-      gla = organization.general_ledger_accounts.find_by(account_number: "#{general_ledger_account.account_number}-#{grant_purchase.sourceable}")
-      general_ledger_accounts << gla
-
-      # add GLA entries
-      amount = purchase_cost * grant_purchase.pcnt_purchase_cost / 100.0
-      general_ledger_account.general_ledger_account_entries.create(description: "#{organization}: #{self.to_s}", amount: amount)
-      gla.general_ledger_account_entries.create(description: "#{organization}: #{self.to_s}", amount: amount)
-
-    end
-
-
-
-
-
-
-
-  end
 
 end

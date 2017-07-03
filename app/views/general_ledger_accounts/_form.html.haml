@@ -8,9 +8,10 @@
 
   = f.input :chart_of_account_id, :as => :hidden, :input_html => {:value => @chart_of_accounts.id}
 
-  = f.association :general_ledger_account_type, :required => true, :collection => GeneralLedgerAccountType.active.where(name: 'Fixed Asset Account'), :label => 'Account Type'
-  = f.input :account_number, :required => true
+  = f.association :general_ledger_account_type, :required => true, :collection => @ledger_account.new_record? ? GeneralLedgerAccountType.active.where(name: 'Asset Account') : GeneralLedgerAccountType.active, :label => 'Account Type', :include_blank => false
+  = f.association :general_ledger_account_subtype, :required => true, :collection => @ledger_account.new_record? ? GeneralLedgerAccountSubtype.active.where(name: 'Fixed Asset Account') : GeneralLedgerAccountSubtype.active, :label => 'Account Subtype', :include_blank => false
   = f.input :name, :required => true
+  = f.input :account_number, :required => true
 
   #grant_budgets.well.well-sm{style: "overflow-y:scroll; max-height:250px;"}
     %label.control-label

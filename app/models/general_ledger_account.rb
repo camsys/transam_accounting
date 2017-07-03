@@ -30,6 +30,9 @@ class GeneralLedgerAccount < ActiveRecord::Base
 
   # Every GLA has an account type
   belongs_to :general_ledger_account_type
+  belongs_to :general_ledger_account_subtype
+
+  belongs_to :grant
 
   has_many :general_ledger_account_entries, :dependent => :destroy
 
@@ -55,6 +58,7 @@ class GeneralLedgerAccount < ActiveRecord::Base
 
   validates :chart_of_account,              :presence => true
   validates :general_ledger_account_type,   :presence => true
+  validates :general_ledger_account_subtype,   :presence => true
   validates :name,                          :presence => true, :length => {:maximum => 64}
   validates :account_number,                :presence => true, :length => {:maximum => 32}
 
@@ -62,6 +66,7 @@ class GeneralLedgerAccount < ActiveRecord::Base
   FORM_PARAMS = [
     :chart_of_account_id,
     :general_ledger_account_type_id,
+    :general_ledger_account_subtype_id,
     :name,
     :account_number,
     :active,
@@ -76,7 +81,7 @@ class GeneralLedgerAccount < ActiveRecord::Base
 
   # Allow selection of active instances
   scope :active, -> { where(:active => true) }
-  scope :fixed_asset_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Fixed Asset Account')) }
+  scope :fixed_asset_accounts, -> { where(:general_ledger_account_subtype => GeneralLedgerAccountSubtype.find_by(name: 'Fixed Asset Account')) }
   scope :asset_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Asset Account')) }
   scope :liability_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Liability Account')) }
   scope :equity_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Equity Account')) }
@@ -99,8 +104,16 @@ class GeneralLedgerAccount < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
+  def grant_specific?
+    grant.present?
+  end
+
   def to_s
-    "#{account_number} - #{name}"
+    account_number
+  end
+
+  def subtotal
+    general_ledger_account_entries.sum(:amount)
   end
 
   #------------------------------------------------------------------------------
@@ -112,6 +125,7 @@ class GeneralLedgerAccount < ActiveRecord::Base
 
     # Set resonable defaults for general ledger accounts
     def set_defaults
+      self.general_ledger_account_type_id ||= self.general_ledger_account_subtype.try(:general_ledger_account_type_id)
       self.active = self.active.nil? ? true : self.active
     end
 

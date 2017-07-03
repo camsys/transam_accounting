@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "general_ledger_accounts/_gla_budgets.html.haml", :type => :view do
+describe "general_ledger_accounts/_grants.html.haml", :type => :view do
   it 'no gla budgets' do
     render 'general_ledger_accounts/gla_budgets', :gla_budgets => []
 

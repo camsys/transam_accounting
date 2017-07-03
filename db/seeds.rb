@@ -23,12 +23,19 @@ funding_source_types = [
 
 
 general_ledger_account_types = [
-  {:active => 1, :name => 'Fixed Asset Account', :description => 'Accounts representing transit assets owned or controlled by the business.'},
   {:active => 1, :name => 'Asset Account',       :description => 'Accounts representing different types of resources owned or controlled by the business.'},
   {:active => 1, :name => 'Liability Account',   :description => 'Accounts representing different types of obligations for the business.'},
   {:active => 1, :name => 'Equity Account',      :description => 'Accounts representing the residual equity the business.'},
   {:active => 1, :name => 'Revenue Account',     :description => 'Accounts representing the businesses gross earnings.'},
   {:active => 1, :name => 'Expense Account',     :description => 'Accounts representing the expenditures for the business.'}
+]
+
+general_ledger_account_subtypes = [
+  {:active => 1, :general_ledger_account_type_id => 1, :name => 'Fixed Asset Account', :description => 'Accounts representing transit assets owned or controlled by the business.'},
+  {:active => 1, :general_ledger_account_type_id => 1, :name => 'Grant Funding Account', :description => 'Accounts representing grant funding.'},
+  {:active => 1, :general_ledger_account_type_id => 1, :name => 'Accumulated Depreciation Account', :description => 'Accounts representing asset accumulated depreciation.'},
+  {:active => 1, :general_ledger_account_type_id => 5, :name => 'Depreciation Expense Account', :description => 'Accounts representing asset depreciation expense.'},
+  {:active => 1, :general_ledger_account_type_id => 1, :name => 'Disposal Account', :description => 'Accounts representing asset disposal.'}
 ]
 
 depreciation_calculation_types = [
@@ -43,7 +50,7 @@ depreciation_interval_types = [
 ]
 
 
-lookup_tables = %w{ funding_source_types general_ledger_account_types depreciation_calculation_types depreciation_interval_types}
+lookup_tables = %w{ funding_source_types general_ledger_account_types general_ledger_account_subtypes depreciation_calculation_types depreciation_interval_types}
 
 lookup_tables.each do |table_name|
   puts "  Loading #{table_name}"
