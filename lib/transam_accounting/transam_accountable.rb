@@ -69,8 +69,6 @@ module TransamAccountable
     chart = ChartOfAccount.new(organization_id: self.id)
     chart.save
 
-
-
     OrganizationGeneralLedgerAccount.active.each do |general_gla|
       chart.general_ledger_accounts.create(general_ledger_account_type: general_gla.general_ledger_account_type, account_number: general_gla.account_number, name: general_gla.name)
     end

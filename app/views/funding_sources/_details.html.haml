@@ -34,7 +34,7 @@
   - if Grant.sourceable_type == 'FundingSource'
     .tab-pane.fade#grant
       .tab-content
-        = render :partial => 'grants/index_table', :locals => {:grants => @funding_source.grants}
+        = render :partial => 'grants/index_table', :locals => {:grants => @funding_source.grants, :sourceable => @funding_source}
 
   - if GrantPurchase.sourceable_type.include? 'FundingSource'
     .tab-pane.fade#asst

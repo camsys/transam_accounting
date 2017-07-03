@@ -92,7 +92,7 @@ class GrantsController < OrganizationAwareController
     # get fiscal years up to planning year + 3 years
     @fiscal_years = fiscal_year_range(4)
 
-    @grant = Grant.new
+    @grant = Grant.new(:sourceable_id => params[:sourceable_id])
 
   end
 

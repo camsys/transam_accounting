@@ -144,7 +144,7 @@ class GrantPurchase < ActiveRecord::Base
     asset_gla = asset.general_ledger_account
     asset.general_ledger_accounts << asset_gla
 
-    grant_gla = asset.organization.general_ledger_accounts.find_by(grant: sourceable)
+    grant_gla = asset.organization.general_ledger_accounts.find_by(grant: sourceable, general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account'))
     if grant_gla.nil?
       grant_gla = GeneralLedgerAccount.create!(chart_of_account_id: asset_gla.chart_of_account_id, general_ledger_account_type_id: GeneralLedgerAccountType.find_by(name: 'Asset Account').id, general_ledger_account_subtype_id: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account').id, account_number: "#{asset_gla.account_number}-#{grant}", name: "#{asset_gla.name} #{grant} Funding", grant_id: sourceable.id)
     end
@@ -153,15 +153,15 @@ class GrantPurchase < ActiveRecord::Base
     # add GLA entries
     amount = asset.purchase_cost * pcnt_purchase_cost / 100.0
 
-    asset_gla_entry = asset_gla.general_ledger_account_entries.find_by(sourceable_type: 'Asset', sourceable_id: asset.id, general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Fixed Asset Account'))
+    asset_gla_entry = asset_gla.general_ledger_account_entries.find_or_create_by(sourceable_type: 'Asset', sourceable_id: asset.id)
     asset_gla_entry.update!(description: "#{asset.organization}: #{asset.to_s}", amount: amount)
 
-    grant_gla_entry = grant_gla.general_ledger_account_entries.find_or_create_by(sourceable_type: 'Asset', sourceable_id: asset.id, general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account'))
+    grant_gla_entry = grant_gla.general_ledger_account_entries.find_or_create_by(sourceable_type: 'Asset', sourceable_id: asset.id)
     grant_gla_entry.update!(description: "#{asset.organization}: #{asset.to_s}", amount: -amount)
   end
 
   def delete_general_ledger_accounts
-    grant_gla = asset.organization.general_ledger_accounts.find_by(grant: sourceable)
+    grant_gla = asset.organization.general_ledger_accounts.find_by(grant: sourceable, general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account'))
     grant_gla.general_ledger_account_entries.find_by(sourceable_type: 'Asset', sourceable_id: asset.id).destroy
     asset.general_ledger_accounts.delete(grant_gla)
   end

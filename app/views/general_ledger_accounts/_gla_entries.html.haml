@@ -8,10 +8,17 @@
         %th.right Amount
 
     %tbody
+      - subtotal = 0
       - gla_entries.each do |gla_entry|
+        - subtotal += gla_entry.amount
         %tr.popup-details
           %td.left= gla_entry.description
           %td.right= format_as_currency(gla_entry.amount)
+
+    %tfoot
+      %tr
+        %td
+        %td.right= format_as_currency(subtotal)
 
 :javascript
   $('.popup-details').popover({

@@ -126,10 +126,6 @@ class Grant < ActiveRecord::Base
       val += p.asset.purchase_cost * (p.pcnt_purchase_cost / 100.0)
     end
 
-    GrantPurchase.where(sourceable: GrantBudget.where(grant: self)).includes(:asset).each do |p|
-      val += p.asset.purchase_cost * (p.pcnt_purchase_cost / 100.0)
-    end
-
     val
   end
 
