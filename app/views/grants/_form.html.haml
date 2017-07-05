@@ -1,5 +1,5 @@
 = simple_form_for(@grant,
-  :html => {:class => 'form-vertical'},
+  :html => {:class => 'form-vertical grant_form'},
   :wrapper => :vertical_form,
   :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes,
     :radio_buttons => :vertical_radio_and_checkboxes,
@@ -15,11 +15,18 @@
   = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
     %span.input-group-addon
       %i.fa.fa-usd
-    = f.input_field :amount, :class => "form-control"
+    = f.input_field :amount, :class => "form-control", :min => GeneralLedgerAccountEntry.where(sourceable: @grant).sum(:amount)
 
   = f.button :submit, :class => "btn btn-primary"
 
 :javascript
   $(document).ready(function(){
     transam.make_same_height('.header-part');
+  });
+
+  // jquery validations
+  $('.grant_form').validate({
+    submitHandler: function(form) {
+      form.submit();
+    }
   });

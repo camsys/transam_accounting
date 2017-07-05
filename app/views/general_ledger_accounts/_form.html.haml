@@ -33,3 +33,32 @@
       form.submit();
     }
   });
+
+  $('body').on('change', '#grant_budgets .grant_budget_amount', function() {
+    id_str = $(this).attr('id');
+    console.log(id_str);
+    new_id_str = id_str.substring(0, id_str.length-6) + 'grant_id';
+
+    if ($( new_id_str ).val() != "") {
+      $.ajax({
+        url: '/general_ledger_accounts/check_grant_budget',
+        data: {
+            grant_id: function() {
+              return $( '#' + new_id_str ).val();
+            },
+            amount: function() {
+              return $( '#' + id_str ).val();
+            },
+        },
+        success: function(result){
+          $('#grant_budgets .grant_budget_amount').rules("add", {
+            max: parseInt(result)
+          });
+
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+        }
+      });
+    }
+  });

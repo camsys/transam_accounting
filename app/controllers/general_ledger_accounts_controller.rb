@@ -112,6 +112,14 @@ class GeneralLedgerAccountsController < OrganizationAwareController
 
   end
 
+  def check_grant_budget
+    @grant = Grant.find_by(id: params[:grant_id])
+
+    respond_to do |format|
+      format.json { render :json => @grant.amount.to_json }
+    end
+  end
+
   # POST /general_ledger_accounts
   # POST /general_ledger_accounts.json
   def create

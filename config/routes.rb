@@ -21,7 +21,11 @@ Rails.application.routes.draw do
     resources :documents
   end
 
-  resources :general_ledger_accounts
+  resources :general_ledger_accounts do
+    collection do
+      get 'check_grant_budget'
+    end
+  end
 
   resources :inventory, :only => [], :controller => 'assets' do
     member do

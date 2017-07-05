@@ -1,12 +1,12 @@
 .nested-fields
   .row
     .col-md-6
-      = f.input :grant_id, :collection => Grant.where(organization_id: @organization_list), :required => true, :label => 'Grant'
+      = f.input :grant_id, :collection => Grant.where(organization_id: @organization_list), :required => true, :label => 'Grant',  :class => 'grant_budget_grant_id'
     .col-md-5
       = f.input :amount, :label => 'Amount', :required => true, :wrapper => :vertical_append do
         %span.input-group-addon
           %i.fa.fa-usd
-        = f.input_field :amount, :class => 'form-control'
+        = f.input_field :amount, :class => 'form-control grant_budget_amount'
 
     .col-md-1
       = link_to_remove_association f, :class => 'btn btn-xs btn-warning', :style => 'margin-top: 27px;' do
