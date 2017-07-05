@@ -25,8 +25,6 @@ module TransamGlAccountableAsset
 
     has_and_belongs_to_many :general_ledger_accounts, :foreign_key => :asset_id
 
-    has_and_belongs_to_many :expenditures, :foreign_key => :asset_id
-
     # each asset was purchased using one or more grants
     has_many    :grant_purchases,  :foreign_key => :asset_id, :dependent => :destroy, :inverse_of => :asset
 

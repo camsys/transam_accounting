@@ -46,9 +46,6 @@ class GeneralLedgerAccount < ActiveRecord::Base
 
   has_many :grants, :through => :grant_budgets
 
-  # Each GLA has 0 or more expenditures
-  has_many :expenditures
-
   # Every GLA has and belongs to many assets
   has_many :assets
 

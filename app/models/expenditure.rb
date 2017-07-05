@@ -9,82 +9,20 @@
 # an inspector could inspect several busses and provide a single invoice.
 #
 #------------------------------------------------------------------------------
-class Expenditure < ActiveRecord::Base
+class Expenditure < Asset
 
-  # Include the object key mixin
-  include TransamObjectKey
-
-  #------------------------------------------------------------------------------
   # Callbacks
-  #------------------------------------------------------------------------------
-  after_initialize  :set_defaults
-
-  # Clean up any HABTM associations before the expenditure is destroyed
-  before_destroy { assets.clear }
+  after_initialize :set_defaults
 
   #------------------------------------------------------------------------------
-  # Associations
+  # Associations common to all expenditures
   #------------------------------------------------------------------------------
 
-  # Every expenditure is owned by an organization
-  belongs_to :organization
-
-  # Every expenditure must be associated with a GL account
-  belongs_to :general_ledger_account
-
-  # Every expenditure can optionally be associated with a Grant
-  belongs_to :grant
-
-  # Every expenditure must be associated with an expense type
-  belongs_to :expense_type
-
-  # each was puchased from a vendor
-  belongs_to :vendor
-
-  # Every expenditure can be associated with one or more assets
-  has_and_belongs_to_many :assets
-
-  # Has 0 or more documents. Using a polymorphic association. These will be removed if the project is removed
-  has_many    :documents,   :as => :documentable, :dependent => :destroy
-
-  # Has 0 or more comments. Using a polymorphic association, These will be removed if the project is removed
-  has_many    :comments,    :as => :commentable,  :dependent => :destroy
-
   #------------------------------------------------------------------------------
-  # Validations
+  # Scopes
   #------------------------------------------------------------------------------
-
-  #validates :general_ledger_account,    :presence => true
-  validates :organization,              :presence => true
-  #validates :grant,                     :presence => true
-  validates :expense_type,              :presence => true
-  validates :expense_date,              :presence => true
-  validates :description,               :presence => true
-  validates :amount,                    :allow_nil => true, :numericality => {:only_integer => :true}
-  validates :pcnt_from_grant,           :allow_nil => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
-
-  # List of hash parameters specific to this class that are allowed by the controller
-  FORM_PARAMS = [
-    :general_ledger_account_id,
-    :grant_id,
-    :expense_type_id,
-    :vendor_id,
-    :expense_date,
-    :description,
-    :amount,
-    :pcnt_from_grant,
-    :asset_ids => []
-  ]
-
-  # List of fields which can be searched using a simple text-based search
-  SEARCHABLE_FIELDS = [
-    :object_key,
-    :general_ledger_account,
-    :grant,
-    :expense_type,
-    :name,
-    :description
-  ]
+  # set the default scope
+  default_scope { where(:asset_type_id => AssetType.where(:class_name => self.name).pluck(:id)) }
 
   #------------------------------------------------------------------------------
   #
@@ -93,7 +31,8 @@ class Expenditure < ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   def self.allowable_params
-    FORM_PARAMS
+    [
+    ]
   end
 
   #------------------------------------------------------------------------------
@@ -102,17 +41,43 @@ class Expenditure < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
-  def to_s
-    name
+  # Render the asset as a JSON object -- overrides the default json encoding
+  def as_json(options={})
+    super.merge(
+        {
+        })
   end
 
-  def name
-    description
+  # Creates a duplicate that has all asset-specific attributes nilled
+  def copy(cleanse = true)
+    a = dup
+    a.cleanse if cleanse
+    a
   end
 
   def searchable_fields
-    SEARCHABLE_FIELDS
+    a = []
+    a << super
+    a += [
+        :description,
+        :serial_number
+    ]
+    a.flatten
   end
+
+  def cleansable_fields
+    a = []
+    a << super
+    a += [
+    ]
+    a.flatten
+  end
+
+  # The cost of a equipment asset is the purchase cost
+  def cost
+    purchase_cost
+  end
+
 
   #------------------------------------------------------------------------------
   #
@@ -123,9 +88,12 @@ class Expenditure < ActiveRecord::Base
 
   # Set resonable defaults for a suppoert facility
   def set_defaults
-    self.amount ||= 0
-    self.pcnt_from_grant ||= 0
-    self.expense_date ||= Date.today
+    super
+
+    # expenditures are not depreciable and not planned for replacement
+    self.depreciable = self.depreciable.nil? ? false : self.depreciable
+    self.replacement_status_type_id ||= ReplacementStatusType.find_by(name: 'None').id
   end
 
 end
+

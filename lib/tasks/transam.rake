@@ -54,4 +54,13 @@ namespace :transam do
       GeneralLedgerAccountSubtype.create!(gla_type) if GeneralLedgerAccountSubtype.find_by(name: gla_type[:name]).nil?
     end
   end
+
+  desc 'add expenditure asset_type'
+  task add_expenditure_asset_type: :environment do
+
+    a = AssetType.new(name: 'Expenditures', class_name: 'Expenditure', display_icon_name: 'fa fa-cogs', map_icon_name: 'blueIcon', description: 'Expenditures', active: true)
+    a.save!
+
+    PolicyAssetTypeRule.create!(policy_id: Policy.where('parent_id IS NULL').pluck(:id).first, asset_type_id: a.id, service_life_calculation_type_id: 1, replacement_cost_calculation_type_id: 1, annual_inflation_rate: 1.1, pcnt_residual_value: 0)
+  end
 end

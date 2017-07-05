@@ -204,7 +204,9 @@ module TransamDepreciable
       self.depreciation_start_date ||= self.in_service_date
       self.book_value ||= self.purchase_cost.to_i
       self.salvage_value ||= 0
-      self.depreciable = true if new_record?
+      self.depreciable = self.depreciable.nil? ? true : self.depreciable
+
+      return true # always return true so can continue to validations
 
     end
 

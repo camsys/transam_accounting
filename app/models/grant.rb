@@ -40,8 +40,6 @@ class Grant < ActiveRecord::Base
 
   has_many :general_ledger_accounts
 
-  has_many :expenditures
-
   # Has 0 or more documents. Using a polymorphic association. These will be removed if the Grant is removed
   has_many    :documents,   :as => :documentable, :dependent => :destroy
 

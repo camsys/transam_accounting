@@ -156,11 +156,11 @@ class GeneralLedgerAccountsController < OrganizationAwareController
   end
 
   def destroy
-    if @ledger_account.assets.count == 0 && @ledger_account.expenditures.count == 0
+    if @ledger_account.general_ledger_account_entries.count == 0
       @ledger_account.destroy
       redirect_to general_ledger_accounts_url, notice: 'General ledger account was successfully destroyed.'
     else
-      redirect_to @ledger_account, notice: 'General ledger account cannot be destroyed as there are assets and expenditures associated with it.'
+      redirect_to @ledger_account, notice: 'General ledger account cannot be destroyed as there are entries in its ledger.'
     end
   end
 

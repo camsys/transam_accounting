@@ -1,0 +1,16 @@
+= format_field("Cost", format_as_currency(@asset.purchase_cost) )
+= format_field("Purchase Date", format_as_date(@asset.purchase_date) )
+= format_field("Warranty Date", format_as_date(@asset.warranty_date) )
+= format_field("In Service Date", format_as_date(@asset.in_service_date) )
+= format_field("Purchased New", format_as_boolean(@asset.purchased_new) )
+= format_field("Vendor", link_to(@asset.vendor, vendor_path(@asset.vendor))) unless @asset.vendor.nil?
+= format_field("Funding Type", @asset.fta_funding_type)
+
+-# render the engine form components if there are any
+- SystemConfig.transam_module_names.each do |mod|
+  - view_component = "#{mod}_purchase"
+  - Rails.logger.debug "Checking for #{view_component}: Results = #{lookup_context.template_exists?(view_component, 'assets', true)}"
+  - if lookup_context.template_exists?(view_component, 'assets', true)
+    = render :partial => "assets/#{view_component}"
+
+= format_field("Expected Useful Life", "#{format_as_integer(@asset.expected_useful_life)} months")

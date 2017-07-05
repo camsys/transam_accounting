@@ -10,11 +10,12 @@
         = "Grants"
   %li
     %a{:href => "#assets", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @ledger_account.assets.count
+      %span.badge.pull-right= @ledger_account.assets.where.not(asset_type: AssetType.find_by(class_name: 'Expenditure')).count
       = "Assets"
+
   %li
     %a{:href => "#expenditures", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @ledger_account.expenditures.count
+      %span.badge.pull-right= @ledger_account.assets.where(asset_type: AssetType.find_by(class_name: 'Expenditure')).count
       = "CapEx"
 
 .tab-content
@@ -30,22 +31,16 @@
           = format_field('Grant', link_to(@ledger_account.grant, grant_path(@ledger_account.grant)))
   .tab-pane.fade#assets
     .tab-content
-      - if @ledger_account.assets.empty?
+      - assets = @ledger_account.assets.where.not(asset_type: AssetType.find_by(class_name: 'Expenditure'))
+      - if assets.empty?
         %p There are no assets associated with this general ledger account.
       - else
-        = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => @ledger_account.assets}
+        = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => assets}
 
   .tab-pane.fade#expenditures
     .tab-content
-      - if @ledger_account.expenditures.empty?
+      - expenditures = @ledger_account.assets.where(asset_type: AssetType.find_by(class_name: 'Expenditure'))
+      - if expenditures.empty?
         %p There are no CapEx associated with this general ledger account.
       - else
-        = render :partial => 'expenditures/index_table', :locals => {:expenditures => @ledger_account.expenditures}
-
-      - if can? :create, Expenditure
-        .row{:style => 'margin-top:50px;'}
-          .col-md-12
-            %fieldset
-              %legend Add CapEx
-              - @expenditure = Expenditure.new
-              = render :partial => 'expenditures/form'
+        = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => expenditures}

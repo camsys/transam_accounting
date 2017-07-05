@@ -1,3 +1,5 @@
+- expenditure_asset_type = AssetType.find_by(class_name: 'Expenditure')
+
 %li{:class => get_nav_link_class(['accounting'])}
   = link_to "#", :class => "dropdown-toggle", :data => {"toggle" => "dropdown"}, :title => 'Accounting' do
     %i.fa.fa-usd.fa-2x
@@ -49,23 +51,24 @@
         %i.fa.fa-fw.fa-legal
         = ' Grants'
 
-    %li.divider
-    %li.text-left.dropdown-submenu
-      = link_to expenditures_path do
-        %i.fa.fa-fw.fa-usd
-        = 'CapEx'
+    - if expenditure_asset_type
+      %li.divider
+      %li.text-left.dropdown-submenu
+        = link_to inventory_index_path(:asset_type => expenditure_asset_type.id, :asset_subtype => 0, :asset_group => 0) do
+          %i.fa.fa-fw.fa-usd
+          = 'CapEx'
 
-      %ul.dropdown-menu
-        - @organization.expense_types.active.each do |type|
-          %li.text-left
-            = link_to expenditures_path(:type => type) do
-              %i.fa.fa-fw.fa-usd
-              = type
-        %li.divider
-        %li
-          = link_to new_expenditure_path do
-            %i.fa.fa-plus.fa-fw
-            = "Add CapEx";
+        %ul.dropdown-menu
+          - expenditure_asset_type.asset_subtypes.active.each do |type|
+            %li.text-left
+              = link_to inventory_index_path(:asset_subtype => type.id, :asset_group => 0) do
+                %i.fa.fa-fw.fa-usd
+                = type
+          %li.divider
+          %li
+            = link_to new_asset_inventory_index_path(:asset_type_id => expenditure_asset_type.id) do
+              %i.fa.fa-plus.fa-fw
+              = "Add CapEx";
 
     %li.divider
     %li.text-left
