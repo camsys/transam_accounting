@@ -1,4 +1,5 @@
-= render :partial => 'grant_purchases_form', :locals => {:f => f}
+- if GrantPurchase.sourceable_type != 'Grant' || f.object.new_record? || f.object.purchase_cost == f.object.book_value
+  = render :partial => 'grant_purchases_form', :locals => {:f => f}
 
-- if GrantPurchase.sourceable_type == 'Grant'
-  = render :partial => 'general_ledger_account_form', :locals => {:f => f}
+  - if GrantPurchase.sourceable_type == 'Grant'
+    = render :partial => 'general_ledger_account_form', :locals => {:f => f}

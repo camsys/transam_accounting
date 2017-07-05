@@ -166,20 +166,29 @@ module TransamDepreciable
       asset = is_typed? ? self : Asset.get_typed_asset(self)
 
       begin
-        # see what algorithm we are using to calculate the book value
-        class_name = asset.policy_analyzer.get_depreciation_calculation_type.class_name
-        book_value = calculate(asset, class_name)
-        asset.book_value = book_value.to_i
+        if asset.depreciable
+          # see what algorithm we are using to calculate the book value
+          class_name = asset.policy_analyzer.get_depreciation_calculation_type.class_name
+          book_value = calculate(asset, class_name)
+          asset.book_value = book_value.to_i
 
-        #update current depreciation date
-        asset.current_depreciation_date = asset.policy_analyzer.get_current_depreciation_date
+          #update current depreciation date
+          asset.current_depreciation_date = asset.policy_analyzer.get_current_depreciation_date
 
-        # if book value and current depreciation has changed, account for it in GLA
-        if ((self.changes.keys.include? 'book_value') || (self.changes.keys.include? 'current_depreciation_date')) && asset.book_value != asset.purchase_cost
-          depr_amount = self.changes['book_value'][0]-self.changes['book_value'][1]
-          asset.general_ledger_accounts.find_by(general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Accumulated Depreciation Account')).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: -depr_amount)
+          # if book value and current depreciation has changed, account for it in GLA
+          if asset.general_ledger_accounts.count > 0 # check whether this app records GLAs at all
+            if ((self.changes.keys.include? 'book_value') || (self.changes.keys.include? 'current_depreciation_date')) && asset.book_value != asset.purchase_cost
+              depr_amount = self.changes['book_value'][0]-self.changes['book_value'][1]
+              asset.general_ledger_accounts.find_by(general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Accumulated Depreciation Account')).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: -depr_amount)
 
-          asset.general_ledger_accounts.find_by(general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Depreciation Expense Account')).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: depr_amount)
+              asset.general_ledger_accounts.find_by(general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Depreciation Expense Account')).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: depr_amount)
+            end
+          end
+        else
+          asset.book_value = asset.purchase_cost
+
+          #update current depreciation date
+          asset.current_depreciation_date = asset.policy_analyzer.get_current_depreciation_date
         end
 
         # save changes to this asset

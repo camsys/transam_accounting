@@ -11,13 +11,18 @@
 
   = dialog_tag('Depreciation', {:icon => 'fa fa-refresh', :class => "header-part"}) do
 
+    - if @asset.purchase_cost != @asset.book_value
+      .row
+        .col-xs-12
+          .alert.alert-warning Asset has already been depreciated. You can only update the salvage value.
+
     .row
       .col-xs-3
-        = f.input :depreciable, :as => :radio_buttons, :label => "Asset is depreciable?"
+        = f.input :depreciable, :as => :radio_buttons, :label => "Asset is depreciable?", :disabled => @asset.purchase_cost != @asset.book_value
 
       .col-xs-3
         = f.input :depreciation_start_date, :wrapper => :vertical_append, :label => "Depreciation Start Date" do
-          = f.input_field :depreciation_start_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.depreciation_start_date)
+          = f.input_field :depreciation_start_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.depreciation_start_date), :disabled => @asset.purchase_cost != @asset.book_value
           %span.input-group-addon
             %i.fa.fa-calendar
 
