@@ -28,6 +28,14 @@ module TransamAccountingAssetsController
   #
   #------------------------------------------------------------------------------
 
+  def get_general_ledger_account
+    rule = PolicyAssetSubtypeRule.find_by(policy_id: Policy.find_by(organization_id: params[:organization_id]).id, asset_subtype_id: params[:asset_subtype_id], fuel_type_id: params[:fuel_type_id]).try(:general_ledger_account_id)
+
+    respond_to do |format|
+      format.json { render :json => rule.to_json }
+    end
+  end
+
   # form for updating depreciation inputs
   def edit_depreciation
     get_asset

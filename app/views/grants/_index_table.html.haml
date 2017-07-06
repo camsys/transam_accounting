@@ -11,43 +11,44 @@
   - if show_actions == 1
     = render :partial => "grants/index_actions"
 
-%table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
-  :pagination => 'true',
-  :show_pagination_switch => 'true',
-  :page_list => "[5, 10, 20, 50, 100, 200]",
-  :page_size => current_user.num_table_rows,
-  :search => 'false',
-  :toolbar => "#table_actions",
-  :export_types => "['csv', 'txt', 'excel']",
-  :show_export => 'true',
-  :show_columns => 'true',
-  :show_footer => "#{grants.count > 0}",
-  :show_toggle => 'true',
-  :state_save => 'true',
-  :state_save_id_table => "grantsid",
-  :state_save_expire => "1y"}}
-  %thead
-    %tr
-      %th.left{:data => {:visible => 'false'}} Object Key
-      %th.left{:data => {:visible => 'false', :sortable => 'true'}} Organization
-      %th.left{:data => {:sortable => 'true'}} Source
-      %th.left{:data => {:sortable => 'true'}} Fiscal Year
-      %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_amount'}} Amount
-      -#%th.right{:data => {:sortable => 'true', :formatter => 'integer_formatter', :footer_formatter => 'sum_expenditures'}} CapEx
-      %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_total_spent'}} Spent
-      %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_total_balance'}} Balance
+.table-responsive
+  %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
+    :pagination => 'true',
+    :show_pagination_switch => 'true',
+    :page_list => "[5, 10, 20, 50, 100, 200]",
+    :page_size => current_user.num_table_rows,
+    :search => 'false',
+    :toolbar => "#table_actions",
+    :export_types => "['csv', 'txt', 'excel']",
+    :show_export => 'true',
+    :show_columns => 'true',
+    :state_save => 'true',
+    :state_save_id_table => "grants_id",
+    :state_save_expire => "1y"}}
+    %thead
+      %tr
+        %th.left{:data => {:visible => 'false'}} Object Key
+        %th.left{:data => {:visible => 'false', :sortable => 'true'}} Organization
+        %th.left{:data => {:sortable => 'true'}}= Grant.label
+        %th.left{:data => {:sortable => 'true'}} Name
+        %th.left{:data => {:sortable => 'true'}} Fiscal Year
+        %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_amount'}} Amount
+        -#%th.right{:data => {:sortable => 'true', :formatter => 'integer_formatter', :footer_formatter => 'sum_expenditures'}} CapEx
+        %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_total_spent'}} Spent
+        %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_total_balance'}} Balance
 
-  %tbody
-    - grants.each do |grant|
-      %tr{:id => grant.object_key, :class => 'action-path'}
-        %td.left= grant.object_key
-        %td.left= grant.organization.short_name
-        %td.left= grant.sourceable
-        %td.center= format_as_fiscal_year(grant.fy_year)
-        %td.right= grant.amount.to_i
-        -#%td.right= grant.grant_purchases.count
-        %td.right= grant.spent.to_i
-        %td.right= grant.balance.to_i
+    %tbody
+      - grants.each do |grant|
+        %tr{:id => grant.object_key, :class => 'action-path'}
+          %td.left= grant.object_key
+          %td.left= grant.organization.short_name
+          %td.left= grant.sourceable
+          %td.left= grant.name
+          %td.center= format_as_fiscal_year(grant.fy_year)
+          %td.right= grant.amount.to_i
+          -#%td.right= grant.grant_purchases.count
+          %td.right= grant.spent.to_i
+          %td.right= grant.balance.to_i
 
 = render :partial => 'shared/table_scripts', :locals => {:table_id => table_dom_id, :path_pattern => grant_path("xxx")}
 

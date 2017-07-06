@@ -38,6 +38,9 @@ class Grant < ActiveRecord::Base
   # Has many grant purchases
   has_many :grant_budgets, :dependent => :destroy
 
+  # Allow the form to submit grant budgets
+  accepts_nested_attributes_for :grant_budgets, :reject_if => :all_blank, :allow_destroy => true
+
   has_many :general_ledger_accounts
 
   # Has 0 or more documents. Using a polymorphic association. These will be removed if the Grant is removed
@@ -70,7 +73,8 @@ class Grant < ActiveRecord::Base
     :name,
     :fy_year,
     :amount,
-    :active
+    :active,
+    :grant_budgets_attributes => [GrantBudget.allowable_params]
   ]
 
   # List of fields which can be searched using a simple text-based search

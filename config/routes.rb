@@ -28,6 +28,10 @@ Rails.application.routes.draw do
   end
 
   resources :inventory, :only => [], :controller => 'assets' do
+    collection do
+      get 'get_general_ledger_account'
+    end
+
     member do
       get 'edit_depreciation'
       post 'update_depreciation'

@@ -1,1 +1,26 @@
-= f.association :general_ledger_account, :collection => @asset.organization.general_ledger_accounts.fixed_asset_accounts, :label => 'GLA', :value => @asset.general_ledger_account_id || @asset.policy_analyzer.get_general_ledger_account_id
+= f.association :general_ledger_account, :collection => @asset.organization.general_ledger_accounts.fixed_asset_accounts, :label => 'General Ledger', :required => true, :value => @asset.general_ledger_account_id || @asset.policy_analyzer.get_general_ledger_account_id
+
+:javascript
+
+  $('#asset_fuel_type_id').change(function() {
+    $.ajax({
+      url: '/inventory/get_general_ledger_account',
+      data: {
+          organization_id: function() {
+            return '#{@asset.organization_id}';
+          },
+          asset_subtype_id: function() {
+            return $( '#asset_asset_subtype_id' ).val();
+          },
+          fuel_type_id: function() {
+            return $( '#asset_fuel_type_id' ).val();
+          }
+      },
+      success: function(result){
+        $('#asset_general_ledger_account_id').val(result);
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+      }
+    });
+  });

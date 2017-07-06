@@ -10,7 +10,8 @@
     = render 'grant_purchase_fields', f: grant_purchase
 
 :javascript
-  $('form').on('submit', function(event) {
+
+  $('body').on('change', '#grant_purchases .funding-pcnt', function() {
     $('#grant_purchases .funding-pcnt').rules("add", {
       pcntSumsHundred: true
     });
