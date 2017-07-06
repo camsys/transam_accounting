@@ -152,7 +152,7 @@ class GrantsController < OrganizationAwareController
   def destroy
     name = @grant.to_s
     @grant.destroy
-    notify_user(:notice, "Grant #{name} was successfully removed.")
+    notify_user(:notice, "Grant # {name} was successfully removed.")
     respond_to do |format|
       format.html { redirect_to grants_url }
       format.json { head :no_content }

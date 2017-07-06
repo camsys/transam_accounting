@@ -1,19 +1,22 @@
+- assets = @grant.assets.where.not(asset_type: AssetType.find_by(class_name: 'Expenditure'))
+- expenditures = @grant.assets.where(asset_type: AssetType.find_by(class_name: 'Expenditure'))
+
 %ul.nav.nav-tabs
   %li
     %a{:href => "#gla", :data =>{:toggle => 'tab'}}
       %span.badge.pull-right= @grant.general_ledger_accounts.count
       = "GL Accounts"
-  -#%li
-    -#  %a{:href => "#expn", :data =>{:toggle => 'tab'}}
-    -#    %span.badge.pull-right= @grant.expenditures.count
-    -#    = "CapEx"
 
   - if GrantPurchase.sourceable_type.include? 'Grant'
     %li
       %a{:href => "#asst", :data =>{:toggle => 'tab'}}
-        - assets = GrantPurchase.sourceable_type == 'Grant' ? @grant.assets : @grant.grant_budgets.map{|g| g.assets}.flatten.uniq
         %span.badge.pull-right= assets.count
         = "Assets"
+
+    %li
+      %a{:href => "#expn", :data =>{:toggle => 'tab'}}
+        %span.badge.pull-right= expenditures.count
+        = "CapEx"
 
   %li
     %a{:href => "#docs", :data =>{:toggle => 'tab'}}
@@ -30,13 +33,6 @@
     .tab-content
       = render :partial => 'gla_table', :locals => {:glas => @grant.general_ledger_accounts}
 
-  -#.tab-pane.fade#expn
-    -#  .tab-content
-    -#    - if @grant.expenditures.empty?
-    -#      %p There are no CapEx associated with this grant.
-    -#    - else
-    -#      = render :partial => 'expenditures/index_table', :locals => {:expenditures => @grant.expenditures}
-
   - if GrantPurchase.sourceable_type.include? 'Grant'
     .tab-pane.fade#asst
       .tab-content
@@ -44,6 +40,13 @@
           %p There are no assets associated with this grant.
         - else
           = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => assets}
+
+    .tab-pane.fade#expn
+      .tab-content
+        - if expenditures.empty?
+          %p There are no CapEx associated with this grant.
+        - else
+          = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => expenditures}
 
   .tab-pane.fade#comm
     .tab-content

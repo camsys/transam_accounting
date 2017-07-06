@@ -176,6 +176,10 @@ class Grant < ActiveRecord::Base
     "#{sourceable_type.underscore}_path(:id => '#{sourceable.object_key}')"
   end
 
+  def can_destroy?
+    general_ledger_accounts.count == 0 && assets.count == 0
+  end
+
   #------------------------------------------------------------------------------
   #
   # Protected Methods
