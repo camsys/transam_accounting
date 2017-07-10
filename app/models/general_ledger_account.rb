@@ -113,10 +113,6 @@ class GeneralLedgerAccount < ActiveRecord::Base
     general_ledger_account_entries.sum(:amount)
   end
 
-  def can_destroy?
-    general_ledger_account_entries.count == 0 && grant_budgets.count == 0 && !grant_specific? && assets.count == 0
-  end
-
   #------------------------------------------------------------------------------
   #
   # Protected Methods

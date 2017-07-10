@@ -3,15 +3,9 @@ module Abilities
     include CanCan::Ability
 
     def initialize(user)
-      can :manage, Grant, :organization_id => user.organization_ids
-      cannot :destroy, Grant do |g|
-        !g.can_destroy?
-      end
+      can [:create, :update], Grant, :organization_id => user.organization_ids
 
-      can :manage, GeneralLedgerAccount, :organization_id => user.organization_ids
-      cannot :destroy, GeneralLedgerAccount do |g|
-        !g.can_destroy?
-      end
+      can [:create, :update], GeneralLedgerAccount, :organization_id => user.organization_ids
 
 
     end
