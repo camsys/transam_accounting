@@ -34,7 +34,7 @@
     = f.simple_fields_for :grant_budgets do |grant_budget|
       = render 'grant_budget_fields', f: grant_budget
 
-  = f.button :submit, :class => "btn btn-primary"
+  = f.button :submit, :class => "btn btn-primary", :id => 'grant_form_submit'
 
 :javascript
 
@@ -43,6 +43,30 @@
   $(document).ready(function(){
     transam.make_same_height('.header-part');
   });
+
+  $('body').on('change', '#grant_budgets .grant_budget_amount', function() {
+    $('#grant_budgets .grant_budget_amount').rules("add", {
+      budgetsSum: $('#grant_amount').val()
+    });
+  });
+  $('#grant_amount').on('change', function() {
+    if ($('#grant_budgets .grant_budget_amount').length > 0) {
+      $('#grant_budgets .grant_budget_amount').rules("add", {
+        budgetsSum: $('#grant_amount').val()
+      });
+      $('.grant_budget_amount').valid();
+    }
+  });
+
+  $.validator.addMethod("budgetsSum", function(value, element, params) {
+    var sum = 0;
+    $('.grant_budget_amount').each(function() {
+        sum += parseInt($(this).val());
+    });
+    console.log(params);
+
+    return sum <= parseInt(params);
+  }, "Sum of entries is not less than or equal to {0}.");
 
   // jquery validations
   $('.grant_form').validate({
