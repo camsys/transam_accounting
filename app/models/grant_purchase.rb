@@ -144,9 +144,9 @@ class GrantPurchase < ActiveRecord::Base
     asset_gla = asset.general_ledger_account
     asset.general_ledger_accounts << asset_gla
 
-    grant_gla = asset.organization.general_ledger_accounts.find_by(grant: sourceable, general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account'))
+    grant_gla = asset.organization.general_ledger_accounts.find_by(grant: sourceable, general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account'), account_number: "#{asset_gla.account_number}-#{sourceable}")
     if grant_gla.nil?
-      grant_gla = GeneralLedgerAccount.create!(chart_of_account_id: asset_gla.chart_of_account_id, general_ledger_account_type_id: GeneralLedgerAccountType.find_by(name: 'Asset Account').id, general_ledger_account_subtype_id: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account').id, account_number: "#{asset_gla.account_number}-#{grant}", name: "#{asset_gla.name} #{grant} Funding", grant_id: sourceable.id)
+      grant_gla = GeneralLedgerAccount.create!(chart_of_account_id: asset_gla.chart_of_account_id, general_ledger_account_type_id: GeneralLedgerAccountType.find_by(name: 'Asset Account').id, general_ledger_account_subtype_id: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account').id, account_number: "#{asset_gla.account_number}-#{sourceable}", name: "#{asset_gla.name} #{sourceable} Funding", grant_id: sourceable.id)
     end
     asset.general_ledger_accounts << grant_gla
 
