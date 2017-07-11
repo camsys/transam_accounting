@@ -36,7 +36,7 @@ class Grant < ActiveRecord::Base
   has_many :assets, :through => :grant_purchases
 
   # Has many grant purchases
-  has_many :grant_budgets, :dependent => :destroy
+  has_many :grant_budgets, :dependent => :destroy, :inverse_of => :grant
 
   # Allow the form to submit grant budgets
   accepts_nested_attributes_for :grant_budgets, :reject_if => :all_blank, :allow_destroy => true
