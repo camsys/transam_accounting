@@ -114,9 +114,10 @@ class GeneralLedgerAccountsController < OrganizationAwareController
 
   def check_grant_budget
     @grant = Grant.find_by(id: params[:grant_id])
+    available = @grant.amount - @grant.grant_budgets.sum(:amount)
 
     respond_to do |format|
-      format.json { render :json => @grant.amount.to_json }
+      format.json { render :json => available.to_json }
     end
   end
 

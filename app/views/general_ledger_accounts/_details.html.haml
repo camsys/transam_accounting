@@ -8,7 +8,7 @@
       %a{:href => "#grants_table", :data =>{:toggle => 'tab'}}
         %span.badge.pull-right= @ledger_account.grant_budgets.count > 0 ? @ledger_account.grant_budgets.count : 1
         = "Grants"
-  - if @ledger_account.general_ledger_account_subtype == GeneralLedgerAccountSubtype.find_by(name: 'Fixed Asset Account')
+  - if @ledger_account.fixed_asset_account?
     %li
       %a{:href => "#assets", :data =>{:toggle => 'tab'}}
         %span.badge.pull-right= @ledger_account.assets.where.not(asset_type: AssetType.find_by(class_name: 'Expenditure')).count
@@ -31,7 +31,7 @@
         - elsif @ledger_account.grant_specific?
           = format_field('Grant', link_to(@ledger_account.grant, grant_path(@ledger_account.grant)))
 
-  - if @ledger_account.general_ledger_account_subtype == GeneralLedgerAccountSubtype.find_by(name: 'Fixed Asset Account')
+  - if @ledger_account.fixed_asset_account?
     .tab-pane.fade#assets
       .tab-content
         - assets = @ledger_account.assets.where.not(asset_type: AssetType.find_by(class_name: 'Expenditure'))
