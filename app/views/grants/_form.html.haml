@@ -80,7 +80,9 @@
   });
 
   $('#grant_budgets').on('cocoon:after-insert', function() {
-    update_glas();
+    if ($('#grant_organization_id').length > 0) {
+      update_glas();
+    }
   })
 
   function update_glas() {
