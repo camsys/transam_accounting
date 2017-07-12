@@ -26,7 +26,7 @@ class AssetDispositionUpdateJob < AbstractAssetUpdateJob
     end
 
 
-    if asset.general_ledger_accounts.count > 0
+    if (asset.respond_to? :general_ledger_accounts) && asset.general_ledger_accounts.count > 0
 
       disposal_account = ChartOfAccount.find_by(organization_id: asset.organization_id).general_ledger_accounts.find_by(general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Disposal Account'))
 
