@@ -7,4 +7,4 @@
     - if @vendor.expenditures.empty?
       %p There are no CapEx associated with this vendor.
     - else
-      = render :partial => 'expenditures/index_table', :locals => {:expenditures => @vendor.expenditures}
+      = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => @vendor.expenditures}
