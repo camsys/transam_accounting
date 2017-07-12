@@ -92,7 +92,6 @@ class Expenditure < Asset
 
     # expenditures are not depreciable and not planned for replacement
     self.depreciable = self.depreciable.nil? ? false : self.depreciable
-    self.replacement_status_type_id ||= ReplacementStatusType.find_by(name: 'None').id
   end
 
 end
