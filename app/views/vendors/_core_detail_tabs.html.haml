@@ -1,0 +1,4 @@
+%li
+  %a{:href => "#assets", :data =>{:toggle => 'tab'}}
+    %span.badge.pull-right=  @vendor.assets.where.not(asset_type: AssetType.find_by(class_name: 'Expenditure')).count
+    = "Assets"

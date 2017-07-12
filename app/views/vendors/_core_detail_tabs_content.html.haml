@@ -1,0 +1,7 @@
+- assets = @vendor.assets.where.not(asset_type: AssetType.find_by(class_name: 'Expenditure'))
+.tab-pane.fade#assets
+  .tab-content
+    - if assets.empty?
+      %p There are no assets associated with this vendor.
+    - else
+      = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => assets}
