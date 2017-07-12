@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ExpendituresController, :type => :controller do
+RSpec.describe ExpendituresController, :skip, :type => :controller do
 
   class TestOrg < Organization
     def get_policy
