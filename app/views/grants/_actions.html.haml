@@ -9,9 +9,3 @@
         = link_to edit_grant_path(@grant) do
           %i.fa.fa-edit.fa-fw
           = " Update this grant"
-    - if can? :destroy, @grant
-      %li.divider
-      %li
-        = link_to grant_path(@grant), :method => :delete, :data => {:confirm => "Are you sure you want to remove this grant? The action cannot be undone."}  do
-          %i.fa.fa-trash-o.fa-fw
-          = " Remove this grant"

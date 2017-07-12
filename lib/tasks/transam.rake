@@ -63,4 +63,25 @@ namespace :transam do
 
     PolicyAssetTypeRule.create!(policy_id: Policy.where('parent_id IS NULL').pluck(:id).first, asset_type_id: a.id, service_life_calculation_type_id: 1, replacement_cost_calculation_type_id: 1, annual_inflation_rate: 1.1, pcnt_residual_value: 0)
   end
+
+  desc "cleanup all GLA/grant data for testing"
+  task cleanup_gla_grant_data: :environment do
+    # cleanup asset data
+    GrantPurchase.delete_all
+    Asset.update_all(general_ledger_account_id: nil)
+
+    # cleanup policy data
+    PolicyAssetSubtypeRule.update_all(general_ledger_account_id: nil)
+
+    Grant.destroy_all
+    GeneralLedgerAccount.destroy_all
+
+    # reload organization GLA's to COA
+    OrganizationGeneralLedgerAccount.all.each do |general_gla|
+        ChartOfAccount.all.each do |chart|
+          chart.general_ledger_accounts.create!(general_ledger_account_type: general_gla.general_ledger_account_type, general_ledger_account_subtype: general_gla.general_ledger_account_subtype, account_number: general_gla.account_number, name: general_gla.name)
+        end
+    end
+  end
+
 end
