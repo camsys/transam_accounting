@@ -52,7 +52,7 @@ module TransamAccountingVendor
     # get end of last fiscal year
     last_fy_end = fiscal_year_end_date(Date.today - 1.year)
 
-    expenditures.where("expense_date > ?", last_fy_end)
+    expenditures.where("purchase_date > ?", last_fy_end)
   end
 
   protected
