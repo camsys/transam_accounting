@@ -14,6 +14,10 @@ is_sqlite =  (ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'sqlite
 
 puts "======= Processing TransAM Accounting Lookup Tables  ======="
 
+asset_types = [
+  {name: 'Expenditures', class_name: 'Expenditure', display_icon_name: 'fa fa-cogs', map_icon_name: 'blueIcon', description: 'Expenditures', active: true}
+]
+
 funding_source_types = [
     {:active => 1, :name => 'Federal',  :description => 'Federal Funding Source'},
     {:active => 1, :name => 'State',    :description => 'State Funding Source'},
@@ -51,6 +55,7 @@ depreciation_interval_types = [
 
 
 lookup_tables = %w{ funding_source_types general_ledger_account_types general_ledger_account_subtypes depreciation_calculation_types depreciation_interval_types}
+merge_tables = %w{ asset_types }
 
 lookup_tables.each do |table_name|
   puts "  Loading #{table_name}"
@@ -65,6 +70,16 @@ lookup_tables.each do |table_name|
   klass = table_name.classify.constantize
   data.each do |row|
     x = klass.new(row)
+    x.save!
+  end
+end
+
+merge_tables.each do |table_name|
+  puts "  Merging #{table_name}"
+  data = eval(table_name)
+  klass = table_name.classify.constantize
+  data.each do |row|
+    x = klass.new(row.except(:belongs_to, :type))
     x.save!
   end
 end
