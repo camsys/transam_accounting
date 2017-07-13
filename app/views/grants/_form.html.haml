@@ -61,9 +61,11 @@
   $.validator.addMethod("budgetsSum", function(value, element, params) {
     var sum = 0;
     $('.grant_budget_amount').each(function() {
-        sum += parseInt($(this).val());
+        int = parseInt($(this).val())
+        if (int > 0) {
+          sum += int;
+        }
     });
-    console.log(params);
 
     return sum <= parseInt(params);
   }, "Sum of entries is not less than or equal to {0}.");
@@ -88,7 +90,7 @@
   function update_glas() {
     org_id = parseInt($('#grant_organization_id').val());
     var gla_ids = glas[org_id];
-    console.log(gla_ids);
+    //console.log(gla_ids);
     $('#grant_budgets select option').each(function() {
         $(this).prop('selected', false);
         var val = $(this).val();
