@@ -78,12 +78,18 @@ class GeneralLedgerAccount < ActiveRecord::Base
 
   # Allow selection of active instances
   scope :active, -> { where(:active => true) }
-  scope :fixed_asset_accounts, -> { where(:general_ledger_account_subtype => GeneralLedgerAccountSubtype.find_by(name: 'Fixed Asset Account')) }
+
   scope :asset_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Asset Account')) }
   scope :liability_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Liability Account')) }
   scope :equity_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Equity Account')) }
   scope :revenue_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Revenue Account')) }
   scope :expense_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Expense Account')) }
+
+  scope :fixed_asset_accounts, -> { where(:general_ledger_account_subtype => GeneralLedgerAccountSubtype.find_by(name: 'Fixed Asset Account')) }
+  scope :grant_funding_accounts, -> { where(:general_ledger_account_subtype => GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account')) }
+  scope :accumulated_depreciation_accounts, -> { where(:general_ledger_account_subtype => GeneralLedgerAccountSubtype.find_by(name: 'Accumulated Depreciation Account')) }
+  scope :depreciation_expense_accounts, -> { where(:general_ledger_account_subtype => GeneralLedgerAccountSubtype.find_by(name: 'Depreciation Expense Account')) }
+  scope :disposal_accounts, -> { where(:general_ledger_account_subtype => GeneralLedgerAccountSubtype.find_by(name: 'Disposal Account')) }
 
   #------------------------------------------------------------------------------
   #
