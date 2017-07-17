@@ -179,9 +179,14 @@ module TransamDepreciable
           if asset.general_ledger_accounts.count > 0 # check whether this app records GLAs at all
             if ((self.changes.keys.include? 'book_value') || (self.changes.keys.include? 'current_depreciation_date')) && asset.book_value != asset.purchase_cost
               depr_amount = self.changes['book_value'][0]-self.changes['book_value'][1]
-              asset.general_ledger_accounts.find_by(general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Accumulated Depreciation Account')).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: -depr_amount)
 
-              asset.general_ledger_accounts.find_by(general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Depreciation Expense Account')).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: depr_amount)
+              asset.grant_purchases.each do |grant_purchase|
+                pcnt_depr_amount = depr_amount * grant_purchase.pcnt_purchase_cost / 100.0
+                asset.general_ledger_accounts.accumulated_depreciation_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: -pcnt_depr_amount)
+
+                asset.general_ledger_accounts.depreciation_expense_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: pcnt_depr_amount)
+              end
+
             end
           end
         else
@@ -218,20 +223,17 @@ module TransamDepreciable
     end
 
     def set_depreciation_general_ledger_accounts
-      accumulated_depr = organization.general_ledger_accounts.find_by(name: 'Accumulated Depreciation')
-      depr_expense = organization.general_ledger_accounts.find_by(name: 'Depreciation Expense')
 
+      if GrantPurchase.sourceable_type == 'Grant'
+        # just add depreciation GLAs for now
+        # does not add GLA entries that is done during update_depreciation
+        grant_purchases.each do |grant_purchase|
+          # accumulated depr
+          general_ledger_accounts << organization.general_ledger_accounts.accumulated_depreciation_accounts.find_by(grant_id: grant_purchase.sourceable_id)
 
-
-      # just add depreciation GLAs for now
-      # does not add GLA entries that is done during update_depreciation
-      grant_purchases.each do |grant_purchase|
-        # accumulated depr
-        grant_accumulated_depr_gla = organization.general_ledger_accounts.find_by(account_number: "#{accumulated_depr.account_number}-#{grant_purchase.sourceable}")
-        general_ledger_accounts << grant_accumulated_depr_gla
-
-        grant_depr_expense_gla = organization.general_ledger_accounts.find_by(account_number: "#{depr_expense.account_number}-#{grant_purchase.sourceable}")
-        general_ledger_accounts << grant_depr_expense_gla
+          # depr_expense_gla
+          general_ledger_accounts << organization.general_ledger_accounts.depreciation_expense_accounts.find_by(grant_id: grant_purchase.sourceable_id)
+        end
       end
 
     end
