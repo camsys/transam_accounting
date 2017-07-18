@@ -3,7 +3,7 @@
   show_actions ||= 0
   sourceable ||= nil
 
-#table_actions.btn-group
+#grants_table_actions.btn-group
   - if can? :create, Grant
     = link_to new_grant_path(:sourceable_id => sourceable.try(:id)), :class => 'btn btn-default' do
       %i.fa.fa-plus.fa-fw
@@ -18,7 +18,7 @@
     :page_list => "[5, 10, 20, 50, 100, 200]",
     :page_size => current_user.num_table_rows,
     :search => 'false',
-    :toolbar => "#table_actions",
+    :toolbar => "#grants_table_actions",
     :export_types => "['csv', 'txt', 'excel']",
     :show_export => 'true',
     :show_columns => 'true',
