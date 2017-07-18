@@ -18,9 +18,6 @@ class GrantPurchase < ActiveRecord::Base
   #------------------------------------------------------------------------------
   after_initialize  :set_defaults
 
-  after_save        :update_general_ledger_accounts, :if => Proc.new{ self.sourceable_type == 'Grant' }
-  before_destroy    :delete_general_ledger_accounts, :if => Proc.new{ self.sourceable_type == 'Grant' }
-
   #------------------------------------------------------------------------------
   # Associations
   #------------------------------------------------------------------------------
@@ -128,42 +125,6 @@ class GrantPurchase < ActiveRecord::Base
 
   end
 
-  def update_general_ledger_accounts
-    # ----------------------------------------------------------------------------------- #
-    # Possible GLAs an asset can be associated with:
-    # -- fixed asset account (main association: general_ledger_account_id)
-    # -- grant funding
-    # -- accumulated depr
-    # -- depreciation expensep
 
-    # -- gain/loss on disposal
-    # -- cash
-    # ----------------------------------------------------------------------------------- #
-
-    # fixed asset account
-    asset_gla = asset.general_ledger_account
-    asset.general_ledger_accounts << asset_gla
-
-    grant_gla = asset.organization.general_ledger_accounts.find_by(grant: sourceable, general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account'), account_number: "#{asset_gla.account_number}-#{sourceable}")
-    if grant_gla.nil?
-      grant_gla = GeneralLedgerAccount.create!(chart_of_account_id: asset_gla.chart_of_account_id, general_ledger_account_type_id: GeneralLedgerAccountType.find_by(name: 'Asset Account').id, general_ledger_account_subtype_id: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account').id, account_number: "#{asset_gla.account_number}-#{sourceable}", name: "#{asset_gla.name} #{sourceable} Funding", grant_id: sourceable.id)
-    end
-    asset.general_ledger_accounts << grant_gla
-
-    # add GLA entries
-    amount = asset.purchase_cost * pcnt_purchase_cost / 100.0
-
-    asset_gla_entry = asset_gla.general_ledger_account_entries.find_or_create_by(sourceable_type: 'Asset', sourceable_id: asset.id)
-    asset_gla_entry.update!(description: "#{asset.organization}: #{asset.to_s}", amount: amount)
-
-    grant_gla_entry = grant_gla.general_ledger_account_entries.find_or_create_by(sourceable_type: 'Asset', sourceable_id: asset.id)
-    grant_gla_entry.update!(description: "#{asset.organization}: #{asset.to_s}", amount: -amount)
-  end
-
-  def delete_general_ledger_accounts
-    grant_gla = asset.organization.general_ledger_accounts.find_by(grant: sourceable, general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account'))
-    grant_gla.general_ledger_account_entries.find_by(sourceable_type: 'Asset', sourceable_id: asset.id).destroy
-    asset.general_ledger_accounts.delete(grant_gla)
-  end
 
 end
