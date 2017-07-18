@@ -51,8 +51,8 @@ class FundingSource < ActiveRecord::Base
 
   validates :life_in_years,             :allow_nil => true, :numericality => {:greater_than_or_equal_to => 1, :only_integer => true}
   validates :match_required,            :presence => true, :numericality => {:greater_than => 0.0, :less_than_or_equal_to => 100.0}
-  validates :fy_start,                  :allow_nil => true, :numericality => {:greater_than_or_equal_to => SystemConfig.instance.epoch.year.to_i, :only_integer => true}
-  validates :fy_end,                    :allow_nil => true, :numericality => {:greater_than_or_equal_to => SystemConfig.instance.epoch.year.to_i, :only_integer => true}
+  validates :fy_start,                  :allow_nil => true, :numericality => {:only_integer => true}
+  validates :fy_end,                    :allow_nil => true, :numericality => {:only_integer => true}
   validates :inflation_rate,            :allow_nil => true, :numericality => {:greater_than_or_equal_to => 0.0, :less_than_or_equal_to => 100.0}
 
   validate :validate_fy_start_less_than_or_equal_fy_end
