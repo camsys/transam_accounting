@@ -11,7 +11,7 @@
 
     %tbody
       - gla_budgets.each do |gla_budget|
-        - grant_gla = GeneralLedgerAccount.where('name LIKE ?', "%Funding").where(grant: gla_budget.grant).first
+        - grant_gla = GeneralLedgerAccount.where('account_number = ? AND name LIKE ?', "#{@ledger_account.account_number}-#{gla_budget.grant}","%Funding").where(grant: gla_budget.grant).first
         %tr.popup-details
           %td.left= link_to gla_budget.grant, grant_path(gla_budget.grant)
           %td.left= link_to grant_gla, general_ledger_account_path(grant_gla)
