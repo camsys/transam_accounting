@@ -63,6 +63,10 @@ module TransamGlAccountableAsset
   protected
 
   def update_general_ledger_accounts
+
+    if self.general_ledger_account.nil?
+      return true
+    end
     # ----------------------------------------------------------------------------------- #
     # Possible GLAs an asset can be associated with:
     # -- fixed asset account (main association: general_ledger_account_id)
