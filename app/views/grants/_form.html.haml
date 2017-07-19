@@ -21,7 +21,7 @@
   = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
     %span.input-group-addon
       %i.fa.fa-usd
-    = f.input_field :amount, :class => "form-control", :min => GeneralLedgerAccountEntry.where(sourceable: @grant).sum(:amount)
+    = f.input_field :amount, :class => "form-control", :min => GeneralLedgerAccountEntry.where(sourceable: @grant).sum(:amount), :max => 1000000000
 
   #grant_budgets.well.well-sm{style: "overflow-y:scroll; max-height:250px;"}
     %label.control-label
