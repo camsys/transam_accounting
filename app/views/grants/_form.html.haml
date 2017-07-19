@@ -45,9 +45,7 @@
   });
 
   $('body').on('change', '#grant_budgets .grant_budget_amount', function() {
-    $('#grant_budgets .grant_budget_amount').rules("add", {
-      budgetsSum: $('#grant_amount').val()
-    });
+    $('.grant_budget_amount').valid();
   });
   $('#grant_amount').on('change', function() {
     if ($('#grant_budgets .grant_budget_amount').length > 0) {
@@ -81,10 +79,14 @@
     update_glas();
   });
 
-  $('#grant_budgets').on('cocoon:after-insert', function() {
+  $('#grant_budgets').on('cocoon:after-insert', function(e, added_budget) {
     if ($('#grant_organization_id').length > 0) {
       update_glas();
     }
+
+    added_budget.find('input.grant_budget_amount').rules("add", {
+      budgetsSum: $('#grant_amount').val()
+    });
   })
 
   function update_glas() {

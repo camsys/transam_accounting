@@ -12,10 +12,14 @@
 :javascript
 
   $('body').on('change', '#grant_purchases .funding-pcnt', function() {
-    $('#grant_purchases .funding-pcnt').rules("add", {
+    $('.funding-pcnt').valid();
+  });
+
+  $('#grant_purchases').on('cocoon:after-insert', function(e, added_purchase) {
+    added_purchase.find('input.funding-pcnt').rules("add", {
       pcntSumsHundred: true
     });
-  });
+  })
 
   $.validator.addMethod("pcntSumsHundred", function(value, element) {
       var sum = 0;

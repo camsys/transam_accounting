@@ -45,13 +45,10 @@
         data: {
             grant_id: function() {
               return $( '#' + new_id_str ).val();
-            },
-            amount: function() {
-              return $( '#' + id_str ).val();
-            },
+            }
         },
         success: function(result){
-          $('#grant_budgets .grant_budget_amount').rules("add", {
+          $(this).rules("add", {
             max: parseInt(result)
           });
 
