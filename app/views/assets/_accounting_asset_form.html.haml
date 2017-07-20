@@ -4,3 +4,7 @@
 
   = render :partial => 'grant_purchases_form', :locals => {:f => f}
 
+- if f.object.purchase_cost != f.object.book_value
+  :javascript
+    $("#asset_purchase_cost").prop('disabled', true);
+
