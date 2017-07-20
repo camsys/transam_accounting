@@ -181,10 +181,12 @@ module TransamDepreciable
               depr_amount = self.changes['book_value'][0]-self.changes['book_value'][1]
 
               asset.grant_purchases.each do |grant_purchase|
+                puts "=+=+=+=+"
                 pcnt_depr_amount = depr_amount * grant_purchase.pcnt_purchase_cost / 100.0
                 asset.general_ledger_accounts.accumulated_depreciation_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: -pcnt_depr_amount)
 
                 asset.general_ledger_accounts.depreciation_expense_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: pcnt_depr_amount)
+                puts "=+=+=+=+"
               end
 
             end
@@ -224,7 +226,7 @@ module TransamDepreciable
 
     def set_depreciation_general_ledger_accounts
 
-      if GrantPurchase.sourceable_type == 'Grant'
+      if GrantPurchase.sourceable_type == 'Grant' && general_ledger_accounts.count > 0
         # just add depreciation GLAs for now
         # does not add GLA entries that is done during update_depreciation
         grant_purchases.each do |grant_purchase|
