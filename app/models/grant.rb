@@ -53,6 +53,7 @@ class Grant < ActiveRecord::Base
   # Validations
   #------------------------------------------------------------------------------
   validates :organization,                    :presence => true
+  validates :name,                            :presence => true, :uniqueness => true
   validates :fy_year,                         :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 1970}
   validates :sourceable,                      :presence => true
   validates :amount,                          :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
@@ -125,7 +126,7 @@ class Grant < ActiveRecord::Base
   def spent
     val = 0
     grant_purchases.includes(:asset).each do |p|
-      val += p.asset.purchase_cost * (p.pcnt_purchase_cost / 100.0)
+      val += (p.asset.purchase_cost * (p.pcnt_purchase_cost / 100.0)).round
     end
 
     val

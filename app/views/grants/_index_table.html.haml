@@ -28,7 +28,8 @@
     %thead
       %tr
         %th.left{:data => {:visible => 'false'}} Object Key
-        %th.left{:data => {:visible => 'false', :sortable => 'true'}} Organization
+        - if @organization_list.count > 1
+          %th.left{:data => {:visible => 'true', :sortable => 'true'}} Organization
         %th.left{:data => {:sortable => 'true'}}= Grant.label
         %th.left{:data => {:sortable => 'true'}} Name
         %th.left{:data => {:sortable => 'true'}} Fiscal Year
@@ -41,7 +42,8 @@
       - grants.each do |grant|
         %tr{:id => grant.object_key, :class => 'action-path'}
           %td.left= grant.object_key
-          %td.left= grant.organization.short_name
+          - if @organization_list.count > 1
+            %td.left= grant.organization.short_name
           %td.left= grant.sourceable
           %td.left= grant.name
           %td.center= format_as_fiscal_year(grant.fy_year)
