@@ -15,7 +15,7 @@
   - if @organization_list.count > 1
     = f.association :organization, :required => true, :collection => Organization.all, :label_method => 'coded_name'
   = f.input :sourceable_id, :collection => Grant.sources, :required => true, :label => Grant.label, :disabled => !@grant.new_record?
-  = f.input :name
+  = f.input :name, :disabled => !@grant.new_record?
   = f.input :fy_year, :collection => @fiscal_years, :label => 'Fiscal Year'
 
   = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
