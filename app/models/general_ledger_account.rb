@@ -56,8 +56,8 @@ class GeneralLedgerAccount < ActiveRecord::Base
   validates :chart_of_account,              :presence => true
   validates :general_ledger_account_type,   :presence => true
   validates :general_ledger_account_subtype,   :presence => true
-  validates :name,                          :presence => true, :length => {:maximum => 64}
-  validates :account_number,                :presence => true, :length => {:maximum => 32}
+  validates :name,                          :presence => true
+  validates :account_number,                :presence => true
 
   # List of allowable form param hash keys
   FORM_PARAMS = [
