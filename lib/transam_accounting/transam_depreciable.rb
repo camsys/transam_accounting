@@ -224,7 +224,7 @@ module TransamDepreciable
 
     def set_depreciation_general_ledger_accounts
 
-      if GrantPurchase.sourceable_type == 'Grant' && general_ledger_accounts.count > 0
+      if GrantPurchase.sourceable_type == 'Grant' && general_ledger_account_id.present?
         # just add depreciation GLAs for now
         # does not add GLA entries that is done during update_depreciation
         grant_purchases.each do |grant_purchase|
