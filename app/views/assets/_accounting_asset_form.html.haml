@@ -1,10 +1,11 @@
-- if GrantPurchase.sourceable_type != 'Grant' || f.object.new_record? || f.object.purchase_cost == f.object.book_value
-  - if GrantPurchase.sourceable_type == 'Grant'
-    = render :partial => 'general_ledger_account_form', :locals => {:f => f}
+- acct_editable = (GrantPurchase.sourceable_type != 'Grant' || f.object.new_record? || f.object.purchase_cost == f.object.book_value)
+- if GrantPurchase.sourceable_type == 'Grant'
+  = render :partial => 'general_ledger_account_form', :locals => {:f => f, :acct_editable => acct_editable}
 
-  = render :partial => 'grant_purchases_form', :locals => {:f => f}
+= render :partial => 'grant_purchases_form', :locals => {:f => f, :acct_editable => acct_editable}
 
 - if f.object.purchase_cost != f.object.book_value
   :javascript
     $("#asset_purchase_cost").prop('disabled', true);
+
 

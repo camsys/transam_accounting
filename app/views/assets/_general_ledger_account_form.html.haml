@@ -1,4 +1,6 @@
-= f.association :general_ledger_account, :collection => @asset.organization.general_ledger_accounts.fixed_asset_accounts, :label => 'General Ledger', :required => true, :value => @asset.general_ledger_account_id || @asset.policy_analyzer.get_general_ledger_account_id
+- acct_editable =  acct_editable.nil? ? true : acct_editable
+
+= f.association :general_ledger_account, :collection => @asset.organization.general_ledger_accounts.fixed_asset_accounts, :label => 'General Ledger', :required => true, :value => @asset.general_ledger_account_id || @asset.policy_analyzer.get_general_ledger_account_id, :disabled => !acct_editable
 
 :javascript
 
