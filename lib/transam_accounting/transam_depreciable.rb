@@ -180,8 +180,14 @@ module TransamDepreciable
             if ((self.changes.keys.include? 'book_value') || (self.changes.keys.include? 'current_depreciation_date')) && asset.book_value != asset.purchase_cost
               depr_amount = self.changes['book_value'][0]-self.changes['book_value'][1]
 
-              asset.grant_purchases.each do |grant_purchase|
-                pcnt_depr_amount = (depr_amount * grant_purchase.pcnt_purchase_cost / 100.0).round
+              amount_not_ledgered = depr_amount # temp variable for tracking rounding errors
+              asset.grant_purchases.order(:pcnt_purchase_cost).each_with_index do |grant_purchase, idx|
+                unless idx+1 == asset.grant_purchases.count
+                  pcnt_depr_amount = (depr_amount * grant_purchase.pcnt_purchase_cost / 100.0).round
+                  amount_not_ledgered -= pcnt_depr_amount
+                else
+                  pcnt_depr_amount = amount_not_ledgered
+                end
                 asset.general_ledger_accounts.accumulated_depreciation_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: -pcnt_depr_amount)
 
                 asset.general_ledger_accounts.depreciation_expense_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: pcnt_depr_amount)

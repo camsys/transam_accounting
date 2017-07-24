@@ -30,8 +30,14 @@ class AssetDispositionUpdateJob < AbstractAssetUpdateJob
 
       disposal_account = ChartOfAccount.find_by(organization_id: asset.organization_id).general_ledger_accounts.find_by(general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Disposal Account'))
 
-      asset.grant_purchases.each do |grant_purchase|
-        amount = (asset.purchase_cost-asset.book_value) * grant_purchase.pcnt_purchase_cost / 100.0
+      amount_not_ledgered = asset.purchase_cost-asset.book_value # temp variable for tracking rounding errors
+      asset.grant_purchases.order(:pcnt_purchase_cost).each_with_index do |grant_purchase, idx|
+        unless idx+1 == asset.grant_purchases.count
+          amount = ((asset.purchase_cost-asset.book_value) * grant_purchase.pcnt_purchase_cost / 100.0).round
+          amount_not_ledgered -= amount
+        else
+          amount = amount_not_ledgered
+        end
 
         asset.general_ledger_accounts.accumulated_depreciation_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} Disposal #{asset.disposition_date}", amount: amount)
       end

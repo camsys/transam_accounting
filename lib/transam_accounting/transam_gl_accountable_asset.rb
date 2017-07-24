@@ -89,6 +89,7 @@ module TransamGlAccountableAsset
       general_ledger_accounts.delete(old_fixed_asset_acct)
       old_fixed_asset_acct.general_ledger_account_entries.where(sourceable_type: 'Asset', sourceable_id: self.id).each do |gla_entry|
         reversal_entry = gla_entry.dup
+        reversal_entry.description = "[Reversed] "+reversal_entry.description
         reversal_entry.amount = gla_entry.amount * (-1)
         reversal_entry.object_key = nil
         reversal_entry.generate_object_key(:object_key)
@@ -111,6 +112,7 @@ module TransamGlAccountableAsset
       acct.general_ledger_account_entries.where(sourceable_type: 'Asset', sourceable_id: self.id).each do |gla_entry|
         reversal_entry = gla_entry.dup
         reversal_entry.amount = gla_entry.amount * (-1)
+        reversal_entry.description = "[Reversed] "+reversal_entry.description
         reversal_entry.object_key = nil
         reversal_entry.generate_object_key(:object_key)
         reversal_entry.save!
@@ -121,14 +123,20 @@ module TransamGlAccountableAsset
     reverse_entries = []
     included_reversed_asset_entries = false #temp
 
-    grant_purchases.each do |gp|
+    amount_not_ledgered = purchase_cost # temp variable for tracking rounding errors
+    grant_purchases.order(:pcnt_purchase_cost).each_with_index do |gp, idx|
       funding_gla = organization.general_ledger_accounts.grant_funding_accounts.find_by(grant: gp.sourceable, account_number: "#{asset_gla.account_number}-#{gp.sourceable}")
       if funding_gla.nil?
         funding_gla = GeneralLedgerAccount.create!(chart_of_account_id: asset_gla.chart_of_account_id, general_ledger_account_type_id: GeneralLedgerAccountType.find_by(name: 'Asset Account').id, general_ledger_account_subtype_id: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account').id, account_number: "#{asset_gla.account_number}-#{gp.sourceable}", name: "#{asset_gla.name} #{gp.sourceable} Funding", grant_id: gp.sourceable_id)
       end
       general_ledger_accounts << funding_gla
 
-      amount = purchase_cost * gp.pcnt_purchase_cost / 100.0
+      unless idx+1==grant_purchases.count
+        amount = (purchase_cost * gp.pcnt_purchase_cost / 100.0).round
+        amount_not_ledgered -= amount
+      else
+        amount = amount_not_ledgered
+      end
 
       # check fixed asset account entries
       asset_gla_entry = asset_gla.general_ledger_account_entries.find_by(sourceable_type: 'Asset', sourceable_id: self.id, amount: amount)
@@ -154,6 +162,7 @@ module TransamGlAccountableAsset
     GeneralLedgerAccountEntry.where(id: reverse_entries).each do |entry|
       reversal_entry = entry.dup
       reversal_entry.amount = entry.amount * (-1)
+      reversal_entry.description = "[Reversed] "+reversal_entry.description
       reversal_entry.object_key = nil
       reversal_entry.generate_object_key(:object_key)
       reversal_entry.save!
