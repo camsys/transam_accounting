@@ -79,6 +79,10 @@
     update_glas();
   });
 
+  $('#grant_sourceable_id').change(function() {
+    update_fiscal_year_range();
+  });
+
   $('#grant_budgets').on('cocoon:after-insert', function(e, added_budget) {
     if ($('#grant_organization_id').length > 0) {
       update_glas();
@@ -102,4 +106,31 @@
             $(this).hide();
         }
     });
+  }
+
+  function update_fiscal_year_range()
+  {
+    var url = '#{find_fiscal_year_range_funding_sources_path}';
+    if ( $('#funding_bucket_proxy_program_id').val() > 0)
+    {
+      $.ajax({
+        url: url,
+        data: {program_id: $('#grant_sourceable_id').val()},
+        success: function(result){
+          $('#grant_fy_year').empty();
+
+          //Add a blank entry to the list.
+          $("#grant_fy_year").append( $("<option></option>").attr("value", "").text(''));
+          for(i = 0;i<result.length;i++){
+            //add an option for each organizations available to the tempalte
+            $("#grant_fy_year").append(
+                $("<option></option>").attr("value", result[i][1]).text(result[i][0])
+            );
+          }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+          }
+        });
+    }
   }

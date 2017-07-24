@@ -155,6 +155,17 @@ class FundingSourcesController < OrganizationAwareController
     end
   end
 
+  def find_fiscal_year_range
+    program_id = params[:program_id]
+    program = FundingSource.find_by(id: program_id)
+
+    result = program.find_all_valid_fiscal_years
+
+    respond_to do |format|
+      format.json { render json: result.to_json }
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_funding_source

@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   resources :funding_sources, :path => :funding_programs do
     collection do
       get 'details'
+      get '_fiscal_year_range'
     end
     resources :comments
     resources :documents
