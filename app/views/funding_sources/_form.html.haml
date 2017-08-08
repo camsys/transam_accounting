@@ -41,9 +41,9 @@
 
   .row
     .col-sm-4
-      = f.input :fy_start, as: :fiscal_year, :required => true, :label => 'Valid From'
+      = f.input :fy_start, as: :fiscal_year, :label => 'Valid From'
     .col-sm-4
-      = f.input :fy_end, as: :fiscal_year, :required => true, :label => 'Valid To'
+      = f.input :fy_end, as: :fiscal_year, :label => 'Valid To'
 
   = f.button :submit, 'Save', :class => "btn btn-primary"
 
