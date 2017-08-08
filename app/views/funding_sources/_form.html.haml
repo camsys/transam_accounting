@@ -41,9 +41,9 @@
 
   .row
     .col-sm-4
-      = f.input :fy_start, collection: get_fiscal_years, label: 'Valid From'
+      = f.input :fy_start, as: :fiscal_year, :required => true, :label => 'Valid From'
     .col-sm-4
-      = f.input :fy_end, collection: get_fiscal_years, label: 'Valid To'
+      = f.input :fy_end, as: :fiscal_year, :required => true, :label => 'Valid To'
 
   = f.button :submit, 'Save', :class => "btn btn-primary"
 
@@ -78,6 +78,8 @@
       $('#funding_source_match_required').val(100);
     }
   });
+
+  transam.make_fiscal_year('input.fiscal_year');
 
   // jquery validations
   $('.funding_source_form').validate({
