@@ -124,7 +124,12 @@ class Grant < ActiveRecord::Base
   # Calculate the anount of the grant that has been spent on assets to date. This calculates
   # only the federal percentage
   def spent
-    GeneralLedgerAccount.grant_funding_accounts.find_by(grant_id: self.id).general_ledger_account_entries.where('amount < 0').sum(:amount) * (-1)
+    gla = GeneralLedgerAccount.grant_funding_accounts.find_by(grant_id: self.id)
+    if gla.present?
+      gla.general_ledger_account_entries.where('amount < 0').sum(:amount) * (-1)
+    else
+      0
+    end
   end
 
   # Returns the balance of the fund. If the account is overdrawn
