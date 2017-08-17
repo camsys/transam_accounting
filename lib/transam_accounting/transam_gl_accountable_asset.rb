@@ -32,7 +32,7 @@ module TransamGlAccountableAsset
     accepts_nested_attributes_for :grant_purchases, :reject_if => :all_blank, :allow_destroy => true
 
     # Override core asset model so that expenditures don't affect parent-child relationships and rollups
-    has_many    :dependents, -> { where.not(:asset_type_id => AssetType.find_by(class_name: 'Expenditure').id) },  :class_name => 'Asset', :foreign_key => :parent_id, :dependent => :nullify
+    has_many    :dependents, -> { where.not(:asset_type_id => AssetType.find_by(class_name: 'Expenditure').try(:id)) },  :class_name => 'Asset', :foreign_key => :parent_id, :dependent => :nullify
 
     # ----------------------------------------------------
     # Validations
