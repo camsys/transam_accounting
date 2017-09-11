@@ -9,7 +9,8 @@
     = select_tag(:funding_source_type_id, options_for_select(FundingSourceType.funding_program.active.map{|f| [f.to_s,f.id]}, :selected => @funding_source_type_id), :class => "form-control", :style => "width: 150px;", :prompt => "Any Source...")
   .form-group
     %label
-      = check_box_tag(:show_active_only, '1', @show_active_only, {:class => "form-control"})
+      = hidden_field_tag :show_active_only, ''
+      = check_box_tag(:show_active_only, '1', @show_active_only == '1', {:class => "form-control"})
       Show Active Programs Only
 
   = button_tag :class => 'btn btn-default', :type => 'submit' do

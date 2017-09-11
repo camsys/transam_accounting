@@ -28,11 +28,16 @@ class FundingSourcesController < OrganizationAwareController
       values << @funding_source_type_id
     end
 
-    @show_active_only = params[:show_active_only]
+    if params[:show_active_only].nil?
+      @show_active_only = '1'
+    else
+      @show_active_only = params[:show_active_only]
+    end
+
 
     #puts conditions.inspect
     #puts values.inspect
-    @funding_sources = @show_active_only ? FundingSource.active.includes(:funding_source_type).where(conditions.join(' AND '), *values) : FundingSource.includes(:funding_source_type).where(conditions.join(' AND '), *values)
+    @funding_sources = @show_active_only == '1' ? FundingSource.active.includes(:funding_source_type).where(conditions.join(' AND '), *values) : FundingSource.includes(:funding_source_type).where(conditions.join(' AND '), *values)
 
     # cache the set of object keys in case we need them later
     cache_list(@funding_sources, INDEX_KEY_LIST_VAR)
@@ -170,6 +175,9 @@ class FundingSourcesController < OrganizationAwareController
     # Use callbacks to share common setup or constraints between actions.
     def set_funding_source
       @funding_source = FundingSource.find_by_object_key(params[:id])
+      if @funding_source.nil?
+        redirect_to '/404'
+      end
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
