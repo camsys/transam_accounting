@@ -1,3 +1,4 @@
+= @funding_source.inspect
 = simple_form_for(@funding_source,
   :html => {:class => 'form-vertical funding_source_form' },
   :wrapper => :vertical_form,
@@ -83,6 +84,7 @@
 
   // jquery validations
   $('.funding_source_form').validate({
+    ignore: [],
     messages: {
       'funding_source[life_in_years]': {
         integer: 'Please enter a whole number greater than or equal to 1.',
