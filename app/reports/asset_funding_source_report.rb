@@ -82,7 +82,7 @@ class AssetFundingSourceReport < AbstractReport
         labels << 'Funding Program'
         formats << :string
         clause = 'funding_sources.name'
-      elsif grp_clause.include? 'year'
+      elsif grp_clause.include? 'FY'
         labels << 'FY'
         formats << :fiscal_year
         clause = 'YEAR(assets.purchase_date)'
@@ -101,14 +101,14 @@ class AssetFundingSourceReport < AbstractReport
       # Add initial columns and ALI count to data
       asset_counts.each_with_index do |(k, v), i|
         row = [*k, v]
-        row << costs.values[i]
+        row << costs.values[i].to_i
 
         if prev_header != row[0]
 
           # add previous row
-          data << [prev_header, [row_data]] if prev_header
+          data << [prev_header, row_data] if prev_header
 
-          row_data = row
+          row_data = [row]
         else
           row_data << row
         end
@@ -116,7 +116,7 @@ class AssetFundingSourceReport < AbstractReport
         prev_header = row[0]
       end
     end
-    data << [prev_header, [row_data]] if prev_header
+    data << [prev_header, row_data] if prev_header
 
     formats[0] = :hidden
 
