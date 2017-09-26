@@ -45,24 +45,4 @@ class DepreciationCalculator < Calculator
     [purchase_cost(asset) - asset.salvage_value, 0].max
   end
 
-  def book_value_start(asset, fiscal_year_date)
-    if asset.depreciation_start_date > fiscal_year_date - 1.year
-      purchase_cost(asset)
-    else
-      calculate_on_date(asset, fiscal_year_date - 1.year)
-    end
-  end
-
-  def book_value_end(asset, fiscal_year_date)
-    calculate_on_date(asset, fiscal_year_date)
-  end
-
-  def depreciated_expense(asset, fiscal_year_date)
-    book_value_start(asset, fiscal_year_date) - book_value_end(asset, fiscal_year_date)
-  end
-
-  def accumulated_depreciation(asset, fiscal_year_date)
-    [purchase_cost(asset) - book_value_end(asset, fiscal_year_date), 0].max
-  end
-
 end

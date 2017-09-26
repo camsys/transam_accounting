@@ -40,6 +40,8 @@ module TransamDepreciable
     # Associations
     #----------------------------------------------------
 
+    has_many :depreciation_entries
+
 
     #----------------------------------------------------
     # Validations
@@ -83,8 +85,11 @@ module TransamDepreciable
   end
 
   # returns the number of months the asset has depreciated
-  def depreciation_months(on_date=Date.today)
-    (on_date.year * 12 + on_date.month) - (depreciation_start_date.year * 12 + depreciation_start_date.month)
+  def depreciation_months(on_date=Date.today, start_date=nil)
+    if start_date.nil?
+      start_date = depreciation_start_date
+    end
+    (on_date.year * 12 + on_date.month) - (start_date.year * 12 + start_date.month)
   end
 
   def get_depreciation_table
@@ -97,38 +102,16 @@ module TransamDepreciable
       else
         # Make sure we are working with a concrete asset class
         asset = is_typed? ? self : Asset.get_typed_asset(self)
-        current_policy = asset.policy
 
-        # see what metric we are using for the depreciated value of the asset
-        class_name = current_policy.depreciation_calculation_type.class_name
-
-        # create an instance of this calculator class
-        calculator_instance = class_name.constantize.new
-
-        # always add depreciation_start_date as first interval (deals with corner cases)
-        on_date = current_policy.depreciation_date(asset.depreciation_start_date)
-
-        # initialize table of results
         table = []
-
-        # get all the depreciation dates from the first date based on the depreciation_start_date to the current
-        # depreciation date
-        while on_date <= current_policy.current_depreciation_date
-
-          book_value_start = calculator_instance.book_value_start(asset, on_date)
-          depreciated_expense = calculator_instance.depreciated_expense(asset, on_date)
-          book_value_end = calculator_instance.book_value_end(asset, on_date)
-          accumulated_depreciation = calculator_instance.accumulated_depreciation(asset, on_date)
-
+        asset.depreciation_entries.each_with_index do |depr_entry, idx|
           table << {
-            :on_date => on_date,
-            :book_value_start => book_value_start,
-            :depreciated_expense => depreciated_expense,
-            :book_value_end => book_value_end,
-            :accumulated_depreciation => accumulated_depreciation
+              :on_date => depr_entry.event_date,
+              :book_value_start => idx > 0 ? asset.depreciation_entries[idx-1].book_value : '',
+              :depreciated_expense => idx > 0 ? asset.depreciation_entries[idx-1].book_value - depr_entry.book_value : '',
+              :book_value_end => depr_entry.book_value,
+              :accumulated_depreciation => asset.purchase_cost - depr_entry.book_value
           }
-
-          on_date += current_policy.depreciation_interval_type.months.months
         end
       end
       cache_object('depreciation_table', table)
@@ -166,7 +149,13 @@ module TransamDepreciable
       asset = is_typed? ? self : Asset.get_typed_asset(self)
 
       begin
+
+
         if asset.depreciable
+          if asset.depreciation_entries.count == 0
+            asset.depreciation_entries.create!(description: 'Initial Value', book_value: asset.purchase_cost, event_date: asset.depreciation_start_date)
+          end
+
           # see what algorithm we are using to calculate the book value
           class_name = asset.policy_analyzer.get_depreciation_calculation_type.class_name
           book_value = calculate(asset, class_name)
@@ -176,8 +165,11 @@ module TransamDepreciable
           asset.current_depreciation_date = asset.policy_analyzer.get_current_depreciation_date
 
           # if book value and current depreciation has changed, account for it in GLA
-          if asset.general_ledger_accounts.count > 0 # check whether this app records GLAs at all
-            if ((self.changes.keys.include? 'book_value') || (self.changes.keys.include? 'current_depreciation_date')) && asset.book_value != asset.purchase_cost
+          if ( asset.book_value_changed? || asset.current_depreciation_date_changed?) && asset.book_value != asset.purchase_cost
+            if asset.depreciation_entries.where(description: 'Annual Adjustment', event_date: asset.current_depreciation_date).count == 0
+              asset.depreciation_entries.create!(description: 'Annual Adjustment', book_value: asset.book_value, event_date: asset.current_depreciation_date)
+            end
+            if asset.general_ledger_accounts.count > 0 # check whether this app records GLAs at all
               depr_amount = self.changes['book_value'][0]-self.changes['book_value'][1]
 
               amount_not_ledgered = depr_amount # temp variable for tracking rounding errors

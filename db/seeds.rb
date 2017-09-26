@@ -18,6 +18,11 @@ asset_types = [
   {name: 'Expenditures', class_name: 'Expenditure', display_icon_name: 'fa fa-cogs', map_icon_name: 'blueIcon', description: 'Expenditures', active: true}
 ]
 
+asset_event_types = [
+    {:active => 1, :name => 'Initial book value', :class_name => 'BookValueUpdateEvent', :job_name => 'AssetBookValueUpdateJob', :display_icon_name => 'fa fa-hourglass-start', :description => 'Initial Book Value Update'},
+    {:active => 1, :name => 'Book value', :class_name => 'BookValueUpdateEvent', :job_name => 'AssetBookValueUpdateJob', :display_icon_name => 'fa fa-hourglass-end', :description => 'Book Value Update'}
+]
+
 funding_source_types = [
     {:active => 1, :name => 'Federal',  :description => 'Federal Funding Source'},
     {:active => 1, :name => 'State',    :description => 'State Funding Source'},
@@ -55,7 +60,7 @@ depreciation_interval_types = [
 
 
 lookup_tables = %w{ funding_source_types general_ledger_account_types general_ledger_account_subtypes depreciation_calculation_types depreciation_interval_types}
-merge_tables = %w{ asset_types }
+merge_tables = %w{ asset_types asset_event_types}
 
 lookup_tables.each do |table_name|
   puts "  Loading #{table_name}"
