@@ -22,7 +22,7 @@ class CreateDepreciationEntries < ActiveRecord::Migration
     ]
 
     asset_event_types.each do |type|
-      if AssetEventType.find_by(class_name: type[:name]).nil?
+      if AssetEventType.find_by(class_name: type[:class_name]).nil?
         AssetEventType.create!(type)
       end
     end

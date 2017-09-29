@@ -42,6 +42,7 @@ module TransamDepreciable
 
     has_many :depreciation_entries, :foreign_key => :asset_id
 
+    has_many   :book_value_updates, -> {where :asset_event_type_id => BookValueUpdateEvent.asset_event_type.id }, :class_name => "BookValueUpdateEvent",  :foreign_key => :asset_id
 
     #----------------------------------------------------
     # Validations
