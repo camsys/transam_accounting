@@ -57,10 +57,12 @@ module TransamAccountingAssetsController
     # Make sure we are working with a full-typed asset
     asset = Asset.get_typed_asset(base_asset)
 
-    # reformat date
-    asset.depreciation_start_date = reformat_date(proxy.depreciation_start_date) if proxy.depreciation_start_date
+
 
     asset.depreciable = proxy.depreciable
+    asset.depreciation_start_date = reformat_date(proxy.depreciation_start_date) if proxy.depreciation_start_date # reformat date
+    asset.depreciation_useful_life = proxy.depreciation_useful_life
+    asset.depreciation_purchase_cost = proxy.depreciation_purchase_cost
     asset.salvage_value = proxy.salvage_value if proxy.salvage_value
 
     asset.updator = current_user

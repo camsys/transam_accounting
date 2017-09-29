@@ -40,7 +40,7 @@ module TransamDepreciable
     # Associations
     #----------------------------------------------------
 
-    has_many :depreciation_entries
+    has_many :depreciation_entries, :foreign_key => :asset_id
 
 
     #----------------------------------------------------
@@ -110,7 +110,7 @@ module TransamDepreciable
               :book_value_start => idx > 0 ? asset.depreciation_entries[idx-1].book_value : '',
               :depreciated_expense => idx > 0 ? asset.depreciation_entries[idx-1].book_value - depr_entry.book_value : '',
               :book_value_end => depr_entry.book_value,
-              :accumulated_depreciation => asset.purchase_cost - depr_entry.book_value
+              :accumulated_depreciation => asset.depreciation_purchase_cost - depr_entry.book_value
           }
         end
       end
@@ -153,7 +153,7 @@ module TransamDepreciable
 
         if asset.depreciable
           if asset.depreciation_entries.count == 0
-            asset.depreciation_entries.create!(description: 'Initial Value', book_value: asset.purchase_cost, event_date: asset.depreciation_start_date)
+            asset.depreciation_entries.create!(description: 'Initial Value', book_value: asset.depreciation_purchase_cost, event_date: asset.depreciation_start_date)
           end
 
           # see what algorithm we are using to calculate the book value
@@ -165,7 +165,7 @@ module TransamDepreciable
           asset.current_depreciation_date = asset.policy_analyzer.get_current_depreciation_date
 
           # if book value and current depreciation has changed, account for it in GLA
-          if ( asset.book_value_changed? || asset.current_depreciation_date_changed?) && asset.book_value != asset.purchase_cost
+          if ( asset.book_value_changed? || asset.current_depreciation_date_changed?) && asset.book_value != asset.depreciation_purchase_cost
             if asset.depreciation_entries.where(description: 'Annual Adjustment', event_date: asset.current_depreciation_date).count == 0
               asset.depreciation_entries.create!(description: 'Annual Adjustment', book_value: asset.book_value, event_date: asset.current_depreciation_date)
             end
@@ -188,7 +188,7 @@ module TransamDepreciable
             end
           end
         else
-          asset.book_value = asset.purchase_cost
+          asset.book_value = asset.depreciation_purchase_cost
 
           #update current depreciation date
           asset.current_depreciation_date = asset.policy_analyzer.get_current_depreciation_date
@@ -205,7 +205,9 @@ module TransamDepreciable
     def set_depreciation_defaults
       self.in_service_date ||= self.purchase_date
       self.depreciation_start_date ||= self.in_service_date
-      self.book_value ||= self.purchase_cost.to_i
+      self.depreciation_useful_life ||= self.expected_useful_life
+      self.depreciation_purchase_cost ||= self.purchase_cost
+      self.book_value ||= self.depreciation_purchase_cost.to_i
       self.salvage_value ||= 0
       self.depreciable = self.depreciable.nil? ? true : self.depreciable
 

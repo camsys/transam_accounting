@@ -156,6 +156,10 @@ class ExpendituresController < OrganizationAwareController
   # Use callbacks to share common setup or constraints between actions.
   def set_expenditure
     @expenditure = Expenditure.find_by(:object_key => params[:id])
+
+    if @expenditure.nil?
+      redirect_to '/404'
+    end
   end
 
   # Only allow a trusted parameter "white list" through.

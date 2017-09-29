@@ -5,9 +5,9 @@ class AssetDepreciableProxy < Proxy
 
   attr_accessor     :depreciable
   attr_accessor     :depreciation_start_date
+  attr_accessor     :depreciation_useful_life
+  attr_accessor     :depreciation_purchase_cost
   attr_accessor     :salvage_value
-  attr_accessor     :expected_useful_life
-  attr_accessor     :expected_useful_miles
 
   def initialize(attrs = {})
     super
@@ -23,9 +23,10 @@ class AssetDepreciableProxy < Proxy
       self.object_key = asset.object_key
       self.depreciable = asset.depreciable
       self.depreciation_start_date = asset.depreciation_start_date
+      self.depreciation_useful_life = asset.depreciation_useful_life
+      self.depreciation_purchase_cost = asset.depreciation_purchase_cost
       self.salvage_value = asset.salvage_value
-      self.expected_useful_life = asset.expected_useful_life
-      self.expected_useful_miles = asset.expected_useful_miles
+
     end
   end
 

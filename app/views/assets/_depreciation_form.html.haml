@@ -17,16 +17,30 @@
           .alert.alert-warning Asset has already been depreciated. You can only update the salvage value.
 
     .row
-      .col-xs-3
+      .col-xs-6
         = f.input :depreciable, :as => :radio_buttons, :label => "Asset is depreciable?", :disabled => @asset.purchase_cost != @asset.book_value
 
-      .col-xs-3
+    .row
+      .col-xs-4
         = f.input :depreciation_start_date, :wrapper => :vertical_append, :label => "Depreciation Start Date" do
           = f.input_field :depreciation_start_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.depreciation_start_date), :disabled => @asset.purchase_cost != @asset.book_value
           %span.input-group-addon
             %i.fa.fa-calendar
 
-      .col-xs-3
+      .col-xs-4
+        = f.input :depreciation_purchase_cost, :wrapper=> :vertical_prepend, :label => "Depreciation Purchase Cost" do
+          %span.input-group-addon
+            %i.fa.fa-usd
+          = f.input_field :depreciation_purchase_cost, :class => "form-control"
+
+    .row
+      .col-xs-4
+        = f.input :depreciation_useful_life, :wrapper => :vertical_append, :label => "Depreciation Useful Life" do
+          = f.input_field :depreciation_useful_life, :as => :string, :class => 'form-control'
+          %span.input-group-addon
+            months
+
+      .col-xs-4
         = f.input :salvage_value, :wrapper=> :vertical_prepend, :label => "Salvage Value" do
           %span.input-group-addon
             %i.fa.fa-usd

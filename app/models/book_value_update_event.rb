@@ -20,8 +20,7 @@ class BookValueUpdateEvent < AssetEvent
     
   # List of hash parameters allowed by the controller
   FORM_PARAMS = [
-    :book_value,
-    :expected_useful_life_months
+    :book_value
   ]
   
   #------------------------------------------------------------------------------
@@ -47,7 +46,7 @@ class BookValueUpdateEvent < AssetEvent
 
   # This must be overriden otherwise a stack error will occur  
   def get_update
-    "Book value: #{format_as_currency(self.book_value)}.#{self.expected_useful_life ? ' Expected useful Life: '+self.expected_useful_life_months+' months.': ''}"
+    "Book value: #{format_as_currency(self.book_value)}."
   end
   
   protected

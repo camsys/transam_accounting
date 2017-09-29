@@ -162,7 +162,17 @@ class GrantsController < OrganizationAwareController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_grant
-      @grant = Grant.find_by_object_key(params[:id])
+      @grant = Grant.find_by_object_key(params[:id], organization_id: @organization_list)
+
+      if @grant.nil?
+       if Grant.find_by(object_key: params[:id]).nil?
+          redirect_to '/404'
+        else
+          notify_user(:warning, 'This record is outside your filter. Change your filter if you want to access it.')
+          redirect_to grants_path
+        end
+        return
+      end
     end
 
     def fiscal_year_range(num_forecasting_years=nil)
