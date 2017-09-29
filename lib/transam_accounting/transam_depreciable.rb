@@ -157,12 +157,13 @@ module TransamDepreciable
 
           depr_start = asset.current_depreciation_date || asset.depreciation_start_date
           depr_current = asset.policy_analyzer.get_current_depreciation_date
+          asset_policy = asset.policy
 
           # see what algorithm we are using to calculate the book value
           class_name = asset.policy_analyzer.get_depreciation_calculation_type.class_name
 
           while depr_start <= depr_current
-            asset.current_depreciation_date = depr_start
+            asset.current_depreciation_date = asset_policy.depreciation_date(depr_start)
             book_value = calculate(asset, class_name)
             asset.book_value = book_value.to_i
 
@@ -170,8 +171,11 @@ module TransamDepreciable
               depr_entry = asset.depreciation_entries.create!(description: 'Annual Adjustment', book_value: asset.book_value, event_date: asset.current_depreciation_date)
 
               if asset.general_ledger_accounts.count > 0 # check whether this app records GLAs at all
-                depr_amount = asset.depreciation_entries.where(description: 'Annual Adjustment', event_date: depr_entry.event_date-1.year).book_value - depr_entry.book_value
-
+                if depr_entry.event_date - 1.year < asset.depreciation_start_date
+                  depr_amount = asset.depreciation_entries.find_by(description: 'Initial Value', event_date: asset.depreciation_start_date).book_value - depr_entry.book_value
+                else
+                  depr_amount = asset.depreciation_entries.find_by(description: 'Annual Adjustment', event_date: depr_entry.event_date - 1.year).book_value - depr_entry.book_value
+                end
                 amount_not_ledgered = depr_amount # temp variable for tracking rounding errors
                 asset.grant_purchases.order(:pcnt_purchase_cost).each_with_index do |grant_purchase, idx|
                   unless idx+1 == asset.grant_purchases.count

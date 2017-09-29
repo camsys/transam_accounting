@@ -57,17 +57,21 @@ module TransamAccountingAssetsController
     # Make sure we are working with a full-typed asset
     asset = Asset.get_typed_asset(base_asset)
 
-
-
     asset.depreciable = proxy.depreciable
     asset.depreciation_start_date = reformat_date(proxy.depreciation_start_date) if proxy.depreciation_start_date # reformat date
+    asset.current_depreciation_date = asset.depreciation_start_date if asset.current_depreciation_date != asset.depreciation_start_date
     asset.depreciation_useful_life = proxy.depreciation_useful_life
     asset.depreciation_purchase_cost = proxy.depreciation_purchase_cost
     asset.salvage_value = proxy.salvage_value if proxy.salvage_value
 
+    asset.depreciation_entries.delete_all
+
     asset.updator = current_user
 
     if asset.save
+
+      Delayed::Job.enqueue AssetUpdateJob.new(asset.object_key), :priority => 0
+
       notify_user(:notice, "Asset #{asset.name} was successfully updated.")
     end
 

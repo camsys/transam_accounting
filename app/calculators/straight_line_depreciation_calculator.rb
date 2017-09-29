@@ -17,9 +17,9 @@ class StraightLineDepreciationCalculator < DepreciationCalculator
     end
 
     # Depreciation months of the asset
-    depreciation_months = asset.depreciation_months(on_date, asset.depreciation_entries.where('event_date <= ?').last.event_date)
+    depreciation_months = asset.depreciation_months(on_date, asset.depreciation_entries.where('event_date <= ?', on_date).last.event_date)
 
-    last_book_value = asset.depreciation_entries.where('event_date <= ?').last.book_value
+    last_book_value = asset.depreciation_entries.where('event_date <= ?', on_date).last.book_value
 
     if depreciation_months < 1 || monthly_depreciation.nil? || asset.depreciation_entries.where('event_date > ?', on_date).count > 0
       return last_book_value

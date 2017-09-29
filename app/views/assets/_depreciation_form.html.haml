@@ -31,12 +31,12 @@
         = f.input :depreciation_purchase_cost, :wrapper=> :vertical_prepend, :label => "Depreciation Purchase Cost" do
           %span.input-group-addon
             %i.fa.fa-usd
-          = f.input_field :depreciation_purchase_cost, :class => "form-control"
+          = f.input_field :depreciation_purchase_cost, :class => "form-control", :disabled => @asset.purchase_cost != @asset.book_value
 
     .row
       .col-xs-4
         = f.input :depreciation_useful_life, :wrapper => :vertical_append, :label => "Depreciation Useful Life" do
-          = f.input_field :depreciation_useful_life, :as => :string, :class => 'form-control'
+          = f.input_field :depreciation_useful_life, :as => :string, :class => 'form-control', :disabled => @asset.purchase_cost != @asset.book_value
           %span.input-group-addon
             months
 
