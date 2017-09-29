@@ -107,7 +107,6 @@ module TransamDepreciable
         asset.depreciation_entries.each_with_index do |depr_entry, idx|
           table << {
               :on_date => depr_entry.event_date,
-              :book_value_start => idx > 0 ? asset.depreciation_entries[idx-1].book_value : '',
               :depreciated_expense => idx > 0 ? asset.depreciation_entries[idx-1].book_value - depr_entry.book_value : '',
               :book_value_end => depr_entry.book_value,
               :accumulated_depreciation => asset.depreciation_purchase_cost - depr_entry.book_value
@@ -156,37 +155,42 @@ module TransamDepreciable
             asset.depreciation_entries.create!(description: 'Initial Value', book_value: asset.depreciation_purchase_cost, event_date: asset.depreciation_start_date)
           end
 
+          depr_start = asset.current_depreciation_date || asset.depreciation_start_date
+          depr_current = asset.policy_analyzer.get_current_depreciation_date
+
           # see what algorithm we are using to calculate the book value
           class_name = asset.policy_analyzer.get_depreciation_calculation_type.class_name
-          book_value = calculate(asset, class_name)
-          asset.book_value = book_value.to_i
 
-          #update current depreciation date
-          asset.current_depreciation_date = asset.policy_analyzer.get_current_depreciation_date
+          while depr_start <= depr_current
+            asset.current_depreciation_date = depr_start
+            book_value = calculate(asset, class_name)
+            asset.book_value = book_value.to_i
 
-          # if book value and current depreciation has changed, account for it in GLA
-          if ( asset.book_value_changed? || asset.current_depreciation_date_changed?) && asset.book_value != asset.depreciation_purchase_cost
             if asset.depreciation_entries.where(description: 'Annual Adjustment', event_date: asset.current_depreciation_date).count == 0
-              asset.depreciation_entries.create!(description: 'Annual Adjustment', book_value: asset.book_value, event_date: asset.current_depreciation_date)
-            end
-            if asset.general_ledger_accounts.count > 0 # check whether this app records GLAs at all
-              depr_amount = self.changes['book_value'][0]-self.changes['book_value'][1]
+              depr_entry = asset.depreciation_entries.create!(description: 'Annual Adjustment', book_value: asset.book_value, event_date: asset.current_depreciation_date)
 
-              amount_not_ledgered = depr_amount # temp variable for tracking rounding errors
-              asset.grant_purchases.order(:pcnt_purchase_cost).each_with_index do |grant_purchase, idx|
-                unless idx+1 == asset.grant_purchases.count
-                  pcnt_depr_amount = (depr_amount * grant_purchase.pcnt_purchase_cost / 100.0).round
-                  amount_not_ledgered -= pcnt_depr_amount
-                else
-                  pcnt_depr_amount = amount_not_ledgered
+              if asset.general_ledger_accounts.count > 0 # check whether this app records GLAs at all
+                depr_amount = asset.depreciation_entries.where(description: 'Annual Adjustment', event_date: depr_entry.event_date-1.year).book_value - depr_entry.book_value
+
+                amount_not_ledgered = depr_amount # temp variable for tracking rounding errors
+                asset.grant_purchases.order(:pcnt_purchase_cost).each_with_index do |grant_purchase, idx|
+                  unless idx+1 == asset.grant_purchases.count
+                    pcnt_depr_amount = (depr_amount * grant_purchase.pcnt_purchase_cost / 100.0).round
+                    amount_not_ledgered -= pcnt_depr_amount
+                  else
+                    pcnt_depr_amount = amount_not_ledgered
+                  end
+                  asset.general_ledger_accounts.accumulated_depreciation_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: -pcnt_depr_amount)
+
+                  asset.general_ledger_accounts.depreciation_expense_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: pcnt_depr_amount)
                 end
-                asset.general_ledger_accounts.accumulated_depreciation_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: -pcnt_depr_amount)
 
-                asset.general_ledger_accounts.depreciation_expense_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: pcnt_depr_amount)
               end
-
             end
+
+            depr_start = depr_start + 1.year
           end
+
         else
           asset.book_value = asset.depreciation_purchase_cost
 

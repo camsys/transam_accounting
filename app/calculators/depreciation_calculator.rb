@@ -32,7 +32,7 @@ class DepreciationCalculator < Calculator
   # -----------------------------
 
   def calculate(asset)
-    calculate_on_date(asset, asset.policy.current_depreciation_date)
+    calculate_on_date(asset, asset.current_depreciation_date)
   end
 
   def purchase_cost(asset)
