@@ -120,7 +120,7 @@ class AssetFundingSourceReport < AbstractReport
 
     formats[0] = :hidden
 
-    return {labels: labels + COMMON_LABELS, data: data, formats: formats + COMMON_FORMATS}
+    return {labels: labels + COMMON_LABELS, data: data, formats: formats + COMMON_FORMATS, header_format: labels[0] == 'FY' ? :fiscal_year : :string}
   end
 
   def get_key(row)
