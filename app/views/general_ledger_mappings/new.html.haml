@@ -1,0 +1,7 @@
+.row
+  .col-md-6.col-md-offset-3
+    %fieldset
+      %legend New GL Mapping
+      = render(:partial => 'shared/form_errors', :locals => {:obj => @general_ledger_mapping}) unless @general_ledger_mapping.errors.empty?
+
+      = render 'form'

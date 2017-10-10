@@ -1,49 +1,17 @@
 %ul.nav.nav-tabs
   %li
+    %a{:href => "#subtypes", :data =>{:toggle => 'tab'}}
+      %span.badge.pull-right= @ledger_account.asset_subtypes.count
+      = "Asset Subtype"
+  %li
     %a{:href => "#gla_entries", :data =>{:toggle => 'tab'}}
       %span.badge.pull-right= @ledger_account.general_ledger_account_entries.count
       = "GL Account Entries"
-  - if @ledger_account.grant_budgets.count > 0 || @ledger_account.grant_specific?
-    %li
-      %a{:href => "#grants_table", :data =>{:toggle => 'tab'}}
-        %span.badge.pull-right= @ledger_account.grant_budgets.count > 0 ? @ledger_account.grant_budgets.count : 1
-        = "Grants"
-  - if @ledger_account.fixed_asset_account?
-    %li
-      %a{:href => "#assets", :data =>{:toggle => 'tab'}}
-        %span.badge.pull-right= @ledger_account.assets.where.not(asset_type: AssetType.find_by(class_name: 'Expenditure')).count
-        = "Assets"
-
-    %li
-      %a{:href => "#expenditures", :data =>{:toggle => 'tab'}}
-        %span.badge.pull-right= @ledger_account.assets.where(asset_type: AssetType.find_by(class_name: 'Expenditure')).count
-        = "CapEx"
 
 .tab-content
+  .tab-pane.fade#subtypes
+    .tab-content
+      = format_field("Asset Subtypes", format_as_list(@ledger_account.asset_subtypes))
   .tab-pane.fade#gla_entries
     .tab-content
       = render :partial => 'gla_entries', :locals => {:gla_entries => @ledger_account.general_ledger_account_entries}
-  - if @ledger_account.grant_budgets.count > 0 || @ledger_account.grant_specific?
-    .tab-pane.fade#grants_table
-      .tab-content
-        - if @ledger_account.grant_budgets.count > 0
-          = render :partial => 'gla_budgets', :locals => {:gla_budgets => @ledger_account.grant_budgets}
-        - elsif @ledger_account.grant_specific?
-          = format_field('Grant', link_to(@ledger_account.grant, grant_path(@ledger_account.grant)))
-
-  - if @ledger_account.fixed_asset_account?
-    .tab-pane.fade#assets
-      .tab-content
-        - assets = @ledger_account.assets.where.not(asset_type: AssetType.find_by(class_name: 'Expenditure'))
-        - if assets.empty?
-          %p There are no assets associated with this general ledger account.
-        - else
-          = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => assets}
-
-    .tab-pane.fade#expenditures
-      .tab-content
-        - expenditures = @ledger_account.assets.where(asset_type: AssetType.find_by(class_name: 'Expenditure'))
-        - if expenditures.empty?
-          %p There are no CapEx associated with this general ledger account.
-        - else
-          = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => expenditures}

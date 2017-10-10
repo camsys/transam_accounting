@@ -34,7 +34,6 @@ module TransamDepreciable
     #------------------------------------------------------------------------------
     before_validation  :set_depreciation_defaults
     before_update      :clear_depreciation_cache
-    after_create       :set_depreciation_general_ledger_accounts
 
     #----------------------------------------------------
     # Associations
@@ -171,25 +170,16 @@ module TransamDepreciable
             if asset.depreciation_entries.where(description: 'Annual Adjustment', event_date: asset.current_depreciation_date).count == 0
               depr_entry = asset.depreciation_entries.create!(description: 'Annual Adjustment', book_value: asset.book_value, event_date: asset.current_depreciation_date)
 
-              if asset.general_ledger_accounts.count > 0 # check whether this app records GLAs at all
+              gl_mapping = GeneralLedgerMapping.find_by(organization_id: asset.organization_id, asset_subtype_id: asset.asset_subtype_id)
+              if gl_mapping.present? # check whether this app records GLAs at all
                 if depr_entry.event_date - 1.year < asset.depreciation_start_date
                   depr_amount = asset.depreciation_entries.find_by(description: 'Initial Value', event_date: asset.depreciation_start_date).book_value - depr_entry.book_value
                 else
                   depr_amount = asset.depreciation_entries.find_by(description: 'Annual Adjustment', event_date: depr_entry.event_date - 1.year).book_value - depr_entry.book_value
                 end
-                amount_not_ledgered = depr_amount # temp variable for tracking rounding errors
-                asset.grant_purchases.order(:pcnt_purchase_cost).each_with_index do |grant_purchase, idx|
-                  unless idx+1 == asset.grant_purchases.count
-                    pcnt_depr_amount = (depr_amount * grant_purchase.pcnt_purchase_cost / 100.0).round
-                    amount_not_ledgered -= pcnt_depr_amount
-                  else
-                    pcnt_depr_amount = amount_not_ledgered
-                  end
-                  asset.general_ledger_accounts.accumulated_depreciation_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: -pcnt_depr_amount)
+                gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Accumulated Depr #{asset.asset_path}", amount: -depr_amount)
 
-                  asset.general_ledger_accounts.depreciation_expense_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: pcnt_depr_amount)
-                end
-
+                gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Depr Expense #{asset.asset_path}", amount: depr_amount)
               end
             end
 
@@ -229,22 +219,6 @@ module TransamDepreciable
       # clear cache for other cached depreciation objects that are not attributes
       # hard-coded temporarily
       delete_cached_object('depreciation_table')
-    end
-
-    def set_depreciation_general_ledger_accounts
-
-      if GrantPurchase.sourceable_type == 'Grant' && general_ledger_account_id.present?
-        # just add depreciation GLAs for now
-        # does not add GLA entries that is done during update_depreciation
-        grant_purchases.each do |grant_purchase|
-          # accumulated depr
-          general_ledger_accounts << organization.general_ledger_accounts.accumulated_depreciation_accounts.find_by(grant_id: grant_purchase.sourceable_id)
-
-          # depr_expense_gla
-          general_ledger_accounts << organization.general_ledger_accounts.depreciation_expense_accounts.find_by(grant_id: grant_purchase.sourceable_id)
-        end
-      end
-
     end
 
 

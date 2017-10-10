@@ -65,13 +65,11 @@ namespace :transam do
   end
 
   desc "cleanup all GLA/grant data for testing"
-  task cleanup_gla_grant_data: :environment do
+  task reload_gla_depr_data: :environment do
     # cleanup asset data
     GrantPurchase.delete_all
-    Asset.update_all(general_ledger_account_id: nil)
 
-    # cleanup policy data
-    PolicyAssetSubtypeRule.update_all(general_ledger_account_id: nil)
+    GeneralLedgerMapping.destroy_all
 
     Grant.destroy_all
     GeneralLedgerAccount.destroy_all
@@ -82,6 +80,8 @@ namespace :transam do
           chart.general_ledger_accounts.create!(general_ledger_account_type: general_gla.general_ledger_account_type, general_ledger_account_subtype: general_gla.general_ledger_account_subtype, account_number: general_gla.account_number, name: general_gla.name)
         end
     end
+
+    Asset.update_all(current_depreciation_date: nil)
   end
 
   desc "Add accounting reports"
@@ -116,7 +116,5 @@ namespace :transam do
       end
     end
   end
-
-  desc ""
 
 end

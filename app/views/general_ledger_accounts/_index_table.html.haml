@@ -23,18 +23,14 @@
   :state_save_expire => "1y"}}
   %thead
     %tr
-      %th.left{:data => {:sortable => 'true', :order => 'desc'}} Account Type
-      %th.left{:data => {:sortable => 'true', :order => 'desc'}} Account Subtype
       %th.left{:data => {:sortable => 'true', :order => 'desc'}} Name
       %th.left{:data => {:sortable => 'true', :order => 'desc'}} Account Number
-      %th.left{:data => {:sortable => 'true'}} Subtotal
+      %th.left{:data => {:sortable => 'true'}} Balance
 
 
   %tbody
     - gl_accounts.each do |a|
       %tr.popup-details{:id => a.object_key, :class => 'action-path', :data => {:action_path => general_ledger_account_path(a)}}
-        %td.left= a.general_ledger_account_type
-        %td.left= a.general_ledger_account_subtype
         %td.left= a.name
         %td.right= a.account_number
         %td.right= format_as_currency(a.subtotal)

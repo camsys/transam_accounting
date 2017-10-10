@@ -36,12 +36,12 @@ class Grant < ActiveRecord::Base
   has_many :assets, :through => :grant_purchases
 
   # Has many grant purchases
-  has_many :grant_budgets, :dependent => :destroy, :inverse_of => :grant
+  #has_many :grant_budgets, :dependent => :destroy, :inverse_of => :grant
 
   # Allow the form to submit grant budgets
-  accepts_nested_attributes_for :grant_budgets, :reject_if => :all_blank, :allow_destroy => true
+  #accepts_nested_attributes_for :grant_budgets, :reject_if => :all_blank, :allow_destroy => true
 
-  has_many :general_ledger_accounts
+  has_one :general_ledger_account
 
   # Has 0 or more documents. Using a polymorphic association. These will be removed if the Grant is removed
   has_many    :documents,   :as => :documentable, :dependent => :destroy

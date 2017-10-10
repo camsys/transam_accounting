@@ -21,32 +21,21 @@ class AssetDispositionUpdateJob < AbstractAssetUpdateJob
     end
 
 
-    if (asset.respond_to? :general_ledger_accounts) && GrantPurchase.sourceable_type == 'Grant' && asset.general_ledger_accounts.count > 0
+    gl_mapping = GeneralLedgerMapping.find_by(organization_id: asset.organization_id, asset_subtype_id: asset.asset_subtype_id)
+    if gl_mapping.present?
 
-      disposal_account = ChartOfAccount.find_by(organization_id: asset.organization_id).general_ledger_accounts.find_by(general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Disposal Account'))
-
-      amount_not_ledgered = asset.purchase_cost-asset.book_value # temp variable for tracking rounding errors
-      asset.grant_purchases.order(:pcnt_purchase_cost).each_with_index do |grant_purchase, idx|
-        unless idx+1 == asset.grant_purchases.count
-          amount = ((asset.purchase_cost-asset.book_value) * grant_purchase.pcnt_purchase_cost / 100.0).round
-          amount_not_ledgered -= amount
-        else
-          amount = amount_not_ledgered
-        end
-
-        asset.general_ledger_accounts.accumulated_depreciation_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} Disposal #{asset.disposition_date}", amount: amount)
-      end
-
+      amount = asset.depreciation_purchase_cost-asset.book_value # temp variable for tracking rounding errors
+      gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: "#{asset.asset_path} Disposal", amount: amount)
 
       if asset.book_value > 0
-        disposal_account.general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} Disposal #{asset.disposition_date}", amount: asset.book_value)
+        gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: "#{asset.asset_path} Disposal", amount: asset.book_value)
       end
 
-      asset.general_ledger_account.general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} Disposal #{asset.disposition_date}", amount: -asset.purchase_cost)
+      gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: "#{asset.asset_path} Disposal", amount: -asset.depreciation_purchase_cost)
 
       disposition_event = asset.disposition_updates.last
       if disposition_event.sale_proceeds > 0
-        disposal_account.general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} Disposal #{asset.disposition_date}", amount: -disposition_event.sale_proceeds)
+        gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: "#{asset.asset_path} Disposal", amount: -disposition_event.sale_proceeds)
       end
     end
   end

@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+  resources :general_ledger_mappings
   resources :funding_sources, :path => :funding_programs do
     collection do
       get 'details'
@@ -24,6 +25,7 @@ Rails.application.routes.draw do
 
   resources :general_ledger_accounts do
     collection do
+      get 'get_accounts'
       get 'check_grant_budget'
     end
   end

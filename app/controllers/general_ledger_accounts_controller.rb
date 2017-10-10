@@ -112,6 +112,23 @@ class GeneralLedgerAccountsController < OrganizationAwareController
 
   end
 
+  def get_accounts
+    case params[:subtype]
+      when 'fixed_asset'
+        result = GeneralLedgerAccount.fixed_asset_accounts.where(chart_of_account_id: params[:chart_of_account_id])
+      when 'depreciation_expense'
+        result = GeneralLedgerAccount.depreciation_expense_accounts.where(chart_of_account_id: params[:chart_of_account_id])
+      when 'accumulated_depreciation'
+        result = GeneralLedgerAccount.accumulated_depreciation_accounts.where(chart_of_account_id: params[:chart_of_account_id])
+      when 'disposal'
+        result = GeneralLedgerAccount.disposal_accounts.where(chart_of_account_id: params[:chart_of_account_id])
+    end
+
+    respond_to do |format|
+      format.json { render json: result.map{|x| [x.id, x.to_s]}.to_json }
+    end
+  end
+
   def check_grant_budget
     @grant = Grant.find_by(id: params[:grant_id])
     available = @grant.amount - @grant.grant_budgets.sum(:amount)

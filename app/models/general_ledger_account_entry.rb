@@ -12,7 +12,6 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
   # Associations
   #------------------------------------------------------------------------------
   belongs_to :general_ledger_account
-  belongs_to  :sourceable, :polymorphic => true
 
   #------------------------------------------------------------------------------
   # Validations
@@ -20,6 +19,7 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
 
   validates :general_ledger_account,              :presence => true
   validates :description,                         :presence => true
+  validates :event_date,                          :presence => true
 
   #------------------------------------------------------------------------------
   #
@@ -27,25 +27,6 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
-  def self.sourceable_type
-    SOURCEABLE_TYPE
-  end
-
-  def self.sources(params=nil)
-    if params
-      SOURCEABLE_TYPE.constantize.where(params)
-    else
-      SOURCEABLE_TYPE.constantize.active
-    end
-  end
-
-  def self.label
-    if SOURCEABLE_TYPE == 'FundingSource'
-      'Funding Program'
-    else
-      SOURCEABLE_TYPE.constantize.model_name.human.titleize
-    end
-  end
 
   #------------------------------------------------------------------------------
   #
@@ -55,10 +36,6 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
 
   def to_s
     description
-  end
-
-  def sourceable_path
-    "#{sourceable_type.underscore}_path(:id => '#{sourceable.object_key}')"
   end
 
   #------------------------------------------------------------------------------
