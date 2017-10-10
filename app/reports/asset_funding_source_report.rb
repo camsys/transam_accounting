@@ -19,8 +19,9 @@ class AssetFundingSourceReport < AbstractReport
         clause = 'organizations.short_name = ?'
       elsif grp_clause.include? 'Funding Program'
         clause = 'funding_sources.name = ?'
-      elsif grp_clause.include? 'year'
-        clause = 'YEAR(assets.purchase_date) = ?'
+      elsif grp_clause.include? 'FY'
+        start_of_fy = DateTime.strptime("#{SystemConfig.instance.start_of_fiscal_year}-1900", "%m-%d-%Y").to_date
+        clause = "IF(DAYOFYEAR(assets.purchase_date) < DAYOFYEAR('#{start_of_fy}'), YEAR(assets.purchase_date)-1, YEAR(assets.purchase_date)) = ?"
       end
       query = query.where(clause, key[i])
     end
@@ -85,7 +86,8 @@ class AssetFundingSourceReport < AbstractReport
       elsif grp_clause.include? 'FY'
         labels << 'FY'
         formats << :fiscal_year
-        clause = 'YEAR(assets.purchase_date)'
+        start_of_fy = DateTime.strptime("#{SystemConfig.instance.start_of_fiscal_year}-1900", "%m-%d-%Y").to_date
+        clause = "IF(DAYOFYEAR(assets.purchase_date) < DAYOFYEAR('#{start_of_fy}'), YEAR(assets.purchase_date)-1, YEAR(assets.purchase_date))"
       end
       @clauses << clause
       query = query.group(clause).order(clause)
