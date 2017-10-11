@@ -14,8 +14,8 @@ class GeneralLedgerMappingsController < OrganizationAwareController
     conditions  = []
     values      = []
 
-    conditions << 'organization_id IN (?)'
-    values << @organization_list
+    conditions << 'chart_of_account_id IN (?)'
+    values << ChartOfAccount.where(organization_id: @organization_list).ids
 
     if params[:asset_type_filter]
       @asset_type_filter = params[:asset_type_filter]
