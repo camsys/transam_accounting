@@ -57,20 +57,17 @@ class BookValueUpdateEvent < AssetEvent
   end
 
   def create_depreciation_entry
-    gl_mapping = GeneralLedgerMapping.find_by(organization_id: asset.organization_id, asset_subtype_id: asset.asset_subtype_id)
+    gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
     if gl_mapping.present? # check whether this app records GLAs at all
-      if event_date - 1.year < asset.depreciation_start_date
-        depr_amount = asset.depreciation_entries.find_by(description: 'Initial Value', event_date: asset.depreciation_start_date).book_value - book_value
-      else
-        depr_amount = asset.depreciation_entries.find_by(description: 'Annual Adjustment', event_date: event_date - 1.year).book_value - book_value
-      end
+      depr_amount = asset.book_value || asset.depreciation_purchase_cost - book_value
+
       gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Accumulated Depr #{asset.asset_path}", amount: -depr_amount)
 
       gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Depr Expense #{asset.asset_path}", amount: depr_amount)
-
     end
 
-    self.asset.depreciation_entries.create!(description: self.comments, book_value: self.book_value, event_date: self.event_date)
+    asset.depreciation_entries.create!(description: self.comments, book_value: self.book_value, event_date: self.event_date)
+    asset.update(book_value: self.book_value)
   end
   
 end

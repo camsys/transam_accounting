@@ -48,5 +48,6 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
   # Set resonable defaults for general ledger account entries
   def set_defaults
     self.amount ||= 0
+    self.event_date ||= Date.today
   end
 end

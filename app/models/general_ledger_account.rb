@@ -34,7 +34,7 @@ class GeneralLedgerAccount < ActiveRecord::Base
 
   has_many :general_ledger_account_entries, :dependent => :destroy
 
-  belongs_to :grant
+  has_many :grant_budgets, :dependent => :destroy, :inverse_of => :general_ledger_account
 
   #------------------------------------------------------------------------------
   # Validations

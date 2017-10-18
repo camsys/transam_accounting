@@ -4,6 +4,7 @@
   %table.table.table-hover#gla_datatable
     %thead
       %tr
+        %th.left Date
         %th.left Description
         %th.right Change
         %th.right Balance
@@ -12,11 +13,11 @@
     %tbody
       - balance = 0
       - gla_entries.each_with_index do |gla_entry,idx|
-        - subtotal += gla_entry.amount
         %tr.popup-details
+          %td.left= format_as_date(gla_entry.event_date)
           %td.left= gla_entry.description.html_safe
           %td.right= format_as_currency(gla_entry.amount)
-          - balance += gla_entries.amount
+          - balance += gla_entry.amount
           %td.right= format_as_currency(balance)
 
 :javascript

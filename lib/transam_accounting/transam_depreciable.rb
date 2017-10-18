@@ -107,6 +107,7 @@ module TransamDepreciable
         asset.depreciation_entries.each_with_index do |depr_entry, idx|
           table << {
               :on_date => depr_entry.event_date,
+              :description => depr_entry.description,
               :depreciated_expense => idx > 0 ? asset.depreciation_entries[idx-1].book_value - depr_entry.book_value : '',
               :book_value_end => depr_entry.book_value,
               :accumulated_depreciation => asset.depreciation_purchase_cost - depr_entry.book_value
@@ -170,7 +171,7 @@ module TransamDepreciable
             if asset.depreciation_entries.where(description: 'Annual Adjustment', event_date: asset.current_depreciation_date).count == 0
               depr_entry = asset.depreciation_entries.create!(description: 'Annual Adjustment', book_value: asset.book_value, event_date: asset.current_depreciation_date)
 
-              gl_mapping = GeneralLedgerMapping.find_by(organization_id: asset.organization_id, asset_subtype_id: asset.asset_subtype_id)
+              gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
               if gl_mapping.present? # check whether this app records GLAs at all
                 if depr_entry.event_date - 1.year < asset.depreciation_start_date
                   depr_amount = asset.depreciation_entries.find_by(description: 'Initial Value', event_date: asset.depreciation_start_date).book_value - depr_entry.book_value

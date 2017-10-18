@@ -1,27 +1,8 @@
-- expenditure_asset_type = AssetType.find_by(class_name: 'Expenditure')
-- expenditures = Expenditure.where(parent_id: @asset.id)
-
 - if @asset.depreciable
   .tab-pane.fade#depreciation
     .tab-content
       = render 'depreciation_table'
 
-- unless @asset.type_of? Expenditure
-  .tab-pane.fade#expenditures
-    .tab-content
-      - if can? :create, Expenditure
-        .btn-group{style: 'margin-bottom:20px;'}
-          %button.btn.btn-default.dropdown-toggle{:data => {:toggle => 'dropdown'}}
-            = "Add CapEx";
-            %span.caret
-
-          %ul.dropdown-menu{:role => 'menu'}
-            - expenditure_asset_type.asset_subtypes.each do |type|
-              %li= link_to type, new_inventory_path(:asset_subtype => type.id, :organization_id => @asset.organization_id, :parent_id => @asset.id)
-
-
-
-      - if expenditures.empty?
-        %p There are no CapEx associated with this asset.
-      - else
-        = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => expenditures}
+.tab-pane.fade#expenditures
+  .tab-content
+    = render :partial => 'expenditures/index_table', :locals => {:expenditures => @asset.expenditures}

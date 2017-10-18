@@ -30,6 +30,8 @@ module TransamGlAccountableAsset
     # Override core asset model so that expenditures don't affect parent-child relationships and rollups
     has_many    :dependents, -> { where.not(:asset_type_id => AssetType.find_by(class_name: 'Expenditure').try(:id)) },  :class_name => 'Asset', :foreign_key => :parent_id, :dependent => :nullify
 
+    has_and_belongs_to_many    :expenditures, :foreign_key => :asset_id
+
     # ----------------------------------------------------
     # Validations
     # ----------------------------------------------------
@@ -68,7 +70,7 @@ module TransamGlAccountableAsset
 
   def update_general_ledger_accounts
 
-    gl_mapping = GeneralLedgerMapping.find_by(organization_id: self.organization_id, asset_subtype_id: self.asset_subtype_id)
+    gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: self.organization_id).id, asset_subtype_id: self.asset_subtype_id)
 
     if gl_mapping.nil?
       return true

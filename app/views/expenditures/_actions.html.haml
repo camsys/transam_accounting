@@ -6,12 +6,12 @@
   %ul.dropdown-menu{:role => 'menu'}
     - if can? :update, @expenditure
       %li
-        = link_to edit_expenditure_path(@expenditure) do
+        = link_to edit_inventory_expenditure_path(@asset,@expenditure) do
           %i.fa.fa-edit.fa-fw
           = " Update this CapEx"
     - if can? :destroy, @expenditure
       %li.divider
       %li
-        = link_to expenditure_path(@expenditure), :method => :delete, :data => {:confirm => "Are you sure you want to remove this expenditure? The action can't be undone."} do
+        = link_to inventory_expenditure_path(@asset,@expenditure), :method => :delete, :data => {:confirm => "Are you sure you want to remove this expenditure? The action can't be undone."} do
           %i.fa.fa-trash-o.fa-fw
           = " Remove this CapEx"

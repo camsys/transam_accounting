@@ -18,10 +18,7 @@ Rails.application.routes.draw do
     resources :documents
   end
 
-  resources :expenditures do
-    resources :comments
-    resources :documents
-  end
+
 
   resources :general_ledger_accounts do
     collection do
@@ -38,6 +35,11 @@ Rails.application.routes.draw do
     member do
       get 'edit_depreciation'
       post 'update_depreciation'
+    end
+
+    resources :expenditures do
+      resources :comments
+      resources :documents
     end
   end
 end

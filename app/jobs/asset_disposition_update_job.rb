@@ -10,8 +10,6 @@ class AssetDispositionUpdateJob < AbstractAssetUpdateJob
 
   def execute_job(asset)
 
-
-
     just_disposed_and_transferred = !asset.disposed? && asset.disposition_updates.last.try(:disposition_type_id) == 2
 
     asset.record_disposition
@@ -20,9 +18,8 @@ class AssetDispositionUpdateJob < AbstractAssetUpdateJob
       send_asset_transferred_message new_asset
     end
 
-
-    gl_mapping = GeneralLedgerMapping.find_by(organization_id: asset.organization_id, asset_subtype_id: asset.asset_subtype_id)
-    if gl_mapping.present?
+    gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
+    if !asset.disposition_updates.empty? && gl_mapping.present?
 
       amount = asset.depreciation_purchase_cost-asset.book_value # temp variable for tracking rounding errors
       gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: "#{asset.asset_path} Disposal", amount: amount)

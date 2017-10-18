@@ -20,7 +20,6 @@ class Grant < ActiveRecord::Base
   # Callbacks
   #------------------------------------------------------------------------------
   after_initialize                  :set_defaults
-  after_create                      :set_general_ledger_accounts
 
   #------------------------------------------------------------------------------
   # Associations
@@ -36,12 +35,12 @@ class Grant < ActiveRecord::Base
   has_many :assets, :through => :grant_purchases
 
   # Has many grant purchases
-  #has_many :grant_budgets, :dependent => :destroy, :inverse_of => :grant
+  has_many :grant_budgets, :dependent => :destroy, :inverse_of => :grant
 
   # Allow the form to submit grant budgets
-  #accepts_nested_attributes_for :grant_budgets, :reject_if => :all_blank, :allow_destroy => true
+  accepts_nested_attributes_for :grant_budgets, :reject_if => :all_blank, :allow_destroy => true
 
-  has_one :general_ledger_account
+  has_many :general_ledger_accounts, :through => :grant_budgets
 
   # Has 0 or more documents. Using a polymorphic association. These will be removed if the Grant is removed
   has_many    :documents,   :as => :documentable, :dependent => :destroy
@@ -124,12 +123,7 @@ class Grant < ActiveRecord::Base
   # Calculate the anount of the grant that has been spent on assets to date. This calculates
   # only the federal percentage
   def spent
-    gla = GeneralLedgerAccount.grant_funding_accounts.find_by(grant_id: self.id)
-    if gla.present?
-      gla.general_ledger_account_entries.where('amount < 0').sum(:amount) * (-1)
-    else
-      0
-    end
+    0 # NEED TO THINK ABOUT
   end
 
   # Returns the balance of the fund. If the account is overdrawn
@@ -190,17 +184,6 @@ class Grant < ActiveRecord::Base
     self.fy_year ||= current_fiscal_year_year
     self.amount ||= 0
     self.active = self.active.nil? ? true : self.active
-  end
-
-  def set_general_ledger_accounts
-    OrganizationGeneralLedgerAccount.active.each do |general_gla|
-      if general_gla.grant_budget_specific
-        acct_num = "#{general_gla.account_number}-#{self.to_s}"
-        if GeneralLedgerAccount.find_by(chart_of_account_id: ChartOfAccount.find_by(organization: organization).id, account_number: acct_num, grant_id: self.id).nil?
-          gla = GeneralLedgerAccount.create!(chart_of_account_id: ChartOfAccount.find_by(organization: organization).id, general_ledger_account_type_id: general_gla.general_ledger_account_type_id, general_ledger_account_subtype_id: general_gla.general_ledger_account_subtype_id, account_number: acct_num, name: "#{general_gla.name} #{self.to_s}", grant_id: self.id)
-        end
-      end
-    end
   end
 
 end

@@ -1,7 +1,7 @@
 :ruby
   glas = Hash.new
   ChartOfAccount.where(organization_id: @organization_list).each do |coa|
-    glas[coa.organization_id] = coa.general_ledger_accounts.fixed_asset_accounts.ids
+    glas[coa.organization_id] = coa.general_ledger_accounts.asset_accounts.ids
   end
 
 = simple_form_for(@grant,
@@ -21,7 +21,7 @@
   = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
     %span.input-group-addon
       %i.fa.fa-usd
-    = f.input_field :amount, :class => "form-control", :min => GeneralLedgerAccountEntry.where(sourceable: @grant).sum(:amount), :max => 1000000000
+    = f.input_field :amount, :class => "form-control"
 
   #grant_budgets.well.well-sm{style: "overflow-y:scroll; max-height:250px;"}
     %label.control-label

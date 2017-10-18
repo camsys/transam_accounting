@@ -117,8 +117,8 @@ class GrantsController < OrganizationAwareController
     @grant.organization_id = @organization_list.first if @grant.organization_id.nil?
 
     respond_to do |format|
-      if @grant.save
-        notify_user(:notice, "The Grant was successfully saved.")
+      if @grant.save!
+        notify_user(:notice, "The grant was successfully saved.")
         format.html { redirect_to grant_url(@grant) }
         format.json { render action: 'show', status: :created, location: @grant }
       else
@@ -162,7 +162,7 @@ class GrantsController < OrganizationAwareController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_grant
-      @grant = Grant.find_by_object_key(params[:id], organization_id: @organization_list)
+      @grant = Grant.find_by(object_key: params[:id], organization_id: @organization_list)
 
       if @grant.nil?
        if Grant.find_by(object_key: params[:id]).nil?
