@@ -84,8 +84,8 @@ module TransamGlAccountableAsset
         amount = (amount_to_ledger * gp.pcnt_purchase_cost_cost / 100.0).round
         amount_to_ledger -= amount
       end
-      gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: self.depreciation_start_date, description: "#{asset_path} purchase", amount: amount)
-      gp.sourceable.general_ledger_account.general_ledger_account_entries.create!(event_date: self.depreciation_start_date, description: "#{asset_path} purchase", amount: -amount)
+      gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: self.depreciation_start_date, description: "Purchase #{asset_path}", amount: amount)
+      #gp.sourceable.general_ledger_account.general_ledger_account_entries.create!(event_date: self.depreciation_start_date, description: "#{asset_path} purchase", amount: -amount)
     end
   end
 

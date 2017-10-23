@@ -35,6 +35,7 @@ class GeneralLedgerMapping < ActiveRecord::Base
 
   # List of hash parameters allowed by the controller
   FORM_PARAMS = [
+      :chart_of_account_id,
       :asset_subtype_id,
       :asset_account_id,
       :depr_expense_account_id,
@@ -60,6 +61,9 @@ class GeneralLedgerMapping < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
+  def to_s
+    "#{chart_of_account.organization.short_name} #{asset_subtype} GL Mapping"
+  end
 
   protected
 

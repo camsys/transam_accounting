@@ -6,6 +6,8 @@ class BookValueUpdateEvent < AssetEvent
   # Callbacks
   after_initialize :set_defaults
 
+  before_save      :set_event_date_for_depr_interval
+
   after_create     :create_depreciation_entry
 
 
@@ -56,6 +58,10 @@ class BookValueUpdateEvent < AssetEvent
     super
   end
 
+  def set_event_date_for_depr_interval
+    self.event_date = asset.policy_analyzer.get_depreciation_date(self.event_date)
+  end
+
   def create_depreciation_entry
     gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
     if gl_mapping.present? # check whether this app records GLAs at all
@@ -66,7 +72,7 @@ class BookValueUpdateEvent < AssetEvent
       gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Depr Expense #{asset.asset_path}", amount: depr_amount)
     end
 
-    asset.depreciation_entries.create!(description: self.comments, book_value: self.book_value, event_date: self.event_date)
+    asset.depreciation_entries.create!(description: "Manual Adjustment - #{self.comments}", book_value: self.book_value, event_date: self.event_date)
     asset.update(book_value: self.book_value)
   end
   

@@ -36,6 +36,17 @@ module TransamAccountingAssetsController
     end
   end
 
+  def get_depreciation_date
+    get_asset
+
+    input_date = Date.strptime(params[:input_date], '%m/%d/%Y')
+    depr_date = @asset.policy_analyzer.get_depreciation_date(input_date)
+
+    respond_to do |format|
+      format.json { render :json => depr_date.strftime('%m/%d/%Y').to_json }
+    end
+  end
+
   # form for updating depreciation inputs
   def edit_depreciation
     get_asset

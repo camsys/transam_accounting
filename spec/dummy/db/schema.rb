@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170103225100) do
+ActiveRecord::Schema.define(version: 20170719152744) do
 
   create_table "activities", force: true do |t|
     t.string   "object_key",           limit: 12
@@ -107,6 +107,7 @@ ActiveRecord::Schema.define(version: 20170103225100) do
     t.string   "document",                       limit: 128
     t.string   "original_filename",              limit: 128
     t.integer  "created_by_id"
+    t.integer  "total_cost"
   end
 
   add_index "asset_events", ["asset_event_type_id"], name: "asset_events_idx3", using: :btree
@@ -296,11 +297,13 @@ ActiveRecord::Schema.define(version: 20170103225100) do
     t.datetime "created_at",                                                              null: false
     t.datetime "updated_at",                                                              null: false
     t.integer  "upload_id"
+    t.integer  "general_ledger_account_id"
   end
 
   add_index "assets", ["asset_subtype_id"], name: "assets_idx4", using: :btree
   add_index "assets", ["asset_type_id"], name: "assets_idx3", using: :btree
   add_index "assets", ["estimated_replacement_year"], name: "assets_idx8", using: :btree
+  add_index "assets", ["general_ledger_account_id"], name: "index_assets_on_general_ledger_account_id", using: :btree
   add_index "assets", ["in_backlog"], name: "assets_idx7", using: :btree
   add_index "assets", ["manufacture_year"], name: "assets_idx5", using: :btree
   add_index "assets", ["object_key"], name: "assets_idx1", using: :btree
@@ -424,8 +427,8 @@ ActiveRecord::Schema.define(version: 20170103225100) do
   end
 
   create_table "delayed_job_priorities", force: true do |t|
-    t.string   "class_name",             null: false
-    t.integer  "priority",   default: 0, null: false
+    t.string   "class_name", null: false
+    t.integer  "priority",   null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -604,7 +607,7 @@ ActiveRecord::Schema.define(version: 20170103225100) do
 
   create_table "fta_funding_types", force: true do |t|
     t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 4,   null: false
+    t.string  "code",        limit: 6,   null: false
     t.string  "description", limit: 256, null: false
     t.boolean "active",                  null: false
   end
@@ -756,6 +759,28 @@ ActiveRecord::Schema.define(version: 20170103225100) do
   add_index "funding_templates_organizations", ["funding_template_id"], name: "index_funding_templates_organizations_on_funding_template_id", using: :btree
   add_index "funding_templates_organizations", ["organization_id"], name: "index_funding_templates_organizations_on_organization_id", using: :btree
 
+  create_table "general_ledger_account_entries", force: true do |t|
+    t.string   "object_key",                limit: 12
+    t.integer  "general_ledger_account_id"
+    t.string   "description"
+    t.decimal  "amount",                               precision: 10, scale: 0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "sourceable_id"
+    t.string   "sourceable_type"
+  end
+
+  add_index "general_ledger_account_entries", ["general_ledger_account_id"], name: "general_ledger_account_entry_general_ledger_account_idx", using: :btree
+
+  create_table "general_ledger_account_subtypes", force: true do |t|
+    t.integer  "general_ledger_account_type_id"
+    t.string   "name"
+    t.string   "description"
+    t.boolean  "active"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "general_ledger_account_types", force: true do |t|
     t.string  "name",        limit: 64,  null: false
     t.string  "description", limit: 254, null: false
@@ -763,14 +788,16 @@ ActiveRecord::Schema.define(version: 20170103225100) do
   end
 
   create_table "general_ledger_accounts", force: true do |t|
-    t.string   "object_key",                     limit: 12, null: false
-    t.integer  "chart_of_account_id",                       null: false
-    t.integer  "general_ledger_account_type_id",            null: false
-    t.string   "account_number",                 limit: 32, null: false
-    t.string   "name",                           limit: 64, null: false
-    t.boolean  "active",                                    null: false
+    t.string   "object_key",                        limit: 12, null: false
+    t.integer  "chart_of_account_id",                          null: false
+    t.integer  "general_ledger_account_type_id",               null: false
+    t.integer  "general_ledger_account_subtype_id"
+    t.string   "account_number",                               null: false
+    t.string   "name",                                         null: false
+    t.boolean  "active",                                       null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "grant_id"
   end
 
   add_index "general_ledger_accounts", ["active"], name: "general_ledger_accounts_idx3", using: :btree
@@ -787,32 +814,35 @@ ActiveRecord::Schema.define(version: 20170103225100) do
     t.integer "general_ledger_account_id", null: false
     t.integer "grant_id",                  null: false
     t.integer "amount",                    null: false
+    t.boolean "active"
   end
 
   add_index "grant_budgets", ["general_ledger_account_id", "grant_id"], name: "grant_budgets_idx1", using: :btree
 
   create_table "grant_purchases", force: true do |t|
     t.integer  "asset_id",           null: false
-    t.integer  "grant_id",           null: false
     t.integer  "pcnt_purchase_cost", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "sourceable_id"
+    t.string   "sourceable_type"
   end
 
-  add_index "grant_purchases", ["asset_id", "grant_id"], name: "grant_purchases_idx1", using: :btree
+  add_index "grant_purchases", ["asset_id"], name: "grant_purchases_idx1", using: :btree
 
   create_table "grants", force: true do |t|
-    t.string   "object_key",        limit: 12, null: false
-    t.integer  "organization_id",              null: false
-    t.integer  "funding_source_id",            null: false
-    t.integer  "fy_year",                      null: false
-    t.string   "grant_number",      limit: 64, null: false
-    t.integer  "amount",                       null: false
+    t.string   "object_key",      limit: 12, null: false
+    t.integer  "organization_id",            null: false
+    t.integer  "fy_year",                    null: false
+    t.integer  "amount",                     null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "sourceable_id"
+    t.string   "sourceable_type"
+    t.boolean  "active"
+    t.string   "name"
   end
 
-  add_index "grants", ["funding_source_id"], name: "grants_idx4", using: :btree
   add_index "grants", ["fy_year"], name: "grants_idx3", using: :btree
   add_index "grants", ["object_key"], name: "grants_idx1", using: :btree
   add_index "grants", ["organization_id"], name: "grants_idx2", using: :btree
@@ -980,6 +1010,17 @@ ActiveRecord::Schema.define(version: 20170103225100) do
 
   add_index "notifications", ["notifiable_id", "notifiable_type"], name: "index_notifications_on_notifiable_id_and_notifiable_type", using: :btree
 
+  create_table "organization_general_ledger_accounts", force: true do |t|
+    t.string  "name"
+    t.string  "account_number"
+    t.integer "general_ledger_account_type_id"
+    t.integer "general_ledger_account_subtype_id"
+    t.boolean "grant_budget_specific"
+    t.boolean "active"
+  end
+
+  add_index "organization_general_ledger_accounts", ["general_ledger_account_type_id"], name: "org_general_ledger_account_general_ledger_account_type_idx", using: :btree
+
   create_table "organization_role_mappings", force: true do |t|
     t.integer  "organization_id", null: false
     t.integer  "role_id",         null: false
@@ -993,6 +1034,7 @@ ActiveRecord::Schema.define(version: 20170103225100) do
     t.string  "display_icon_name", limit: 64,  null: false
     t.string  "map_icon_name",     limit: 64,  null: false
     t.string  "description",       limit: 254, null: false
+    t.string  "roles"
     t.boolean "active",                        null: false
   end
 
@@ -1051,6 +1093,11 @@ ActiveRecord::Schema.define(version: 20170103225100) do
   add_index "organizations_service_provider_types", ["organization_id"], name: "organization_spt_idx1", using: :btree
   add_index "organizations_service_provider_types", ["service_provider_type_id"], name: "organization_spt_idx2", using: :btree
 
+  create_table "planning_partners_organizations", force: true do |t|
+    t.integer "planning_partner_id"
+    t.integer "organization_id"
+  end
+
   create_table "policies", force: true do |t|
     t.string   "object_key",                       limit: 12,                          null: false
     t.integer  "organization_id",                                                      null: false
@@ -1103,9 +1150,11 @@ ActiveRecord::Schema.define(version: 20170103225100) do
     t.boolean  "default_rule"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "general_ledger_account_id"
   end
 
   add_index "policy_asset_subtype_rules", ["asset_subtype_id"], name: "policy_asset_subtype_rules_idx2", using: :btree
+  add_index "policy_asset_subtype_rules", ["general_ledger_account_id"], name: "index_policy_asset_subtype_rules_on_general_ledger_account_id", using: :btree
   add_index "policy_asset_subtype_rules", ["policy_id"], name: "policy_asset_subtype_rules_idx1", using: :btree
 
   create_table "policy_asset_type_rules", force: true do |t|
@@ -1163,6 +1212,8 @@ ActiveRecord::Schema.define(version: 20170103225100) do
     t.string   "chart_type",        limit: 32
     t.text     "chart_options"
     t.boolean  "active",                        null: false
+    t.boolean  "printable"
+    t.boolean  "exportable"
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
   end
@@ -1182,6 +1233,25 @@ ActiveRecord::Schema.define(version: 20170103225100) do
 
   add_index "roles", ["name"], name: "roles_idx1", using: :btree
   add_index "roles", ["resource_id"], name: "roles_idx2", using: :btree
+
+  create_table "saved_searches", force: true do |t|
+    t.string   "object_key",     limit: 12,  null: false
+    t.integer  "user_id",                    null: false
+    t.string   "name",           limit: 64,  null: false
+    t.string   "description",    limit: 254, null: false
+    t.integer  "search_type_id"
+    t.text     "json"
+    t.text     "query_string"
+    t.integer  "ordinal"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "search_types", force: true do |t|
+    t.string  "name"
+    t.string  "class_name"
+    t.boolean "active"
+  end
 
   create_table "service_life_calculation_types", force: true do |t|
     t.string  "name",        limit: 64,  null: false

@@ -4,6 +4,11 @@
     %span.input-group-addon
       %i.fa.fa-calendar
 
+  .row
+    .col-sm-12
+      #depr_date_warning.alert.alert-warning
+        = "Asset's book value will be updated for the end of the depreciation interval on <strong id='depr_date'>#{@asset.policy_analyzer.get_depreciation_date(f.object.event_date).strftime('%m/%d/%Y')}</strong>.".html_safe
+
   = f.input :book_value, :wrapper => :vertical_append, :label => "Book Value" do
     %span.input-group-addon
       %i.fa.fa-usd
@@ -12,3 +17,35 @@
   = f.input :comments, :input_html => { :rows => 6 }, :placeholder => "Enter any additional comments..."
   .form-group
     = f.button :submit, "Update Book Value", :class => 'btn btn-primary'
+
+
+:javascript
+
+  $('#asset_event_event_date').datepicker({
+     onSelect: function(d,i){
+        if(d !== i.lastVal){
+            $(this).change();
+        }
+     }
+  });
+
+  $('#asset_event_event_date').change(function() {
+    var date = $(this).datepicker({ dateFormat: 'mm/dd/YYYY' }).val();
+
+    if (date != "") {
+      $.ajax({
+        url: "#{get_depreciation_date_inventory_path(@asset)}",
+        data: {
+            input_date: function() {
+              return date;
+            }
+        },
+        success: function(result){
+          $('#depr_date_warning #depr_date').text(result);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+        }
+      });
+    }
+  });

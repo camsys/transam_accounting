@@ -166,9 +166,10 @@ module TransamDepreciable
           while depr_start <= depr_current
             asset.current_depreciation_date = asset_policy.depreciation_date(depr_start)
             book_value = calculate(asset, class_name)
-            asset.book_value = book_value.to_i
 
             if asset.depreciation_entries.where(description: 'Annual Adjustment', event_date: asset.current_depreciation_date).count == 0
+              asset.book_value = book_value.to_i
+
               depr_entry = asset.depreciation_entries.create!(description: 'Annual Adjustment', book_value: asset.book_value, event_date: asset.current_depreciation_date)
 
               gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)

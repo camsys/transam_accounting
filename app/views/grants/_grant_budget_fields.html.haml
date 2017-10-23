@@ -1,7 +1,7 @@
 .nested-fields
   .row
     .col-md-6
-      = f.input :general_ledger_account_id, :collection => GeneralLedgerAccount.where(chart_of_account_id: ChartOfAccount.where(organization_id: @organization_list).ids).asset_accounts, :required => true, :label => 'GLA',  :class => 'grant_budget_general_ledger_account_id', :disabled => !@grant.new_record?
+      = f.input :general_ledger_account_id, :collection => GeneralLedgerAccount.where(chart_of_account_id: ChartOfAccount.where(organization_id: @organization_list).ids).fixed_asset_accounts, :required => true, :label => 'GLA',  :label_method => 'coded_name', :class => 'grant_budget_general_ledger_account_id', :disabled => !@grant.new_record?
     .col-md-5
       = f.input :amount, :label => 'Amount', :required => true, :wrapper => :vertical_append do
         %span.input-group-addon
@@ -9,5 +9,5 @@
         = f.input_field :amount, :class => 'form-control grant_budget_amount', :disabled => !@grant.new_record?
 
     .col-md-1
-      = link_to_remove_association f, :class => 'btn btn-xs btn-warning', :style => 'margin-top: 27px;' do
+      = link_to_remove_association f, :class => 'btn btn-xs btn-warning', :style => 'margin-top: 27px;', :disabled => !@grant.new_record? do
         %i.fa.fa-trash-o

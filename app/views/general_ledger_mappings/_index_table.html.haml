@@ -25,7 +25,6 @@
 
     %thead
       %tr
-        %th.center{:data => {:field => 'checked', :checkbox => 'true'}}
         %th.center{:data => {:visible => 'false'}} Object Key
         %th.center{:data => {:sortable => 'true'}} Organization
         %th.center{:data => {:sortable => 'true'}} Asset Subtype
@@ -38,7 +37,7 @@
       - gl_mappings.each do |f|
         %tr
           %td.left= f.object_key
-          %td.left= f.organization.short_name
+          %td.left= f.chart_of_account.organization.short_name
           %td.left= f.asset_subtype
           %td.left= f.asset_account
           %td.left= f.depr_expense_account

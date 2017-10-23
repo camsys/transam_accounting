@@ -50,7 +50,7 @@ class Expenditure < ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   #validates :general_ledger_account,    :presence => true
-  validates :organization,              :presence => true
+  #validates :organization,              :presence => true
   #validates :grant,                     :presence => true
   validates :expense_type,              :presence => true
   validates :expense_date,              :presence => true
@@ -114,20 +114,30 @@ class Expenditure < ActiveRecord::Base
   #------------------------------------------------------------------------------
   protected
   def create_depreciation_entry
-    gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
-    if gl_mapping.present? # check whether this app records GLAs at all
-      if event_date - 1.year < asset.depreciation_start_date
-        depr_amount = asset.depreciation_entries.find_by(description: 'Initial Value', event_date: asset.depreciation_start_date).book_value - book_value
-      else
-        depr_amount = asset.depreciation_entries.find_by(description: 'Annual Adjustment', event_date: event_date - 1.year).book_value - book_value
+    assets.each do |asset|
+      gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
+      new_book_value = asset.book_value + self.amount
+
+      if gl_mapping.present? # check whether this app records GLAs at all
+
+        depr_date = asset.policy_analyzer.get_depreciation_date(expense_date - 1.year)
+
+
+        if depr_date < asset.depreciation_start_date
+          depr_amount = asset.depreciation_entries.find_by(description: 'Initial Value', event_date: asset.depreciation_start_date).book_value - new_book_value
+        else
+          depr_amount = asset.depreciation_entries.find_by(description: 'Annual Adjustment', event_date: depr_date).book_value - new_book_value
+        end
+        gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx - Accumulated Depr #{asset.asset_path}", amount: -depr_amount)
+
+        gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx - Depr Expense #{asset.asset_path}", amount: depr_amount)
+
+        gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx - #{asset.asset_path}", amount: self.amount)
       end
-      gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Accumulated Depr #{asset.asset_path}", amount: -depr_amount)
 
-      gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Depr Expense #{asset.asset_path}", amount: depr_amount)
-
+      asset.depreciation_entries.create!(description: "CapEx - #{self.description}", book_value: new_book_value, event_date: expense_date)
+      asset.update(book_value: new_book_value)
     end
-
-    self.asset.depreciation_entries.create!(description: self.comments, book_value: self.book_value, event_date: self.event_date)
   end
 
 

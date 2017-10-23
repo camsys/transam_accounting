@@ -94,16 +94,16 @@ class GeneralLedgerAccount < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
-  def grant_specific?
-    grant.present?
-  end
-
   def fixed_asset_account?
     general_ledger_account_subtype.name == 'Fixed Asset Account'
   end
 
   def to_s
     account_number
+  end
+
+  def coded_name
+    "#{account_number}-#{name}"
   end
 
   def subtotal

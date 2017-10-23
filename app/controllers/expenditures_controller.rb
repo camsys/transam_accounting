@@ -118,7 +118,7 @@ class ExpendituresController < AssetAwareController
       @expenditure.assets << @asset
     end
 
-    if @expenditure.save
+    if @expenditure.save!
       if @asset.present?
         redirect_to inventory_url(@asset), notice: 'Expenditure was successfully created.'
       else

@@ -125,7 +125,7 @@ class GeneralLedgerAccountsController < OrganizationAwareController
     end
 
     respond_to do |format|
-      format.json { render json: result.map{|x| [x.id, x.to_s]}.to_json }
+      format.json { render json: result.map{|x| [x.id, x.coded_name]}.to_json }
     end
   end
 

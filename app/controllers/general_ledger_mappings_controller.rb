@@ -84,7 +84,7 @@ class GeneralLedgerMappingsController < OrganizationAwareController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_general_ledger_mapping
-      @general_ledger_mapping = GeneralLedgerMapping.find(object_key: params[:id])
+      @general_ledger_mapping = GeneralLedgerMapping.find_by(object_key: params[:id])
     end
 
     # Only allow a trusted parameter "white list" through.

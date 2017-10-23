@@ -22,7 +22,6 @@
   %thead
     %tr
       %th.left{:data => {:visible => 'false'}} Object Key
-      %th.left{:data => {:sortable => 'true'}} Account
       %th.left{:data => {:sortable => 'true'}} Category
       %th.left{:data => {:sortable => 'true'}} Date
       %th.left{:data => {:sortable => 'true'}} Expense
@@ -32,7 +31,6 @@
     - expenditures.includes(:general_ledger_account, :expense_type, :grant).each do |e|
       %tr{:id => e.object_key, :class => 'action-path'}
         %td.left= e.object_key
-        %td.left= e.general_ledger_account
         %td.left= e.expense_type
         %td.left= format_as_date(e.expense_date)
         %td.left= e.description.html_safe
@@ -45,7 +43,7 @@
   function sum_column_as_currency(col_data) {
     var sum = 0;
     for (i = 0; i < col_data.length; i++) {
-      sum += parseInt(col_data[i][7]);
+      sum += parseInt(col_data[i][4]);
     }
     return "<strong>" + currency_formatter(sum) + "</strong>";
   };

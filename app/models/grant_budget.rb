@@ -76,7 +76,9 @@ class GrantBudget < ActiveRecord::Base
   protected
 
   def update_general_ledger_accounts
-    general_ledger_account.general_ledger_account_entries.create!(description: "Grant Funding - #{grant}", amount: amount)
+    url = Rails.application.routes.url_helpers.grant_path(grant)
+
+    general_ledger_account.general_ledger_account_entries.create!(description: "Grant Funding - <a href='#{url}'>#{grant.to_s}</a>", amount: amount)
   end
 
   # Set resonable defaults for a new grant
