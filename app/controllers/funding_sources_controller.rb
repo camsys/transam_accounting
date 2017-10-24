@@ -37,7 +37,7 @@ class FundingSourcesController < OrganizationAwareController
 
     #puts conditions.inspect
     #puts values.inspect
-    @funding_sources = @show_active_only == '1' ? FundingSource.active.includes(:funding_source_type).where(conditions.join(' AND '), *values) : FundingSource.includes(:funding_source_type).where(conditions.join(' AND '), *values).order(:name)
+    @funding_sources = @show_active_only == '1' ? FundingSource.active.includes(:funding_source_type).where(conditions.join(' AND '), *values).order(:name) : FundingSource.includes(:funding_source_type).where(conditions.join(' AND '), *values).order(:name)
 
     # cache the set of object keys in case we need them later
     cache_list(@funding_sources, INDEX_KEY_LIST_VAR)
