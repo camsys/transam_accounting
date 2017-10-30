@@ -11,9 +11,15 @@
 
   = f.input :description, :required => true, :label => 'Expense'
 
+  - coa = ChartOfAccount.find_by(organization_id: @asset.organization)
+  - unless coa.nil?
+    .row
+      .col-sm-12
+        = f.association :general_ledger_account, :required => true, :collection => GeneralLedgerAccount.where(chart_of_account_id: coa.id), :label => 'Purchase Account'
+
   .row
     .col-sm-4
-      = f.association :expense_type, :required => true, :collection => ExpenseType.where(organization_id: @asset.organization_id).active, :label => 'Category'
+      = f.association :expense_type, :required => true, :collection => ExpenseType.active, :label => 'Category'
     .col-sm-4
       = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
         %span.input-group-addon

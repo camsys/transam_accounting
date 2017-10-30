@@ -50,6 +50,10 @@ class BookValueUpdateEvent < AssetEvent
   def get_update
     "Book value: #{self.book_value}."
   end
+
+  def can_update?
+     false # set to false so it doesnt show up in the asset detail page action menu and existing events cannot be updated
+  end
   
   protected
 

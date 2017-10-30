@@ -122,6 +122,8 @@ class GeneralLedgerAccountsController < OrganizationAwareController
         result = GeneralLedgerAccount.accumulated_depreciation_accounts.where(chart_of_account_id: params[:chart_of_account_id])
       when 'disposal'
         result = GeneralLedgerAccount.disposal_accounts.where(chart_of_account_id: params[:chart_of_account_id])
+      else
+        result = GeneralLedgerAccount.where(chart_of_account_id: params[:chart_of_account_id])
     end
 
     respond_to do |format|

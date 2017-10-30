@@ -1,7 +1,7 @@
 :ruby
   glas = Hash.new
   ChartOfAccount.where(organization_id: @organization_list).each do |coa|
-    glas[coa.organization_id] = coa.general_ledger_accounts.fixed_asset_accounts.ids
+    glas[coa.organization_id] = coa.general_ledger_accounts.ids
   end
 
 = simple_form_for(@grant,

@@ -1,10 +1,10 @@
 - if can? :create, GeneralLedgerMapping
   .btn-group{style: 'margin-top:-2px;'}
-    = link_to new_general_ledger_mapping_path, :class => 'btn btn-default' do
+    = link_to new_general_ledger_mapping_path(chart_of_account_id: @chart_of_account_id), :class => 'btn btn-default' do
       %i.fa.fa-plus.fa-fw
       = "Add GL Mapping"
 
-= form_tag general_ledger_mappings_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action', style: 'padding-top: 1px' do
+= form_tag general_ledger_mappings_path(chart_of_account_id: @chart_of_account_id), :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action', style: 'padding-top: 1px' do
   .form-group
     = select_tag(:asset_type_filter, options_for_select(AssetType.all.collect{|a| [a.to_s, a.id]}, :selected => @asset_type_filter), :class => "form-control", :multiple => true)
 

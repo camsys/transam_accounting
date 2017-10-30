@@ -103,15 +103,31 @@ module TransamDepreciable
         # Make sure we are working with a concrete asset class
         asset = is_typed? ? self : Asset.get_typed_asset(self)
 
+        gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
+
         table = []
         asset.depreciation_entries.each_with_index do |depr_entry, idx|
           table << {
               :on_date => depr_entry.event_date,
               :description => depr_entry.description,
-              :depreciated_expense => idx > 0 ? asset.depreciation_entries[idx-1].book_value - depr_entry.book_value : '',
-              :book_value_end => depr_entry.book_value,
-              :accumulated_depreciation => asset.depreciation_purchase_cost - depr_entry.book_value
+              :general_ledger_account => '',
+              :amount => idx > 0 ? depr_entry.book_value - asset.depreciation_entries[idx-1].book_value : 0,
+              :book_value => depr_entry.book_value
           }
+
+          if ChartOfAccount.find_by(organization_id: asset.organization_id)
+            if depr_entry.description.include? 'Purchase'
+              table[-1][:general_ledger_account] = gl_mapping.asset_account.account_number
+            elsif depr_entry.description.include? 'Depreciation Expense'
+              table[-1][:general_ledger_account] = gl_mapping.depr_expense_account.account_number
+            elsif depr_entry.description.include? 'Disposal'
+              table[-1][:general_ledger_account] = gl_mapping.gain_loss_account.account_number
+            elsif depr_entry.description.include? 'CapEx'
+              table[-1][:general_ledger_account] = Expenditure.find_by(expense_date: depr_entry.event_date, description: depr_entry.description.split(' ')[1]).general_ledger_account
+            elsif depr_entry.description.include? 'Rehab'
+              table[-1][:general_ledger_account] = RehabilitationUpdateEvent.find_by(expense_date: depr_entry.event_date, description: depr_entry.description.split(' ')[1]).general_ledger_account
+            end
+          end
         end
       end
       cache_object('depreciation_table', table)
@@ -153,7 +169,7 @@ module TransamDepreciable
 
         if asset.depreciable
           if asset.depreciation_entries.count == 0
-            asset.depreciation_entries.create!(description: 'Initial Value', book_value: asset.depreciation_purchase_cost, event_date: asset.depreciation_start_date)
+            asset.depreciation_entries.create!(description: 'Purchase', book_value: asset.depreciation_purchase_cost, event_date: asset.depreciation_start_date)
           end
 
           depr_start = asset.current_depreciation_date || asset.depreciation_start_date
@@ -167,21 +183,21 @@ module TransamDepreciable
             asset.current_depreciation_date = asset_policy.depreciation_date(depr_start)
             book_value = calculate(asset, class_name)
 
-            if asset.depreciation_entries.where(description: 'Annual Adjustment', event_date: asset.current_depreciation_date).count == 0
+            if asset.depreciation_entries.where(description: 'Depreciation Expense', event_date: asset.current_depreciation_date).count == 0
               asset.book_value = book_value.to_i
 
-              depr_entry = asset.depreciation_entries.create!(description: 'Annual Adjustment', book_value: asset.book_value, event_date: asset.current_depreciation_date)
+              depr_entry = asset.depreciation_entries.create!(description: 'Depreciation Expense', book_value: asset.book_value, event_date: asset.current_depreciation_date)
 
               gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
               if gl_mapping.present? # check whether this app records GLAs at all
                 if depr_entry.event_date - 1.year < asset.depreciation_start_date
-                  depr_amount = asset.depreciation_entries.find_by(description: 'Initial Value', event_date: asset.depreciation_start_date).book_value - depr_entry.book_value
+                  depr_amount = asset.depreciation_entries.find_by(description: 'Purchase', event_date: asset.depreciation_start_date).book_value - depr_entry.book_value
                 else
-                  depr_amount = asset.depreciation_entries.find_by(description: 'Annual Adjustment', event_date: depr_entry.event_date - 1.year).book_value - depr_entry.book_value
+                  depr_amount = asset.depreciation_entries.find_by(description: 'Depreciation Expense', event_date: depr_entry.event_date - 1.year).book_value - depr_entry.book_value
                 end
-                gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Accumulated Depr #{asset.asset_path}", amount: -depr_amount)
+                gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Accumulated Depreciation #{asset.asset_path}", amount: -depr_amount)
 
-                gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Depr Expense #{asset.asset_path}", amount: depr_amount)
+                gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Depreciation Expense #{asset.asset_path}", amount: depr_amount)
               end
             end
 

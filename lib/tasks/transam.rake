@@ -56,21 +56,8 @@ namespace :transam do
   end
 
   desc "cleanup all GLA/grant data for testing"
-  task reload_gla_depr_data: :environment do
-    # cleanup asset data
-    GrantPurchase.delete_all
-
-    GeneralLedgerMapping.destroy_all
-
-    Grant.destroy_all
-    GeneralLedgerAccount.destroy_all
-
-    # reload organization GLA's to COA
-    OrganizationGeneralLedgerAccount.all.each do |general_gla|
-        ChartOfAccount.all.each do |chart|
-          chart.general_ledger_accounts.create!(general_ledger_account_type: general_gla.general_ledger_account_type, general_ledger_account_subtype: general_gla.general_ledger_account_subtype, account_number: general_gla.account_number, name: general_gla.name)
-        end
-    end
+  task reload_depr_data: :environment do
+    DepreciationEntry.destroy_all
 
     Asset.update_all(current_depreciation_date: nil)
   end

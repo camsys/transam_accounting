@@ -1,7 +1,6 @@
 class GeneralLedgerMappingsController < OrganizationAwareController
 
   add_breadcrumb "Home", :root_path
-  add_breadcrumb "GL Mappings", :general_ledger_mappings_path
 
   INDEX_KEY_LIST_VAR    = "bond_request_key_list_cache_var"
 
@@ -14,8 +13,15 @@ class GeneralLedgerMappingsController < OrganizationAwareController
     conditions  = []
     values      = []
 
-    conditions << 'chart_of_account_id IN (?)'
-    values << ChartOfAccount.where(organization_id: @organization_list).ids
+    if params[:chart_of_account_id]
+      @chart_of_account_id = params[:chart_of_account_id].to_i
+      conditions << 'chart_of_account_id = ?'
+      values << @chart_of_account_id
+
+      coa = ChartOfAccount.find_by(id: @chart_of_account_id)
+      add_breadcrumb coa, general_ledger_accounts_path(organization_id: coa.organization_id)
+      add_breadcrumb "GL Mappings", :general_ledger_mappings_path
+    end
 
     if params[:asset_type_filter]
       @asset_type_filter = params[:asset_type_filter]
@@ -45,13 +51,22 @@ class GeneralLedgerMappingsController < OrganizationAwareController
 
   # GET /general_ledger_mappings/new
   def new
-    add_breadcrumb "New", :new_general_ledger_mapping_path
+
+    @chart_of_account_id = params[:chart_of_account_id].to_i
+    coa = ChartOfAccount.find_by(id: @chart_of_account_id)
+    add_breadcrumb coa, general_ledger_accounts_path(organization_id: coa.organization_id)
+    add_breadcrumb "GL Mappings", general_ledger_mappings_path(chart_of_account_id: @chart_of_account_id)
+    add_breadcrumb "New", new_general_ledger_mapping_path(chart_of_account_id: @chart_of_account_id)
 
     @general_ledger_mapping = GeneralLedgerMapping.new
   end
 
   # GET /general_ledger_mappings/1/edit
   def edit
+    @chart_of_account_id = @general_ledger_mapping.chart_of_account_id
+    coa = ChartOfAccount.find_by(id: @chart_of_account_id)
+    add_breadcrumb coa, general_ledger_accounts_path(organization_id: coa.organization_id)
+    add_breadcrumb "GL Mappings", general_ledger_mappings_path(chart_of_account_id: @chart_of_account_id)
     add_breadcrumb "Update #{@general_ledger_mapping}", edit_general_ledger_mapping_path(@general_ledger_mapping)
   end
 

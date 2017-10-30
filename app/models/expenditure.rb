@@ -116,27 +116,15 @@ class Expenditure < ActiveRecord::Base
   def create_depreciation_entry
     assets.each do |asset|
       gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
-      new_book_value = asset.book_value + self.amount
-
       if gl_mapping.present? # check whether this app records GLAs at all
 
-        depr_date = asset.policy_analyzer.get_depreciation_date(expense_date - 1.year)
+        gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx #{asset.asset_path}", amount: self.amount)
 
-
-        if depr_date < asset.depreciation_start_date
-          depr_amount = asset.depreciation_entries.find_by(description: 'Initial Value', event_date: asset.depreciation_start_date).book_value - new_book_value
-        else
-          depr_amount = asset.depreciation_entries.find_by(description: 'Annual Adjustment', event_date: depr_date).book_value - new_book_value
-        end
-        gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx - Accumulated Depr #{asset.asset_path}", amount: -depr_amount)
-
-        gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx - Depr Expense #{asset.asset_path}", amount: depr_amount)
-
-        gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx - #{asset.asset_path}", amount: self.amount)
+        self.general_ledger_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx #{asset.asset_path}", amount: -self.amount)
       end
 
-      asset.depreciation_entries.create!(description: "CapEx - #{self.description}", book_value: new_book_value, event_date: expense_date)
-      asset.update(book_value: new_book_value)
+      asset.depreciation_entries.create!(description: "CapEx #{self.description}", book_value: asset.book_value + self.amount, event_date: expense_date)
+      asset.update(book_value: asset.book_value + self.amount)
     end
   end
 

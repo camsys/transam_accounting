@@ -15,6 +15,7 @@ class GeneralLedgerMapping < ActiveRecord::Base
   belongs_to :chart_of_account
   belongs_to :asset_subtype
   belongs_to :asset_account, :class_name => 'GeneralLedgerAccount'
+  belongs_to :purchase_account, :class_name => 'GeneralLedgerAccount'
   belongs_to :depr_expense_account, :class_name => 'GeneralLedgerAccount'
   belongs_to :accumulated_depr_account, :class_name => 'GeneralLedgerAccount'
   belongs_to :gain_loss_account, :class_name => 'GeneralLedgerAccount'
@@ -25,6 +26,7 @@ class GeneralLedgerMapping < ActiveRecord::Base
   validates :chart_of_account,                   :presence => true
   validates :asset_subtype,                      :presence => true
   validates :asset_account,                      :presence => true
+  validates :purchase_account,                   :presence => true
   validates :depr_expense_account,               :presence => true
   validates :accumulated_depr_account,           :presence => true
   validates :gain_loss_account,                  :presence => true
@@ -38,6 +40,7 @@ class GeneralLedgerMapping < ActiveRecord::Base
       :chart_of_account_id,
       :asset_subtype_id,
       :asset_account_id,
+      :purchase_account_id,
       :depr_expense_account_id,
       :accumulated_depr_account_id,
       :gain_loss_account_id

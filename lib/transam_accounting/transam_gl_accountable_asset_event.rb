@@ -1,4 +1,4 @@
-module TransamAccountable
+module TransamGlAccountableAssetEvent
   #------------------------------------------------------------------------------
   #
   # Accountable
@@ -13,20 +13,18 @@ module TransamAccountable
 
   included do
 
-    after_create :create_chart_of_account
+    after_create     :create_depreciation_entry
 
     # ----------------------------------------------------
     # Associations
     # ----------------------------------------------------
 
-    # Each org can have 0 or more grants
-    has_many  :grants
+    belongs_to :general_ledger_account
 
-    # Each org can have 0 or 1 chart of accounts
-    has_one   :chart_of_account
+    FORM_PARAMS = [
+        :general_ledger_account_id
+    ]
 
-    # Each org can have 0 or more general ledger accounts if they have a chart of accounts
-    has_many  :general_ledger_accounts, :through => :chart_of_account
 
     # ----------------------------------------------------
     # Validations
@@ -50,18 +48,22 @@ module TransamAccountable
   #
   #------------------------------------------------------------------------------
 
-  # Utility method for returning the chart of accounts
-  def chart_of_accounts
-    chart_of_account
-  end
 
   protected
 
-  private
+  def create_depreciation_entry
+    assets.each do |asset|
+      gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
+      if gl_mapping.present? # check whether this app records GLAs at all
 
-  def create_chart_of_account
-    chart = ChartOfAccount.new(organization_id: self.id)
-    chart.save
+        gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: expense_date, description: "Rehab #{asset.asset_path}", amount: self.total_cost)
+
+        self.general_ledger_account.general_ledger_account_entries.create!(event_date: expense_date, description: "Rehab #{asset.asset_path}", amount: -self.total_cost)
+      end
+
+      asset.depreciation_entries.create!(description: "CapEx #{self.description}", book_value: asset.book_value + self.total_cost, event_date: expense_date)
+      asset.update(book_value: asset.book_value + self.total_cost)
+    end
   end
 
 end

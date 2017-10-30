@@ -3,15 +3,16 @@
 :wrapper => :vertical_form,
 :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
 
-  = f.association :chart_of_account, :collection => ChartOfAccount.where(organization_id: @organization_list)
+  = f.input :chart_of_account_id, :as => :hidden, :value => @chart_of_account_id
   = f.association :asset_subtype, :collection => AssetType.all, :as => :grouped_select, :group_method => :asset_subtypes
 
-  = f.association :asset_account, :collection => []
-  = f.association :depr_expense_account, :collection => []
-  = f.association :accumulated_depr_account, :collection => []
-  = f.association :gain_loss_account, :collection => []
+  = f.association :asset_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id)
+  = f.association :purchase_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id)
+  = f.association :depr_expense_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Depreciation Expense Account'
+  = f.association :accumulated_depr_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Accumulated Depreciation Account'
+  = f.association :gain_loss_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Gain/Loss Account'
 
-  = f.button :submit, :class => "btn btn-primary"
+  = f.button :submit, :class => "btn btn-primary", :label => 'Save'
 
 :javascript
 
@@ -19,84 +20,4 @@
     submitHandler: function(form) {
       form.submit();
     }
-  });
-
-  $('#general_ledger_mapping_chart_of_account_id').change(function(){
-    $('#general_ledger_mapping_asset_account_id').empty();
-    $('#general_ledger_mapping_depr_expense_account_id').empty();
-    $('#general_ledger_mapping_accumulated_depr_account_id').empty();
-    $('#general_ledger_mapping_gain_loss_account_id').empty();
-
-
-    if ($('#general_ledger_mapping_chart_of_account_id').val() > 0) {
-      var url = '#{get_accounts_general_ledger_accounts_path}';
-      $.ajax({
-        url: url,
-        data: {chart_of_account_id: $('#general_ledger_mapping_chart_of_account_id').val(), subtype: 'fixed_asset'},
-        success: function(result){
-          //Add a blank entry to the list
-          $('#general_ledger_mapping_asset_account_id').append( $("<option></option>").attr("value", "").text(''));
-          for(i = 0;i<result.length;i++){
-            $("#general_ledger_mapping_asset_account_id").append(
-              $("<option></option>").attr("value", result[i][0]).text(result[i][1])
-            );
-          }
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
-          }
-      });
-
-      $.ajax({
-        url: url,
-        data: {chart_of_account_id: $('#general_ledger_mapping_chart_of_account_id').val(), subtype: 'depreciation_expense'},
-        success: function(result){
-          //Add a blank entry to the list
-          $('#general_ledger_mapping_depr_expense_account_id').append( $("<option></option>").attr("value", "").text(''));
-          for(i = 0;i<result.length;i++){
-            $("#general_ledger_mapping_depr_expense_account_id").append(
-              $("<option></option>").attr("value", result[i][0]).text(result[i][1])
-            );
-          }
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
-          }
-      });
-
-      $.ajax({
-        url: url,
-        data: {chart_of_account_id: $('#general_ledger_mapping_chart_of_account_id').val(), subtype: 'accumulated_depreciation'},
-        success: function(result){
-          //Add a blank entry to the list
-          $('#general_ledger_mapping_accumulated_depr_account_id').append( $("<option></option>").attr("value", "").text(''));
-          for(i = 0;i<result.length;i++){
-            $("#general_ledger_mapping_accumulated_depr_account_id").append(
-              $("<option></option>").attr("value", result[i][0]).text(result[i][1])
-            );
-          }
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
-          }
-      });
-
-      $.ajax({
-        url: url,
-        data: {chart_of_account_id: $('#general_ledger_mapping_chart_of_account_id').val(), subtype: 'disposal'},
-        success: function(result){
-          //Add a blank entry to the list
-          $('#general_ledger_mapping_gain_loss_account_id').append( $("<option></option>").attr("value", "").text(''));
-          for(i = 0;i<result.length;i++){
-            $("#general_ledger_mapping_gain_loss_account_id").append(
-              $("<option></option>").attr("value", result[i][0]).text(result[i][1])
-            );
-          }
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
-          }
-      });
-    }
-
   });
