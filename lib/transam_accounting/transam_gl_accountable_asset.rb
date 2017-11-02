@@ -85,7 +85,6 @@ module TransamGlAccountableAsset
         amount_to_ledger -= amount
       end
       gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: self.depreciation_start_date, description: "Purchase #{asset_path}", amount: amount)
-      gl_mapping.purchase_account.general_ledger_account_entries.create!(event_date: self.depreciation_start_date, description: "Purchase #{asset_path}", amount: -amount)
     end
   end
 

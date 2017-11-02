@@ -39,7 +39,10 @@ class DepreciationEntry < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
-
+  scope :depreciation_expenses, -> { where("description LIKE 'Depreciation Expense%'") }
+  scope :manual_adjustments, -> { where("description LIKE 'Manual%'") }
+  scope :capex, -> { where("description LIKE 'CapEx%'") }
+  scope :rehab, -> { where("description LIKE 'Rehab%'") }
 
   #------------------------------------------------------------------------------
   #

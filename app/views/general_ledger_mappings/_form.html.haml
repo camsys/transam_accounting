@@ -7,7 +7,6 @@
   = f.association :asset_subtype, :collection => AssetType.all, :as => :grouped_select, :group_method => :asset_subtypes
 
   = f.association :asset_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id)
-  = f.association :purchase_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id)
   = f.association :depr_expense_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Depreciation Expense Account'
   = f.association :accumulated_depr_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Accumulated Depreciation Account'
   = f.association :gain_loss_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Gain/Loss Account'

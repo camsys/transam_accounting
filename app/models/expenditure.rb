@@ -115,16 +115,17 @@ class Expenditure < ActiveRecord::Base
   protected
   def create_depreciation_entry
     assets.each do |asset|
+      changed_amount = (self.amount - self.amount_was.to_i)
+
       gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
+
       if gl_mapping.present? # check whether this app records GLAs at all
+        gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx #{asset.asset_path}", amount: changed_amount)
 
-        gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx #{asset.asset_path}", amount: self.amount)
-
-        self.general_ledger_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx #{asset.asset_path}", amount: -self.amount)
+        self.general_ledger_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx #{asset.asset_path}", amount: -changed_amount) if self.general_ledger_account.present?
       end
 
-      asset.depreciation_entries.create!(description: "CapEx #{self.description}", book_value: asset.book_value + self.amount, event_date: expense_date)
-      asset.update(book_value: asset.book_value + self.amount)
+      asset.depreciation_entries.create!(description: "CapEx #{self.description}", book_value: asset.book_value + changed_amount, event_date: expense_date)
     end
   end
 

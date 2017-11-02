@@ -71,13 +71,12 @@ class BookValueUpdateEvent < AssetEvent
     if gl_mapping.present? # check whether this app records GLAs at all
       depr_amount = asset.book_value || asset.depreciation_purchase_cost - book_value
 
-      gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Accumulated Depr #{asset.asset_path}", amount: -depr_amount)
+      gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Accumulated Depreciation #{asset.asset_path}", amount: -depr_amount)
 
-      gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Depr Expense #{asset.asset_path}", amount: depr_amount)
+      gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Deprectiation Expense #{asset.asset_path}", amount: depr_amount)
     end
 
-    asset.depreciation_entries.create!(description: "Manual Adjustment - #{self.comments}", book_value: self.book_value, event_date: self.event_date)
-    asset.update(book_value: self.book_value)
+    asset.depreciation_entries.create!(description: "Manual Adjustment #{self.comments}", book_value: self.book_value, event_date: self.event_date)
   end
   
 end

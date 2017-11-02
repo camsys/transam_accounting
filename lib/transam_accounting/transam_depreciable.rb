@@ -168,27 +168,52 @@ module TransamDepreciable
 
 
         if asset.depreciable
-          if asset.depreciation_entries.count == 0
+
+          gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
+
+          if asset.depreciation_entries.count == 0 # add the initial depr entry if it does not exist
             asset.depreciation_entries.create!(description: 'Purchase', book_value: asset.depreciation_purchase_cost, event_date: asset.depreciation_start_date)
           end
 
-          depr_start = asset.current_depreciation_date || asset.depreciation_start_date
-          depr_current = asset.policy_analyzer.get_current_depreciation_date
-          asset_policy = asset.policy
+          # check and set the asset book value from the last depr entry
+          # start depreciating from this point forward including that date -- (the inclusive is just in case the automated calculation hasn't been done for that date yet)
+          asset.book_value = asset.depreciation_entries.last.book_value
+          depr_start = asset.depreciation_entries.last.event_date
 
-          # see what algorithm we are using to calculate the book value
-          class_name = asset.policy_analyzer.get_depreciation_calculation_type.class_name
+          # destroy any manual adjustments (this includes capex and rehab) past the depr start
+          asset.depreciation_entries.where('event_date > ?', depr_start).destroy_all
+          if gl_mapping.present?
+            gl_mapping.accumulated_depr_account.general_ledger_account_entries.where(description: "Manual Adjustment - Accumulated Depreciation #{asset.asset_path}").where.where('event_date > ?', depr_start).each do |gl_entry|
+              gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: event_date, description: "REVERSED Manual Adjustment - Accumulated Depreciation #{asset.asset_path}", amount: -gl_entry.amount)
 
-          while depr_start <= depr_current
-            asset.current_depreciation_date = asset_policy.depreciation_date(depr_start)
-            book_value = calculate(asset, class_name)
+              gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: event_date, description: "REVERSED Manual Adjustment - Deprectiation Expense #{asset.asset_path}", amount: gl_entry.amount)
+            end
+          end
 
+
+          while depr_start <= asset.policy_analyzer.get_current_depreciation_date
+            asset.current_depreciation_date = asset.policy_analyzer.get_depreciation_date(depr_start)
+
+            # re-add capex/rehab for this depreciation interval. no changes to GL.
+            asset.expenditures.where('expense_date > ? AND expense_date <= ?', depr_start, asset.current_depreciation_date).each do |evt|
+              asset.book_value += evt.amount
+              asset.depreciation_entries.create!(description: "CapEx #{evt.description}", book_value: asset.book_value, event_date: evt.expense_date)
+            end
+            asset.rehabilitation_updates.where('event_date > ? AND event_date <= ?', depr_start, asset.current_depreciation_date).each do |evt|
+              asset.book_value += evt.total_cost
+              asset.depreciation_entries.create!(description: "Rehabilitation #{evt.comments}", book_value: asset.book_value, event_date: evt.event_date)
+            end
+
+
+            # get this interval's system calculated depreciation
             if asset.depreciation_entries.where(description: 'Depreciation Expense', event_date: asset.current_depreciation_date).count == 0
+              # see what algorithm we are using to calculate the book value
+              class_name = asset.policy_analyzer.get_depreciation_calculation_type.class_name
+              book_value = calculate(asset, class_name)
               asset.book_value = book_value.to_i
 
               depr_entry = asset.depreciation_entries.create!(description: 'Depreciation Expense', book_value: asset.book_value, event_date: asset.current_depreciation_date)
 
-              gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
               if gl_mapping.present? # check whether this app records GLAs at all
                 if depr_entry.event_date - 1.year < asset.depreciation_start_date
                   depr_amount = asset.depreciation_entries.find_by(description: 'Purchase', event_date: asset.depreciation_start_date).book_value - depr_entry.book_value
@@ -201,7 +226,7 @@ module TransamDepreciable
               end
             end
 
-            depr_start = depr_start + 1.year
+            depr_start = depr_start + (asset.policy_analyzer.get_depreciation_interval_type.months).months
           end
 
         else
