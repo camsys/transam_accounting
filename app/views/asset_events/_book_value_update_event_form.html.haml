@@ -22,7 +22,7 @@
     var strEndDate = '#{@asset.policy_analyzer.get_depreciation_date(Date.today)-1.day}';
     var endDateParts = strEndDate.split("-");
     $('[data-behavior~=datepicker]').datepicker({
-      startDate: new Date(startDateParts[0], (startDateParts[1] - 1), startDateParts[2]),
-      endDate: new Date(endDateParts[0], (endDateParts[1] - 1), endDateParts[2])
+      //startDate: new Date(startDateParts[0], (startDateParts[1] - 1), startDateParts[2]),
+      //endDate: new Date(endDateParts[0], (endDateParts[1] - 1), endDateParts[2])
     });
   });

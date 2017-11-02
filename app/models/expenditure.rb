@@ -125,7 +125,17 @@ class Expenditure < ActiveRecord::Base
         self.general_ledger_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx #{asset.asset_path}", amount: -changed_amount) if self.general_ledger_account.present?
       end
 
-      asset.depreciation_entries.create!(description: "CapEx #{self.description}", book_value: asset.book_value + changed_amount, event_date: expense_date)
+      asset.depreciation_entries.create!(description: "CapEx #{self.description}", book_value: changed_amount, event_date: expense_date)
+
+      asset.depreciation_entries.depreciation_expenses.where('event_date > ?',self.expense_date).each do |depr_entry|
+        if gl_mapping.present?
+          gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: expense_date, description: "REVERSED Accumulated Depreciation #{asset.asset_path}", amount: -depr_entry.book_value)
+
+          gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: expense_date, description: "REVERSED Deprectiation Expense #{asset.asset_path}", amount: depr_entry.book_value)
+        end
+
+        depr_entry.destroy!
+      end
     end
   end
 

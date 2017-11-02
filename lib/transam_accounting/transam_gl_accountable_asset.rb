@@ -15,7 +15,6 @@ module TransamGlAccountableAsset
     # ----------------------------------------------------
     # Callbacks
     # ----------------------------------------------------
-    after_save        :update_general_ledger_accounts
 
     # ----------------------------------------------------
     # Associations
@@ -49,7 +48,6 @@ module TransamGlAccountableAsset
   module ClassMethods
     def self.allowable_params
       [
-          :general_ledger_account_id,
           :grant_purchases_attributes => [GrantPurchase.allowable_params]
       ]
     end
@@ -67,25 +65,5 @@ module TransamGlAccountableAsset
   end
 
   protected
-
-  def update_general_ledger_accounts
-
-    gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: self.organization_id).id, asset_subtype_id: self.asset_subtype_id)
-
-    if gl_mapping.nil?
-      return true
-    end
-
-    amount_to_ledger = self.depreciation_purchase_cost
-    grant_purchases.each_with_index do |gp, idx|
-      if idx + 1 == grant_purchases.count
-        amount = amount_to_ledger
-      else
-        amount = (amount_to_ledger * gp.pcnt_purchase_cost_cost / 100.0).round
-        amount_to_ledger -= amount
-      end
-      gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: self.depreciation_start_date, description: "Purchase #{asset_path}", amount: amount)
-    end
-  end
 
 end
