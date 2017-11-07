@@ -11,7 +11,7 @@
   = f.association :accumulated_depr_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Accumulated Depreciation Account'
   = f.association :gain_loss_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Gain/Loss Account'
 
-  = f.button :submit, :class => "btn btn-primary", :label => 'Save'
+  = f.button :submit, 'Save', :class => "btn btn-primary"
 
 :javascript
 
