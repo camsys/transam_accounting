@@ -13,6 +13,11 @@ module TransamAccounting
         config.paths["db/migrate"].expanded.each do |expanded_path|
           app.config.paths["db/migrate"] << expanded_path
         end
+        app.config.paths.add "db/data_migrations"
+        config.paths.add "db/data_migrations"
+        config.paths["db/data_migrations"].expanded.each do |expanded_path|
+          app.config.paths["db/data_migrations"] << expanded_path
+        end
       end
     end
 
