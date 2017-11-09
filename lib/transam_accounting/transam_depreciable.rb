@@ -170,7 +170,7 @@ module TransamDepreciable
             asset.depreciation_entries.create!(description: 'Purchase', book_value: asset.depreciation_purchase_cost, event_date: asset.depreciation_start_date)
 
             if gl_mapping.present?
-              gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.depreciation_start_date, description: "Purchase #{asset.asset_path}", amount: asset.depreciation_purchase_cost)
+              gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.depreciation_start_date, description: "Purchase #{asset.asset_path}", amount: asset.depreciation_purchase_cost, asset: asset)
             end
 
             depr_start = asset.depreciation_start_date
@@ -195,9 +195,9 @@ module TransamDepreciable
               asset.book_value = book_value.to_i
 
               if gl_mapping.present? # check whether this app records GLAs at all
-                gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Accumulated Depreciation #{asset.asset_path}", amount: depr_amount)
+                gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Accumulated Depreciation #{asset.asset_path}", amount: depr_amount, asset: asset)
 
-                gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Depreciation Expense #{asset.asset_path}", amount: -depr_amount)
+                gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Depreciation Expense #{asset.asset_path}", amount: -depr_amount, asset: asset)
               end
             end
 
@@ -223,7 +223,6 @@ module TransamDepreciable
     def set_depreciation_defaults
       self.in_service_date ||= self.purchase_date
       self.depreciation_start_date ||= self.in_service_date
-      self.depreciation_useful_life ||= self.expected_useful_life
       self.depreciation_purchase_cost ||= self.purchase_cost
       self.book_value ||= self.depreciation_purchase_cost.to_i
       self.salvage_value ||= 0

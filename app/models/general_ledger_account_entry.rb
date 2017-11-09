@@ -12,6 +12,7 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
   # Associations
   #------------------------------------------------------------------------------
   belongs_to :general_ledger_account
+  belongs_to :asset
 
   #------------------------------------------------------------------------------
   # Validations

@@ -23,17 +23,17 @@ class AssetDispositionUpdateJob < AbstractAssetUpdateJob
     if !asset.disposition_updates.empty? && gl_mapping.present?
 
       amount = asset.depreciation_purchase_cost-asset.book_value # temp variable for tracking rounding errors
-      gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal #{asset.asset_path}", amount: amount)
+      gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal #{asset.asset_path}", amount: amount, asset: asset)
 
       if asset.book_value > 0
-        gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal #{asset.asset_path}", amount: asset.book_value)
+        gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal #{asset.asset_path}", amount: asset.book_value, asset: asset)
       end
 
-      gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal #{asset.asset_path}", amount: -asset.depreciation_purchase_cost)
+      gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal #{asset.asset_path}", amount: -asset.depreciation_purchase_cost, asset: asset)
 
       disposition_event = asset.disposition_updates.last
       if disposition_event.sale_proceeds > 0
-        gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: "Disposal #{asset.asset_path}", amount: -disposition_event.sale_proceeds)
+        gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: "Disposal #{asset.asset_path}", amount: -disposition_event.sale_proceeds, asset: asset)
       end
     end
   end
