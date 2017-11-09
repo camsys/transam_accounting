@@ -116,7 +116,7 @@ class AssetFiscalYearValueReport < AbstractReport
     ]
   end
   
-  def get_data(organization_id_list, params, keys=nil)
+  def get_data(organization_id_list, params)
 
     labels = []
     formats = []
