@@ -11,7 +11,7 @@ class StraightLineDepreciationCalculator < DepreciationCalculator
     # depreciation time
     num_months_initial = asset.depreciation_useful_life.nil? ? asset.policy_analyzer.get_min_service_life_months : asset.depreciation_useful_life
     last_depr_date = on_date - (asset.policy_analyzer.get_depreciation_interval_type.months).months
-    num_months_used = (last_depr_date.year * 12 + last_depr_date.month) - (asset.depreciation_start_date.year * 12 + asset.depreciation_start_date.month)
+    num_months_used =  last_depr_date > asset.depreciation_start_date ? (last_depr_date.year * 12 + last_depr_date.month) - (asset.depreciation_start_date.year * 12 + asset.depreciation_start_date.month) : 0
     num_months_extended = asset.rehabilitation_updates.sum(:extended_useful_life_months)
     num_months_unused = num_months_initial-num_months_used+num_months_extended
 

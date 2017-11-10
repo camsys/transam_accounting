@@ -188,11 +188,11 @@ module TransamDepreciable
             if asset.depreciation_entries.where(description: 'Depreciation Expense', event_date: asset.current_depreciation_date).count == 0
               # see what algorithm we are using to calculate the book value
               class_name = asset.policy_analyzer.get_depreciation_calculation_type.class_name
-              book_value = calculate(asset, class_name)
+              book_value = (calculate(asset, class_name) + 0.5).to_i
 
               depr_amount = book_value - asset.book_value
               asset.depreciation_entries.create!(description: 'Depreciation Expense', book_value: depr_amount, event_date: asset.current_depreciation_date)
-              asset.book_value = book_value.to_i
+              asset.book_value = book_value
 
               if gl_mapping.present? # check whether this app records GLAs at all
                 gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Accumulated Depreciation #{asset.asset_path}", amount: depr_amount, asset: asset)
