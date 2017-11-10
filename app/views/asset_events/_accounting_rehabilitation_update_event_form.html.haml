@@ -1,4 +1,4 @@
 - coa = ChartOfAccount.find_by(organization_id: @asset.organization_id)
 
 -if coa.present?
-  = f.input :general_ledger_account_id, :collection => GeneralLedgerAccount.where(chart_of_account_id: coa.id), :label => 'Purchase Account'
+  = f.input :general_ledger_account_id, :collection => GeneralLedgerAccount.where(chart_of_account_id: coa.id), :label => 'Purchase Account', :label_method => 'coded_name'

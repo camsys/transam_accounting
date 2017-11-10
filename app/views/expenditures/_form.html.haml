@@ -15,7 +15,7 @@
   - unless coa.nil?
     .row
       .col-sm-12
-        = f.association :general_ledger_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: coa.id), :label => 'Purchase Account'
+        = f.association :general_ledger_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: coa.id), :label => 'Purchase Account', :label_method => 'coded_name'
 
   .row
     .col-sm-4
