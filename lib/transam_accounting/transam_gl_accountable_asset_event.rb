@@ -65,6 +65,7 @@ module TransamGlAccountableAssetEvent
     end
 
     asset.depreciation_entries.create!(description: "Rehab #{self.comments}", book_value: changed_amount, event_date: self.event_date)
+    asset.update!(current_depreciation_date: self.event_date)
 
     asset.depreciation_entries.depreciation_expenses.where('event_date > ?',self.event_date).each do |depr_entry|
       if gl_mapping.present?
