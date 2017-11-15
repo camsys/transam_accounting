@@ -106,12 +106,12 @@ module TransamDepreciable
       table << {
           :on_date => depr_entry.event_date,
           :description => depr_entry.description,
-          :general_ledger_account => '',
           :amount => depr_entry.book_value,
           :book_value => start_book_val
       }
 
-      if ChartOfAccount.find_by(organization_id: asset.organization_id)
+      if ChartOfAccount.find_by(organization_id: asset.organization_id) && gl_mapping.present?
+        table[-1][:general_ledger_account] = ''
         if depr_entry.description.include? 'Purchase'
           table[-1][:general_ledger_account] = gl_mapping.asset_account
         elsif (depr_entry.description.include? 'Depreciation Expense') || (depr_entry.description.include? 'Manual Adjustment')
