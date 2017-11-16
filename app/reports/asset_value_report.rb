@@ -1,8 +1,8 @@
 class AssetValueReport < AbstractReport
 
-  COMMON_LABELS = ['Quantity', 'Cost', 'Accumulated Depr.', 'Book Value']
+  COMMON_LABELS = ['Quantity', 'Cost Basis', 'Accumulated Depr.', 'Book Value']
   COMMON_FORMATS = [:integer, :currency, :currency, :currency]
-  DETAIL_LABELS = ['Agency', 'Type', 'Subtype', 'Asset Tag', 'Cost', 'Accumulated Depr', 'Book Value']
+  DETAIL_LABELS = ['Agency', 'Type', 'Subtype', 'Asset Tag', 'Cost Basis', 'Accumulated Depr', 'Book Value']
   DETAIL_FORMATS = [:string, :string, :string, :string, :currency, :currency, :currency]
 
   def self.get_detail_data(organization_id_list, params)
@@ -22,7 +22,7 @@ class AssetValueReport < AbstractReport
       query = query.where(clause, key[i])
     end
     
-    data = query.pluck(*['organizations.short_name', 'asset_types.name', 'asset_subtypes.name', 'assets.asset_tag', 'assets.purchase_cost', 'assets.purchase_cost-assets.book_value', 'assets.book_value']).to_a
+    data = query.pluck(*['organizations.short_name', 'asset_types.name', 'asset_subtypes.name', 'assets.asset_tag', 'assets.depreciation_purchase_cost', 'assets.depreciation_purchase_cost-assets.book_value', 'assets.book_value']).to_a
 
     {labels: DETAIL_LABELS, data: data, formats: DETAIL_FORMATS}
   end
@@ -44,8 +44,10 @@ class AssetValueReport < AbstractReport
     
     # Default scope orders by project_id
     query = Asset.operational.joins(:organization, :asset_type, :asset_subtype).where(organization_id: organization_id_list)
+    rehabs = RehabilitationUpdateEvent.unscoped.joins(asset: [:organization, :asset_type, :asset_subtype]).where(assets: {organization_id: organization_id_list})
+    expenditures = Expenditure.joins(assets: [:organization, :asset_type, :asset_subtype]).where(assets: {organization_id: organization_id_list})
 
-    params[:group_by] = ['by_agency'] if params[:group_by].nil?
+    params[:group_by] = ['by_agency', 'by_type', 'by_subtype'] if params[:group_by].nil?
     # Add clauses based on params
     @clauses = []
     @group_by = params[:group_by] ? {group_by: params[:group_by]} : {}
@@ -64,11 +66,15 @@ class AssetValueReport < AbstractReport
       end
       @clauses << clause
       query = query.group(clause).order(clause)
+      rehabs = rehabs.group(clause).order(clause)
+      expenditures = expenditures.group(clause).order(clause)
     end
 
     # Generate queries for each column
     asset_counts = query.count
-    costs = query.sum(:purchase_cost)
+    costs = query.sum(:depreciation_purchase_cost)
+    rehabs = rehabs.sum(:total_cost)
+    expenditures = expenditures.sum(:amount)
     book_values = query.sum(:book_value)
     
     data = []
@@ -79,7 +85,7 @@ class AssetValueReport < AbstractReport
       end
       # Add cost
       costs.each_with_index do |(k, v), i|
-        data[i] << v
+        data[i] << v + rehabs[k].to_i + expenditures[k].to_i
       end
       # Add accumulated depr and book value,
       book_values.each_with_index do |(k, v), i|

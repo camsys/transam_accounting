@@ -105,7 +105,7 @@ class AssetFiscalYearValueReport < AbstractReport
         {
             type: :select,
             where: :fy_year,
-            values: get_fiscal_years,
+            values: get_fiscal_years(Date.today-(SystemConfig.instance.num_forecasting_years).years,SystemConfig.instance.num_forecasting_years-1),
             label: 'FY'
         },
         {
@@ -121,9 +121,9 @@ class AssetFiscalYearValueReport < AbstractReport
     labels = []
     formats = []
 
-    params[:fy_year] = current_fiscal_year_year if params[:fy_year].nil?
+    params[:fy_year] = current_fiscal_year_year - 1 if params[:fy_year].nil?
     @fy = params[:fy_year].to_i
-    params[:group_by] = ['by_agency'] if params[:group_by].nil?
+    params[:group_by] = ['by_agency', 'by_type', 'by_subtype'] if params[:group_by].nil?
 
     # Default scope orders by project_id
     fy_start = start_of_fiscal_year(params[:fy_year].to_i)

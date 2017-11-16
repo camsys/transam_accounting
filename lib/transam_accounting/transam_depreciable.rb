@@ -119,10 +119,10 @@ module TransamDepreciable
         elsif depr_entry.description.include? 'Disposal'
           table[-1][:general_ledger_account] = gl_mapping.gain_loss_account
         elsif depr_entry.description.include? 'CapEx'
-          description = depr_entry.description[6..-1]
+          description = depr_entry.description[7..-1]
           table[-1][:general_ledger_account] = asset.expenditures.find_by(expense_date: depr_entry.event_date, description: description).general_ledger_account || ''
         elsif depr_entry.description.include? 'Rehab'
-          description = depr_entry.description[6..-1]
+          description = depr_entry.description[7..-1]
           table[-1][:general_ledger_account] = asset.rehabilitation_updates.find_by(event_date: depr_entry.event_date, comments: description).general_ledger_account || ''
         end
       end
@@ -170,7 +170,7 @@ module TransamDepreciable
             asset.depreciation_entries.create!(description: 'Purchase', book_value: asset.depreciation_purchase_cost, event_date: asset.depreciation_start_date)
 
             if gl_mapping.present?
-              gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.depreciation_start_date, description: "Purchase #{asset.asset_path}", amount: asset.depreciation_purchase_cost, asset: asset)
+              gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.depreciation_start_date, description: "Purchase: #{asset.asset_path}", amount: asset.depreciation_purchase_cost, asset: asset)
             end
 
             depr_start = asset.depreciation_start_date
@@ -195,9 +195,9 @@ module TransamDepreciable
               asset.book_value = book_value
 
               if gl_mapping.present? # check whether this app records GLAs at all
-                gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Accumulated Depreciation #{asset.asset_path}", amount: depr_amount, asset: asset)
+                gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Accumulated Depreciation: #{asset.asset_path}", amount: depr_amount, asset: asset)
 
-                gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Depreciation Expense #{asset.asset_path}", amount: -depr_amount, asset: asset)
+                gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Depreciation Expense: #{asset.asset_path}", amount: -depr_amount, asset: asset)
               end
             end
 

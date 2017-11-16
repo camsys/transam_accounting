@@ -63,7 +63,7 @@ class GeneralLedgerAccount < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
-  # Allow selection of active instances
+  default_scope { order(:account_number) }
   scope :active, -> { where(:active => true) }
 
   scope :asset_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Asset Account')) }

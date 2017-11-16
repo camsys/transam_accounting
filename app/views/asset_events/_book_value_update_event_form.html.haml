@@ -4,6 +4,9 @@
     %span.input-group-addon
       %i.fa.fa-calendar
 
+  .alert.alert-info
+    = "Book value as of <span id='current_event_date'>#{format_as_date(f.object.event_date)}</span>: <b><span id='current_book_val'>#{format_as_currency(@asset.book_value)}</span></b>".html_safe
+
   = f.input :book_value, :wrapper => :vertical_append, :label => "Book Value" do
     %span.input-group-addon
       %i.fa.fa-usd
@@ -22,7 +25,41 @@
     var strEndDate = '#{@asset.policy_analyzer.get_depreciation_date(Date.today)-1.day}';
     var endDateParts = strEndDate.split("-");
     $('[data-behavior~=datepicker]').datepicker({
-      //startDate: new Date(startDateParts[0], (startDateParts[1] - 1), startDateParts[2]),
-      //endDate: new Date(endDateParts[0], (endDateParts[1] - 1), endDateParts[2])
+      startDate: new Date(startDateParts[0], (startDateParts[1] - 1), startDateParts[2]),
+      endDate: new Date(endDateParts[0], (endDateParts[1] - 1), endDateParts[2])
     });
   });
+
+  $('#asset_event_event_date').datepicker({
+    onSelect: function(d,i){
+      if(d !== i.lastVal){
+        $(this).change();
+      }
+    }
+  });
+
+  $('#asset_event_event_date').change(function() {
+    $.ajax({
+      url: '#{get_book_value_on_date_inventory_path(@asset)}',
+      data: {
+          on_date: function() {
+            return $('#asset_event_event_date').val();
+          }
+      },
+      success: function(result){
+        $('#current_event_date').text($('#asset_event_event_date').val());
+        $('#current_book_val').text(currency_formatter(parseInt(result)));
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+      }
+    });
+  });
+
+  function integer_formatter(value) {
+    return format("###,##0.", value);
+  };
+
+  function currency_formatter(value) {
+    return '$' + integer_formatter(value);
+  };

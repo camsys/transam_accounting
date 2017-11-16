@@ -36,6 +36,16 @@ module TransamAccountingAssetsController
     end
   end
 
+  def get_book_value_on_date
+    get_asset
+
+    book_val = @asset.depreciation_entries.where('event_date <= ?', reformat_date(params[:on_date])).sum(:book_value)
+
+    respond_to do |format|
+      format.json { render :json => book_val.to_json }
+    end
+  end
+
   # form for updating depreciation inputs
   def edit_depreciation
     get_asset

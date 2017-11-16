@@ -109,7 +109,7 @@ reports = [
     {
         :active => 1,
         :belongs_to => 'report_type',
-        :type => "Inventory Report",
+        :type => "GL/Accounting Report",
         :name => 'Asset Value Report',
         :class_name => "AssetValueReport",
         :view_name => "generic_table_with_subreports",
@@ -119,6 +119,21 @@ reports = [
         :exportable => true,
         :roles => 'guest,user,manager',
         :description => 'Displays a report of asset book values.',
+        :chart_type => '',
+        :chart_options => ""
+    },
+    {
+        :active => 1,
+        :report_type => "GL/Accounting Report",
+        :name => 'Asset Value Report by FY',
+        :class_name => "AssetFiscalYearValueReport",
+        :view_name => "generic_table_with_subreports",
+        :show_in_nav => 1,
+        :show_in_dashboard => 1,
+        :printable => true,
+        :exportable => true,
+        :roles => 'guest,user,manager',
+        :description => 'Displays a report of asset values in GL by FY.',
         :chart_type => '',
         :chart_options => ""
     }

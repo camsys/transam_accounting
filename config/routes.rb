@@ -33,6 +33,7 @@ Rails.application.routes.draw do
     end
 
     member do
+      get 'get_book_value_on_date'
       get 'edit_depreciation'
       post 'update_depreciation'
     end

@@ -39,6 +39,8 @@ class DepreciationEntry < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
+  default_scope { order(:event_date) }
+
   scope :depreciation_expenses, -> { where("description LIKE 'Depreciation Expense%'") }
   scope :manual_adjustments, -> { where("description LIKE 'Manual%'") }
   scope :capex, -> { where("description LIKE 'CapEx%'") }
