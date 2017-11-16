@@ -75,7 +75,7 @@ class GeneralLedgerMappingsController < OrganizationAwareController
     @general_ledger_mapping = GeneralLedgerMapping.new(general_ledger_mapping_params)
 
     if @general_ledger_mapping.save
-      redirect_to general_ledger_mappings_path, notice: 'General ledger mapping was successfully created.'
+      redirect_to general_ledger_mappings_path(chart_of_account_id: @general_ledger_mapping.chart_of_account_id), notice: 'General ledger mapping was successfully created.'
     else
       render :new
     end
@@ -84,7 +84,7 @@ class GeneralLedgerMappingsController < OrganizationAwareController
   # PATCH/PUT /general_ledger_mappings/1
   def update
     if @general_ledger_mapping.update(general_ledger_mapping_params)
-      redirect_to general_ledger_mappings_path, notice: 'General ledger mapping was successfully updated.'
+      redirect_to general_ledger_mappings_path(chart_of_account_id: @general_ledger_mapping.chart_of_account_id), notice: 'General ledger mapping was successfully updated.'
     else
       render :edit
     end
@@ -92,8 +92,9 @@ class GeneralLedgerMappingsController < OrganizationAwareController
 
   # DELETE /general_ledger_mappings/1
   def destroy
+    chart_of_account_id = @general_ledger_mapping.chart_of_account_id
     @general_ledger_mapping.destroy
-    redirect_to general_ledger_mappings_url, notice: 'General ledger mapping was successfully destroyed.'
+    redirect_to general_ledger_mappings_path(chart_of_account_id: chart_of_account_id), notice: 'General ledger mapping was successfully destroyed.'
   end
 
   private
