@@ -7,6 +7,7 @@ class DepreciationEntry < ActiveRecord::Base
   # Callbacks
   #------------------------------------------------------------------------------
   after_initialize  :set_defaults
+  before_save       :check_description_length
 
   #------------------------------------------------------------------------------
   # Associations
@@ -76,6 +77,12 @@ class DepreciationEntry < ActiveRecord::Base
 
   def set_defaults
 
+  end
+
+  def check_description_length
+    if self.description.length > 255
+      self.description = self.description[0..254]
+    end
   end
 
 end

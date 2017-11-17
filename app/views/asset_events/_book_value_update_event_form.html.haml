@@ -26,16 +26,13 @@
     var endDateParts = strEndDate.split("-");
     $('[data-behavior~=datepicker]').datepicker({
       startDate: new Date(startDateParts[0], (startDateParts[1] - 1), startDateParts[2]),
-      endDate: new Date(endDateParts[0], (endDateParts[1] - 1), endDateParts[2])
-    });
-  });
-
-  $('#asset_event_event_date').datepicker({
-    onSelect: function(d,i){
-      if(d !== i.lastVal){
-        $(this).change();
+      endDate: new Date(endDateParts[0], (endDateParts[1] - 1), endDateParts[2]),
+      onSelect: function(d,i){
+        if(d !== i.lastVal){
+          $(this).change();
+        }
       }
-    }
+    });
   });
 
   $('#asset_event_event_date').change(function() {
