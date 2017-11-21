@@ -120,10 +120,10 @@ module TransamDepreciable
           table[-1][:general_ledger_account] = gl_mapping.gain_loss_account
         elsif depr_entry.description.include? 'CapEx'
           description = depr_entry.description[7..-1]
-          table[-1][:general_ledger_account] = asset.expenditures.find_by(expense_date: depr_entry.event_date, description: description).general_ledger_account || ''
+          table[-1][:general_ledger_account] = asset.expenditures.find_by(expense_date: depr_entry.event_date, description: description).try(:general_ledger_account)
         elsif depr_entry.description.include? 'Rehab'
           description = depr_entry.description[7..-1]
-          table[-1][:general_ledger_account] = asset.rehabilitation_updates.find_by(event_date: depr_entry.event_date, comments: description).general_ledger_account || ''
+          table[-1][:general_ledger_account] = asset.rehabilitation_updates.find_by(event_date: depr_entry.event_date, comments: description).try(:general_ledger_account)
         end
       end
     end
