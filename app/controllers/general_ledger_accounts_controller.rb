@@ -72,6 +72,22 @@ class GeneralLedgerAccountsController < OrganizationAwareController
     end
   end
 
+  def toggle_archive
+    coa = ChartOfAccount.find_by(id: params[:chart_of_account_id])
+
+    if coa.present?
+      if ArchivedFiscalYear.archive(coa.organization_id, params[:fy_year], true)
+        notify_user(:notice, "The FY was successfully archived/unarchived.")
+      else
+        notify_user(:alert, "Cannot archive/unarchive FY.")
+      end
+
+      redirect_to general_ledger_accounts_path(organization_id: coa.organization_id)
+    else
+      redirect_to '/404'
+    end
+  end
+
   def show
 
     add_breadcrumb @chart_of_accounts, general_ledger_accounts_path(organization_id: @chart_of_accounts.organization_id)

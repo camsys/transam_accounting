@@ -1,0 +1,51 @@
+= render :layout => "search_panel" do |f|
+  .panel-group#search-fields
+
+    .panel.panel-info
+      .panel-heading
+        = link_to 'General Ledger Account', '#gla', :role => 'button', :data => {:toggle => 'collapse'}, :aria => {:expanded => true}
+
+      .panel-body#gla.collapse
+        .row
+          .col-md-3
+            = f.input :mapping, collection: [['Asset Accounts', 'asset_account'], ['Accumulated Depreciation Accounts', 'accumulated_depr_account'], ['Depreciation Expense Accounts', 'depr_expense_account'], ['Gain/Loss Accounts', 'gain_loss_account']], label: 'GL Mappings', input_html: { multiple: true }
+          .col-md-3
+            = f.input :account_number
+          .col-md-3
+            = f.input :name, :label => 'Account Name'
+
+    .panel.panel-info
+      .panel-heading
+        = link_to 'General Ledger Entries', '#gla-entries', :role => 'button', :data => {:toggle => 'collapse'}, :aria => {:expanded => true}
+      .panel-body#gla-entries.collapse
+        .row
+          .col-md-3
+            = f.input :event_date, :wrapper => :vertical_prepend, :label => "Entry Date" do
+              .input-group-btn
+                %button.btn.btn-default.dropdown-toggle{"data-toggle" => "dropdown", :type => "button"}
+                %ul.dropdown-menu{:role => "menu"}
+                  %li
+                    %a{:data => {:compare => "-1"}} Before
+                  %li
+                    %a{:data => {:compare => "0"}} On
+                  %li
+                    %a{:data => {:compare => "1"}} After
+                = f.input_field :event_date_comparator, :as => :hidden, :value => '0'
+              = f.date_field :event_date, :class => "form-control"
+          .col-md-3
+            = f.input :description, :label => 'Entry Description'
+
+
+    .panel.panel-info
+      .panel-heading
+        = link_to 'Assets', '#asset', :role => 'button', :data => {:toggle => 'collapse'}, :aria => {:expanded => true}
+
+      .panel-body#asset.collapse
+        #types
+          .row
+            .col-md-3
+              = f.input :asset_type_id, :collection => AssetType.active.map { |type| [type.name, type.id, :class => type.class_name] },  input_html: { multiple: true }, :label => "Type"
+            .col-md-3
+              = f.input :asset_subtype_id, collection: AssetType.active, as: :grouped_select, group_method: :asset_subtypes, input_html: { multiple: true }, :label => "Asset Subtype"
+            .col-md-3
+              = f.input :asset_tag

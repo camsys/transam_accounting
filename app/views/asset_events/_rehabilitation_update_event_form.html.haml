@@ -1,0 +1,105 @@
+:ruby
+  if @asset_event.asset_event_asset_subsystems.empty?
+    AssetSubsystem.for_type(@asset.asset_type).each do |ss|
+      @asset_event.asset_event_asset_subsystems.build(asset_subsystem: ss)
+    end
+  end
+
+= render :layout => "update_event_form" do |f|
+  = f.input :event_date, :label => 'Date of Report', :wrapper => :vertical_append do
+    = f.input_field :event_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.event_date)
+    %span.input-group-addon
+      %i.fa.fa-calendar
+  - if AssetSubsystem.active.count > 0
+    .row
+      .col-sm-4.col-sm-offset-8.text-center
+        .col-sm-6
+          .control-label Parts
+        .col-sm-6
+          .control-label Labor
+    = f.simple_fields_for :asset_event_asset_subsystems do |s|
+      = s.input :asset_subsystem_id, :as => :hidden
+      .form-group#costs
+        %label.control-label.col-sm-8.text-right
+          = s.object.asset_subsystem
+        .col-sm-4
+          .col-sm-6.form-group
+            = s.input :parts_cost, :wrapper => :vertical_prepend, :label => false do
+              %span.input-group-addon
+                %i.fa.fa-usd
+              = s.input_field :parts_cost, :class => 'form-control', :label => false
+          .col-sm-6.form-group
+            = s.input :labor_cost, :wrapper => :vertical_prepend, label: false do
+              %span.input-group-addon
+                %i.fa.fa-usd
+              = s.input_field :labor_cost, :class => 'form-control', :label => false
+    .form-group.col-sm-4.col-sm-offset-8
+      %label Total Cost
+      .input-group
+        %span.input-group-addon
+          %i.fa.fa-usd
+        %input#total.form-control{type: "number", disabled: true, val: 0}
+  - else
+    = f.input :total_cost, :wrapper => :vertical_prepend, label: 'Total Cost' do
+      %span.input-group-addon
+        %i.fa.fa-usd
+      = f.input_field :total_cost, :class => 'form-control', :required => true, :value => 0, :label => false
+  = f.input :extended_useful_life_months
+  = f.input :extended_useful_life_miles if @asset.type_of? :rolling_stock
+
+  = f.input :comments, :required => true, :input_html => { :rows => 6 }, :placeholder => "Describe work performed...", label: "Notes"
+  .form-group
+    = f.button :submit, "Add Rehabilitation", :class => 'btn btn-primary'
+
+:javascript
+
+  $(document).ready(function() {
+    $("#costs input").on("change", function() {
+      var all_rehab_costs = $("#costs input").map(function() {
+        var val = $(this).val();
+        return parseInt(val) || 0;
+      });
+      var total_rehab_costs = all_rehab_costs.get().reduce(function(a,b) {
+        return a+b;
+      });
+      $("#total").val(total_rehab_costs);
+    });
+
+    var strStartDate = '#{start_of_fiscal_year([Organization.get_typed_organization(@asset.organization).last_archived_fiscal_year, current_fiscal_year_year-1].max)}';
+    var startDateParts = strStartDate.split("-");
+    var strEndDate = '#{@asset.policy_analyzer.get_depreciation_date(Date.today)-1.day}';
+    var endDateParts = strEndDate.split("-");
+    $('[data-behavior~=datepicker]').datepicker({
+      startDate: new Date(startDateParts[0], (startDateParts[1] - 1), startDateParts[2]),
+      endDate: new Date(endDateParts[0], (endDateParts[1] - 1), endDateParts[2])
+    });
+  });
+
+  $('#asset_event_event_date').change(function() {
+    $.ajax({
+      url: '#{get_depreciation_months_left_inventory_path(@asset)}',
+      data: {
+          on_date: function() {
+            return $('#asset_event_event_date').val();
+          }
+      },
+      success: function(result){
+        if (parseInt(result) == 0) {
+          $('#asset_event_extended_useful_life_months').rules("add", {
+            min: 1
+          });
+        } else {
+          $('#asset_event_extended_useful_life_months').rules("add", {
+            min: 0
+          });
+        }
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+      }
+    });
+  });
+
+
+
+

@@ -1,9 +1,9 @@
-class AssetFiscalYearValueReport < AbstractReport
+class GrossAssetValueReport < AbstractReport
 
   include FiscalYear
 
-  COMMON_LABELS = ['Value FY Start', 'Fixed Asset', 'Depr. Expense', 'Accumulated Depr.', 'Gain/Loss', 'Value FY End']
-  COMMON_FORMATS = [:currency, :currency, :currency, :currency, :currency, :currency]
+  COMMON_LABELS = ['Value FY Start', 'Fixed Asset', 'Gain/Loss', 'Value FY End']
+  COMMON_FORMATS = [:currency, :currency, :currency, :currency]
   DETAIL_LABELS = ['Asset Tag']
   DETAIL_FORMATS = [:string]
 
@@ -27,23 +27,7 @@ class AssetFiscalYearValueReport < AbstractReport
                       .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
                       .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
                       .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                      .where('organizations.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
-    accumulated_depr = GeneralLedgerAccountEntry
-                           .joins(:general_ledger_account, :asset)
-                           .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.accumulated_depr_account_id = general_ledger_accounts.id')
-                           .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
-                           .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
-                           .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
-                           .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                           .where('organizations.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
-    depr_expense = GeneralLedgerAccountEntry
-                       .joins(:general_ledger_account, :asset)
-                       .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.depr_expense_account_id = general_ledger_accounts.id')
-                       .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
-                       .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
-                       .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
-                       .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                       .where('organizations.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
+                      .where('organizations.id IN (?) AND amount > 0 AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
     gain_loss = GeneralLedgerAccountEntry
                     .joins(:general_ledger_account, :asset)
                     .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.gain_loss_account_id = general_ledger_accounts.id')
@@ -66,8 +50,6 @@ class AssetFiscalYearValueReport < AbstractReport
       book_value_start = book_value_start.where(clause, key[i+1])
       book_value_end = book_value_end.where(clause, key[i+1])
       fixed_asset = fixed_asset.where(clause, key[i+1])
-      accumulated_depr = accumulated_depr.where(clause, key[i+1])
-      depr_expense = depr_expense.where(clause, key[i+1])
       gain_loss = gain_loss.where(clause, key[i+1])
 
     end
@@ -75,8 +57,6 @@ class AssetFiscalYearValueReport < AbstractReport
     book_value_start = book_value_start.group('assets.asset_tag').order('assets.asset_tag').sum('depreciation_entries.book_value')
     book_value_end = book_value_end.group('assets.asset_tag').order('assets.asset_tag').sum('depreciation_entries.book_value')
     fixed_asset = fixed_asset.group('assets.asset_tag').order('assets.asset_tag').sum('general_ledger_account_entries.amount')
-    accumulated_depr = accumulated_depr.group('assets.asset_tag').order('assets.asset_tag').sum('general_ledger_account_entries.amount')
-    depr_expense = depr_expense.group('assets.asset_tag').order('assets.asset_tag').sum('general_ledger_account_entries.amount')
     gain_loss = gain_loss.group('assets.asset_tag').order('assets.asset_tag').sum('general_ledger_account_entries.amount')
 
     data = []
@@ -86,8 +66,6 @@ class AssetFiscalYearValueReport < AbstractReport
         data << [*k]
         data[-1] << book_value_start[k] || 0
         data[-1] << fixed_asset[k] || 0
-        data[-1] << depr_expense[k] || 0
-        data[-1] << accumulated_depr[k] || 0
         data[-1] << gain_loss[k] || 0
         data[-1] << book_value_end[k] || 0
       end
@@ -140,23 +118,7 @@ class AssetFiscalYearValueReport < AbstractReport
                       .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
                       .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
                       .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                      .where('organizations.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
-    accumulated_depr = GeneralLedgerAccountEntry
-                           .joins(:general_ledger_account, :asset)
-                           .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.accumulated_depr_account_id = general_ledger_accounts.id')
-                           .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
-                           .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
-                           .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
-                           .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                           .where('organizations.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
-    depr_expense = GeneralLedgerAccountEntry
-                       .joins(:general_ledger_account, :asset)
-                       .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.depr_expense_account_id = general_ledger_accounts.id')
-                       .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
-                       .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
-                       .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
-                       .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                       .where('organizations.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
+                      .where('organizations.id IN (?) AND amount > 0 AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
     gain_loss = GeneralLedgerAccountEntry
                     .joins(:general_ledger_account, :asset)
                     .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.gain_loss_account_id = general_ledger_accounts.id')
@@ -187,8 +149,6 @@ class AssetFiscalYearValueReport < AbstractReport
       book_value_start = book_value_start.group(clause).order(clause)
       book_value_end = book_value_end.group(clause).order(clause)
       fixed_asset = fixed_asset.group(clause).order(clause)
-      accumulated_depr = accumulated_depr.group(clause).order(clause)
-      depr_expense = depr_expense.group(clause).order(clause)
       gain_loss = gain_loss.group(clause).order(clause)
 
     end
@@ -196,8 +156,6 @@ class AssetFiscalYearValueReport < AbstractReport
     book_value_start = book_value_start.sum('depreciation_entries.book_value')
     book_value_end = book_value_end.sum('depreciation_entries.book_value')
     fixed_asset = fixed_asset.sum('general_ledger_account_entries.amount')
-    accumulated_depr = accumulated_depr.sum('general_ledger_account_entries.amount')
-    depr_expense = depr_expense.sum('general_ledger_account_entries.amount')
     gain_loss = gain_loss.sum('general_ledger_account_entries.amount')
     
     data = []
@@ -207,8 +165,6 @@ class AssetFiscalYearValueReport < AbstractReport
         data << [*k]
         data[-1] << book_value_start[k] || 0
         data[-1] << fixed_asset[k] || 0
-        data[-1] << depr_expense[k] || 0
-        data[-1] << accumulated_depr[k] || 0
         data[-1] << gain_loss[k] || 0
         data[-1] << book_value_end[k] || 0
       end

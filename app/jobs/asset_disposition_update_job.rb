@@ -21,17 +21,17 @@ class AssetDispositionUpdateJob < AbstractAssetUpdateJob
       send_asset_transferred_message new_asset
     end
 
-    gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
+    gl_mapping = asset.general_ledger_mapping
     if !asset.disposition_updates.empty? && gl_mapping.present?
 
-      amount = asset.depreciation_purchase_cost-asset.book_value # temp variable for tracking rounding errors
+      amount = asset.adjusted_cost_basis-asset.book_value # temp variable for tracking rounding errors
       gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: amount, asset: asset)
 
       if asset.book_value > 0
         gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: asset.book_value, asset: asset)
       end
 
-      gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: -asset.depreciation_purchase_cost, asset: asset)
+      gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: -asset.adjusted_cost_basis, asset: asset)
 
       disposition_event = asset.disposition_updates.last
       if disposition_event.sales_proceeds > 0

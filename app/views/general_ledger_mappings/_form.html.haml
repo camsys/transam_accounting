@@ -6,10 +6,10 @@
   = f.input :chart_of_account_id, :as => :hidden, :value => @chart_of_account_id
   = f.association :asset_subtype, :collection => AssetType.all, :as => :grouped_select, :group_method => :asset_subtypes
 
-  = f.association :asset_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id)
-  = f.association :depr_expense_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Depreciation Expense Account'
-  = f.association :accumulated_depr_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Accumulated Depreciation Account'
-  = f.association :gain_loss_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Gain/Loss Account'
+  = f.association :asset_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label_method => 'coded_name'
+  = f.association :depr_expense_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Depreciation Expense Account', :label_method => 'coded_name'
+  = f.association :accumulated_depr_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Accumulated Depreciation Account', :label_method => 'coded_name'
+  = f.association :gain_loss_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: @chart_of_account_id), :label => 'Gain/Loss Account', :label_method => 'coded_name'
 
   = f.button :submit, 'Save', :class => "btn btn-primary"
 

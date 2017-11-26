@@ -46,6 +46,15 @@ module TransamAccountingAssetsController
     end
   end
 
+  def get_depreciation_months_left
+    get_asset
+    months_left = @asset.depreciation_months_left(Date.strptime(params[:on_date], '%m/%d/%Y'))
+
+    respond_to do |format|
+      format.json { render :json => months_left.to_json }
+    end
+  end
+
   # form for updating depreciation inputs
   def edit_depreciation
     get_asset

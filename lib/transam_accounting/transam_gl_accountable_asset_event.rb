@@ -54,7 +54,7 @@ module TransamGlAccountableAssetEvent
   def create_depreciation_entry
     changed_amount = (self.total_cost - self.total_cost_was.to_i)
 
-    gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
+    gl_mapping = asset.general_ledger_mapping
     if gl_mapping.present? # check whether this app records GLAs at all
 
       gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: event_date, description: "Rehab: #{asset.asset_path}", amount: changed_amount, asset: asset)

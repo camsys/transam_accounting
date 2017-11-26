@@ -11,25 +11,23 @@
 
   = f.input :description, :required => true, :label => 'Expense'
 
-  - coa = ChartOfAccount.find_by(organization_id: @asset.organization)
-  - unless coa.nil?
-    .row
-      .col-sm-12
-        = f.association :general_ledger_account, :collection => GeneralLedgerAccount.where(chart_of_account_id: coa.id), :label => 'Purchase Account', :label_method => 'coded_name'
-
   .row
-    .col-sm-4
+    .col-sm-6
       = f.association :expense_type, :required => true, :collection => ExpenseType.active, :label => 'Category'
-    .col-sm-4
-      = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
-        %span.input-group-addon
-          %i.fa.fa-usd
-        = f.input_field :amount, :class => "form-control", :min => 0
-    .col-sm-4
+    .col-sm-6
       = f.input :expense_date, :required => true, :wrapper => :vertical_append, :label => "Expense Date" do
         = f.input_field :expense_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.expense_date)
         %span.input-group-addon
           %i.fa.fa-calendar
+
+  .row
+    .col-sm-6
+      = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
+        %span.input-group-addon
+          %i.fa.fa-usd
+        = f.input_field :amount, :class => "form-control", :min => 0
+    .col-sm-6
+      = f.input :extended_useful_life_months
 
   = f.button :submit, :class => 'btn btn-primary'
 

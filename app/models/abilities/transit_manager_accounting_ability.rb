@@ -8,9 +8,9 @@ module Abilities
         organization_ids = user.organization_ids
       end
 
-      can [:create, :update], Grant, :organization_id => organization_ids
+      can :manage, Grant, :organization_id => organization_ids
 
-      can [:create, :update], GeneralLedgerAccount do |gla|
+      can :manage, GeneralLedgerAccount do |gla|
         organization_ids.include? gla.chart_of_account.organization_id
       end
 

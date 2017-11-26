@@ -73,6 +73,32 @@ module TransamDepreciable
   #
   #------------------------------------------------------------------------------
 
+  def depreciation_months_left(on_date=Date.today)
+    num_months_initial = self.depreciation_useful_life.nil? ? self.policy_analyzer.get_min_service_life_months : self.depreciation_useful_life
+    last_depr_date = on_date - (self.policy_analyzer.get_depreciation_interval_type.months).months
+    num_months_used =  last_depr_date > on_date.depreciation_start_date ? (last_depr_date.year * 12 + last_depr_date.month) - (on_date.depreciation_start_date.year * 12 + on_date.depreciation_start_date.month) : 0
+    num_months_extended = self.rehabilitation_updates.sum(:extended_useful_life_months)
+    num_months_unused = num_months_initial-num_months_used+num_months_extended
+
+    num_months_unused
+  end
+
+  def original_cost_basis
+    self.depreciation_purchase_cost
+  end
+
+  def adjusted_cost_basis
+    original_cost_basis + expenditures.sum(:amount) + rehabilitation_updates.sum(:total_cost)
+  end
+
+  def original_depreciation_useful_life_months
+    self.depreciation_useful_life || self.expected_useful_life
+  end
+
+  def adjusted_depreciation_useful_life_months
+    original_depreciation_useful_life_months + expenditures.sum(:extended_useful_life_months) + rehabilitation_updates.sum(:extended_useful_life_months)
+  end
+
   # Render the asset as a JSON object -- overrides the default json encoding
   def depreciable_as_json(options={})
     {
@@ -97,7 +123,7 @@ module TransamDepreciable
     # Make sure we are working with a concrete asset class
     asset = is_typed? ? self : Asset.get_typed_asset(self)
 
-    gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
+    gl_mapping = asset.general_ledger_mapping
 
     table = []
     start_book_val = 0
@@ -164,7 +190,7 @@ module TransamDepreciable
 
         if asset.depreciable
 
-          gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
+          gl_mapping = asset.general_ledger_mapping
 
           if asset.depreciation_entries.count == 0 # add the initial depr entry if it does not exist
             asset.depreciation_entries.create!(description: 'Purchase', book_value: asset.depreciation_purchase_cost, event_date: asset.depreciation_start_date)

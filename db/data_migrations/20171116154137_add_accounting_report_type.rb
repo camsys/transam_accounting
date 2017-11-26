@@ -6,7 +6,7 @@ class AddAccountingReportType < ActiveRecord::DataMigration
     report_type.active = true
     report_type.save!
 
-    Report.where(class_name: ['AssetValueReport', 'AssetFiscalYearValueReport']).update_all(report_type_id: report_type.id)
+    Report.where(class_name: ['AssetValueReport']).update_all(report_type_id: report_type.id)
   end
 
 

@@ -24,6 +24,7 @@ Rails.application.routes.draw do
     collection do
       get 'get_accounts'
       get 'check_grant_budget'
+      get 'toggle_archive'
     end
   end
 
@@ -34,6 +35,7 @@ Rails.application.routes.draw do
 
     member do
       get 'get_book_value_on_date'
+      get 'get_depreciation_months_left'
       get 'edit_depreciation'
       post 'update_depreciation'
     end

@@ -5,3 +5,15 @@
   = link_to general_ledger_mappings_path(chart_of_account_id: @chart_of_accounts.id), :class => 'btn btn-default' do
     %i.fa.fa-map-signs.fa-fw
     = " GL Mappings";
+- if can? :manage, GeneralLedgerAccount
+  .btn-group{:role => 'group'}
+    %button.btn.btn-info.move-assets-button{:type => 'button'}
+      %i.fa.fa-tasks
+      %span#button-text Archive
+    %button.btn.btn-info.move-assets-button.dropdown-toggle{:type => 'button', :data => {:toggle => 'dropdown'}, :aria => {:haspopup => 'true', :expanded => 'false'}}
+      %span.caret
+      %span.sr-only Toggle Dropdown
+    %ul.dropdown-menu
+      - Organization.get_typed_organization(@chart_of_accounts.organization).archived_fiscal_years.available_years.each do |fy|
+        %li
+          = link_to fy[0], toggle_archive_general_ledger_accounts_path(chart_of_account_id: @chart_of_accounts.id, fy_year: fy[1])

@@ -45,8 +45,13 @@
                   %i.fa.fa-fw.fa-book
                   = org.short_name
 
-      %li.divider
+    %li.divider
+    %li.text-left
+      = link_to reset_searches_path(:search_type => SearchType.find_by(class_name: 'GeneralLedgerAccountSearcher').id) do
+        %i.fa.fa-search.fa-fw
+        GL Query
 
+    %li.divider
     %li.text-left
       = link_to grants_path do
         %i.fa.fa-fw.fa-legal

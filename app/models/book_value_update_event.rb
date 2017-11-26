@@ -64,7 +64,7 @@ class BookValueUpdateEvent < AssetEvent
     asset.depreciation_entries.create!(description: "Manual Adjustment: #{self.comments}", book_value: -depr_amount, event_date: self.event_date)
     asset.update_columns(current_depreciation_date: self.event_date)
 
-    gl_mapping = GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: asset.organization_id).id, asset_subtype_id: asset.asset_subtype_id)
+    gl_mapping = asset.general_ledger_mapping
     if gl_mapping.present? # check whether this app records GLAs at all
       gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Accumulated Depreciation: #{asset.asset_path}", amount: -depr_amount, asset: asset)
 

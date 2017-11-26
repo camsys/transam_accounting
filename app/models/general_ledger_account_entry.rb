@@ -47,6 +47,15 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
     description
   end
 
+  def as_json(options={})
+    super(options).merge!({
+        general_ledger_account_object_key: general_ledger_account.object_key,
+        general_ledger_account_account_number: general_ledger_account.account_number,
+        asset_organization: asset.try(:organization).try(:short_name),
+        asset: asset.try(:asset_tag)
+    })
+  end
+
   #------------------------------------------------------------------------------
   #
   # Protected Methods
