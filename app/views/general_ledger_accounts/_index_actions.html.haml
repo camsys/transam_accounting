@@ -14,6 +14,7 @@
       %span.caret
       %span.sr-only Toggle Dropdown
     %ul.dropdown-menu
-      - Organization.get_typed_organization(@chart_of_accounts.organization).archived_fiscal_years.available_years.each do |fy|
+      - archivable_fy = Organization.get_typed_organization(@chart_of_accounts.organization).first_archivable_fiscal_year
+      - get_fiscal_years(start_of_fiscal_year(archivable_fy), current_fiscal_year_year - archivable_fy).each do |fy|
         %li
           = link_to fy[0], toggle_archive_general_ledger_accounts_path(chart_of_account_id: @chart_of_accounts.id, fy_year: fy[1])

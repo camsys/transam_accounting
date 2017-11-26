@@ -65,7 +65,7 @@
       $("#total").val(total_rehab_costs);
     });
 
-    var strStartDate = '#{start_of_fiscal_year([Organization.get_typed_organization(@asset.organization).last_archived_fiscal_year, current_fiscal_year_year-1].max)}';
+    var strStartDate = '#{start_of_fiscal_year(Organization.get_typed_organization(@asset.organization).first_archivable_fiscal_year)}';
     var startDateParts = strStartDate.split("-");
     var strEndDate = '#{@asset.policy_analyzer.get_depreciation_date(Date.today)-1.day}';
     var endDateParts = strEndDate.split("-");

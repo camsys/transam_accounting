@@ -3,6 +3,8 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
   # Include the object key mixin
   include TransamObjectKey
 
+  include FiscalYear
+
   #------------------------------------------------------------------------------
   # Callbacks
   #------------------------------------------------------------------------------
@@ -29,6 +31,8 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   default_scope { order(:event_date) }
+
+  scope :from_fy, -> (fy_year) {  where('event_date >= ?', start_of_fiscal_year(fy_year)) }
 
   #------------------------------------------------------------------------------
   #

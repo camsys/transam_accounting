@@ -14,4 +14,4 @@
       = format_field("Asset Subtypes", format_as_list(@ledger_account.asset_subtypes))
   .tab-pane.fade#gla_entries
     .tab-content
-      = render :partial => 'gla_entries', :locals => {:gla_entries => @ledger_account.general_ledger_account_entries}
+      = render :partial => 'gla_entries', :locals => {:gla_entries => @ledger_account.general_ledger_account_entries.from_fy(Organization.get_typed_organization(@ledger_account.chart_of_account.organization).first_archivable_fiscal_year)}
