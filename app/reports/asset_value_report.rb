@@ -25,7 +25,8 @@ class AssetValueReport < AbstractReport
     data = query.pluck(*['organizations.short_name', 'asset_types.name', 'asset_subtypes.name', 'assets.asset_tag', 'assets.book_value']).to_a
 
     query.each_with_index do |asset, idx|
-      data[idx].insert(-2, asset.adjusted_cost_basis, asset.adjusted_cost_basis-asset.book_value)
+      typed_asset = Asset.get_typed_asset(asset)
+      data[idx].insert(-2, typed_asset.adjusted_cost_basis, typed_asset.adjusted_cost_basis-asset.book_value)
     end
 
     {labels: DETAIL_LABELS, data: data, formats: DETAIL_FORMATS}
@@ -61,12 +62,6 @@ class AssetValueReport < AbstractReport
 
     labels = []
     formats = []
-    
-    # Default scope orders by project_id
-    query = Asset.operational.joins(:organization, :asset_type, :asset_subtype).where(organization_id: organization_id_list)
-    query = query.joins("#{GeneralLedgerAccount.unscoped.select('general_ledger_mappings.asset_subtype_id', 'account_number').joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.asset_account_id = general_ledger_accounts.id').joins(chart_of_account: :organization).where(organizations: {id: 3}).to_sql}")
-    rehabs = RehabilitationUpdateEvent.unscoped.joins(asset: [:organization, :asset_type, :asset_subtype]).where(assets: {organization_id: organization_id_list})
-    expenditures = Expenditure.joins(assets: [:organization, :asset_type, :asset_subtype]).where(assets: {organization_id: organization_id_list})
 
     params[:calendar_month] = Date.today.month unless params[:calendar_month].to_i > 0
     params[:calendar_year] = Date.today.year if params[:calendar_year].blank?
@@ -75,9 +70,15 @@ class AssetValueReport < AbstractReport
 
     end_date = Date.new(params[:calendar_year].to_i, params[:calendar_month].to_i, 1).end_of_month
 
-    book_value_query = Asset.operational.joins(:organization, :asset_type, :asset_subtype).joins('INNER JOIN depreciation_entries ON assets.id = depreciation_entries.asset_id').where(organization_id: organization_id_list).where('event_date <= ?', end_date)
+    book_value_query = Asset.operational
+                           .joins(:organization, :asset_type, :asset_subtype)
+                           .joins('INNER JOIN depreciation_entries ON assets.id = depreciation_entries.asset_id')
+                           .joins('INNER JOIN general_ledger_account_entries ON general_ledger_account_entries.asset_id = assets.id')
+                           .joins('INNER JOIN general_ledger_accounts ON general_ledger_accounts.id = general_ledger_account_entries.general_ledger_account_id')
+                           .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.asset_account_id = general_ledger_accounts.id')
+                           .where(organization_id: organization_id_list).where('depreciation_entries.event_date <= ?', end_date)
 
-    fixed_asset = GeneralLedgerAccountEntry
+    fixed_asset = GeneralLedgerAccountEntry.unscoped
                       .joins(:general_ledger_account, :asset)
                       .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.asset_account_id = general_ledger_accounts.id')
                       .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
@@ -85,14 +86,6 @@ class AssetValueReport < AbstractReport
                       .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
                       .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
                       .where('organizations.id IN (?) AND amount > 0 AND event_date <= ?', organization_id_list, end_date)
-    accumulated_depr = GeneralLedgerAccountEntry
-                           .joins(:general_ledger_account, :asset)
-                           .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.accumulated_depr_account_id = general_ledger_accounts.id')
-                           .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
-                           .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
-                           .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
-                           .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                           .where('organizations.id IN (?) AND event_date <= ?', organization_id_list, end_date)
 
 
     # Add clauses based on params
@@ -110,7 +103,10 @@ class AssetValueReport < AbstractReport
         when :by_subtype
           formats << :string
           clause = 'asset_subtypes.name'
+
           @clauses << clause
+          book_value_query = book_value_query.group(clause).order(clause)
+          fixed_asset = fixed_asset.group(clause).order(clause)
 
           labels << 'Asset Acct'
           formats << :string
@@ -119,22 +115,22 @@ class AssetValueReport < AbstractReport
       @clauses << clause
       book_value_query = book_value_query.group(clause).order(clause)
       fixed_asset = fixed_asset.group(clause).order(clause)
-      accumulated_depr = accumulated_depr.group(clause).order(clause)
 
     end
 
+    asset_count = book_value_query.count('DISTINCT(assets.id)')
     book_value_query = book_value_query.sum('depreciation_entries.book_value')
     fixed_asset = fixed_asset.sum('general_ledger_account_entries.amount')
-    accumulated_depr = accumulated_depr.sum('general_ledger_account_entries.amount')
 
     data = []
     if params[:group_by]
       # Add initial book value
       book_value_query.each do |k, v|
         data << [*k]
-        data[-1] << fixed_asset[k] || 0
-        data[-1] << accumulated_depr[k] || 0
-        data[-1] << v
+        data[-1] << asset_count[k].to_i
+        data[-1] << fixed_asset[k].to_i
+        data[-1] << fixed_asset[k].to_i - v.to_i
+        data[-1] << v.to_i
       end
     end
 

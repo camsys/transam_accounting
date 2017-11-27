@@ -111,4 +111,28 @@ namespace :transam do
     end
   end
 
+  desc "Add GL entries to disposed assets"
+  task add_disposition_gl_entries: :environment do
+    Asset.disposed.each do |asset|
+      asset = Asset.get_typed_asset(asset)
+      gl_mapping = asset.general_ledger_mapping
+      if gl_mapping.present?
+
+        amount = asset.adjusted_cost_basis-asset.book_value # temp variable for tracking rounding errors
+        gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: amount, asset: asset)
+
+        if asset.book_value > 0
+          gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: asset.book_value, asset: asset)
+        end
+
+        gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: -asset.adjusted_cost_basis, asset: asset)
+
+        disposition_event = asset.disposition_updates.last
+        if disposition_event.sales_proceeds > 0
+          gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: "Disposal: #{asset.asset_path}", amount: -disposition_event.sales_proceeds, asset: asset)
+        end
+      end
+    end
+  end
+
 end

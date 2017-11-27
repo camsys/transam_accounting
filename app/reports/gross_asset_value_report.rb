@@ -20,7 +20,7 @@ class GrossAssetValueReport < AbstractReport
     book_value_start = book_value_query.where('event_date <= ?', fy_start)
     book_value_end = book_value_query.where('event_date <= ?', fy_end)
 
-    fixed_asset = GeneralLedgerAccountEntry
+    fixed_asset = GeneralLedgerAccountEntry.unscoped
                       .joins(:general_ledger_account, :asset)
                       .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.asset_account_id = general_ledger_accounts.id')
                       .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
@@ -28,14 +28,14 @@ class GrossAssetValueReport < AbstractReport
                       .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
                       .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
                       .where('organizations.id IN (?) AND amount > 0 AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
-    gain_loss = GeneralLedgerAccountEntry
+
+    gain_loss_accounts = GeneralLedgerMapping.select(:gain_loss_account_id).distinct.joins(chart_of_account: :organization).where(organizations: {id: organization_id_list})
+    gain_loss = GeneralLedgerAccountEntry.unscoped
                     .joins(:general_ledger_account, :asset)
-                    .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.gain_loss_account_id = general_ledger_accounts.id')
                     .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
                     .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
-                    .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
-                    .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                    .where('organizations.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
+                    .joins('INNER JOIN organizations ON assets.organization_id = organizations.id')
+                    .where('organizations.id IN (?) AND general_ledger_accounts.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, gain_loss_accounts, fy_start, fy_end)
 
     (params[:group_by] || []).each_with_index do |group, i|
       case group.to_sym
@@ -119,14 +119,14 @@ class GrossAssetValueReport < AbstractReport
                       .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
                       .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
                       .where('organizations.id IN (?) AND amount > 0 AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
-    gain_loss = GeneralLedgerAccountEntry
+
+    gain_loss_accounts = GeneralLedgerMapping.select(:gain_loss_account_id).distinct.joins(chart_of_account: :organization).where(organizations: {id: organization_id_list})
+    gain_loss = GeneralLedgerAccountEntry.unscoped
                     .joins(:general_ledger_account, :asset)
-                    .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.gain_loss_account_id = general_ledger_accounts.id')
                     .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
                     .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
-                    .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
-                    .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                    .where('organizations.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
+                    .joins('INNER JOIN organizations ON assets.organization_id = organizations.id')
+                    .where('organizations.id IN (?) AND general_ledger_accounts.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, gain_loss_accounts, fy_start, fy_end)
 
 
     # Add clauses based on params

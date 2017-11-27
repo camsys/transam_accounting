@@ -31,6 +31,8 @@ module TransamGlAccountableAsset
 
     has_and_belongs_to_many    :expenditures, :foreign_key => :asset_id
 
+    has_many :general_ledger_account_entries, :foreign_key => :asset_id
+
     # ----------------------------------------------------
     # Validations
     # ----------------------------------------------------

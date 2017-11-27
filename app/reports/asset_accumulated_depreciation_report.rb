@@ -16,34 +16,24 @@ class AssetAccumulatedDepreciationReport < AbstractReport
     fy_start = self.new.start_of_fiscal_year(params[:fy_year].to_i)
     fy_end = self.new.start_of_fiscal_year(params[:fy_year].to_i+1)-1.day
 
-    accumulated_depr = GeneralLedgerAccountEntry
+    accumulated_depr_accounts = GeneralLedgerMapping.select(:accumulated_depr_account_id).distinct.joins(chart_of_account: :organization).where(organizations: {id: organization_id_list})
+    accumulated_depr = GeneralLedgerAccountEntry.unscoped
                            .joins(:general_ledger_account, :asset)
-                           .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.accumulated_depr_account_id = general_ledger_accounts.id')
                            .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
                            .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
-                           .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
-                           .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                           .where('organizations.id IN (?)', organization_id_list)
+                           .joins('INNER JOIN organizations ON assets.organization_id = organizations.id')
+                           .where('organizations.id IN (?) AND general_ledger_accounts.id IN (?)', organization_id_list, accumulated_depr_accounts)
 
     accumulated_depr_start = accumulated_depr.where('event_date <= ?', fy_start)
     accumulated_depr_end = accumulated_depr.where('event_date <= ?', fy_end)
 
-    depr_expense = GeneralLedgerAccountEntry
-                       .joins(:general_ledger_account, :asset)
-                       .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.depr_expense_account_id = general_ledger_accounts.id')
-                       .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
-                       .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
-                       .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
-                       .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                       .where('organizations.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
-    gain_loss = GeneralLedgerAccountEntry
+    gain_loss_accounts = GeneralLedgerMapping.select(:gain_loss_account_id).distinct.joins(chart_of_account: :organization).where(organizations: {id: organization_id_list})
+    gain_loss = GeneralLedgerAccountEntry.unscoped
                     .joins(:general_ledger_account, :asset)
-                    .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.gain_loss_account_id = general_ledger_accounts.id')
                     .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
                     .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
-                    .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
-                    .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                    .where('organizations.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
+                    .joins('INNER JOIN organizations ON assets.organization_id = organizations.id')
+                    .where('assets.disposition_date IS NOT NULL AND organizations.id IN (?) AND general_ledger_accounts.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, gain_loss_accounts, fy_start, fy_end)
 
     (params[:group_by] || []).each_with_index do |group, i|
       case group.to_sym
@@ -57,25 +47,22 @@ class AssetAccumulatedDepreciationReport < AbstractReport
 
       accumulated_depr_start = accumulated_depr_start.where(clause, key[i+1])
       accumulated_depr_end = accumulated_depr_end.where(clause, key[i+1])
-      depr_expense = depr_expense.where(clause, key[i+1])
       gain_loss = gain_loss.where(clause, key[i+1])
 
     end
 
     accumulated_depr_start = accumulated_depr_start.group('assets.asset_tag').order('assets.asset_tag').sum('general_ledger_account_entries.amount')
     accumulated_depr_end = accumulated_depr_end.group('assets.asset_tag').order('assets.asset_tag').sum('general_ledger_account_entries.amount')
-    depr_expense = depr_expense.group('assets.asset_tag').order('assets.asset_tag').sum('general_ledger_account_entries.amount')
     gain_loss = gain_loss.group('assets.asset_tag').order('assets.asset_tag').sum('general_ledger_account_entries.amount')
 
     data = []
     if params[:group_by]
       # Add initial book value
-      accumulated_depr_end.each do |k, v|
-        data << [*k]
-        data[-1] << accumulated_depr_start[k] || 0
-        data[-1] << depr_expense[k] || 0
-        data[-1] << gain_loss[k] || 0
-        data[-1] << accumulated_depr_end[k] || 0
+      accumulated_depr_start.each do |k, v|
+        data << [*k, v]
+        data[-1] << accumulated_depr_end[k] - v
+        data[-1] << gain_loss[k].to_i
+        data[-1] << accumulated_depr_end[k]
       end
     end
 
@@ -115,34 +102,25 @@ class AssetAccumulatedDepreciationReport < AbstractReport
     fy_start = start_of_fiscal_year(params[:fy_year].to_i)
     fy_end = start_of_fiscal_year(params[:fy_year].to_i+1)-1.day
 
-    accumulated_depr = GeneralLedgerAccountEntry
+    accumulated_depr_accounts = GeneralLedgerMapping.select(:accumulated_depr_account_id).distinct.joins(chart_of_account: :organization).where(organizations: {id: organization_id_list})
+    accumulated_depr = GeneralLedgerAccountEntry.unscoped
                            .joins(:general_ledger_account, :asset)
-                           .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.accumulated_depr_account_id = general_ledger_accounts.id')
                            .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
                            .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
-                           .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
-                           .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                           .where('organizations.id IN (?)', organization_id_list)
+                           .joins('INNER JOIN organizations ON assets.organization_id = organizations.id')
+                           .where('organizations.id IN (?) AND general_ledger_accounts.id IN (?)', organization_id_list, accumulated_depr_accounts)
 
     accumulated_depr_start = accumulated_depr.where('event_date <= ?', fy_start)
     accumulated_depr_end = accumulated_depr.where('event_date <= ?', fy_end)
 
-    depr_expense = GeneralLedgerAccountEntry
-                       .joins(:general_ledger_account, :asset)
-                       .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.depr_expense_account_id = general_ledger_accounts.id')
-                       .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
-                       .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
-                       .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
-                       .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                       .where('organizations.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
-    gain_loss = GeneralLedgerAccountEntry
+    gain_loss_accounts = GeneralLedgerMapping.select(:gain_loss_account_id).distinct.joins(chart_of_account: :organization).where(organizations: {id: organization_id_list})
+    gain_loss = GeneralLedgerAccountEntry.unscoped
                     .joins(:general_ledger_account, :asset)
-                    .joins('INNER JOIN general_ledger_mappings ON general_ledger_mappings.gain_loss_account_id = general_ledger_accounts.id')
                     .joins('INNER JOIN asset_subtypes ON assets.asset_subtype_id = asset_subtypes.id')
                     .joins('INNER JOIN asset_types ON asset_subtypes.asset_type_id = asset_types.id')
-                    .joins('INNER JOIN chart_of_accounts ON general_ledger_mappings.chart_of_account_id = chart_of_accounts.id')
-                    .joins('INNER JOIN organizations ON chart_of_accounts.organization_id = organizations.id')
-                    .where('organizations.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, fy_start, fy_end)
+                    .joins('INNER JOIN organizations ON assets.organization_id = organizations.id')
+                    .where('assets.disposition_date IS NOT NULL AND organizations.id IN (?) AND general_ledger_accounts.id IN (?) AND event_date >= ? AND event_date <= ?', organization_id_list, gain_loss_accounts, fy_start, fy_end)
+
 
 
     # Add clauses based on params
@@ -164,25 +142,21 @@ class AssetAccumulatedDepreciationReport < AbstractReport
       @clauses << clause
       accumulated_depr_start = accumulated_depr_start.group(clause).order(clause)
       accumulated_depr_end = accumulated_depr_end.group(clause).order(clause)
-      depr_expense = depr_expense.group(clause).order(clause)
       gain_loss = gain_loss.group(clause).order(clause)
 
     end
 
     accumulated_depr_start = accumulated_depr_start.sum('general_ledger_account_entries.amount')
     accumulated_depr_end = accumulated_depr_end.sum('general_ledger_account_entries.amount')
-    depr_expense = depr_expense.sum('general_ledger_account_entries.amount')
     gain_loss = gain_loss.sum('general_ledger_account_entries.amount')
     
     data = []
     if params[:group_by]
-      # Add initial book value
-      accumulated_depr_end.each do |k, v|
-        data << [*k]
-        data[-1] << accumulated_depr_start[k] || 0
-        data[-1] << depr_expense[k] || 0
-        data[-1] << gain_loss[k] || 0
-        data[-1] << accumulated_depr_end[k] || 0
+      accumulated_depr_start.each do |k, v|
+        data << [*k, v]
+        data[-1] << accumulated_depr_end[k] - v
+        data[-1] << gain_loss[k].to_i
+        data[-1] << accumulated_depr_end[k]
       end
     end
 
