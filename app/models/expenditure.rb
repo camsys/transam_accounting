@@ -67,6 +67,7 @@ class Expenditure < ActiveRecord::Base
       :description,
       :amount,
       :extended_useful_life_months,
+      :vendor,
       :asset_ids => []
   ]
 
@@ -77,7 +78,8 @@ class Expenditure < ActiveRecord::Base
       :grant,
       :expense_type,
       :name,
-      :description
+      :description,
+      :vendor
   ]
 
   #------------------------------------------------------------------------------
@@ -121,9 +123,9 @@ class Expenditure < ActiveRecord::Base
       gl_mapping = asset.general_ledger_mapping
 
       if gl_mapping.present? # check whether this app records GLAs at all
-        gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx: #{asset.asset_path}", amount: changed_amount, asset: asset)
+        gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx: #{asset.asset_path} #{self.vendor}", amount: changed_amount, asset: asset)
 
-        self.general_ledger_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx: #{asset.asset_path}", amount: -changed_amount, asset: asset) if self.general_ledger_account.present?
+        self.general_ledger_account.general_ledger_account_entries.create!(event_date: expense_date, description: "CapEx: #{asset.asset_path} #{self.vendor}", amount: -changed_amount, asset: asset) if self.general_ledger_account.present?
       end
 
       asset.depreciation_entries.create!(description: "CapEx: #{self.description}", book_value: changed_amount, event_date: expense_date)

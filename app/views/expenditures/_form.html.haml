@@ -11,6 +11,8 @@
 
   = f.input :description, :required => true, :label => 'Expense'
 
+  = f.input :vendor
+
   .row
     .col-sm-6
       = f.association :expense_type, :required => true, :collection => ExpenseType.active, :label => 'Category'
