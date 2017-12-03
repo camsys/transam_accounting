@@ -121,8 +121,6 @@ class GrantPurchase < ActiveRecord::Base
   # Set resonable defaults for a new capital project
   def set_defaults
 
-    self.pcnt_purchase_cost ||= 0
-
   end
 
 
