@@ -49,8 +49,8 @@ module TransamDepreciable
 
     validates  :depreciation_start_date,    :presence => true
     #validates  :current_depreciation_date,  :presence => true
-    validates  :book_value,                 :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
-    validates  :salvage_value,              :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
+    validates  :book_value,                 :presence => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0}
+    validates  :salvage_value,              :presence => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0}
     validates_inclusion_of :depreciable, :in => [true, false]
 
   end
