@@ -32,7 +32,7 @@ class GrantBudget < ActiveRecord::Base
 
   validates_presence_of :grant
   validates_presence_of :general_ledger_account
-  validates :amount,                    :allow_nil => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
+  validates :amount,                    :allow_nil => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0}
 
   # List of hash parameters specific to this class that are allowed by the controller
   FORM_PARAMS = [
