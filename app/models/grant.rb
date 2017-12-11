@@ -54,9 +54,9 @@ class Grant < ActiveRecord::Base
   #------------------------------------------------------------------------------
   validates :organization,                    :presence => true
   validates :name,                            :presence => true, :uniqueness => true
-  validates :fy_year,                         :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 1970}
+  validates :fy_year,                         :presence => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 1970}
   validates :sourceable,                      :presence => true
-  validates :amount,                          :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0}
+  validates :amount,                          :presence => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0}
 
   #------------------------------------------------------------------------------
   # Scopes

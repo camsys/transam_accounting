@@ -30,7 +30,7 @@ class GrantPurchase < ActiveRecord::Base
   #------------------------------------------------------------------------------
   validates_presence_of :sourceable
   validates_presence_of :asset
-  validates :pcnt_purchase_cost,  :presence => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
+  validates :pcnt_purchase_cost,  :presence => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
 
   #------------------------------------------------------------------------------
   # Scopes
@@ -120,8 +120,6 @@ class GrantPurchase < ActiveRecord::Base
 
   # Set resonable defaults for a new capital project
   def set_defaults
-
-    self.pcnt_purchase_cost ||= 0
 
   end
 
