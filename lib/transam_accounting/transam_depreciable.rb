@@ -76,7 +76,7 @@ module TransamDepreciable
   def depreciation_months_left(on_date=Date.today)
     num_months_initial = self.depreciation_useful_life.nil? ? self.policy_analyzer.get_min_service_life_months : self.depreciation_useful_life
     last_depr_date = on_date - (self.policy_analyzer.get_depreciation_interval_type.months).months
-    num_months_used =  last_depr_date > depreciation_start_date ? (last_depr_date.year * 12 + last_depr_date.month) - (depreciation_start_date.year * 12 + on_date.depreciation_start_date.month) : 0
+    num_months_used =  last_depr_date > depreciation_start_date ? (last_depr_date.year * 12 + last_depr_date.month) - (depreciation_start_date.year * 12 + depreciation_start_date.month) : 0
     num_months_extended = self.rehabilitation_updates.sum(:extended_useful_life_months)
     num_months_unused = num_months_initial-num_months_used+num_months_extended
 
