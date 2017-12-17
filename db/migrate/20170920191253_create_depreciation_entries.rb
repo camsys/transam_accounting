@@ -11,7 +11,7 @@ class CreateDepreciationEntries < ActiveRecord::Migration
     end
 
     create_table :depreciation_entries_general_ledger_account_entries do |t|
-      t.integer :depreciation_entry_id, index:true
+      t.integer :depreciation_entry_id, index: true
       t.integer :general_ledger_account_entry_id, index: true
     end
 

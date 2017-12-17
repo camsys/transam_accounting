@@ -55,8 +55,8 @@ class Expenditure < ActiveRecord::Base
   validates :expense_type,              :presence => true
   validates :expense_date,              :presence => true
   validates :description,               :presence => true
-  validates :amount,                    :allow_nil => true, :numericality => {:only_integer => :true}
-  validates :pcnt_from_grant,           :allow_nil => true, :numericality => {:only_integer => :true, :greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
+  validates :amount,                    :allow_nil => true, :numericality => {:only_integer => true}
+  validates :pcnt_from_grant,           :allow_nil => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
 
   # List of hash parameters specific to this class that are allowed by the controller
   FORM_PARAMS = [
