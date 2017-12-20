@@ -18,13 +18,15 @@
 
 
   $('body').on('change', '#grant_purchases .funding-pcnt', function() {
+
+    $('input.funding-pcnt').rules( "add", {
+      pcntSumsHundred: true
+    });
+
     $('.funding-pcnt').valid();
   });
 
   $('#grant_purchases').on('cocoon:after-insert', function(e, added_purchase) {
-    added_purchase.find('input.funding-pcnt').rules("add", {
-      pcntSumsHundred: true
-    });
 
     if ($('.remove_grant_purchase').length > 1) {
       $('.remove_grant_purchase').show();
