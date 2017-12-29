@@ -58,7 +58,7 @@ class GeneralLedgerMappingsController < OrganizationAwareController
     add_breadcrumb "GL Mappings", general_ledger_mappings_path(chart_of_account_id: @chart_of_account_id)
     add_breadcrumb "New", new_general_ledger_mapping_path(chart_of_account_id: @chart_of_account_id)
 
-    @general_ledger_mapping = GeneralLedgerMapping.new
+    @general_ledger_mapping = GeneralLedgerMapping.new(chart_of_account_id: @chart_of_account_id)
   end
 
   # GET /general_ledger_mappings/1/edit
