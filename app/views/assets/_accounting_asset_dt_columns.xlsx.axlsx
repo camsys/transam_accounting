@@ -1,3 +1,5 @@
-[format_as_boolean(a.depreciable), format_as_currency(a.book_value)].each do |val|
+[format_as_yes_no(a.depreciable), format_as_currency(a.book_value),
+ format_as_currency(a.salvage_value), format_as_date(a.current_depreciation_date),
+ format_as_date(a.depreciation_start_date)].each do |val|
   row.add_cell(val)
 end
