@@ -1,28 +1,55 @@
-- acct_editable =  acct_editable.nil? ? true : acct_editable
-
 #grant_purchases.well.well-sm{style: "overflow-y:scroll; max-height:250px;"}
   %label.control-label
     %i.fa.fa-usd.fa-1-5x
     Funding History
-  - if acct_editable
-    .links.pull-right
-      = link_to_add_association f, :grant_purchases, :class => 'btn btn-xs btn-info', data: {association_insertion_method: 'after'} do
-        %i.fa.fa-plus
   %label#grant_purchases-error.error
   = f.simple_fields_for :grant_purchases do |grant_purchase|
-    = render 'grant_purchase_fields', f: grant_purchase, acct_editable: acct_editable
+    = render 'grant_purchase_fields', f: grant_purchase
+  .links.pull-right
+    = link_to_add_association f, :grant_purchases, :class => 'btn btn-xs btn-info' do
+      %i.fa.fa-plus
+
 
 :javascript
 
+  $( document ).ready(function() {
+    $('input.funding-pcnt').rules( "add", {
+      pcntSumsHundred: true
+    });
+  });
+
+
+  if ($('.remove_grant_purchase').length == 1) {
+    $('.remove_grant_purchase').hide();
+  }
+
+
   $('body').on('change', '#grant_purchases .funding-pcnt', function() {
+
+    $('input.funding-pcnt').rules( "add", {
+      pcntSumsHundred: true
+    });
+
     $('.funding-pcnt').valid();
   });
 
   $('#grant_purchases').on('cocoon:after-insert', function(e, added_purchase) {
-    added_purchase.find('input.funding-pcnt').rules("add", {
-      pcntSumsHundred: true
-    });
-  })
+
+    if ($('.remove_grant_purchase').length > 1) {
+      $('.remove_grant_purchase').show();
+    } else {
+      $('.remove_grant_purchase').hide();
+    }
+
+  });
+
+  $('#grant_purchases').on('cocoon:after-remove', function(e, added_purchase) {
+    if ($('.remove_grant_purchase').length == 1) {
+      $('.remove_grant_purchase').hide();
+    } else {
+      $('.remove_grant_purchase').show();
+    }
+  });
 
   $.validator.addMethod("pcntSumsHundred", function(value, element) {
       var sum = 0;
