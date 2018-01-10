@@ -34,12 +34,14 @@ module TransamDepreciable
     #------------------------------------------------------------------------------
     before_validation  :set_depreciation_defaults
     before_update      :clear_depreciation_cache
-    after_create       :set_depreciation_general_ledger_accounts
 
     #----------------------------------------------------
     # Associations
     #----------------------------------------------------
 
+    has_many :depreciation_entries, :foreign_key => :asset_id
+
+    has_many   :book_value_updates, -> {where :asset_event_type_id => BookValueUpdateEvent.asset_event_type.id }, :class_name => "BookValueUpdateEvent",  :foreign_key => :asset_id
 
     #----------------------------------------------------
     # Validations
@@ -71,6 +73,32 @@ module TransamDepreciable
   #
   #------------------------------------------------------------------------------
 
+  def depreciation_months_left(on_date=Date.today)
+    num_months_initial = self.depreciation_useful_life.nil? ? self.policy_analyzer.get_min_service_life_months : self.depreciation_useful_life
+    last_depr_date = on_date - (self.policy_analyzer.get_depreciation_interval_type.months).months
+    num_months_used =  last_depr_date > depreciation_start_date ? (last_depr_date.year * 12 + last_depr_date.month) - (depreciation_start_date.year * 12 + depreciation_start_date.month) : 0
+    num_months_extended = self.rehabilitation_updates.sum(:extended_useful_life_months)
+    num_months_unused = num_months_initial-num_months_used+num_months_extended
+
+    num_months_unused
+  end
+
+  def original_cost_basis
+    self.depreciation_purchase_cost
+  end
+
+  def adjusted_cost_basis
+    original_cost_basis + expenditures.sum(:amount) + rehabilitation_updates.sum(:total_cost)
+  end
+
+  def original_depreciation_useful_life_months
+    self.depreciation_useful_life || self.expected_useful_life
+  end
+
+  def adjusted_depreciation_useful_life_months
+    original_depreciation_useful_life_months + expenditures.sum(:extended_useful_life_months) + rehabilitation_updates.sum(:extended_useful_life_months)
+  end
+
   # Render the asset as a JSON object -- overrides the default json encoding
   def depreciable_as_json(options={})
     {
@@ -83,55 +111,47 @@ module TransamDepreciable
   end
 
   # returns the number of months the asset has depreciated
-  def depreciation_months(on_date=Date.today)
-    (on_date.year * 12 + on_date.month) - (depreciation_start_date.year * 12 + depreciation_start_date.month)
+  def depreciation_months(on_date=Date.today, start_date=nil)
+    if start_date.nil?
+      start_date = depreciation_start_date
+    end
+    (on_date.year * 12 + on_date.month) - (start_date.year * 12 + start_date.month)
   end
 
   def get_depreciation_table
 
-    # See if the table has already been created and cached
-    table = get_cached_object('depreciation_table')
-    if table.nil?
-      if depreciation_start_date.nil?
-        table = []
-      else
-        # Make sure we are working with a concrete asset class
-        asset = is_typed? ? self : Asset.get_typed_asset(self)
-        current_policy = asset.policy
+    # Make sure we are working with a concrete asset class
+    asset = is_typed? ? self : Asset.get_typed_asset(self)
 
-        # see what metric we are using for the depreciated value of the asset
-        class_name = current_policy.depreciation_calculation_type.class_name
+    gl_mapping = asset.general_ledger_mapping
 
-        # create an instance of this calculator class
-        calculator_instance = class_name.constantize.new
+    table = []
+    start_book_val = 0
+    asset.depreciation_entries.order(:event_date).each_with_index do |depr_entry, idx|
+      start_book_val += depr_entry.book_value
+      table << {
+          :on_date => depr_entry.event_date,
+          :description => depr_entry.description,
+          :amount => depr_entry.book_value,
+          :book_value => start_book_val
+      }
 
-        # always add depreciation_start_date as first interval (deals with corner cases)
-        on_date = current_policy.depreciation_date(asset.depreciation_start_date)
-
-        # initialize table of results
-        table = []
-
-        # get all the depreciation dates from the first date based on the depreciation_start_date to the current
-        # depreciation date
-        while on_date <= current_policy.current_depreciation_date
-
-          book_value_start = calculator_instance.book_value_start(asset, on_date)
-          depreciated_expense = calculator_instance.depreciated_expense(asset, on_date)
-          book_value_end = calculator_instance.book_value_end(asset, on_date)
-          accumulated_depreciation = calculator_instance.accumulated_depreciation(asset, on_date)
-
-          table << {
-            :on_date => on_date,
-            :book_value_start => book_value_start,
-            :depreciated_expense => depreciated_expense,
-            :book_value_end => book_value_end,
-            :accumulated_depreciation => accumulated_depreciation
-          }
-
-          on_date += current_policy.depreciation_interval_type.months.months
+      if ChartOfAccount.find_by(organization_id: asset.organization_id) && gl_mapping.present?
+        table[-1][:general_ledger_account] = ''
+        if depr_entry.description.include? 'Purchase'
+          table[-1][:general_ledger_account] = gl_mapping.asset_account
+        elsif (depr_entry.description.include? 'Depreciation Expense') || (depr_entry.description.include? 'Manual Adjustment')
+          table[-1][:general_ledger_account] = gl_mapping.depr_expense_account
+        elsif depr_entry.description.include? 'Disposal'
+          table[-1][:general_ledger_account] = gl_mapping.gain_loss_account
+        elsif depr_entry.description.include? 'CapEx'
+          description = depr_entry.description[7..-1]
+          table[-1][:general_ledger_account] = asset.expenditures.find_by(expense_date: depr_entry.event_date, description: description).try(:general_ledger_account)
+        elsif depr_entry.description.include? 'Rehab'
+          description = depr_entry.description[7..-1]
+          table[-1][:general_ledger_account] = asset.rehabilitation_updates.find_by(event_date: depr_entry.event_date, comments: description).try(:general_ledger_account)
         end
       end
-      cache_object('depreciation_table', table)
     end
     return table
   end
@@ -166,37 +186,52 @@ module TransamDepreciable
       asset = is_typed? ? self : Asset.get_typed_asset(self)
 
       begin
+
+
         if asset.depreciable
-          # see what algorithm we are using to calculate the book value
-          class_name = asset.policy_analyzer.get_depreciation_calculation_type.class_name
-          book_value = calculate(asset, class_name)
-          asset.book_value = book_value.to_i
 
-          #update current depreciation date
-          asset.current_depreciation_date = asset.policy_analyzer.get_current_depreciation_date
+          gl_mapping = asset.general_ledger_mapping
 
-          # if book value and current depreciation has changed, account for it in GLA
-          if asset.general_ledger_accounts.count > 0 # check whether this app records GLAs at all
-            if ((self.changes.keys.include? 'book_value') || (self.changes.keys.include? 'current_depreciation_date')) && asset.book_value != asset.purchase_cost
-              depr_amount = self.changes['book_value'][0]-self.changes['book_value'][1]
+          if asset.depreciation_entries.count == 0 # add the initial depr entry if it does not exist
+            asset.depreciation_entries.create!(description: 'Purchase', book_value: asset.depreciation_purchase_cost, event_date: asset.depreciation_start_date)
 
-              amount_not_ledgered = depr_amount # temp variable for tracking rounding errors
-              asset.grant_purchases.order(:pcnt_purchase_cost).each_with_index do |grant_purchase, idx|
-                unless idx+1 == asset.grant_purchases.count
-                  pcnt_depr_amount = (depr_amount * grant_purchase.pcnt_purchase_cost / 100.0).round
-                  amount_not_ledgered -= pcnt_depr_amount
-                else
-                  pcnt_depr_amount = amount_not_ledgered
-                end
-                asset.general_ledger_accounts.accumulated_depreciation_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: -pcnt_depr_amount)
-
-                asset.general_ledger_accounts.depreciation_expense_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} #{asset.current_depreciation_date}", amount: pcnt_depr_amount)
-              end
-
+            if gl_mapping.present?
+              gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.depreciation_start_date, description: "Purchase: #{asset.asset_path}", amount: asset.depreciation_purchase_cost, asset: asset)
             end
+
+            depr_start = asset.depreciation_start_date
+          else
+            depr_start = asset.current_depreciation_date
           end
+
+          # check and set the asset book value from the depr entries
+          asset.book_value = asset.depreciation_entries.sum(:book_value)
+
+          while depr_start <= asset.policy_analyzer.get_current_depreciation_date
+            asset.current_depreciation_date = asset.policy_analyzer.get_depreciation_date(depr_start)
+
+            # get this interval's system calculated depreciation
+            if asset.depreciation_entries.where(description: 'Depreciation Expense', event_date: asset.current_depreciation_date).count == 0
+              # see what algorithm we are using to calculate the book value
+              class_name = asset.policy_analyzer.get_depreciation_calculation_type.class_name
+              book_value = (calculate(asset, class_name) + 0.5).to_i
+
+              depr_amount = book_value - asset.book_value
+              asset.depreciation_entries.create!(description: 'Depreciation Expense', book_value: depr_amount, event_date: asset.current_depreciation_date)
+              asset.book_value = book_value
+
+              if gl_mapping.present? # check whether this app records GLAs at all
+                gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Accumulated Depreciation: #{asset.asset_path}", amount: depr_amount, asset: asset)
+
+                gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: asset.current_depreciation_date, description: "Depreciation Expense: #{asset.asset_path}", amount: -depr_amount, asset: asset)
+              end
+            end
+
+            depr_start = depr_start + (asset.policy_analyzer.get_depreciation_interval_type.months).months
+          end
+
         else
-          asset.book_value = asset.purchase_cost
+          asset.book_value = asset.depreciation_purchase_cost
 
           #update current depreciation date
           asset.current_depreciation_date = asset.policy_analyzer.get_current_depreciation_date
@@ -206,6 +241,7 @@ module TransamDepreciable
         asset.save(:validate => false) if save_asset
       rescue Exception => e
         Rails.logger.warn e.message
+        Rails.logger.warn e.backtrace
       end
     end
 
@@ -213,7 +249,8 @@ module TransamDepreciable
     def set_depreciation_defaults
       self.in_service_date ||= self.purchase_date
       self.depreciation_start_date ||= self.in_service_date
-      self.book_value ||= self.purchase_cost.to_i
+      self.depreciation_purchase_cost ||= self.purchase_cost
+      self.book_value ||= self.depreciation_purchase_cost.to_i
       self.salvage_value ||= 0
       self.depreciable = self.depreciable.nil? ? true : self.depreciable
 
@@ -226,22 +263,6 @@ module TransamDepreciable
       # clear cache for other cached depreciation objects that are not attributes
       # hard-coded temporarily
       delete_cached_object('depreciation_table')
-    end
-
-    def set_depreciation_general_ledger_accounts
-
-      if GrantPurchase.sourceable_type == 'Grant' && general_ledger_account_id.present?
-        # just add depreciation GLAs for now
-        # does not add GLA entries that is done during update_depreciation
-        grant_purchases.each do |grant_purchase|
-          # accumulated depr
-          general_ledger_accounts << organization.general_ledger_accounts.accumulated_depreciation_accounts.find_by(grant_id: grant_purchase.sourceable_id)
-
-          # depr_expense_gla
-          general_ledger_accounts << organization.general_ledger_accounts.depreciation_expense_accounts.find_by(grant_id: grant_purchase.sourceable_id)
-        end
-      end
-
     end
 
 

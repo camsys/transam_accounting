@@ -36,6 +36,25 @@ module TransamAccountingAssetsController
     end
   end
 
+  def get_book_value_on_date
+    get_asset
+
+    book_val = @asset.depreciation_entries.where('event_date <= ?', reformat_date(params[:on_date])).sum(:book_value)
+
+    respond_to do |format|
+      format.json { render :json => book_val.to_json }
+    end
+  end
+
+  def get_depreciation_months_left
+    get_asset
+    months_left = @asset.depreciation_months_left(Date.strptime(params[:on_date], '%m/%d/%Y'))
+
+    respond_to do |format|
+      format.json { render :json => months_left.to_json }
+    end
+  end
+
   # form for updating depreciation inputs
   def edit_depreciation
     get_asset
@@ -57,15 +76,19 @@ module TransamAccountingAssetsController
     # Make sure we are working with a full-typed asset
     asset = Asset.get_typed_asset(base_asset)
 
-    # reformat date
-    asset.depreciation_start_date = reformat_date(proxy.depreciation_start_date) if proxy.depreciation_start_date
-
     asset.depreciable = proxy.depreciable
+    asset.depreciation_start_date = reformat_date(proxy.depreciation_start_date) if proxy.depreciation_start_date # reformat date
+    asset.current_depreciation_date = asset.depreciation_start_date if asset.current_depreciation_date != asset.depreciation_start_date
+    asset.depreciation_useful_life = proxy.depreciation_useful_life
+    asset.depreciation_purchase_cost = proxy.depreciation_purchase_cost
     asset.salvage_value = proxy.salvage_value if proxy.salvage_value
 
     asset.updator = current_user
 
     if asset.save
+
+      Delayed::Job.enqueue AssetUpdateJob.new(asset.object_key), :priority => 0
+
       notify_user(:notice, "Asset #{asset.name} was successfully updated.")
     end
 

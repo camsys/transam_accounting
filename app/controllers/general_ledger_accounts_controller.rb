@@ -72,6 +72,22 @@ class GeneralLedgerAccountsController < OrganizationAwareController
     end
   end
 
+  def toggle_archive
+    coa = ChartOfAccount.find_by(id: params[:chart_of_account_id])
+
+    if coa.present?
+      if ArchivedFiscalYear.archive(coa.organization_id, params[:fy_year], true)
+        notify_user(:notice, "The FY was successfully archived/unarchived.")
+      else
+        notify_user(:alert, "Cannot archive/unarchive FY.")
+      end
+
+      redirect_to general_ledger_accounts_path(organization_id: coa.organization_id)
+    else
+      redirect_to '/404'
+    end
+  end
+
   def show
 
     add_breadcrumb @chart_of_accounts, general_ledger_accounts_path(organization_id: @chart_of_accounts.organization_id)
@@ -110,6 +126,25 @@ class GeneralLedgerAccountsController < OrganizationAwareController
     add_breadcrumb @ledger_account
     add_breadcrumb "Update"
 
+  end
+
+  def get_accounts
+    case params[:subtype]
+      when 'fixed_asset'
+        result = GeneralLedgerAccount.fixed_asset_accounts.where(chart_of_account_id: params[:chart_of_account_id])
+      when 'depreciation_expense'
+        result = GeneralLedgerAccount.depreciation_expense_accounts.where(chart_of_account_id: params[:chart_of_account_id])
+      when 'accumulated_depreciation'
+        result = GeneralLedgerAccount.accumulated_depreciation_accounts.where(chart_of_account_id: params[:chart_of_account_id])
+      when 'disposal'
+        result = GeneralLedgerAccount.disposal_accounts.where(chart_of_account_id: params[:chart_of_account_id])
+      else
+        result = GeneralLedgerAccount.where(chart_of_account_id: params[:chart_of_account_id])
+    end
+
+    respond_to do |format|
+      format.json { render json: result.map{|x| [x.id, x.coded_name]}.to_json }
+    end
   end
 
   def check_grant_budget

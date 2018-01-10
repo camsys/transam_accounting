@@ -1,3 +1,7 @@
-.row
-  .col-md-12
-    = render :partial => 'index_table', :locals => {:gl_accounts => @ledger_accounts, :show_actions => 1}
+.col-sm-12.col-md-10.col-md-offset-1
+  .page-header
+    %h2= @chart_of_accounts
+
+  .row
+    .col-sm-12
+      = render :partial => 'index_table', :locals => {:gl_accounts => @ledger_accounts, :show_actions => 1}

@@ -1,0 +1,62 @@
+= render :layout => "update_event_form" do |f|
+  = f.input :event_date, :label => 'Date of Report', :wrapper => :vertical_append do
+    = f.input_field :event_date, :class => "form-control", :as => :string, :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.event_date)
+    %span.input-group-addon
+      %i.fa.fa-calendar
+
+  .alert.alert-info
+    = "Book value as of <span id='current_event_date'>#{format_as_date(f.object.event_date)}</span>: <b><span id='current_book_val'>#{format_as_currency(@asset.book_value)}</span></b>".html_safe
+
+  = f.input :book_value, :wrapper => :vertical_append, :label => "Book Value" do
+    %span.input-group-addon
+      %i.fa.fa-usd
+    = f.input_field :book_value, :class => "form-control", :label => 'New Book Value'
+
+  = f.input :comments, :input_html => { :rows => 6 }, :placeholder => "Enter any additional comments..."
+  .form-group
+    = f.button :submit, "Update Book Value", :class => 'btn btn-primary'
+
+
+:javascript
+
+  $(document).ready(function(){
+    var strStartDate = '#{start_of_fiscal_year(Organization.get_typed_organization(@asset.organization).first_archivable_fiscal_year)}';
+    var startDateParts = strStartDate.split("-");
+    var strEndDate = '#{@asset.policy_analyzer.get_depreciation_date(Date.today)-1.day}';
+    var endDateParts = strEndDate.split("-");
+    $('[data-behavior~=datepicker]').datepicker({
+      startDate: new Date(startDateParts[0], (startDateParts[1] - 1), startDateParts[2]),
+      endDate: new Date(endDateParts[0], (endDateParts[1] - 1), endDateParts[2]),
+      onSelect: function(d,i){
+        if(d !== i.lastVal){
+          $(this).change();
+        }
+      }
+    });
+  });
+
+  $('#asset_event_event_date').change(function() {
+    $.ajax({
+      url: '#{get_book_value_on_date_inventory_path(@asset)}',
+      data: {
+          on_date: function() {
+            return $('#asset_event_event_date').val();
+          }
+      },
+      success: function(result){
+        $('#current_event_date').text($('#asset_event_event_date').val());
+        $('#current_book_val').text(currency_formatter(parseInt(result)));
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+      }
+    });
+  });
+
+  function integer_formatter(value) {
+    return format("###,##0.", value);
+  };
+
+  function currency_formatter(value) {
+    return '$' + integer_formatter(value);
+  };

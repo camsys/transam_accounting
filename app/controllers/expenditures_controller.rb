@@ -1,10 +1,9 @@
-class ExpendituresController < OrganizationAwareController
+class ExpendituresController < AssetAwareController
 
   # Include the fiscal year mixin
   include FiscalYear
 
   add_breadcrumb "Home", :root_path
-  add_breadcrumb "Expenditures", :expenditures_path
 
   before_action :set_expenditure, only: [:show, :edit, :update, :destroy]
   before_action :reformat_date_field, only: [:create, :update]
@@ -79,8 +78,9 @@ class ExpendituresController < OrganizationAwareController
   # GET /expenditures/1
   def show
 
-    add_breadcrumb @expenditure.expense_type, expenditures_path(:type => @expenditure.expense_type)
-    add_breadcrumb @expenditure
+
+    add_asset_breadcrumbs
+    add_breadcrumb @expenditure, inventory_expenditure_path(@asset, @expenditure)
 
     # get the @prev_record_path and @next_record_path view vars
     get_next_and_prev_object_keys(@expenditure, INDEX_KEY_LIST_VAR)
@@ -93,24 +93,22 @@ class ExpendituresController < OrganizationAwareController
   def new
     @expenditure = Expenditure.new
 
-    add_breadcrumb "New"
+    add_asset_breadcrumbs
+    add_breadcrumb "New", new_inventory_expenditure_path(@asset)
 
   end
 
   # GET /expenditures/1/edit
   def edit
-    add_breadcrumb @expenditure.expense_type, expenditures_path(:type => @expenditure.expense_type)
-    add_breadcrumb @expenditure, expenditure_path(@expenditure)
-    add_breadcrumb 'Update', edit_expenditure_path(@expenditure)
+    add_asset_breadcrumbs
+    add_breadcrumb @expenditure, inventory_expenditure_path(@asset, @expenditure)
+    add_breadcrumb 'Update', edit_inventory_expenditure_path(@asset,@expenditure)
   end
 
   # POST /expenditures
   def create
 
     @expenditure = Expenditure.new(expenditure_params)
-    @expenditure.organization = @organization
-
-    add_breadcrumb "New"
 
     # If we have an asset to add we need to return to the asset page
     # not the expenditure page
@@ -120,7 +118,7 @@ class ExpendituresController < OrganizationAwareController
       @expenditure.assets << @asset
     end
 
-    if @expenditure.save
+    if @expenditure.save!
       if @asset.present?
         redirect_to inventory_url(@asset), notice: 'Expenditure was successfully created.'
       else
@@ -133,10 +131,6 @@ class ExpendituresController < OrganizationAwareController
 
   # PATCH/PUT /expenditures/1
   def update
-
-    add_breadcrumb @expenditure.expense_type, expenditures_path(:type => @expenditure.expense_type)
-    add_breadcrumb @expenditure, expenditure_path(@expenditure)
-    add_breadcrumb 'Update'
 
     if @expenditure.update(expenditure_params)
       redirect_to @expenditure, notice: 'Expenditure was successfully updated.'
@@ -153,9 +147,20 @@ class ExpendituresController < OrganizationAwareController
 
   private
 
+  def add_asset_breadcrumbs
+    add_breadcrumb @asset.asset_type.name.pluralize(2), inventory_index_path(:asset_type => @asset.asset_type, :asset_subtype => 0)
+    add_breadcrumb @asset.asset_subtype.name.pluralize(2), inventory_index_path(:asset_subtype => @asset.asset_subtype)
+    add_breadcrumb @asset.asset_tag, inventory_path(@asset)
+  end
+
   # Use callbacks to share common setup or constraints between actions.
   def set_expenditure
     @expenditure = Expenditure.find_by(:object_key => params[:id])
+
+    if @expenditure.nil?
+      redirect_to '/404'
+    end
+
   end
 
   # Only allow a trusted parameter "white list" through.

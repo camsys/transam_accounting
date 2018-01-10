@@ -3,6 +3,8 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
   # Include the object key mixin
   include TransamObjectKey
 
+  include FiscalYear
+
   #------------------------------------------------------------------------------
   # Callbacks
   #------------------------------------------------------------------------------
@@ -12,7 +14,7 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
   # Associations
   #------------------------------------------------------------------------------
   belongs_to :general_ledger_account
-  belongs_to  :sourceable, :polymorphic => true
+  belongs_to :asset
 
   #------------------------------------------------------------------------------
   # Validations
@@ -20,6 +22,17 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
 
   validates :general_ledger_account,              :presence => true
   validates :description,                         :presence => true
+  validates :event_date,                          :presence => true
+
+  #------------------------------------------------------------------------------
+  #
+  # Scopes
+  #
+  #------------------------------------------------------------------------------
+
+  default_scope { order(:event_date) }
+
+  scope :from_fy, -> (fy_year) {  where('event_date >= ?', GeneralLedgerAccountEntry.new.start_of_fiscal_year(fy_year)) }
 
   #------------------------------------------------------------------------------
   #
@@ -27,25 +40,6 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
-  def self.sourceable_type
-    SOURCEABLE_TYPE
-  end
-
-  def self.sources(params=nil)
-    if params
-      SOURCEABLE_TYPE.constantize.where(params)
-    else
-      SOURCEABLE_TYPE.constantize.active
-    end
-  end
-
-  def self.label
-    if SOURCEABLE_TYPE == 'FundingSource'
-      'Funding Program'
-    else
-      SOURCEABLE_TYPE.constantize.model_name.human.titleize
-    end
-  end
 
   #------------------------------------------------------------------------------
   #
@@ -57,8 +51,13 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
     description
   end
 
-  def sourceable_path
-    "#{sourceable_type.underscore}_path(:id => '#{sourceable.object_key}')"
+  def as_json(options={})
+    super(options).merge!({
+        general_ledger_account_object_key: general_ledger_account.object_key,
+        general_ledger_account_account_number: general_ledger_account.account_number,
+        asset_organization: asset.try(:organization).try(:short_name),
+        asset: asset.try(:asset_tag)
+    })
   end
 
   #------------------------------------------------------------------------------
@@ -71,5 +70,6 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
   # Set resonable defaults for general ledger account entries
   def set_defaults
     self.amount ||= 0
+    self.event_date ||= Date.today
   end
 end

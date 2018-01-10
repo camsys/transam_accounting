@@ -11,8 +11,7 @@ class GrantBudget < ActiveRecord::Base
   # Callbacks
   #------------------------------------------------------------------------------
   after_initialize                  :set_defaults
-  after_save                        :update_general_ledger_accounts
-  before_destroy                    :delete_general_ledger_accounts
+  after_create                      :update_general_ledger_accounts
 
   #------------------------------------------------------------------------------
   # Associations
@@ -77,18 +76,9 @@ class GrantBudget < ActiveRecord::Base
   protected
 
   def update_general_ledger_accounts
-    # for each grant budget, create/update funding GLA
-    grant_funding_gla = GeneralLedgerAccount.find_or_create_by(chart_of_account_id: general_ledger_account.chart_of_account_id, general_ledger_account_type_id: GeneralLedgerAccountType.find_by(name: 'Asset Account').id, general_ledger_account_subtype_id: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account').id, account_number: "#{general_ledger_account.account_number}-#{grant}", name: "#{general_ledger_account.name} #{grant} Funding", grant_id: grant.id)
-    if grant_funding_gla.subtotal != amount
-      grant_funding_gla_entry = grant_funding_gla.general_ledger_account_entries.find_or_create_by(description: 'Grant Funding', sourceable: grant)
-      grant_funding_gla_entry.update!(amount: amount - grant_funding_gla.subtotal)
-    end
-  end
+    url = Rails.application.routes.url_helpers.grant_path(grant)
 
-  def delete_general_ledger_accounts
-    grant_funding_gla = GeneralLedgerAccount.find_by(chart_of_account_id: general_ledger_account.chart_of_account_id, general_ledger_account_type_id: GeneralLedgerAccountType.find_by(name: 'Asset Account').id, general_ledger_account_subtype_id: GeneralLedgerAccountSubtype.find_by(name: 'Grant Funding Account').id, account_number: "#{general_ledger_account.account_number}-#{grant}", name: "#{general_ledger_account.name} #{grant} Funding", grant_id: grant.id)
-    grant_funding_gla.general_ledger_account_entries.find_by(sourceable: grant).destroy
-    grant_funding_gla.destroy if grant_funding_gla.general_ledger_account_entries.count == 0
+    general_ledger_account.general_ledger_account_entries.create!(description: "Grant Funding - <a href='#{url}'>#{grant.to_s}</a>", amount: amount)
   end
 
   # Set resonable defaults for a new grant

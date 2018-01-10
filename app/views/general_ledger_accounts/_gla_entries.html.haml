@@ -1,24 +1,35 @@
 - if gla_entries.empty?
   %p There are no entries in this GL account.
 -else
-  %table.table.table-hover#gla_datatable
+  %table.table.table-hover#gla_datatable{:data => {:toggle => 'table',
+      :pagination => 'true',
+      :show_pagination_switch => 'true',
+      :page_list => "[5, 10, 20, 50, 100, 200]",
+      :page_size => current_user.num_table_rows,
+      :search => 'false',
+      :export_types => "['csv', 'txt', 'excel']",
+      :show_export => 'true',
+      :show_toggle => 'false',
+      :state_save => 'true',
+      :state_save_id_table => "gla_entries_id",
+      :state_save_expire => "1y"}}
     %thead
       %tr
+        %th.left Date
         %th.left Description
-        %th.right Amount
+        %th.right Change
+        %th.right Balance
+
 
     %tbody
-      - subtotal = 0
-      - gla_entries.each do |gla_entry|
-        - subtotal += gla_entry.amount
+      - balance = 0
+      - gla_entries.each_with_index do |gla_entry,idx|
         %tr.popup-details
-          %td.left= gla_entry.description
+          %td.left= format_as_date(gla_entry.event_date)
+          %td.left= gla_entry.description.html_safe
           %td.right= format_as_currency(gla_entry.amount)
-
-    %tfoot
-      %tr
-        %td
-        %td.right= format_as_currency(subtotal)
+          - balance += gla_entry.amount
+          %td.right= format_as_currency(balance)
 
 :javascript
   $('.popup-details').popover({
@@ -27,4 +38,17 @@
     placement: 'left',
     animation: 'true',
     html: 'true'
+  });
+
+  $("#gla_datatable").on('all.bs.table', function(evt, name, args) {
+    $('.fixed-table-container').css('min-height', '300px')
+    transam.make_same_height('.header-part');
+  });
+
+  $(window).load(function() {
+    transam.make_same_height('.header-part');
+  });
+
+  $(window).resize(function() {
+    $("#gla_datatable").bootstrapTable('resetView');
   });

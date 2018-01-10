@@ -1,0 +1,25 @@
+:javascript
+  $(document).ready(function() {
+
+    var strStartDate = '#{start_of_fiscal_year(Organization.get_typed_organization(@asset.organization).first_archivable_fiscal_year)}';
+    var startDateParts = strStartDate.split("-");
+    var strEndDate = '#{@asset.policy_analyzer.get_depreciation_date(Date.today)-1.day}';
+    var endDateParts = strEndDate.split("-");
+    $('[data-behavior~=datepicker]').datepicker({
+        startDate: new Date(startDateParts[0], (startDateParts[1] - 1), startDateParts[2]),
+        endDate: new Date(endDateParts[0], (endDateParts[1] - 1), endDateParts[2])
+    });
+
+    // jquery validations
+    $('.expenditure_form').validate({
+      ignore: [], //validate hidden fields
+      submitHandler: function(form) {
+        form.submit();
+      }
+    });
+
+    $('#expenditure_amount').rules("add", {
+      min: 0,
+    });
+
+  });

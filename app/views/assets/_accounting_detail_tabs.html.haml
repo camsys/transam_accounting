@@ -1,10 +1,9 @@
 - if @asset.depreciable
   %li
     %a{:href => "#depreciation", :data =>{:toggle => 'tab'}}
-      Depreciation
+      Asset Values
 
-- unless @asset.type_of? Expenditure
-  %li
-    %a{:href => "#expenditures", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= Expenditure.where(parent_id: @asset.id).count
-      CapEx
+%li
+  %a{:href => "#expenditures", :data =>{:toggle => 'tab'}}
+    %span.badge.pull-right= @asset.expenditures.count
+    CapEx

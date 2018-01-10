@@ -1,0 +1,32 @@
+- if can? :create, GeneralLedgerMapping
+  .btn-group{style: 'margin-top:-2px;'}
+    = link_to new_general_ledger_mapping_path(chart_of_account_id: @chart_of_account_id), :class => 'btn btn-default' do
+      %i.fa.fa-plus.fa-fw
+      = "Add GL Mapping"
+
+= form_tag general_ledger_mappings_path(chart_of_account_id: @chart_of_account_id), :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action', style: 'padding-top: 1px' do
+  .form-group
+    = select_tag(:asset_type_filter, options_for_select(AssetType.all.collect{|a| [a.to_s, a.id]}, :selected => @asset_type_filter), :class => "form-control", :multiple => true)
+
+  = button_tag :class => 'btn btn-default', :type => 'submit' do
+    %i.fa.fa-filter
+
+
+:javascript
+
+  $(document).ready(function() {
+
+    $('#asset_type_filter').multiselect({
+      inheritClass: true,
+      maxHeight: 250,
+      buttonText: function(options, select) {
+        if (options.length === 0) {
+          return 'Any Asset Type...';
+        } else {
+          return 'Asset Type - ' + options.length + ' selected';
+        }
+      }
+    });
+
+  });
+

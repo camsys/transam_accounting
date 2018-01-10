@@ -55,33 +55,11 @@ namespace :transam do
     end
   end
 
-  desc 'add expenditure asset_type'
-  task add_expenditure_asset_type: :environment do
-
-    a = AssetType.new(name: 'Expenditures', class_name: 'Expenditure', display_icon_name: 'fa fa-cogs', map_icon_name: 'blueIcon', description: 'Expenditures', active: true)
-    a.save!
-
-    PolicyAssetTypeRule.create!(policy_id: Policy.where('parent_id IS NULL').pluck(:id).first, asset_type_id: a.id, service_life_calculation_type_id: 1, replacement_cost_calculation_type_id: 1, annual_inflation_rate: 1.1, pcnt_residual_value: 0)
-  end
-
   desc "cleanup all GLA/grant data for testing"
-  task cleanup_gla_grant_data: :environment do
-    # cleanup asset data
-    GrantPurchase.delete_all
-    Asset.update_all(general_ledger_account_id: nil)
+  task reload_depr_data: :environment do
+    DepreciationEntry.destroy_all
 
-    # cleanup policy data
-    PolicyAssetSubtypeRule.update_all(general_ledger_account_id: nil)
-
-    Grant.destroy_all
-    GeneralLedgerAccount.destroy_all
-
-    # reload organization GLA's to COA
-    OrganizationGeneralLedgerAccount.all.each do |general_gla|
-        ChartOfAccount.all.each do |chart|
-          chart.general_ledger_accounts.create!(general_ledger_account_type: general_gla.general_ledger_account_type, general_ledger_account_subtype: general_gla.general_ledger_account_subtype, account_number: general_gla.account_number, name: general_gla.name)
-        end
-    end
+    Asset.update_all(current_depreciation_date: nil)
   end
 
   desc "Add accounting reports"
@@ -102,6 +80,22 @@ namespace :transam do
             :description => 'Displays asset purchase info.',
             :chart_type => '',
             :chart_options => ""
+        },
+        {
+            :active => 1,
+            :belongs_to => 'report_type',
+            :type => "Inventory Report",
+            :name => 'Asset Value Report',
+            :class_name => "AssetValueReport",
+            :view_name => "generic_table_with_subreports",
+            :show_in_nav => 1,
+            :show_in_dashboard => 1,
+            :printable => true,
+            :exportable => true,
+            :roles => 'guest,user,manager',
+            :description => 'Displays a report of asset book values.',
+            :chart_type => '',
+            :chart_options => ""
         }
     ]
 
@@ -113,6 +107,30 @@ namespace :transam do
       else
         x = Report.find_by(class_name: row[:class_name])
         x.update!(row.except(:belongs_to, :type))
+      end
+    end
+  end
+
+  desc "Add GL entries to disposed assets"
+  task add_disposition_gl_entries: :environment do
+    Asset.disposed.each do |asset|
+      asset = Asset.get_typed_asset(asset)
+      gl_mapping = asset.general_ledger_mapping
+      if gl_mapping.present?
+
+        amount = asset.adjusted_cost_basis-asset.book_value # temp variable for tracking rounding errors
+        gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: amount, asset: asset)
+
+        if asset.book_value > 0
+          gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: asset.book_value, asset: asset)
+        end
+
+        gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: -asset.adjusted_cost_basis, asset: asset)
+
+        disposition_event = asset.disposition_updates.last
+        if disposition_event.sales_proceeds > 0
+          gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: "Disposal: #{asset.asset_path}", amount: -disposition_event.sales_proceeds, asset: asset)
+        end
       end
     end
   end

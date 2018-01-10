@@ -1,7 +1,7 @@
 :ruby
   glas = Hash.new
   ChartOfAccount.where(organization_id: @organization_list).each do |coa|
-    glas[coa.organization_id] = coa.general_ledger_accounts.fixed_asset_accounts.ids
+    glas[coa.organization_id] = coa.general_ledger_accounts.ids
   end
 
 = simple_form_for(@grant,
@@ -13,7 +13,7 @@
     :boolean => :vertical_boolean}) do |f|
 
   - if @organization_list.count > 1
-    = f.association :organization, :required => true, :collection => Organization.all, :label_method => 'coded_name'
+    = f.association :organization, :required => true, :collection => Organization.where(id: @organization_list), :label_method => 'coded_name'
   = f.input :sourceable_id, :collection => Grant.sources, :required => true, :label => Grant.label, :disabled => !@grant.new_record?
   = f.input :name, :disabled => !@grant.new_record?
   = f.input :fy_year, :collection => @fiscal_years, :label => 'Fiscal Year'
@@ -21,14 +21,14 @@
   = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
     %span.input-group-addon
       %i.fa.fa-usd
-    = f.input_field :amount, :class => "form-control", :min => GeneralLedgerAccountEntry.where(sourceable: @grant).sum(:amount), :max => 1000000000
+    = f.input_field :amount, :class => "form-control"
 
   #grant_budgets.well.well-sm{style: "overflow-y:scroll; max-height:250px;"}
     %label.control-label
       %i.fa.fa-usd.fa-1-5x
       General Ledger
     .links.pull-right
-      = link_to_add_association f, :grant_budgets, :class => 'btn btn-xs btn-info', data: {association_insertion_method: 'after'} do
+      = link_to_add_association f, :grant_budgets, :class => 'btn btn-xs btn-info', data: {association_insertion_method: 'after'}, :disabled => !@grant.new_record? do
         %i.fa.fa-plus
     %label#grant_budgets-error.error
     = f.simple_fields_for :grant_budgets do |grant_budget|
@@ -96,16 +96,20 @@
   function update_glas() {
     org_id = parseInt($('#grant_organization_id').val());
     var gla_ids = glas[org_id];
+
     //console.log(gla_ids);
     $('#grant_budgets select option').each(function() {
-        $(this).prop('selected', false);
         var val = $(this).val();
         if((val && gla_ids != undefined && gla_ids.indexOf(parseInt(val)) > -1) || (val == "")) {
             $(this).show();
         } else {
+            $(this).prop('selected', false);
             $(this).hide();
         }
     });
+
+
+
   }
 
   function update_fiscal_year_range()

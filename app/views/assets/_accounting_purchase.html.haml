@@ -8,6 +8,3 @@
 
 - if @asset.grant_purchases.count > 0
   = format_field(GrantPurchase.label.pluralize, format_as_list(formatted_grant_purchases))
-
-- if @asset.general_ledger_accounts.count > 0
-  = format_field('GLA', @asset.general_ledger_account)

@@ -13,15 +13,10 @@
         %span.badge.pull-right= assets.count
         = "Assets"
 
-    %li
-      %a{:href => "#expn", :data =>{:toggle => 'tab'}}
-        %span.badge.pull-right= expenditures.count
-        = "CapEx"
-
   %li
     %a{:href => "#docs", :data =>{:toggle => 'tab'}}
       %span.badge.pull-right= @grant.documents.count
-      = "Supporting Documents "
+      = "Documents "
 
   %li
     %a{:href => "#comm", :data =>{:toggle => 'tab'}}
@@ -40,13 +35,6 @@
           %p There are no assets associated with this grant.
         - else
           = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => assets}
-
-    .tab-pane.fade#expn
-      .tab-content
-        - if expenditures.empty?
-          %p There are no CapEx associated with this grant.
-        - else
-          = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => expenditures}
 
   .tab-pane.fade#comm
     .tab-content

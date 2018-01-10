@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+  resources :general_ledger_mappings
   resources :funding_sources, :path => :funding_programs do
     collection do
       get 'details'
@@ -17,14 +18,13 @@ Rails.application.routes.draw do
     resources :documents
   end
 
-  resources :expenditures do
-    resources :comments
-    resources :documents
-  end
+
 
   resources :general_ledger_accounts do
     collection do
+      get 'get_accounts'
       get 'check_grant_budget'
+      get 'toggle_archive'
     end
   end
 
@@ -34,8 +34,15 @@ Rails.application.routes.draw do
     end
 
     member do
+      get 'get_book_value_on_date'
+      get 'get_depreciation_months_left'
       get 'edit_depreciation'
       post 'update_depreciation'
+    end
+
+    resources :expenditures do
+      resources :comments
+      resources :documents
     end
   end
 end

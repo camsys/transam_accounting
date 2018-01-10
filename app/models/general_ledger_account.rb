@@ -32,22 +32,9 @@ class GeneralLedgerAccount < ActiveRecord::Base
   belongs_to :general_ledger_account_type
   belongs_to :general_ledger_account_subtype
 
-  belongs_to :grant
-
   has_many :general_ledger_account_entries, :dependent => :destroy
 
-  # Every GLA has 0 or more grants. This is not a strictly HABTM relationship
-  # but it allows us to relate GLAs to grants without modifying the grants table
-  # which is in the transit engine
   has_many :grant_budgets, :dependent => :destroy, :inverse_of => :general_ledger_account
-
-  # Allow the form to submit grant purchases
-  accepts_nested_attributes_for :grant_budgets, :reject_if => :all_blank, :allow_destroy => true
-
-  has_many :grants, :through => :grant_budgets
-
-  # Every GLA has and belongs to many assets
-  has_many :assets
 
   #------------------------------------------------------------------------------
   # Validations
@@ -66,8 +53,8 @@ class GeneralLedgerAccount < ActiveRecord::Base
     :general_ledger_account_subtype_id,
     :name,
     :account_number,
+    :grant_id,
     :active,
-    :grant_budgets_attributes => [GrantBudget.allowable_params]
   ]
 
   #------------------------------------------------------------------------------
@@ -76,7 +63,7 @@ class GeneralLedgerAccount < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
-  # Allow selection of active instances
+  default_scope { order(:account_number) }
   scope :active, -> { where(:active => true) }
 
   scope :asset_accounts, -> { where(:general_ledger_account_type => GeneralLedgerAccountType.find_by(name: 'Asset Account')) }
@@ -107,10 +94,6 @@ class GeneralLedgerAccount < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
-  def grant_specific?
-    grant.present?
-  end
-
   def fixed_asset_account?
     general_ledger_account_subtype.name == 'Fixed Asset Account'
   end
@@ -119,8 +102,16 @@ class GeneralLedgerAccount < ActiveRecord::Base
     account_number
   end
 
+  def coded_name
+    "#{account_number}-#{name}"
+  end
+
   def subtotal
     general_ledger_account_entries.sum(:amount)
+  end
+
+  def asset_subtypes
+    AssetSubtype.where(id: GeneralLedgerMapping.where('asset_account_id = ? OR depr_expense_account_id = ? OR accumulated_depr_account_id = ? OR gain_loss_account_id = ?', self, self, self, self).pluck(:asset_subtype_id))
   end
 
   #------------------------------------------------------------------------------

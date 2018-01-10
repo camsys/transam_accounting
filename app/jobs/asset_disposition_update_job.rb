@@ -8,45 +8,34 @@
 class AssetDispositionUpdateJob < AbstractAssetUpdateJob
 
 
+
   def execute_job(asset)
+    asset = Asset.get_typed_asset(asset)
 
-
-
-    just_disposed_and_transferred = !asset.disposed? && asset.disposition_updates.last.try(:disposition_type_id) == 2
+    disposition_event = asset.disposition_updates.last
+    just_disposed_and_transferred = !asset.disposed? && disposition_event.try(:disposition_type_id) == 2
 
     asset.record_disposition
     if(just_disposed_and_transferred)
-      new_asset = asset.transfer asset.organization_id
+      new_asset = asset.transfer disposition_event.organization_id
       send_asset_transferred_message new_asset
     end
 
+    gl_mapping = asset.general_ledger_mapping
+    if !asset.disposition_updates.empty? && gl_mapping.present?
 
-    if (asset.respond_to? :general_ledger_accounts) && GrantPurchase.sourceable_type == 'Grant' && asset.general_ledger_accounts.count > 0
-
-      disposal_account = ChartOfAccount.find_by(organization_id: asset.organization_id).general_ledger_accounts.find_by(general_ledger_account_subtype: GeneralLedgerAccountSubtype.find_by(name: 'Disposal Account'))
-
-      amount_not_ledgered = asset.purchase_cost-asset.book_value # temp variable for tracking rounding errors
-      asset.grant_purchases.order(:pcnt_purchase_cost).each_with_index do |grant_purchase, idx|
-        unless idx+1 == asset.grant_purchases.count
-          amount = ((asset.purchase_cost-asset.book_value) * grant_purchase.pcnt_purchase_cost / 100.0).round
-          amount_not_ledgered -= amount
-        else
-          amount = amount_not_ledgered
-        end
-
-        asset.general_ledger_accounts.accumulated_depreciation_accounts.find_by(grant_id: grant_purchase.sourceable_id).general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} Disposal #{asset.disposition_date}", amount: amount)
-      end
-
+      amount = asset.adjusted_cost_basis-asset.book_value # temp variable for tracking rounding errors
+      gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: amount, asset: asset)
 
       if asset.book_value > 0
-        disposal_account.general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} Disposal #{asset.disposition_date}", amount: asset.book_value)
+        gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: asset.book_value, asset: asset)
       end
 
-      asset.general_ledger_account.general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} Disposal #{asset.disposition_date}", amount: -asset.purchase_cost)
+      gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: -asset.adjusted_cost_basis, asset: asset)
 
       disposition_event = asset.disposition_updates.last
-      if disposition_event.sale_proceeds > 0
-        disposal_account.general_ledger_account_entries.create!(sourceable_type: 'Asset', sourceable_id: asset.id, description: "#{asset.organization}: #{asset.to_s} Disposal #{asset.disposition_date}", amount: -disposition_event.sale_proceeds)
+      if disposition_event.sales_proceeds > 0
+        gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: "Disposal: #{asset.asset_path}", amount: -disposition_event.sales_proceeds, asset: asset)
       end
     end
   end

@@ -1,7 +1,9 @@
 = format_field("Expense", expenditure.description )
 = format_field("Amount", format_as_currency(expenditure.amount))
 = format_field("Category", expenditure.expense_type )
-= format_field("Vendor", link_to(expenditure.vendor.name, vendor_path(expenditure.vendor))) unless expenditure.vendor.nil?
 = format_field("Date", format_as_date(expenditure.expense_date))
-= format_field("Account", expenditure.general_ledger_account ) unless @organization.chart_of_accounts.blank?
-= format_field("Grant", "#{link_to(expenditure.grant, grant_path(expenditure.grant))} (#{format_as_percentage(expenditure.pcnt_from_grant)})") unless expenditure.grant.nil?
+= format_field("Account", expenditure.general_ledger_account )
+= format_field("Grant", "#{link_to(expenditure.grant, grant_path(expenditure.grant))}") if expenditure.grant
+%hr
+= format_field("Created At", format_as_date_time(expenditure.created_at))
+= format_field("Updated At", format_as_date_time(expenditure.updated_at))

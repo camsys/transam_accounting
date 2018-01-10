@@ -2,11 +2,16 @@ module Abilities
   class TransitManagerAccountingAbility
     include CanCan::Ability
 
-    def initialize(user)
-      can [:create, :update], Grant, :organization_id => user.organization_ids
+    def initialize(user, organization_ids=[])
 
-      can [:create, :update], GeneralLedgerAccount do |gla|
-        user.organization_ids.include? gla.chart_of_account.organization_id
+      if organization_ids.empty?
+        organization_ids = user.organization_ids
+      end
+
+      can :manage, Grant, :organization_id => organization_ids
+
+      can :manage, GeneralLedgerAccount do |gla|
+        organization_ids.include? gla.chart_of_account.organization_id
       end
 
 

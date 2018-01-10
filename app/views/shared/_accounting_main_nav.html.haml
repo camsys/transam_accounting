@@ -26,49 +26,36 @@
 
     %li.divider
 
-    - if @organization_list.count == 1
-      %li.text-left
-        = link_to general_ledger_accounts_path do
-          %i.fa.fa-book.fa-fw
-          Chart of Accounts
-    - else
-      %li.text-left.dropdown-submenu
-        = link_to '#' do
-          %i.fa.fa-book.fa-fw
-          Chart of Accounts
+    - if ChartOfAccount.where(organization_id: @organization_list).count > 0
+      - if @organization_list.count == 1
+        %li.text-left
+          = link_to general_ledger_accounts_path do
+            %i.fa.fa-book.fa-fw
+            Chart of Accounts
+      - else
+        %li.text-left.dropdown-submenu
+          = link_to '#' do
+            %i.fa.fa-book.fa-fw
+            Chart of Accounts
 
-        %ul.dropdown-menu
-          - Organization.where(id: @organization_list).each do |org|
-            %li.text-left
-              = link_to general_ledger_accounts_path(:organization_id => org.id) do
-                %i.fa.fa-fw.fa-book
-                = org.short_name
+          %ul.dropdown-menu
+            - Organization.where(id: @organization_list).each do |org|
+              %li.text-left
+                = link_to general_ledger_accounts_path(:organization_id => org.id) do
+                  %i.fa.fa-fw.fa-book
+                  = org.short_name
 
     %li.divider
+    %li.text-left
+      = link_to reset_searches_path(:search_type => SearchType.find_by(class_name: 'GeneralLedgerAccountSearcher').id) do
+        %i.fa.fa-search.fa-fw
+        GL Query
 
+    %li.divider
     %li.text-left
       = link_to grants_path do
         %i.fa.fa-fw.fa-legal
         = ' Grants'
-
-    - if expenditure_asset_type
-      %li.divider
-      %li.text-left.dropdown-submenu
-        = link_to inventory_index_path(:asset_type => expenditure_asset_type.id, :asset_subtype => 0, :asset_group => 0) do
-          %i.fa.fa-fw.fa-usd
-          = 'CapEx'
-
-        %ul.dropdown-menu
-          - expenditure_asset_type.asset_subtypes.active.each do |type|
-            %li.text-left
-              = link_to inventory_index_path(:asset_subtype => type.id, :asset_group => 0) do
-                %i.fa.fa-fw.fa-usd
-                = type
-          %li.divider
-          %li
-            = link_to new_asset_inventory_index_path(:asset_type_id => expenditure_asset_type.id) do
-              %i.fa.fa-plus.fa-fw
-              = "Add CapEx";
 
     %li.divider
     %li.text-left
