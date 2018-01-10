@@ -1,0 +1,3 @@
+['Deprc', 'Book Value', 'Salvage Value', 'Depr. Date', 'Depr. Start Date'].each do |header|
+  row.add_cell(header)
+end
