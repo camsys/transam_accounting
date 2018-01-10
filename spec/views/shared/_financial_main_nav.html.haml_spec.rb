@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "shared/_accounting_main_nav.html.haml", :type => :view do
+describe "shared/_financial_nav.html.haml", :type => :view do
   it 'links', :skip do
     allow(controller).to receive(:current_ability).and_return(Ability.new(create(:admin)))
 

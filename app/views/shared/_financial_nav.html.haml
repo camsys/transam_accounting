@@ -1,0 +1,27 @@
+%li{:class => get_nav_link_class(['accounting'])}
+  = link_to "#", :class => "dropdown-toggle", :data => {"toggle" => "dropdown"}, :title => 'Accounting' do
+    %i.fa.fa-usd.fa-2x
+    %b.caret
+  %ul.dropdown-menu.multi-level{:role => 'menu'}
+
+    - count = 0
+    - SystemConfig.transam_module_names.each do |mod|
+      - view_component = "#{mod}_financial_nav"
+      - if lookup_context.template_exists?(view_component, 'shared', true)
+        - count += 1
+        - if count > 1
+          %li.divider
+        = render :partial => "shared/#{view_component}"
+
+    %li.divider
+    %li.text-left
+      - if can? :read_all, CapitalPlan
+        = link_to capital_plans_path do
+          %i.fa.fa-fw.fa-list
+          Status
+      - else
+        - org_list = @organization_list.select{|x| Asset.operational.where(organization_id: x).count > 0}
+        - if org_list.count > 0
+          = link_to capital_plan_path(CapitalPlan.current_plan(org_list.first)) do
+            %i.fa.fa-fw.fa-list
+            Status
