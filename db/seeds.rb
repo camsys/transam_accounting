@@ -58,9 +58,13 @@ depreciation_interval_types = [
   {:active => 1, :name => 'Monthly', :description => 'Depreciation calculated monthly.', :months => 1}
 ]
 
+report_types = [
+  {:active => 1, :name => 'GL/Accounting Report', :description => 'GL/Accounting Report', :display_icon_name => 'fa fa-book'}
+]
+
 
 lookup_tables = %w{ funding_source_types general_ledger_account_types general_ledger_account_subtypes depreciation_calculation_types depreciation_interval_types}
-merge_tables = %w{ asset_types asset_event_types}
+merge_tables = %w{ asset_types asset_event_types report_types}
 
 lookup_tables.each do |table_name|
   puts "  Loading #{table_name}"
@@ -124,7 +128,7 @@ reports = [
     },
     {
         :active => 1,
-        :report_type => "GL/Accounting Report",
+        :type => "GL/Accounting Report",
         :name => 'Asset Value Report by FY',
         :class_name => "AssetFiscalYearValueReport",
         :view_name => "generic_table_with_subreports",
