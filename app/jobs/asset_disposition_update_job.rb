@@ -22,7 +22,7 @@ class AssetDispositionUpdateJob < AbstractAssetUpdateJob
     end
 
     gl_mapping = asset.general_ledger_mapping
-    if !asset.disposition_updates.empty? && gl_mapping.present?
+    if gl_mapping.present?
 
       amount = asset.adjusted_cost_basis-asset.book_value # temp variable for tracking rounding errors
       gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: amount, asset: asset)
@@ -35,9 +35,10 @@ class AssetDispositionUpdateJob < AbstractAssetUpdateJob
 
       disposition_event = asset.disposition_updates.last
       if disposition_event.sales_proceeds > 0
-        gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: "Disposal: #{asset.asset_path}", amount: -disposition_event.sales_proceeds, asset: asset)
+        gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: -disposition_event.sales_proceeds, asset: asset)
       end
     end
+
   end
 
   def prepare
