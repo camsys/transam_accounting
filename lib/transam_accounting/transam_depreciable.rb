@@ -84,7 +84,7 @@ module TransamDepreciable
   end
 
   def original_cost_basis
-    self.depreciation_purchase_cost
+    self.depreciation_purchase_cost || self.purchase_cost
   end
 
   def adjusted_cost_basis

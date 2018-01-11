@@ -67,7 +67,9 @@ module TransamGlAccountableAsset
   end
 
   def general_ledger_mapping
-    GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: self.organization_id).id, asset_subtype_id: self.asset_subtype_id)
+    if ChartOfAccount.find_by(organization_id: self.organization_id)
+      GeneralLedgerMapping.find_by(chart_of_account_id: ChartOfAccount.find_by(organization_id: self.organization_id).id, asset_subtype_id: self.asset_subtype_id)
+    end
   end
 
   protected
