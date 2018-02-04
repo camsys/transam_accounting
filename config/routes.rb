@@ -40,9 +40,11 @@ Rails.application.routes.draw do
       post 'update_depreciation'
     end
 
-    resources :expenditures do
-      resources :comments
-      resources :documents
-    end
+    resources :expenditures
+  end
+
+  resources :expenditures, :only => [] do
+    resources :comments
+    resources :documents
   end
 end

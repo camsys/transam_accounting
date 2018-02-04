@@ -10,7 +10,7 @@
     .col-md-12
       %fieldset
         %legend Add Document
-        = simple_form_for([@asset, @expenditure, Document.new], :url => inventory_expenditure_documents_path(@asset, @expenditure),
+        = simple_form_for([@expenditure, Document.new], :url => expenditure_documents_path(@expenditure),
             :html => {:multipart => true, :class => 'form-vertical expenditure_document_form' },
             :wrapper => :vertical_form,
             :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|

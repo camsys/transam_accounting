@@ -10,7 +10,7 @@
     .col-md-12
       %fieldset
         %legend Add Comment
-        = form_for [@asset, @expenditure, Comment.new], :url => inventory_expenditure_comments_path(@asset, @expenditure), :role => 'form' do |f|
+        = form_for [@expenditure, Comment.new], :url => expenditure_comments_path(@expenditure), :role => 'form' do |f|
           .form-group
             = f.text_area :comment, :class => 'form-control', :placeholder => 'Enter a new comment...', :required => true, :minlength => 10, :maxlength => 254
           = f.submit :class => 'btn btn-primary'
