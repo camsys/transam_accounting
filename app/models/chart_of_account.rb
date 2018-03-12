@@ -17,6 +17,8 @@ class ChartOfAccount < ActiveRecord::Base
   #------------------------------------------------------------------------------
   after_initialize  :set_defaults
 
+  after_create      :activate_gl_reports
+
   #------------------------------------------------------------------------------
   # Associations
   #------------------------------------------------------------------------------
@@ -82,6 +84,16 @@ class ChartOfAccount < ActiveRecord::Base
     # Set resonable defaults for chart of accounts
     def set_defaults
       self.active = self.active.nil? ? true : self.active
+    end
+
+    # GL reports are deactivated in new transam instance
+    # if a chart of account exists, GL features are enabled -- therefore need to activate reports
+    def activate_gl_reports
+      report_type = ReportType.find_by(name: "GL/Accounting Report")
+      report_type.update!(active: true)
+
+      report_type.reports.update_all(active: true)
+
     end
 
 
