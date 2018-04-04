@@ -3,7 +3,7 @@ rvm:
 - 2.2.2
 branches:
   only:
-  - master
+  - /quarter\d*/
 env:
 - TEST_SUITE=rspec RAILS_VERSION=4.1.9
 script:
