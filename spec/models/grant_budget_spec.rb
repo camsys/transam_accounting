@@ -3,9 +3,9 @@ require 'rails_helper'
 RSpec.describe GrantBudget, :type => :model do
 
   before(:each) do
-    test_grant = create(:grant)
-    test_gla = create(:general_ledger_account)
-    test_grant_budget = create(:grant_budget, grant: test_grant, general_ledger_account: test_gla)
+    let(:test_grant) {create(:grant)}
+    let(:test_gla) {create(:general_ledger_account)}
+    let(:test_grant_budget) {create(:grant_budget, grant: test_grant, general_ledger_account: test_gla)}
   end
 
   describe 'associations/validations' do

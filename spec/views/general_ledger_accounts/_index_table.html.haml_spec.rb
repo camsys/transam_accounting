@@ -8,6 +8,5 @@ describe "general_ledger_accounts/_index_table.html.haml", :type => :view do
 
     expect(rendered).to have_content(test_gla.name)
     expect(rendered).to have_content(test_gla.account_number)
-    expect(rendered).to have_content(test_gla.general_ledger_account_type.to_s)
   end
 end
