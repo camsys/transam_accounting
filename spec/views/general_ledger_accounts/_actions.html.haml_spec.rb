@@ -7,6 +7,5 @@ describe "general_ledger_accounts/_actions.html.haml", :type => :view do
     render
 
     expect(rendered).to have_link('Update this general ledger account')
-    expect(rendered).to have_link('Remove this general ledger account')
   end
 end

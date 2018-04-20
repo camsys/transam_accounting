@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe "grants/_summary.html.haml", :type => :view do
   it 'info' do
+    allow(controller).to receive(:params).and_return({controller: 'grants'})
     test_grant = create(:grant, :fy_year => 2015)
     assign(:grant, test_grant)
     render

@@ -24,7 +24,15 @@ RSpec.describe GeneralLedgerAccount, :type => :model do
   end
 
   it '#allowable_params' do
-    expect(GeneralLedgerAccount.allowable_params).to eq([:chart_of_account_id, :general_ledger_account_type_id, :general_ledger_account_subtype_id, :name, :account_number, :active, {:grant_budgets_attributes=>[GrantBudget.allowable_params]}])
+    expect(GeneralLedgerAccount.allowable_params).to eq([
+                                                            :chart_of_account_id,
+                                                            :general_ledger_account_type_id,
+                                                            :general_ledger_account_subtype_id,
+                                                            :name,
+                                                            :account_number,
+                                                            :grant_id,
+                                                            :active,
+                                                        ])
   end
 
   it '.to_s' do

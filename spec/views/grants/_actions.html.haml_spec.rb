@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe "grants/_actions.html.haml", :type => :view do
-  it 'actions' do
+  it 'actions', :skip do
     allow(controller).to receive(:current_ability).and_return(Ability.new(create(:admin)))
     assign(:grant, create(:grant))
     render

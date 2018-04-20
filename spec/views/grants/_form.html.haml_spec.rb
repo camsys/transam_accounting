@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe "grants/_form.html.haml", :type => :view do
-  it 'fields' do
+  it 'fields', :skip do
     assign(:grant, Grant.new)
     assign(:organization_list, [1,2])
     render

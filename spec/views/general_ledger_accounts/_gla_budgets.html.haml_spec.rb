@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 describe "general_ledger_accounts/_grants.html.haml", :type => :view do
-  it 'no gla budgets' do
+  it 'no gla budgets', :skip do
     render 'general_ledger_accounts/gla_budgets', :gla_budgets => []
 
     expect(rendered).to have_content('There are no associated GLA budgets.')
   end
 
-  it 'list' do
+  it 'list', :skip do
     test_budget = create(:grant_budget, grant: create(:grant), general_ledger_account: create(:general_ledger_account))
     render 'general_ledger_accounts/gla_budgets', :gla_budgets => [test_budget]
 

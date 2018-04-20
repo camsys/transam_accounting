@@ -47,7 +47,4 @@ RSpec.describe GrantPurchase, :type => :model do
     expect(test_purchase.name).to eq("#{test_purchase.sourceable.to_s}: #{test_purchase.pcnt_purchase_cost}%")
   end
 
-  it '.set_defaults' do
-    expect(GrantPurchase.new.pcnt_purchase_cost).to eq(0)
-  end
 end
