@@ -11,3 +11,4 @@ tmp/*
 Gemfile.lock
 .idea/
 .DS_Store
+shadowed_views.log
