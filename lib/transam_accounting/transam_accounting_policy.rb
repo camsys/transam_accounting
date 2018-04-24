@@ -34,11 +34,7 @@ module TransamAccountingPolicy
     validates :depreciation_calculation_type,  :presence => true
     validates :depreciation_interval_type,     :presence => true
 
-    # List of hash parameters allowed by the controller
-    FORM_PARAMS = [
-      :depreciation_calculation_type_id,
-      :depreciation_interval_type_id
-    ]
+
 
   end
 
@@ -49,7 +45,13 @@ module TransamAccountingPolicy
   #------------------------------------------------------------------------------
 
   module ClassMethods
-
+    def self.allowable_params
+      # List of hash parameters allowed by the controller
+      [
+          :depreciation_calculation_type_id,
+          :depreciation_interval_type_id
+      ]
+    end
   end
 
   #------------------------------------------------------------------------------
