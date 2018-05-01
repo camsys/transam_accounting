@@ -15,16 +15,8 @@
         %span.badge.pull-right= @funding_source.assets.count
         = "Assets"
 
-  %li
-    %a{:href => "#docs", :data =>{:toggle => 'tab'}}
-      %span{:style => 'white-space: nowrap !important;'}
-        = "Documents"
-        %span.badge= @funding_source.documents.count
-  %li
-    %a{:href => "#comments", :data =>{:toggle => 'tab'}}
-      %span{:style => 'white-space: nowrap !important;'}
-        = "Comments"
-        %span.badge= @funding_source.comments.count
+  = nav_tab_count_tag("#docs", "= "Documents"", @funding_source.documents.count)
+  = nav_tab_count_tag("#comments", "= "Comments"", @funding_source.comments.count)
 
 .tab-content{:style => 'max-height:400px;overflow-y: auto;'}
   .tab-pane.fade#desc
