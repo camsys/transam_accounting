@@ -68,6 +68,8 @@
                 = link_to funding_source_path(f), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
                   %i.fa.fa-trash-o.fa-fw.text-danger
 
+= render 'shared/table_formatters'
+
 :javascript
 
   $('#' + '#{table_dom_id}').on('post-body.bs.table', function () {
@@ -78,13 +80,14 @@
     $('.transam-tooltip').tooltip();
   });
 
-  function percentage_formatter(value) {
-    if (value == "") {
-      return value;
-    } else {
-      return format("##0.000", value) + "%";
-    }
-  };
+  //TODO Delete this once I know this removed duplication is not necessary
+  // function percentage_formatter(value) {
+  //   if (value == "") {
+  //     return value;
+  //   } else {
+  //     return format("##0.000", value) + "%";
+  //   }
+  // };
 
   $('#' + '#{table_dom_id}').on('click', 'td', function () {
     var path = "#{funding_source_path('xxx')}";
