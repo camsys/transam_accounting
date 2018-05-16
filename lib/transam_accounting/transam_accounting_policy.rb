@@ -115,7 +115,7 @@ module TransamAccountingPolicy
 
     def apply_depreciation_policy_changes
       if previous_changes.keys.any? {|x| x.include? 'depreciation' }
-        Asset.where(organization_id: self.organization_id).each do |asset|
+        Asset.operational.where(organization_id: self.organization_id).each do |asset|
           begin
             typed_asset = Asset.get_typed_asset(asset)
             typed_asset.update_book_value
