@@ -80,15 +80,6 @@
     $('.transam-tooltip').tooltip();
   });
 
-  //TODO Delete this once I know this removed duplication is not necessary
-  // function percentage_formatter(value) {
-  //   if (value == "") {
-  //     return value;
-  //   } else {
-  //     return format("##0.000", value) + "%";
-  //   }
-  // };
-
   $('#' + '#{table_dom_id}').on('click', 'td', function () {
     var path = "#{funding_source_path('xxx')}";
     var row = $(this).parent('tr').attr('id');
