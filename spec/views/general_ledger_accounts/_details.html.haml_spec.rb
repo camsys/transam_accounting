@@ -8,7 +8,6 @@ describe "general_ledger_accounts/_details.html.haml", :type => :view do
     assign(:expenditure, Expenditure.new)
     render
 
-    expect(rendered).to have_content('There are no associated GLA budgets.')
-    expect(rendered).to have_content('There are no CapEx associated with this general ledger account.')
+    expect(rendered).to have_content('There are no entries in this GL account.')
   end
 end

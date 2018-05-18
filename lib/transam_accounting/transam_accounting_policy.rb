@@ -18,6 +18,8 @@ module TransamAccountingPolicy
     #------------------------------------------------------------------------------
     after_initialize  :set_depreciation_defaults
 
+    after_save        :apply_depreciation_policy_changes
+
     # ----------------------------------------------------
     # Associations
     # ----------------------------------------------------
@@ -34,11 +36,7 @@ module TransamAccountingPolicy
     validates :depreciation_calculation_type,  :presence => true
     validates :depreciation_interval_type,     :presence => true
 
-    # List of hash parameters allowed by the controller
-    FORM_PARAMS = [
-      :depreciation_calculation_type_id,
-      :depreciation_interval_type_id
-    ]
+
 
   end
 
@@ -49,7 +47,13 @@ module TransamAccountingPolicy
   #------------------------------------------------------------------------------
 
   module ClassMethods
-
+    def self.allowable_params
+      # List of hash parameters allowed by the controller
+      [
+          :depreciation_calculation_type_id,
+          :depreciation_interval_type_id
+      ]
+    end
   end
 
   #------------------------------------------------------------------------------
@@ -106,6 +110,19 @@ module TransamAccountingPolicy
       if new_record?
         self.depreciation_calculation_type ||= DepreciationCalculationType.find_by_name('Straight Line')
         self.depreciation_interval_type ||= DepreciationIntervalType.find_by_name('Annually')
+      end
+    end
+
+    def apply_depreciation_policy_changes
+      if previous_changes.keys.any? {|x| x.include? 'depreciation' }
+        Asset.operational.where(organization_id: self.organization_id).each do |asset|
+          begin
+            typed_asset = Asset.get_typed_asset(asset)
+            typed_asset.update_book_value
+          rescue Exception => e
+            Rails.logger.warn e.message
+          end
+        end
       end
     end
 

@@ -1,0 +1,4 @@
+- if ChartOfAccount.count > 0
+  .btn-group{:role => 'group'}
+    = link_to reset_searches_path(search_type: search_type.id ), :role => 'button', :class => 'btn btn-default' do
+      = "New #{search_type} Query"

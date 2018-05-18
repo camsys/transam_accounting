@@ -3,7 +3,8 @@ rvm:
 - 2.2.2
 branches:
   only:
-  - /quarter\d*/
+    - master
+    - /quarter\d*/
 env:
 - TEST_SUITE=rspec RAILS_VERSION=4.1.9
 script:
@@ -14,3 +15,4 @@ before_script:
 - cp spec/dummy/config/database.travis.yml spec/dummy/config/database.yml
 before_install:
 - mysql -e "create database IF NOT EXISTS transam_accounting_testing;" -uroot
+bundler_args: --without not_travis

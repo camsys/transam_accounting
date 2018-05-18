@@ -3,7 +3,7 @@ class GeneralLedgerAccountsController < OrganizationAwareController
   add_breadcrumb "Home", :root_path
 
   # Set the @chart_of_accounts and @ledger_account variable
-  before_filter :get_ledger_account, :only => [:show, :edit, :update, :destroy]
+  before_action :get_ledger_account, :only => [:show, :edit, :update, :destroy]
 
   # Protect the controller
   authorize_resource
