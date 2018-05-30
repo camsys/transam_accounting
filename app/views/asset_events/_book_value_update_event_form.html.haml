@@ -1,6 +1,10 @@
 = render :layout => "update_event_form" do |f|
   = f.input :event_date, :label => 'Date of Report', :wrapper => :vertical_append do
-    = f.input_field :event_date, :class => "form-control", :as => :string, :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.event_date)
+    = f.input_field :event_date, :as => :string, :class => 'form-control datepicker',
+      :data => {'date-container' => "##{format_as_id(@asset_event.asset_event_type.name)}_dialog",
+        'date-start-date' => "#{format_as_date(start_of_fiscal_year(Organization.get_typed_organization(@asset.organization).first_archivable_fiscal_year))}",
+        'date-end-date' => "#{format_as_date(@asset.policy_analyzer.get_depreciation_date(Date.today)-1.day)}"},
+        :value => format_as_date(f.object.event_date)
     %span.input-group-addon
       %i.fa.fa-calendar
 
@@ -19,22 +23,6 @@
 = render 'shared/table_formatters'
 
 :javascript
-
-  $(document).ready(function(){
-    var strStartDate = '#{start_of_fiscal_year(Organization.get_typed_organization(@asset.organization).first_archivable_fiscal_year)}';
-    var startDateParts = strStartDate.split("-");
-    var strEndDate = '#{@asset.policy_analyzer.get_depreciation_date(Date.today)-1.day}';
-    var endDateParts = strEndDate.split("-");
-    $('[data-behavior~=datepicker]').datepicker({
-      startDate: new Date(startDateParts[0], (startDateParts[1] - 1), startDateParts[2]),
-      endDate: new Date(endDateParts[0], (endDateParts[1] - 1), endDateParts[2]),
-      onSelect: function(d,i){
-        if(d !== i.lastVal){
-          $(this).change();
-        }
-      }
-    });
-  });
 
   $('#asset_event_event_date').change(function() {
     $.ajax({
