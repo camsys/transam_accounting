@@ -61,10 +61,17 @@ depreciation_interval_types = [
 report_types = [
   {:active => 0, :name => 'GL/Accounting Report', :description => 'GL/Accounting Report', :display_icon_name => 'fa fa-book'}
 ]
+system_config_extensions = [
+    {class_name: 'RehabilitationUpdateEvent', extension_name: 'TransamGlAccountableAssetEvent', active: true},
+    {class_name: 'AssetsController', extension_name: 'TransamAccountingAssetsController', active: true},
+    {class_name: 'Organization', extension_name: 'TransamAccountable', active: true},
+    {class_name: 'Policy', extension_name: 'TransamAccountingPolicy', active: true},
+    {class_name: 'Vendor', extension_name: 'TransamAccountingVendor', active: true}
 
+]
 
 lookup_tables = %w{ funding_source_types general_ledger_account_types general_ledger_account_subtypes depreciation_calculation_types depreciation_interval_types}
-merge_tables = %w{ asset_types asset_event_types report_types}
+merge_tables = %w{ asset_types asset_event_types report_types system_config_extensions}
 
 lookup_tables.each do |table_name|
   puts "  Loading #{table_name}"
