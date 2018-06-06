@@ -9,7 +9,9 @@ source "https://rubygems.org"
 # gem 'debugger'
 gem 'transam_core', git: 'https://github.com/camsys/transam_core', branch: :quarter2
 gem 'transam_reporting', git: 'https://github.com/camsys/transam_reporting', branch: :quarter2
-gem 'transam_transit', git: 'https://github.com/camsys/transam_transit', branch: :quarter2
+
+gem 'transam_transit', path: '../transam_transit'
+#gem 'transam_transit', git: 'https://github.com/camsys/transam_transit', branch: :quarter2
 gem 'mysql2', '< 0.6.0' # lock gem for dummy app
 gem "capybara", '2.6.2' # lock gem for old capybara behavior on hidden element xpath
 

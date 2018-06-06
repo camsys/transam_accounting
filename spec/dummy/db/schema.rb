@@ -133,6 +133,13 @@ ActiveRecord::Schema.define(version: 20180330151633) do
 
   add_index "asset_events_vehicle_usage_codes", ["asset_event_id", "vehicle_usage_code_id"], name: "asset_events_vehicle_usage_codes_idx1", using: :btree
 
+  create_table "asset_fleet_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "class_name"
+    t.text "groups"
+    t.text "custom_groups"
+    t.boolean "active"
+  end
+
   create_table "asset_groups", force: :cascade do |t|
     t.string   "object_key",      limit: 12,  null: false
     t.integer  "organization_id", limit: 4,   null: false
