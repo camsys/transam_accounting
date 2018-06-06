@@ -1,7 +1,6 @@
 class AssetAccumulatedDepreciationReport < AbstractReport
 
   include FiscalYear
-  include TransamHelper
   
   COMMON_LABELS = ['Accumulated Depr. Start', 'Depr. Expense', 'Gain/Loss', 'Accumulated Depr. End']
   COMMON_FORMATS = [:currency, :currency, :currency, :currency, :currency, :currency]
@@ -80,7 +79,7 @@ class AssetAccumulatedDepreciationReport < AbstractReport
             type: :select,
             where: :fy_year,
             values: get_past_fiscal_years,
-            label: get_fy_label
+            label: FiscalYearHelper.get_fy_label
         },
         {
             type: :check_box_collection,

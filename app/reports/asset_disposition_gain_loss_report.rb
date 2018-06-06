@@ -1,7 +1,6 @@
 class AssetDispositionGainLossReport < AbstractReport
 
   include FiscalYear
-  include TransamHelper
   
   COMMON_LABELS = ['Cost Basis', 'Accumulated Depr.', ' Sale Proceeds','Gain/Loss']
   COMMON_FORMATS = [:currency, :currency, :currency, :currency]
@@ -90,7 +89,7 @@ class AssetDispositionGainLossReport < AbstractReport
             type: :select,
             where: :fy_year,
             values: get_past_fiscal_years,
-            label: get_fy_label
+            label: FiscalYearHelper.get_fy_label
         },
         {
             type: :check_box_collection,

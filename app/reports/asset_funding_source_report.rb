@@ -1,6 +1,6 @@
 class AssetFundingSourceReport < AbstractReport
 
-  include TransamHelper
+  include FiscalYearHelper
   
   COMMON_LABELS = ['# Assets', 'Spent']
   COMMON_FORMATS = [:integer, :currency]
@@ -21,7 +21,7 @@ class AssetFundingSourceReport < AbstractReport
         clause = 'organizations.short_name = ?'
       elsif grp_clause.include? 'Funding Program'
         clause = 'funding_sources.name = ?'
-      elsif grp_clause.include? get_fy_label
+      elsif grp_clause.include? FiscalYearHelper.get_fy_label
         start_of_fy = DateTime.strptime("#{SystemConfig.instance.start_of_fiscal_year}-1900", "%m-%d-%Y").to_date
         clause = "IF(DAYOFYEAR(assets.purchase_date) < DAYOFYEAR('#{start_of_fy}'), YEAR(assets.purchase_date)-1, YEAR(assets.purchase_date)) = ?"
       end
