@@ -28,13 +28,13 @@ RSpec.describe GeneralLedgerAccountsController, :type => :controller do
   it 'GET show' do
     test_chart = create(:chart_of_account, :organization => test_user.organization)
     test_gla = create(:general_ledger_account, :chart_of_account => test_chart)
-    get :show, :id => test_gla.object_key
+    get :show, params: {:id => test_gla.object_key}
 
     expect(assigns(:ledger_account)).to eq(test_gla)
   end
 
   it 'GET new' do
-    get :new, :chart_of_account_id => create(:chart_of_account).id
+    get :new, params: {:chart_of_account_id => create(:chart_of_account).id}
 
     expect(assigns(:ledger_account).to_json).to eq(GeneralLedgerAccount.new.to_json)
   end
@@ -42,7 +42,7 @@ RSpec.describe GeneralLedgerAccountsController, :type => :controller do
   it 'GET edit' do
     test_chart = create(:chart_of_account, :organization => test_user.organization)
     test_gla = create(:general_ledger_account, :chart_of_account => test_chart)
-    get :edit, :id => test_gla.object_key
+    get :edit, params:{:id => test_gla.object_key}
 
     expect(assigns(:ledger_account)).to eq(test_gla)
   end
@@ -50,7 +50,7 @@ RSpec.describe GeneralLedgerAccountsController, :type => :controller do
   it 'POST create' do
     test_chart = create(:chart_of_account, :organization => test_user.organization)
 
-    post :create, :general_ledger_account => attributes_for(:general_ledger_account, :chart_of_account_id => test_chart.id, :account_number => 'GLA-123123')
+    post :create, params:{ :general_ledger_account => attributes_for(:general_ledger_account, :chart_of_account_id => test_chart.id, :account_number => 'GLA-123123')}
 
     expect(assigns(:ledger_account).chart_of_account).to eq(test_chart)
     expect(assigns(:ledger_account).account_number).to eq('GLA-123123')
@@ -59,7 +59,7 @@ RSpec.describe GeneralLedgerAccountsController, :type => :controller do
   it 'POST update' do
     test_chart = create(:chart_of_account, :organization => test_user.organization)
     test_gla = create(:general_ledger_account, :chart_of_account => test_chart)
-    post :update, :id => test_gla.object_key, :general_ledger_account => {:name => 'Test GLA2'}
+    post :update, params: {:id => test_gla.object_key, :general_ledger_account => {:name => 'Test GLA2'}}
     test_gla.reload
 
     expect(test_gla.name).to eq('Test GLA2')
@@ -68,7 +68,7 @@ RSpec.describe GeneralLedgerAccountsController, :type => :controller do
   it 'DELETE destroy' do
     test_chart = create(:chart_of_account, :organization => test_user.organization)
     test_gla = create(:general_ledger_account, :chart_of_account => test_chart)
-    delete :destroy, :id => test_gla.object_key
+    delete :destroy, params:{ :id => test_gla.object_key}
 
     expect(GeneralLedgerAccount.find_by(:object_key => test_gla.object_key)).to be nil
   end

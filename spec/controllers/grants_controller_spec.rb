@@ -45,29 +45,29 @@ RSpec.describe GrantsController, :type => :controller do
     it 'sourceable' do
       test_funding_source = test_grant.sourceable
       test_grant.update!(:organization => subject.current_user.organization)
-      get :index, :sourceable_id => test_funding_source.id
+      get :index, params: {:sourceable_id => test_funding_source.id}
 
       expect(assigns(:sourceable_id)).to eq(test_funding_source.id)
       expect(assigns(:grants)).to include(test_grant)
 
-      get :index, :sourceable_id => test_funding_source.id + 1
+      get :index, params: {:sourceable_id => test_funding_source.id + 1}
       expect(assigns(:grants)).not_to include(test_grant)
     end
     it 'fiscal year' do
       test_fy = test_grant.fy_year
       test_grant.update!(:organization => subject.current_user.organization)
-      get :index, :fiscal_year => test_fy
+      get :index, params: {:fiscal_year => test_fy}
 
       expect(assigns(:fiscal_year)).to eq(test_fy)
       expect(assigns(:grants)).to include(test_grant)
 
-      get :index, :fiscal_year => test_fy + 1
+      get :index, params: {:fiscal_year => test_fy + 1}
       expect(assigns(:grants)).not_to include(test_grant)
     end
   end
 
   it 'GET summary_info' do
-    get :summary_info, :id => test_grant.object_key, :format => :json
+    get :summary_info, params: {:id => test_grant.object_key, :format => :json}
 
     expect(assigns(:grant)).to eq(test_grant)
   end
@@ -76,7 +76,7 @@ RSpec.describe GrantsController, :type => :controller do
   it 'GET show', :skip do
     test_asset = create(:buslike_asset, :organization => subject.current_user.organization)
     create(:grant_purchase, :asset => test_asset, :grant => test_grant)
-    get :show, :id => test_grant.object_key
+    get :show, params: {:id => test_grant.object_key}
 
     expect(assigns(:grant)).to eq(test_grant)
     expect(assigns(:assets)).to include(test_asset)
@@ -89,26 +89,26 @@ RSpec.describe GrantsController, :type => :controller do
   end
 
   it 'GET edit' do
-    get :edit, :id => test_grant.object_key
+    get :edit, params: {:id => test_grant.object_key}
 
     expect(assigns(:grant)).to eq(test_grant)
   end
 
   it 'POST create' do
-    post :create, :grant => {:fy_year => Date.today.year+1, :amount => 55555}
+    post :create, params: {:grant => {:fy_year => Date.today.year+1, :amount => 55555}}
 
     expect(assigns(:grant).fy_year).to eq(Date.today.year+1)
     expect(assigns(:grant).amount).to eq(55555)
   end
 
   it 'PUT update' do
-    put :update, :id => test_grant.object_key, :grant => {:amount => 54321}
+    put :update, params: {:id => test_grant.object_key, :grant => {:amount => 54321}}
 
     expect(assigns(:grant).amount).to eq(54321)
   end
 
   it 'DELETE destroy' do
-    delete :destroy, :id => test_grant.object_key
+    delete :destroy, params: {:id => test_grant.object_key}
 
     expect(Grant.find_by(:object_key => test_grant.object_key)).to be nil
   end
