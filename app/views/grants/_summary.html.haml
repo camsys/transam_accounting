@@ -1,6 +1,6 @@
 = format_field("Fund", @grant.sourceable)
 = format_field("Organization", @grant.organization)
-= format_field("Fiscal Year", format_as_fiscal_year(@grant.fy_year))
+= format_field(get_fiscal_year_label, format_as_fiscal_year(@grant.fy_year))
 = format_field("Budget", format_as_currency(@grant.amount))
 = format_field("Spent", format_as_currency(@grant.spent))
 = format_field("Balance", format_as_currency(@grant.balance))
