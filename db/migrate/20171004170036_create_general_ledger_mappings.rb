@@ -1,4 +1,4 @@
-class CreateGeneralLedgerMappings < ActiveRecord::Migration
+class CreateGeneralLedgerMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :general_ledger_mappings do |t|
       t.string :object_key, null: false, limit: 12

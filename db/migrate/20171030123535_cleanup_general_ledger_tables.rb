@@ -1,4 +1,4 @@
-class CleanupGeneralLedgerTables < ActiveRecord::Migration
+class CleanupGeneralLedgerTables < ActiveRecord::Migration[4.2]
   def change
     add_column :asset_events, :general_ledger_account_id, :integer
 

@@ -1,4 +1,4 @@
-class AddSourceableAccountingModels < ActiveRecord::Migration
+class AddSourceableAccountingModels < ActiveRecord::Migration[4.2]
   def change
     change_table :grants do |t|
       t.references :sourceable, :polymorphic => true

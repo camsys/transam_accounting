@@ -1,4 +1,4 @@
-class CreateGeneralLedgerAccountEntries < ActiveRecord::Migration
+class CreateGeneralLedgerAccountEntries < ActiveRecord::Migration[4.2]
   def change
     create_table :general_ledger_account_entries do |t|
       t.string :object_key, limit: 12

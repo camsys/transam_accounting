@@ -1,4 +1,4 @@
-class CreateDepreciationEntries < ActiveRecord::Migration
+class CreateDepreciationEntries < ActiveRecord::Migration[4.2]
   def change
     create_table :depreciation_entries do |t|
       t.string :object_key, null: false, limit: 12
