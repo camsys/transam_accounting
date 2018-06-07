@@ -77,9 +77,9 @@ class GeneralLedgerAccountsController < OrganizationAwareController
 
     if coa.present?
       if ArchivedFiscalYear.archive(coa.organization_id, params[:fy_year], true)
-        notify_user(:notice, "The FY was successfully archived/unarchived.")
+        notify_user(:notice, "The #{helpers.get_fy_label} was successfully archived/unarchived.")
       else
-        notify_user(:alert, "Cannot archive/unarchive FY.")
+        notify_user(:alert, "Cannot archive/unarchive #{helpers.get_fy_label}.")
       end
 
       redirect_to general_ledger_accounts_path(organization_id: coa.organization_id)

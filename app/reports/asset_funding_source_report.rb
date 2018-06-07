@@ -1,5 +1,7 @@
 class AssetFundingSourceReport < AbstractReport
 
+  include FiscalYearHelper
+  
   COMMON_LABELS = ['# Assets', 'Spent']
   COMMON_FORMATS = [:integer, :currency]
   DETAIL_LABELS = ['Asset Tag', 'Asset Type', 'Asset Subtype', 'Spent']
@@ -19,7 +21,7 @@ class AssetFundingSourceReport < AbstractReport
         clause = 'organizations.short_name = ?'
       elsif grp_clause.include? 'Funding Program'
         clause = 'funding_sources.name = ?'
-      elsif grp_clause.include? 'FY'
+      elsif grp_clause.include? FiscalYearHelper.get_fy_label
         start_of_fy = DateTime.strptime("#{SystemConfig.instance.start_of_fiscal_year}-1900", "%m-%d-%Y").to_date
         clause = "IF(DAYOFYEAR(assets.purchase_date) < DAYOFYEAR('#{start_of_fy}'), YEAR(assets.purchase_date)-1, YEAR(assets.purchase_date)) = ?"
       end
@@ -42,16 +44,16 @@ class AssetFundingSourceReport < AbstractReport
             where: :group_by,
             values: [
                 'Agency, Funding Program',
-                'Agency, Funding Program, FY',
+                "Agency, Funding Program, #{get_fy_label}",
 
                 'Funding Program, Agency',
-                'Funding Program, Agency, FY',
+                "Funding Program, Agency, #{get_fy_label}",
 
-                'Funding Program, FY',
-                'Funding Program, FY, Agency',
+                "Funding Program, #{get_fy_label}",
+                "Funding Program, #{get_fy_label}, Agency",
 
-                'FY, Funding Program',
-                'FY, Funding Program, Agency',
+                "#{get_fy_label}, Funding Program",
+                "#{get_fy_label}, Funding Program, Agency",
             ],
             label: 'Group By'
         }
@@ -83,8 +85,8 @@ class AssetFundingSourceReport < AbstractReport
         labels << 'Funding Program'
         formats << :string
         clause = 'funding_sources.name'
-      elsif grp_clause.include? 'FY'
-        labels << 'FY'
+      elsif grp_clause.include? get_fy_label
+        labels << get_fy_label
         formats << :fiscal_year
         start_of_fy = DateTime.strptime("#{SystemConfig.instance.start_of_fiscal_year}-1900", "%m-%d-%Y").to_date
         clause = "IF(DAYOFYEAR(assets.purchase_date) < DAYOFYEAR('#{start_of_fy}'), YEAR(assets.purchase_date)-1, YEAR(assets.purchase_date))"
@@ -122,7 +124,7 @@ class AssetFundingSourceReport < AbstractReport
 
     formats[0] = :hidden
 
-    return {labels: labels + COMMON_LABELS, data: data, formats: formats + COMMON_FORMATS, header_format: labels[0] == 'FY' ? :fiscal_year : :string}
+    return {labels: labels + COMMON_LABELS, data: data, formats: formats + COMMON_FORMATS, header_format: labels[0] == get_fy_label ? :fiscal_year : :string}
   end
 
   def get_key(row)

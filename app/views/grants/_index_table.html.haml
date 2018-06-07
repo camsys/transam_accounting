@@ -32,7 +32,7 @@
           %th.left{:data => {:visible => 'true', :sortable => 'true'}} Organization
         %th.left{:data => {:sortable => 'true'}}= Grant.label
         %th.left{:data => {:sortable => 'true'}} Name
-        %th.left{:data => {:sortable => 'true'}} Fiscal Year
+        %th.left{:data => {:sortable => 'true'}} #{get_fiscal_year_label}
         %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_amount'}} Amount
         -#%th.right{:data => {:sortable => 'true', :formatter => 'integer_formatter', :footer_formatter => 'sum_expenditures'}} CapEx
         %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_total_spent'}} Spent

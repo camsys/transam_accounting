@@ -1,8 +1,8 @@
 class GrossAssetValueReport < AbstractReport
 
   include FiscalYear
-
-  COMMON_LABELS = ['Value FY Start', 'Fixed Asset', 'Gain/Loss', 'Value FY End']
+  
+  COMMON_LABELS = ['Value #{FiscalYearHelper.get_fy_label} Start', 'Fixed Asset', 'Gain/Loss', 'Value #{FiscalYearHelper.get_fy_label} End']
   COMMON_FORMATS = [:currency, :currency, :currency, :currency]
   DETAIL_LABELS = ['Asset Tag']
   DETAIL_FORMATS = [:string]
@@ -84,7 +84,7 @@ class GrossAssetValueReport < AbstractReport
             type: :select,
             where: :fy_year,
             values: get_past_fiscal_years,
-            label: 'FY'
+            label: FiscalYearHelper.get_fy_label
         },
         {
             type: :check_box_collection,
