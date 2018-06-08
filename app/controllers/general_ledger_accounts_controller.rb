@@ -1,4 +1,5 @@
 class GeneralLedgerAccountsController < OrganizationAwareController
+  include FiscalYearHelper
 
   add_breadcrumb "Home", :root_path
 
@@ -77,9 +78,9 @@ class GeneralLedgerAccountsController < OrganizationAwareController
 
     if coa.present?
       if ArchivedFiscalYear.archive(coa.organization_id, params[:fy_year], true)
-        notify_user(:notice, "The #{helpers.get_fy_label} was successfully archived/unarchived.")
+        notify_user(:notice, "The #{get_fy_label} was successfully archived/unarchived.")
       else
-        notify_user(:alert, "Cannot archive/unarchive #{helpers.get_fy_label}.")
+        notify_user(:alert, "Cannot archive/unarchive #{get_fy_label}.")
       end
 
       redirect_to general_ledger_accounts_path(organization_id: coa.organization_id)
