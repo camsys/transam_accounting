@@ -24,7 +24,7 @@ RSpec.describe AssetsController, :type => :controller do
 
   it 'GET edit_depreciation' do
     test_asset.update!(:organization => subject.current_user.organization)
-    get :edit_depreciation, :id => test_asset.object_key, use_route: :edit_depreciation_inventory_path
+    get :edit_depreciation, params: {:id => test_asset.object_key, use_route: :edit_depreciation_inventory_path}
 
     expect(assigns(:asset)).to eq(Asset.get_typed_asset(test_asset))
     expect(assigns(:proxy).object_key).to eq(test_asset.object_key)
@@ -39,7 +39,7 @@ RSpec.describe AssetsController, :type => :controller do
     # update required fields for a vehicle
     test_asset.update!(:depreciable => false, :manufacturer_id => 1, :manufacturer_model => 'VERSION-XX', :title_owner_organization_id => 1,:fta_ownership_type_id => 1, :fta_vehicle_type_id => 1, :fuel_type_id => 1, :serial_number => 'XXX-123456789', :vehicle_length => 40)
 
-    post :update_depreciation, use_route: :update_depreciation_inventory_path, :asset_depreciable_proxy => {:object_key => test_asset.object_key, :depreciable => '1', :depreciation_start_date => (Date.today - 1.day).strftime('%m/%d/%Y'), :salvage_value => '1111'}
+    post :update_depreciation, params: { use_route: :update_depreciation_inventory_path, :asset_depreciable_proxy => {:object_key => test_asset.object_key, :depreciable => '1', :depreciation_start_date => (Date.today - 1.day).strftime('%m/%d/%Y'), :salvage_value => '1111'}}
     test_asset.reload
 
     expect(test_asset.depreciable).to be true
