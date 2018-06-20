@@ -83,6 +83,10 @@ module TransamValuable
   #
   #------------------------------------------------------------------------------
 
+  def depreciable?
+    false # set to false temporarily
+  end
+
   def depreciation_months_left(on_date=Date.today)
     num_months_initial = self.depreciation_useful_life.nil? ? self.policy_analyzer.get_min_service_life_months : self.depreciation_useful_life
     last_depr_date = on_date - (self.policy_analyzer.get_depreciation_interval_type.months).months
