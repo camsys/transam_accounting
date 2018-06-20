@@ -5,7 +5,8 @@ class AddAccountingSystemConfigExtensions < ActiveRecord::DataMigration
         {class_name: 'AssetsController', extension_name: 'TransamAccountingAssetsController', active: true},
         #{class_name: 'Organization', extension_name: 'TransamAccountable', active: true}, comment out temporarily as all orgs dont have COA
         {class_name: 'Policy', extension_name: 'TransamAccountingPolicy', active: true},
-        {class_name: 'Vendor', extension_name: 'TransamAccountingVendor', active: true}
+        {class_name: 'Vendor', extension_name: 'TransamAccountingVendor', active: true},
+        {class_name: 'TransamAsset', extension_name: 'TransamValuable', active: true}
 
     ]
 
