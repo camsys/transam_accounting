@@ -1,4 +1,4 @@
-class CreateGeneralLedgerAccountSubtypes < ActiveRecord::Migration
+class CreateGeneralLedgerAccountSubtypes < ActiveRecord::Migration[4.2]
   def change
     create_table :general_ledger_account_subtypes do |t|
       t.references :general_ledger_account_type

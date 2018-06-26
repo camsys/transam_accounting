@@ -36,15 +36,15 @@
           = f.input_field :purchase_cost, :class => "form-control"
 
         = f.input :purchase_date, :wrapper => :vertical_append, :label => "Purchase Date" do
-          = f.input_field :purchase_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.purchase_date)
+          = f.input_field :purchase_date, :as => :string, :class => 'form-control datepicker', :data => {'date-container' => '#equipment_dialog'}, :value => format_as_date(f.object.purchase_date)
           %span.input-group-addon
             %i.fa.fa-calendar
         = f.input :warranty_date, :wrapper => :vertical_append, :label => "Warranty Date" do
-          = f.input_field :warranty_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.warranty_date)
+          = f.input_field :warranty_date, :as => :string, :class => 'form-control datepicker', :data => {'date-container' => '#equipment_dialog'}, :value => format_as_date(f.object.warranty_date)
           %span.input-group-addon
             %i.fa.fa-calendar
         = f.input :in_service_date, :wrapper => :vertical_append, :label => "In Service Date" do
-          = f.input_field :in_service_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.in_service_date)
+          = f.input_field :in_service_date, :as => :string, :class => 'form-control datepicker', :data => {'date-container' => '#equipment_dialog'}, :value => format_as_date(f.object.in_service_date)
           %span.input-group-addon
             %i.fa.fa-calendar
         = f.input :purchased_new, :as => :radio_buttons, :required => true, :label => "Purchased New"
@@ -74,9 +74,6 @@
     // Force uppercase text for OFT inputs
     $('[data-convert="uppercase"]').keyup(function(evt) {
       this.value = this.value.toUpperCase();
-    });
-
-    $('[data-behavior~=datepicker]').datepicker({
     });
 
     $('#vendor_name').on('focus', function() {

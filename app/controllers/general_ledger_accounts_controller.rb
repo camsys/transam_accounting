@@ -1,9 +1,10 @@
 class GeneralLedgerAccountsController < OrganizationAwareController
+  include FiscalYearHelper
 
   add_breadcrumb "Home", :root_path
 
   # Set the @chart_of_accounts and @ledger_account variable
-  before_filter :get_ledger_account, :only => [:show, :edit, :update, :destroy]
+  before_action :get_ledger_account, :only => [:show, :edit, :update, :destroy]
 
   # Protect the controller
   authorize_resource
@@ -77,9 +78,9 @@ class GeneralLedgerAccountsController < OrganizationAwareController
 
     if coa.present?
       if ArchivedFiscalYear.archive(coa.organization_id, params[:fy_year], true)
-        notify_user(:notice, "The FY was successfully archived/unarchived.")
+        notify_user(:notice, "The #{get_fy_label} was successfully archived/unarchived.")
       else
-        notify_user(:alert, "Cannot archive/unarchive FY.")
+        notify_user(:alert, "Cannot archive/unarchive #{get_fy_label}.")
       end
 
       redirect_to general_ledger_accounts_path(organization_id: coa.organization_id)

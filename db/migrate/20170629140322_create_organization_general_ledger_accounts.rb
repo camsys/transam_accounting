@@ -1,4 +1,4 @@
-class CreateOrganizationGeneralLedgerAccounts < ActiveRecord::Migration
+class CreateOrganizationGeneralLedgerAccounts < ActiveRecord::Migration[4.2]
   def change
     create_table :organization_general_ledger_accounts do |t|
       t.string :name

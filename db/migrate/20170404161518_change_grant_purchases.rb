@@ -1,4 +1,4 @@
-class ChangeGrantPurchases < ActiveRecord::Migration
+class ChangeGrantPurchases < ActiveRecord::Migration[4.2]
   def change
     change_table :grant_purchases do |t|
       t.references :sourceable, :polymorphic => true

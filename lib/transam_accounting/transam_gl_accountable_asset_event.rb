@@ -21,11 +21,6 @@ module TransamGlAccountableAssetEvent
 
     belongs_to :general_ledger_account
 
-    FORM_PARAMS = [
-        :general_ledger_account_id
-    ]
-
-
     # ----------------------------------------------------
     # Validations
     # ----------------------------------------------------
@@ -39,7 +34,11 @@ module TransamGlAccountableAssetEvent
   #------------------------------------------------------------------------------
 
   module ClassMethods
-
+    def self.allowable_params
+      [
+          :general_ledger_account_id
+      ]
+    end
   end
 
   #------------------------------------------------------------------------------

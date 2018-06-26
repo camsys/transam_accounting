@@ -23,7 +23,7 @@
     .row
       .col-xs-4
         = f.input :depreciation_start_date, :wrapper => :vertical_append, :label => "Depreciation Start Date" do
-          = f.input_field :depreciation_start_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.depreciation_start_date), :disabled => @asset.depreciation_purchase_cost != @asset.book_value
+          = f.input_field :depreciation_start_date, :as => :string, :class => 'form-control datepicker', :data => {'date-container' => '#depreciation_dialog'}, :value => format_as_date(f.object.depreciation_start_date), :disabled => @asset.depreciation_purchase_cost != @asset.book_value
           %span.input-group-addon
             %i.fa.fa-calendar
 
@@ -48,12 +48,3 @@
 
     = f.button :submit, 'Update Depreciation', :class => 'btn btn-primary'
     = link_to "Cancel", :back, {:id => 'cancel-button', :class => "btn btn-default"}
-
-:javascript
-
-  // Document Ready
-  $(document).ready(function(){
-    $('[data-behavior~=datepicker]').datepicker({
-    });
-
-  });

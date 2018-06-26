@@ -16,7 +16,7 @@
     = f.association :organization, :required => true, :collection => Organization.where(id: @organization_list), :label_method => 'coded_name'
   = f.input :sourceable_id, :collection => Grant.sources, :required => true, :label => Grant.label, :disabled => !@grant.new_record?
   = f.input :name, :disabled => !@grant.new_record?
-  = f.input :fy_year, :collection => @fiscal_years, :label => 'Fiscal Year'
+  = f.input :fy_year, :collection => @fiscal_years, :label => get_fiscal_year_label
 
   = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
     %span.input-group-addon
@@ -38,7 +38,7 @@
 
 :javascript
 
-  var glas = JSON.parse('#{glas.to_json}');
+  var glas = JSON.parse('#{glas.to_json.html_safe}');
 
   $(document).ready(function(){
     transam.make_same_height('.header-part');

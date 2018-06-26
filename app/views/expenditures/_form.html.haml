@@ -18,7 +18,11 @@
       = f.association :expense_type, :required => true, :collection => ExpenseType.active, :label => 'Category'
     .col-sm-6
       = f.input :expense_date, :required => true, :wrapper => :vertical_append, :label => "Expense Date" do
-        = f.input_field :expense_date, :as => :string, :class => 'form-control datepicker', :data => {'behavior' => 'datepicker'}, :value => format_as_date(f.object.expense_date)
+        = f.input_field :expense_date, :as => :string, :class => 'form-control datepicker',
+          :data => {'date-container' => "##{format_as_id(@asset_event.asset_event_type.name)}_dialog",
+            'date-start-date' => "#{format_as_date(start_of_fiscal_year(Organization.get_typed_organization(@asset.organization).first_archivable_fiscal_year))}",
+            'date-end-date' => "#{format_as_date(@asset.policy_analyzer.get_depreciation_date(Date.today)-1.day)}"},
+            :value => format_as_date(f.object.expense_date)
         %span.input-group-addon
           %i.fa.fa-calendar
 

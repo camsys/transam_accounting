@@ -1,4 +1,4 @@
-class ClearOutAssociationFields < ActiveRecord::Migration
+class ClearOutAssociationFields < ActiveRecord::Migration[4.2]
   def change
     drop_table :assets_general_ledger_accounts
 

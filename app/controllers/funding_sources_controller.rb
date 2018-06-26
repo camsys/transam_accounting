@@ -8,7 +8,7 @@ class FundingSourcesController < OrganizationAwareController
   add_breadcrumb "Home", :root_path
   add_breadcrumb "Funding Programs", :funding_sources_path
 
-  before_filter :check_for_cancel,        :only => [:create, :update]
+  before_action :check_for_cancel,        :only => [:create, :update]
   before_action :set_funding_source,      :only => [:show, :edit, :update, :destroy]
 
   INDEX_KEY_LIST_VAR    = "funding_source_key_list_cache_var"
