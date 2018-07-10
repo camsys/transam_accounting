@@ -21,7 +21,7 @@ class DepreciationEntry < ActiveRecord::Base
   # Validations
   #------------------------------------------------------------------------------
 
-  validates :asset,           :presence => true
+  #validates :asset,           :presence => true
   validates :description,     :presence => true
   validates :book_value,      :presence => true
 

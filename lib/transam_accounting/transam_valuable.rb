@@ -49,7 +49,7 @@ module TransamValuable
 
     has_many   :book_value_updates, -> {where :asset_event_type_id => BookValueUpdateEvent.asset_event_type.id }, :class_name => "BookValueUpdateEvent",  :foreign_key => :transam_asset_id
 
-    has_and_belongs_to_many    :expenditures, :foreign_key => :transam_asset_id
+    has_and_belongs_to_many    :expenditures, :join_table => :assets_expenditures, :foreign_key => :transam_asset_id
 
     has_many :general_ledger_account_entries, :foreign_key => :transam_asset_id
 
@@ -132,14 +132,11 @@ module TransamValuable
 
   def get_depreciation_table
 
-    # Make sure we are working with a concrete asset class
-    asset = is_typed? ? self : Asset.get_typed_asset(self)
-
-    gl_mapping = asset.general_ledger_mapping
+    gl_mapping = self.general_ledger_mapping
 
     table = []
     start_book_val = 0
-    asset.depreciation_entries.order(:event_date).each_with_index do |depr_entry, idx|
+    self.depreciation_entries.order(:event_date).each_with_index do |depr_entry, idx|
       start_book_val += depr_entry.book_value
       table << {
           :on_date => depr_entry.event_date,
@@ -148,7 +145,7 @@ module TransamValuable
           :book_value => start_book_val
       }
 
-      if ChartOfAccount.find_by(organization_id: asset.organization_id) && gl_mapping.present?
+      if ChartOfAccount.find_by(organization_id: self.organization_id) && gl_mapping.present?
         table[-1][:general_ledger_account] = ''
         if depr_entry.description.include? 'Purchase'
           table[-1][:general_ledger_account] = gl_mapping.asset_account
@@ -158,10 +155,10 @@ module TransamValuable
           table[-1][:general_ledger_account] = gl_mapping.gain_loss_account
         elsif depr_entry.description.include? 'CapEx'
           description = depr_entry.description[7..-1]
-          table[-1][:general_ledger_account] = asset.expenditures.find_by(expense_date: depr_entry.event_date, description: description).try(:general_ledger_account)
+          table[-1][:general_ledger_account] = self.expenditures.find_by(expense_date: depr_entry.event_date, description: description).try(:general_ledger_account)
         elsif depr_entry.description.include? 'Rehab'
           description = depr_entry.description[7..-1]
-          table[-1][:general_ledger_account] = asset.rehabilitation_updates.find_by(event_date: depr_entry.event_date, comments: description).try(:general_ledger_account)
+          table[-1][:general_ledger_account] = self.rehabilitation_updates.find_by(event_date: depr_entry.event_date, comments: description).try(:general_ledger_account)
         end
       end
     end
@@ -198,7 +195,7 @@ module TransamValuable
           self.current_depreciation_date = policy_analyzer.get_depreciation_date(depr_start)
 
           # get this interval's system calculated depreciation
-          if depreciation_entries.where(description: 'Depreciation Expense', event_date: asset.current_depreciation_date).count == 0
+          if depreciation_entries.where(description: 'Depreciation Expense', event_date: current_depreciation_date).count == 0
             # see what algorithm we are using to calculate the book value
             class_name = policy_analyzer.get_depreciation_calculation_type.class_name
             book_val = (calculate(self, class_name) + 0.5).to_i
