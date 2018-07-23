@@ -23,6 +23,18 @@ asset_event_types = [
     {:active => 1, :name => 'Book value', :class_name => 'BookValueUpdateEvent', :job_name => 'AssetBookValueUpdateJob', :display_icon_name => 'fa fa-hourglass-end', :description => 'Book Value Update'}
 ]
 
+activities = [
+    { name: 'Automated Depreciation Expense',
+      description: 'Calculate book value of assets at end of depreciation interval',
+      show_in_dashboard: false,
+      system_activity: true,
+      frequency_quantity: 1,
+      frequency_type_id: 3,
+      execution_time: '00:01',
+      job_name: 'AssetDepreciationExpenseUpdateJob',
+      active: true }
+]
+
 funding_source_types = [
     {:active => 1, :name => 'Federal',  :description => 'Federal Funding Source'},
     {:active => 1, :name => 'State',    :description => 'State Funding Source'},
@@ -71,7 +83,7 @@ system_config_extensions = [
 ]
 
 lookup_tables = %w{ funding_source_types general_ledger_account_types general_ledger_account_subtypes depreciation_calculation_types depreciation_interval_types}
-merge_tables = %w{ asset_types asset_event_types report_types system_config_extensions}
+merge_tables = %w{ asset_types asset_event_types activities report_types system_config_extensions}
 
 lookup_tables.each do |table_name|
   puts "  Loading #{table_name}"

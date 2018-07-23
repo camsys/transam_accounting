@@ -93,7 +93,7 @@ class BookValueUpdateEvent < AssetEvent
     end
 
     asset.update_asset_book_value
-    asset.save
+    asset.save(:validate => false)
 
     return true
   end

@@ -32,8 +32,8 @@ module TransamValuable
     #------------------------------------------------------------------------------
     # Callbacks
     #------------------------------------------------------------------------------
-    before_validation  :set_depreciation_defaults
-    before_save        :update_asset_book_value
+    after_initialize  :set_depreciation_defaults
+    before_create        :update_asset_book_value
 
     #----------------------------------------------------
     # Associations
