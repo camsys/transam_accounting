@@ -33,7 +33,7 @@ module TransamValuable
     # Callbacks
     #------------------------------------------------------------------------------
     after_initialize  :set_depreciation_defaults
-    before_create        :update_asset_book_value
+    after_create        :update_asset_book_value
 
     #----------------------------------------------------
     # Associations
@@ -220,6 +220,8 @@ module TransamValuable
         #update current depreciation date
         self.current_depreciation_date = policy_analyzer.get_current_depreciation_date
       end
+
+      self.save(validate: false)
 
     rescue Exception => e
       Rails.logger.warn e.message
