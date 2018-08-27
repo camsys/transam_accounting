@@ -14,10 +14,6 @@ is_sqlite =  (ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'sqlite
 
 puts "======= Processing TransAM Accounting Lookup Tables  ======="
 
-asset_types = [
-  {name: 'Expenditures', class_name: 'Expenditure', display_icon_name: 'fa fa-cogs', map_icon_name: 'blueIcon', description: 'Expenditures', active: true}
-]
-
 asset_event_types = [
     {:active => 1, :name => 'Initial book value', :class_name => 'BookValueUpdateEvent', :job_name => 'AssetBookValueUpdateJob', :display_icon_name => 'fa fa-hourglass-start', :description => 'Initial Book Value Update'},
     {:active => 1, :name => 'Book value', :class_name => 'BookValueUpdateEvent', :job_name => 'AssetBookValueUpdateJob', :display_icon_name => 'fa fa-hourglass-end', :description => 'Book Value Update'}
