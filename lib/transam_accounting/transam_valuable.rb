@@ -32,7 +32,7 @@ module TransamValuable
     #------------------------------------------------------------------------------
     # Callbacks
     #------------------------------------------------------------------------------
-    after_initialize  :set_depreciation_defaults
+    before_validation  :set_depreciation_defaults
     after_create        :update_asset_book_value
 
     #----------------------------------------------------
