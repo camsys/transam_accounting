@@ -1,6 +1,7 @@
 class DepreciationEntry < ActiveRecord::Base
 
   # Include the object key mixin
+  # Note: skipping uniquess constraint, see below
   include TransamObjectKey
 
   #------------------------------------------------------------------------------
@@ -85,4 +86,7 @@ class DepreciationEntry < ActiveRecord::Base
     end
   end
 
+  def skip_uniqueness?
+    true
+  end
 end
