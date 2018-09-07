@@ -33,7 +33,7 @@ module TransamValuable
     # Callbacks
     #------------------------------------------------------------------------------
     before_validation  :set_depreciation_defaults
-    after_create        :update_asset_book_value
+    after_save         :update_asset_book_value
 
     #----------------------------------------------------
     # Associations
@@ -169,63 +169,52 @@ module TransamValuable
   def update_asset_book_value
     Rails.logger.info "Updating book value for asset = #{object_key}"
 
-    begin
+    if depreciable
 
+      gl_mapping = general_ledger_mapping
 
-      if depreciable
+      if depreciation_entries.count == 0 # add the initial depr entry if it does not exist
+        depreciation_entries.create!(description: 'Purchase', book_value: depreciation_purchase_cost, event_date: depreciation_start_date)
 
-        gl_mapping = general_ledger_mapping
-
-        if depreciation_entries.count == 0 # add the initial depr entry if it does not exist
-          depreciation_entries.create!(description: 'Purchase', book_value: depreciation_purchase_cost, event_date: depreciation_start_date)
-
-          if gl_mapping.present?
-            gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: depreciation_start_date, description: "Purchase: #{asset_path}", amount: depreciation_purchase_cost, asset: self)
-          end
-
-          depr_start = depreciation_start_date
-        else
-          depr_start = current_depreciation_date
+        if gl_mapping.present?
+          gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: depreciation_start_date, description: "Purchase: #{asset_path}", amount: depreciation_purchase_cost, asset: self)
         end
 
-        # check and set the asset book value from the depr entries
-        self.book_value = depreciation_entries.sum(:book_value)
-
-        while depr_start <= policy_analyzer.get_current_depreciation_date
-          self.current_depreciation_date = policy_analyzer.get_depreciation_date(depr_start)
-
-          # get this interval's system calculated depreciation
-          if depreciation_entries.where(description: 'Depreciation Expense', event_date: current_depreciation_date).count == 0
-            # see what algorithm we are using to calculate the book value
-            class_name = policy_analyzer.get_depreciation_calculation_type.class_name
-            book_val = (calculate(self, class_name) + 0.5).to_i
-
-            depr_amount = book_val - self.book_value
-            self.depreciation_entries.create!(description: 'Depreciation Expense', book_value: depr_amount, event_date: current_depreciation_date)
-            self.book_value = book_val
-
-            if gl_mapping.present? # check whether this app records GLAs at all
-              gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: current_depreciation_date, description: "Accumulated Depreciation: #{asset_path}", amount: depr_amount, asset: self)
-
-              gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: current_depreciation_date, description: "Depreciation Expense: #{asset_path}", amount: -depr_amount, asset: self)
-            end
-          end
-
-          depr_start = depr_start + (policy_analyzer.get_depreciation_interval_type.months).months
-        end
-
+        depr_start = depreciation_start_date
       else
-        self.book_value = depreciation_purchase_cost
-
-        #update current depreciation date
-        self.current_depreciation_date = policy_analyzer.get_current_depreciation_date
+        depr_start = current_depreciation_date || depreciation_start_date
       end
 
-      self.save(validate: false)
+      # check and set the asset book value from the depr entries
+      self.update_columns(book_value: depreciation_entries.sum(:book_value))
+      while depr_start <= policy_analyzer.get_current_depreciation_date
+        self.update_columns(current_depreciation_date: policy_analyzer.get_depreciation_date(depr_start))
 
-    rescue Exception => e
-      Rails.logger.warn e.message
-      Rails.logger.warn e.backtrace
+        # get this interval's system calculated depreciation
+        if depreciation_entries.where(description: 'Depreciation Expense', event_date: current_depreciation_date).count == 0
+          # see what algorithm we are using to calculate the book value
+          class_name = policy_analyzer.get_depreciation_calculation_type.class_name
+          book_val = (calculate(self, class_name) + 0.5).to_i
+
+          depr_amount = book_val - self.book_value
+          self.depreciation_entries.create!(description: 'Depreciation Expense', book_value: depr_amount, event_date: current_depreciation_date)
+          self.update_columns(book_value: book_val)
+
+          if gl_mapping.present? # check whether this app records GLAs at all
+            gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: current_depreciation_date, description: "Accumulated Depreciation: #{asset_path}", amount: depr_amount, asset: self)
+
+            gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: current_depreciation_date, description: "Depreciation Expense: #{asset_path}", amount: -depr_amount, asset: self)
+          end
+        end
+
+        depr_start = depr_start + (policy_analyzer.get_depreciation_interval_type.months).months
+      end
+
+    else
+      self.update_columns(book_value: depreciation_purchase_cost)
+
+      #update current depreciation date
+      self.update_columns(current_depreciation_date: policy_analyzer.get_current_depreciation_date)
     end
   end
 
