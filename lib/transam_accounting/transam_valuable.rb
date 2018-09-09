@@ -40,7 +40,7 @@ module TransamValuable
     #----------------------------------------------------
 
     # each asset was purchased using one or more grants
-    has_many    :grant_purchases,  :foreign_key => :asset_id, :dependent => :destroy, :inverse_of => :transam_asset
+    has_many    :grant_purchases,  :foreign_key => :transam_asset_id, :dependent => :destroy, :inverse_of => :transam_asset
 
     # Allow the form to submit grant purchases
     accepts_nested_attributes_for :grant_purchases, :reject_if => :all_blank, :allow_destroy => true
