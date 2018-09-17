@@ -71,19 +71,19 @@ module TransamAccountingAssetsController
 
   def update_depreciation
     proxy = AssetDepreciableProxy.new(params[:asset_depreciable_proxy])
-    base_asset = Asset.find_by_object_key(proxy.object_key)
+    base_asset = Rails.application.config.asset_base_class_name.constantize.find_by_object_key(proxy.object_key)
 
     # Make sure we are working with a full-typed asset
-    asset = Asset.get_typed_asset(base_asset)
+    asset = Rails.application.config.asset_base_class_name.constantize.get_typed_asset(base_asset)
 
     asset.depreciable = proxy.depreciable
     asset.depreciation_start_date = reformat_date(proxy.depreciation_start_date) if proxy.depreciation_start_date # reformat date
-    asset.current_depreciation_date = asset.depreciation_start_date if asset.current_depreciation_date != asset.depreciation_start_date
     asset.depreciation_useful_life = proxy.depreciation_useful_life
     asset.depreciation_purchase_cost = proxy.depreciation_purchase_cost
     asset.salvage_value = proxy.salvage_value if proxy.salvage_value
 
     asset.updator = current_user
+    asset.update_asset_book_value
 
     if asset.save
 

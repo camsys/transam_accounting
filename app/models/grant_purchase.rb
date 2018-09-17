@@ -24,12 +24,13 @@ class GrantPurchase < ActiveRecord::Base
   # Every grant purchase is associated with an asset and some form of funding (sourceable)
   belongs_to  :sourceable, :polymorphic => true
   belongs_to  :asset
+  belongs_to  :transam_asset
 
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
   validates_presence_of :sourceable
-  validates_presence_of :asset
+  validates_presence_of Rails.application.config.asset_base_class_name.underscore.to_sym
   validates :pcnt_purchase_cost,  :presence => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
 
   #------------------------------------------------------------------------------

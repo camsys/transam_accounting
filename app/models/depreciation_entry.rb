@@ -1,6 +1,7 @@
 class DepreciationEntry < ActiveRecord::Base
 
   # Include the object key mixin
+  # Note: skipping uniquess constraint, see below
   include TransamObjectKey
 
   #------------------------------------------------------------------------------
@@ -21,7 +22,7 @@ class DepreciationEntry < ActiveRecord::Base
   # Validations
   #------------------------------------------------------------------------------
 
-  validates :asset,           :presence => true
+  #validates :asset,           :presence => true
   validates :description,     :presence => true
   validates :book_value,      :presence => true
 
@@ -85,4 +86,7 @@ class DepreciationEntry < ActiveRecord::Base
     end
   end
 
+  def skip_uniqueness?
+    true
+  end
 end

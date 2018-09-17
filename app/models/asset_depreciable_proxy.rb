@@ -19,7 +19,7 @@ class AssetDepreciableProxy < Proxy
   # Set resonable defaults for a depreciable asset
   def set_defaults(a)
     unless a.nil?
-      asset = Asset.get_typed_asset(a)
+      asset = Rails.application.config.asset_base_class_name.constantize.get_typed_asset(a)
       self.object_key = asset.object_key
       self.depreciable = asset.depreciable
       self.depreciation_start_date = asset.depreciation_start_date

@@ -1,4 +1,4 @@
-.nested-fields
+.nested-fields{style: 'border:none;'}
   .row
     .col-md-6
       = f.input :sourceable_id, :collection => GrantPurchase.sources({organization_id: @asset.organization_id, active: true}), :required => true, :label => GrantPurchase.label

@@ -1,0 +1,59 @@
+
+= simple_form_for(@asset,
+  :as => :asset,
+  :url => inventory_index_path,
+  :method => 'post',
+  :html => {:class => 'form-vertical'},
+  :wrapper => :vertical_form,
+  :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes,
+    :radio_buttons => :vertical_radio_and_checkboxes,
+    :file => :vertical_file_input,
+    :boolean => :vertical_boolean}) do |f|
+
+  - fta_asset_class = @asset.fta_asset_class || FtaAssetClass.find_by(id: params[:asset_base_class_id])
+  = hidden_field_tag :asset_base_class_id, fta_asset_class.id
+
+  = f.input :description
+  = f.input :asset_tag
+  = f.input :external_id
+  = f.input :fta_asset_category_id, as: :hidden, input_html: {value: fta_asset_class.fta_asset_category_id}
+  = f.association :fta_asset_class
+  = f.input :global_fta_type, :collection => FtaEquipmentType.all.map{|f| [ f.to_s, f.to_global_id ]}
+  = f.association :asset_subtype
+  = f.association :esl_category
+
+  = f.input :quantity
+  = f.input :quantity_unit
+  = f.association :serial_numbers
+
+  = f.input :other_manufacturer
+  = f.input :other_manufacturer_model
+  = f.input :manufacture_year
+
+  = render :partial => "assets/accounting_asset_form", :locals => {:f => f}
+
+  = f.input :purchase_cost
+  = f.input :pcnt_capital_responsibility
+
+  = f.input :purchased_new
+  = f.input :purchase_date
+  = f.input :contract_num
+  = f.association :contract_type
+  = f.association :vendor
+  = f.input :other_vendor
+  = f.input :has_warranty
+  = f.input :warranty_date
+
+  = f.input :in_service_date
+
+  = f.input :title_number
+  = f.association :title_ownership_organization
+  = f.input :other_title_ownership_organization
+  = f.association :lienholder
+  = f.input :other_lienholder
+
+  - view_component = 'app_characteristics_form'
+  - if lookup_context.template_exists?(view_component, 'transit_assets', true)
+    = render :partial => "transit_assets/#{view_component}", :locals => {:f => f}
+
+  = f.button :submit, :class => 'btn btn-primary'

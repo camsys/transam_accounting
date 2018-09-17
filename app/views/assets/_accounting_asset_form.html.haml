@@ -1,5 +1,23 @@
-- @asset.grant_purchases.build if @asset.grant_purchases.empty?
+- if can? :update, asset
+  #grant_purchases.well.well-sm{style: "overflow-y:scroll; max-height:250px; width:95%;"}
+    = simple_form_for(asset.transam_asset,
+        :as => :asset,
+        :url => inventory_path(asset.transam_asset),
+        :method => 'put',
+        :html => {:class => 'form-vertical form-section grant_purchases_form'},
+        :wrapper => :vertical_form,
+        :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes,
+          :radio_buttons => :vertical_radio_and_checkboxes,
+          :file => :vertical_file_input,
+          :boolean => :vertical_boolean}) do |f|
+      %label#grant_purchases-error.error
+      = f.simple_fields_for :grant_purchases do |grant_purchase|
+        = render 'grant_purchase_fields', f: grant_purchase
+      .links.pull-right
+        = link_to_add_association f, :grant_purchases, :class => 'btn btn-xs btn-info' do
+          %i.fa.fa-plus
 
-= render :partial => 'grant_purchases_form', :locals => {:f => f}
+      = f.button :submit, 'Save', :class => 'btn btn-primary'
+
 
 

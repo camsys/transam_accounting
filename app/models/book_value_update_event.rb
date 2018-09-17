@@ -91,6 +91,11 @@ class BookValueUpdateEvent < AssetEvent
 
       depr_entry.destroy!
     end
+
+    asset.update_asset_book_value
+    asset.save(:validate => false)
+
+    return true
   end
   
 end
