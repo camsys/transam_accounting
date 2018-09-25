@@ -4,6 +4,7 @@
         :as => :asset,
         :url => inventory_path(asset.transam_asset),
         :method => 'put',
+        :remote => true,
         :html => {:class => 'form-vertical form-section grant_purchases_form'},
         :wrapper => :vertical_form,
         :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes,
