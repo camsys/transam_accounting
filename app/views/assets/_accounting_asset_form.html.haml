@@ -28,9 +28,12 @@
         form.submit();
       }
     });
-     $('input.funding-pcnt').rules( "add", {
-      pcntSumsHundred: true
-    });
+    if ($('input.funding-pcnt').length > 0) {
+      $('input.funding-pcnt').rules( "add", {
+        pcntSumsHundred: true
+      });
+    }
+
   });
 
   $('body').on('change', '#grant_purchases .funding-pcnt', function() {
