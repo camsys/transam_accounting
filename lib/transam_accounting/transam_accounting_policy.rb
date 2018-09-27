@@ -115,15 +115,16 @@ module TransamAccountingPolicy
 
     def apply_depreciation_policy_changes
       if previous_changes.keys.any? {|x| x.include? 'depreciation' }
-        Asset.operational.where(organization_id: self.organization_id).each do |asset|
+        Rails.application.config.asset_base_class_name.constantize.operational.where(organization_id: self.organization_id).each do |asset|
           begin
-            typed_asset = Asset.get_typed_asset(asset)
-            typed_asset.update_book_value
+            typed_asset = Rails.application.config.asset_base_class_name.constantize.get_typed_asset(asset)
+            typed_asset.send(:update_asset_book_value)
           rescue Exception => e
             Rails.logger.warn e.message
           end
         end
       end
     end
+    handle_asynchronously :apply_depreciation_policy_changes
 
 end
