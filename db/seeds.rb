@@ -79,7 +79,7 @@ system_config_extensions = [
 ]
 
 lookup_tables = %w{ funding_source_types general_ledger_account_types general_ledger_account_subtypes depreciation_calculation_types depreciation_interval_types}
-merge_tables = %w{ asset_types asset_event_types activities report_types system_config_extensions}
+merge_tables = %w{ asset_event_types activities report_types system_config_extensions}
 
 lookup_tables.each do |table_name|
   puts "  Loading #{table_name}"
