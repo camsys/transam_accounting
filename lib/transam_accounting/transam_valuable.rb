@@ -47,7 +47,7 @@ module TransamValuable
 
     has_many :depreciation_entries, :foreign_key => :transam_asset_id
 
-    has_many   :book_value_updates, -> {where :asset_event_type_id => BookValueUpdateEvent.asset_event_type.id }, :class_name => "BookValueUpdateEvent",  :foreign_key => :transam_asset_id
+    has_many   :book_value_updates, -> {where :asset_event_type_id => BookValueUpdateEvent.asset_event_type.id }, :class_name => "BookValueUpdateEvent",  :as => Rails.application.config.asset_base_class_name.underscore.to_sym
 
     has_and_belongs_to_many    :expenditures, :join_table => :assets_expenditures, :foreign_key => :transam_asset_id
 
