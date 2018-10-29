@@ -11,6 +11,7 @@
           :radio_buttons => :vertical_radio_and_checkboxes,
           :file => :vertical_file_input,
           :boolean => :vertical_boolean}) do |f|
+
       %label#grant_purchases-error.error
       = f.simple_fields_for :grant_purchases do |grant_purchase|
         = render 'grant_purchase_fields', f: grant_purchase
@@ -25,7 +26,7 @@
     $('.grant_purchases_form').validate({
       submitHandler: function(form) {
         $('input').prop('disabled', false); // re-enable any disabled fields so they'll submit
-        form.submit();
+        form.trigger('submit.rails'); // submits form both as HTML or JS as defined in form data-remote
       }
     });
     if ($('input.funding-pcnt').length > 0) {
