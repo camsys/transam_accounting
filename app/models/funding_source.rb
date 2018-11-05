@@ -40,7 +40,7 @@ class FundingSource < ActiveRecord::Base
   has_many    :grants, :as => :sourceable, :dependent => :destroy
 
   has_many :grant_purchases, :as => :sourceable, :dependent => :destroy
-  has_many :assets, :through => :grant_purchases
+  has_many :assets, :through => :grant_purchases, :class_name => Rails.application.config.asset_base_class_name
 
   #------------------------------------------------------------------------------
   # Validations
