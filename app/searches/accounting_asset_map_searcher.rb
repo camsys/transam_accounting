@@ -1,7 +1,7 @@
 # Inventory searcher.
 # Designed to be populated from a search form using a new/create controller model.
 #
-class TransitAssetMapSearcher < BaseSearcher
+class AccountingAssetMapSearcher < BaseSearcher
 
   # Include the numeric sanitizers mixin
   include TransamNumericSanitizers
