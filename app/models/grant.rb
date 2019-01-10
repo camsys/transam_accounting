@@ -8,13 +8,13 @@
 #------------------------------------------------------------------------------
 class Grant < ActiveRecord::Base
 
-  SOURCEABLE_TYPE = Rails.application.config.grant_source
-
   # Include the object key mixin
   include TransamObjectKey
 
   # Include the fiscal year mixin
   include FiscalYear
+
+  include TransamWorkflow
 
   #------------------------------------------------------------------------------
   # Callbacks
@@ -24,11 +24,13 @@ class Grant < ActiveRecord::Base
   #------------------------------------------------------------------------------
   # Associations
   #------------------------------------------------------------------------------
-  # Every funding line item belongs to an organization
-  belongs_to  :organization
+  belongs_to  :owner, class_name: 'Organization'
+  belongs_to  :contributor, class_name: 'Organization'
 
   # Has a single funding source
   belongs_to  :sourceable, :polymorphic => true
+
+  has_many :grant_amendments
 
   # Has many grant purchases
   has_many :grant_purchases, :as => :sourceable, :dependent => :destroy
@@ -42,17 +44,57 @@ class Grant < ActiveRecord::Base
 
   has_many :general_ledger_accounts, :through => :grant_budgets
 
-  # Has 0 or more documents. Using a polymorphic association. These will be removed if the Grant is removed
-  has_many    :documents,   :as => :documentable, :dependent => :destroy
+  belongs_to  :creator,     :class_name => "User",  :foreign_key => :created_by_user_id
 
-  # Has 0 or more comments. Using a polymorphic association, These will be removed if the project is removed
-  has_many    :comments,    :as => :commentable,  :dependent => :destroy
+  belongs_to  :updater,     :class_name => "User",  :foreign_key => :updated_by_user_id
+
+
+  #------------------------------------------------------------------------------
+  #
+  # State Machine
+  #
+  # Used to track the state of a grant through the workflow process
+  #
+  #------------------------------------------------------------------------------
+  state_machine :state, :initial => :in_development do
+
+    #-------------------------------
+    # List of allowable states
+    #-------------------------------
+
+    state :in_development
+
+    state :open
+
+    state :closed
+
+    #---------------------------------------------------------------------------
+    # List of allowable events. Events transition a Grant from one state to another
+    #---------------------------------------------------------------------------
+
+    event :publish do
+      transition [:in_development] => :open
+    end
+
+    event :close do
+      transition [:open] => :closed
+    end
+
+    event :reopen do
+      transition [:closed] => :open
+    end
+
+    # Callbacks
+    before_transition do |form, transition|
+      Rails.logger.debug "Transitioning #{form} from #{transition.from_name} to #{transition.to_name} using #{transition.event}"
+    end
+  end
 
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
   validates :organization,                    :presence => true
-  validates :name,                            :presence => true, :uniqueness => true
+  validates :grant_num,                            :presence => true, :uniqueness => true
   validates :fy_year,                         :presence => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 1970}
   validates :sourceable,                      :presence => true
   validates :amount,                          :presence => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0}
@@ -67,12 +109,16 @@ class Grant < ActiveRecord::Base
 
   # List of hash parameters allowed by the controller
   FORM_PARAMS = [
-    :organization_id,
+    :owner_id,
+    :contributor_id,
+    :other_contributor,
     :sourceable_type,
     :sourceable_id,
-    :name,
+    :grant_num,
     :fy_year,
+    :award_date,
     :amount,
+    :legislative_authorization,
     :active,
     :grant_budgets_attributes => [GrantBudget.allowable_params]
   ]
@@ -81,7 +127,7 @@ class Grant < ActiveRecord::Base
   SEARCHABLE_FIELDS = [
     :object_key,
     :sourceable,
-    :name
+    :grant_num
   ]
 
   #------------------------------------------------------------------------------
@@ -94,31 +140,15 @@ class Grant < ActiveRecord::Base
     FORM_PARAMS
   end
 
-  def self.sourceable_type
-    SOURCEABLE_TYPE
-  end
-
-  def self.sources(params=nil)
-    if params
-      SOURCEABLE_TYPE.constantize.where(params)
-    else
-      SOURCEABLE_TYPE.constantize.active
-    end
-  end
-
-  def self.label
-    if SOURCEABLE_TYPE == 'FundingSource'
-      'Funding Program'
-    else
-      SOURCEABLE_TYPE.constantize.model_name.human.titleize
-    end
-  end
-
   #------------------------------------------------------------------------------
   #
   # Instance Methods
   #
   #------------------------------------------------------------------------------
+
+  def funding_source
+    sourceable_type == 'FundingSource' ? sourceable : sourceable.funding_source
+  end
 
   # Calculate the anount of the grant that has been spent on assets to date. This calculates
   # only the federal percentage
@@ -150,6 +180,10 @@ class Grant < ActiveRecord::Base
   #
   # end
 
+  def closeout_date
+    workflow_events.where(event: 'close').created_at.to_date
+  end
+
   # Override the mixin method and delegate to it
   def fiscal_year(year = nil)
     if year
@@ -160,7 +194,7 @@ class Grant < ActiveRecord::Base
   end
 
   def to_s
-    name
+    grant_num
   end
 
   def searchable_fields

@@ -28,62 +28,33 @@
     %thead
       %tr
         %th.left{:data => {:visible => 'false'}} Object Key
-        - if @organization_list.count > 1
-          %th.left{:data => {:visible => 'true', :sortable => 'true'}} Organization
-        %th.left{:data => {:sortable => 'true'}}= Grant.label
-        %th.left{:data => {:sortable => 'true'}} Name
-        %th.left{:data => {:sortable => 'true'}} #{get_fiscal_year_label}
-        %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_amount'}} Amount
-        -#%th.right{:data => {:sortable => 'true', :formatter => 'integer_formatter', :footer_formatter => 'sum_expenditures'}} CapEx
-        %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_total_spent'}} Spent
-        %th.right{:data => {:sortable => 'true', :formatter => 'currency_formatter', :footer_formatter => 'sum_total_balance'}} Balance
+        %th.left{:data => {:sortable => 'true'}} Grant Number
+        %th.left{:data => {:sortable => 'true'}} Source
+        %th.left{:data => {:sortable => 'true'}} Program
+        %th.left{:data => {:sortable => 'true'}} Grant Year
+        %th.left{:data => {:sortable => 'true'}} Owner
+        %th.left{:data => {:sortable => 'true'}} Contributor
+        %th.left{:data => {:sortable => 'true'}} Legislative Authorization
+        %th.left{:data => {:sortable => 'true'}} Date of Award
+        %th.left{:data => {:sortable => 'true'}} Date of Most Recent Amendment
+        %th.left{:data => {:sortable => 'true'}} Status
+        %th.left{:data => {:sortable => 'true'}} Last Update By
+        %th.left{:data => {:sortable => 'true'}} Last Update Date
 
     %tbody
-      - grants.each do |grant|
+      - @grants.each do |grant|
         %tr{:id => grant.object_key, :class => 'action-path'}
           %td.left= grant.object_key
-          - if @organization_list.count > 1
-            %td.left= grant.organization.short_name
-          %td.left= grant.sourceable
-          %td.left= grant.name
-          %td.center= format_as_fiscal_year(grant.fy_year)
-          %td.right= grant.amount.to_i
-          -#%td.right= grant.grant_purchases.count
-          %td.right= grant.spent.to_i
-          %td.right= grant.balance.to_i
+          %td.left= grant.grant_num
+          %td.left= grant.sourceable.funding_source_type
+          %td.left= grant.funding_surce
+          %td.left= grant.fy_year
+          %td.left= grant.owner
+          %td.left= grant.contributor
+          %td.left= format_as_date(grant.award_date)
+          %td.left= format_as_date(grant.grant_amendments.last.created_at.to_date)
+          %td.left= grant.state.titleize
+          %td.left= grant.updater
+          %td.left= format_as_date_time(grant.updated_at)
 
 = render :partial => 'shared/table_scripts', :locals => {:table_id => table_dom_id, :path_pattern => grant_path("xxx")}
-
-:javascript
-
-  function sum_amount(col_data) {
-    var sum = 0;
-    for (i = 0; i < col_data.length; i++) {
-      sum += parseInt(col_data[i][4]);
-    }
-    return "<strong>" + currency_formatter(sum) + "</strong>";
-  };
-
-  function sum_expenditures(col_data) {
-    var sum = 0;
-    for (i = 0; i < col_data.length; i++) {
-      sum += parseInt(col_data[i][4]);
-    }
-    return "<strong>" + integer_formatter(sum) + "</strong>";
-  };
-
-  function sum_total_spent(col_data) {
-    var sum = 0;
-    for (i = 0; i < col_data.length; i++) {
-      sum += parseInt(col_data[i][5]);
-    }
-    return "<strong>" + currency_formatter(sum) + "</strong>";
-  };
-
-  function sum_total_balance(col_data) {
-    var sum = 0;
-    for (i = 0; i < col_data.length; i++) {
-      sum += parseInt(col_data[i][4]) - parseInt(col_data[i][5]);
-    }
-    return "<strong>" + currency_formatter(sum) + "</strong>";
-  };

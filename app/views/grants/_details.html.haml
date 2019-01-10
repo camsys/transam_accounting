@@ -1,51 +1,49 @@
-- assets = @grant.assets.where.not(asset_type: AssetType.find_by(class_name: 'Expenditure'))
-- expenditures = @grant.assets.where(asset_type: AssetType.find_by(class_name: 'Expenditure'))
+.row.border-between
+  .col-sm-6
+    .row
+      .col-sm-3= editable_asset_field_tag(@grant, :grant_num, 'Grant Number', required: true)
+    .row
+      .col-sm-3
+        = select_tag(:funding_source_type, options_from_collection_for_select(FundingSourceType.all, "id", "name"))
+    .row
+      .col-sm-3= editable_asset_association_tag(@grant, :global_sourceable, '* Type', FundingSource.all.collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]}, current_method: :global_sourceable)
+    .row
+      .col-sm-3= editable_asset_association_tag(@grant, :owner, '* Owner', Organization.all)
+      .col-sm-3= editable_asset_association_tag(@grant, :contributor, '* Contributor', Organization.all)
+      .col-sm-6= editable_asset_field_tag(@grant, :other_contributor)
+    .row
+      .col-sm-9= editable_asset_field_tag(@grant, :legislative_authorization)
+    .row
+      .col-sm-4= editable_asset_field_tag(@grant, :award_date, 'Date of Award', type: 'date')
+      .col-sm-4
+        .form-group
+          %label.control-label
+            Date of Most Recent Amendment
+          .display-value= format_as_date(@grant.grant_amendments.last.try(:created_at).to_date)
+      .col-sm-4
+        .form-group
+          %label.control-label
+            Date of Closeout
+          .display-value= format_as_date(@grant.closeout_date)
 
-%ul.nav.nav-tabs
-  %li
-    %a{:href => "#gla", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @grant.general_ledger_accounts.count
-      = "GL Accounts"
+  .col-sm-6
+    .row
+      .col-sm-6
+        .form-group
+          %label.control-label
+            Method of Apportionment Structure
+          .display-value Single Apportionment
+      .col-sm-6= editable_asset_field_tag(@grant, :fy_year, 'Grant Year')
+    .row
+      .col-sm-3= editable_asset_field_tag(@grant, :amount, 'Total Apportionment', required: true)
+    .row
+      .col-sm-3= editable_asset_field_tag(@grant, :over_allocation_allowed, 'Allow Over-Allocation', type: 'boolean')
+    .row
+      .col-sm-3
+        .form-group
+          %label.control-label
+            Grant Development Method
+          .display-value Directly Generated
 
-  - if GrantPurchase.sourceable_type.include? 'Grant'
-    %li
-      %a{:href => "#asst", :data =>{:toggle => 'tab'}}
-        %span.badge.pull-right= assets.count
-        = "Assets"
 
-  %li
-    %a{:href => "#docs", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @grant.documents.count
-      = "Documents "
 
-  %li
-    %a{:href => "#comm", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @grant.comments.count
-      = "Comments "
-
-.tab-content
-  .tab-pane.fade#gla
-    .tab-content
-      = render :partial => 'gla_table', :locals => {:glas => @grant.general_ledger_accounts}
-
-  - if GrantPurchase.sourceable_type.include? 'Grant'
-    .tab-pane.fade#asst
-      .tab-content
-        - if assets.empty?
-          %p There are no assets associated with this grant.
-        - else
-          = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => assets}
-
-  .tab-pane.fade#comm
-    .tab-content
-      = render 'comments'
-
-  .tab-pane.fade#docs
-    .tab-content
-      = render 'documents'
-
-= render 'detail_scripts'
-
-- # Load module specific tab if they exist
-- SystemConfig.transam_module_names.each do |mod|
-  = render :partial => "grants/#{mod}_detail_tabs_scripts" rescue nil

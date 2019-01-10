@@ -12,27 +12,38 @@
     :file => :vertical_file_input,
     :boolean => :vertical_boolean}) do |f|
 
-  - if @organization_list.count > 1
-    = f.association :organization, :required => true, :collection => Organization.where(id: @organization_list), :label_method => 'coded_name'
-  = f.input :sourceable_id, :collection => Grant.sources, :required => true, :label => Grant.label, :disabled => !@grant.new_record?
-  = f.input :name, :disabled => !@grant.new_record?
-  = f.input :fy_year, :collection => @fiscal_years, :label => get_fiscal_year_label
+  %fieldset
+    %legend Details
 
-  = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
-    %span.input-group-addon
-      %i.fa.fa-usd
-    = f.input_field :amount, :class => "form-control"
+    .row
+      .col-sm-3= f.input :grant_num
+    .row
+      .col-sm-3= select_tag(:funding_source_type, options_from_collection_for_select(FundingSourceType.all, "id", "name"))
+    .row
+      .col-sm-3= f.input :global_sourceable
+    .row
+      .col-sm-3= f.association :owner, collection: Organization.all
+      .col-sm-3= f.association :contributor, collection: Organization.all
+      .col-sm-6= f.input :other_contributor
 
-  #grant_budgets.well.well-sm{style: "overflow-y:scroll; max-height:250px;"}
-    %label.control-label
-      %i.fa.fa-usd.fa-1-5x
-      General Ledger
-    .links.pull-right
-      = link_to_add_association f, :grant_budgets, :class => 'btn btn-xs btn-info', data: {association_insertion_method: 'after'}, :disabled => !@grant.new_record? do
-        %i.fa.fa-plus
-    %label#grant_budgets-error.error
-    = f.simple_fields_for :grant_budgets do |grant_budget|
-      = render 'grant_budget_fields', f: grant_budget
+    .row
+      .col-sm-9= f.input :legislative_authorization
+
+    .row
+      .col-sm-4
+        .form-group
+          %label.control-label Method of Apportionment Structure
+          .display-value Single Apportionment
+      .col-sm-4= f.input :fy_year
+
+    .row
+      .col-sm-3
+        = f.input :over_allocation_allowed, label: 'Allow Over-Allocation'
+    .row
+      .col-sm-3
+        .form-group
+          %label.control-label Grant Development Method
+          .display-value Directly Generated
 
   = f.button :submit, :class => "btn btn-primary", :id => 'grant_form_submit'
 
