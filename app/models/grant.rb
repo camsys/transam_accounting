@@ -34,7 +34,7 @@ class Grant < ActiveRecord::Base
 
   # Has many grant purchases
   has_many :grant_purchases, :as => :sourceable, :dependent => :destroy
-  has_many :assets, :through => :grant_purchases
+  has_and_belongs_to_many :assets, :through => :grant_purchases
 
   # Has many grant purchases
   has_many :grant_budgets, :dependent => :destroy, :inverse_of => :grant
@@ -148,6 +148,13 @@ class Grant < ActiveRecord::Base
 
   def funding_source
     sourceable_type == 'FundingSource' ? sourceable : sourceable.funding_source
+  end
+  
+  def global_sourceable
+    self.sourceable.to_global_id if self.sourceable.present?
+  end
+  def global_sourceable=(sourceable)
+    self.sourceable=GlobalID::Locator.locate sourceable
   end
 
   # Calculate the anount of the grant that has been spent on assets to date. This calculates

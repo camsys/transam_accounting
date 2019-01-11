@@ -21,11 +21,13 @@ class AccountingAssetMapSearcher < BaseSearcher
   # Simple Equality Queries
   #---------------------------------------------------
 
+  # grant purchases through funding sources
+  # TODO add grant purchases through grants
   def sourceable_conditions
     clean_sourceable_id = remove_blanks(sourceable_id)
 
     unless clean_sourceable_id.empty?
-      grant_purchase_asset_ids = GrantPurchase.where(sourceable_id: clean_sourceable_id, sourceable_type: GrantPurchase::SOURCEABLE_TYPE).pluck(:asset_id)
+      grant_purchase_asset_ids = GrantPurchase.where(sourceable_id: clean_sourceable_id, sourceable_type: 'FundingSource').pluck(:asset_id)
       @klass.where('id IN (?)', grant_purchase_asset_ids).distinct
     end
   end

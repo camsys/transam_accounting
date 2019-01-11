@@ -39,8 +39,10 @@ module TransamValuable
     # Associations
     #----------------------------------------------------
 
-    # each asset was purchased using one or more grants
+    # each asset was purchased using some sources
     has_many    :grant_purchases,  :foreign_key => :transam_asset_id, :dependent => :destroy, :inverse_of => :transam_asset
+    has_and_belongs_to_many :grants, -> { where(grant_purchases: {sourceable_type: 'Grant'}) }, through: :grant_purchases
+    has_and_belongs_to_many :funding_sources, -> { where(grant_purchases: {sourceable_type: 'FundingSource'}) }, through: :grant_purchases
 
     # Allow the form to submit grant purchases
     accepts_nested_attributes_for :grant_purchases, :reject_if => :all_blank, :allow_destroy => true

@@ -1,20 +1,21 @@
 .row.border-between
   .col-sm-6
     .row
-      .col-sm-3= editable_asset_field_tag(@grant, :grant_num, 'Grant Number', required: true)
+      .col-sm-3= editable_field_tag(@grant, :grant_num, 'Grant Number', required: true)
     .row
       .col-sm-3
         = select_tag(:funding_source_type, options_from_collection_for_select(FundingSourceType.all, "id", "name"))
     .row
-      .col-sm-3= editable_asset_association_tag(@grant, :global_sourceable, '* Type', FundingSource.all.collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]}, current_method: :global_sourceable)
+      .col-sm-3= editable_association_tag(@grant, :global_sourceable, '* Type', FundingSource.all.collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]}, current_method: :global_sourceable)
     .row
-      .col-sm-3= editable_asset_association_tag(@grant, :owner, '* Owner', Organization.all)
-      .col-sm-3= editable_asset_association_tag(@grant, :contributor, '* Contributor', Organization.all)
-      .col-sm-6= editable_asset_field_tag(@grant, :other_contributor)
+      .col-sm-3= editable_association_tag(@grant, :owner, '* Owner', Organization.all)
+      .col-sm-3= editable_association_tag(@grant, :contributor, '* Contributor', [['', 'Multiple'], ['', 'Other']] + Organization.all.collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]})
+      .col-sm-4= editable_field_tag(@grant, :other_contributor)
+      .col-sm-2= editable_field_tag(@grant, :has_multiple_contributors, type: 'boolean')
     .row
-      .col-sm-9= editable_asset_field_tag(@grant, :legislative_authorization)
+      .col-sm-9= editable_field_tag(@grant, :legislative_authorization)
     .row
-      .col-sm-4= editable_asset_field_tag(@grant, :award_date, 'Date of Award', type: 'date')
+      .col-sm-4= editable_field_tag(@grant, :award_date, 'Date of Award', type: 'date')
       .col-sm-4
         .form-group
           %label.control-label
@@ -33,11 +34,11 @@
           %label.control-label
             Method of Apportionment Structure
           .display-value Single Apportionment
-      .col-sm-6= editable_asset_field_tag(@grant, :fy_year, 'Grant Year')
+      .col-sm-6= editable_field_tag(@grant, :fy_year, 'Grant Year')
     .row
-      .col-sm-3= editable_asset_field_tag(@grant, :amount, 'Total Apportionment', required: true)
+      .col-sm-3= editable_field_tag(@grant, :amount, 'Total Apportionment', required: true)
     .row
-      .col-sm-3= editable_asset_field_tag(@grant, :over_allocation_allowed, 'Allow Over-Allocation', type: 'boolean')
+      .col-sm-3= editable_field_tag(@grant, :over_allocation_allowed, 'Allow Over-Allocation', type: 'boolean')
     .row
       .col-sm-3
         .form-group

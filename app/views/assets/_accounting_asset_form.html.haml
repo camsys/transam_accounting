@@ -13,10 +13,10 @@
           :boolean => :vertical_boolean}) do |f|
 
       %label#grant_purchases-error.error
-      = f.simple_fields_for :grant_purchases do |grant_purchase|
-        = render 'grant_purchase_fields', f: grant_purchase
+      = f.simple_fields_for :grants do |grant|
+        = render 'grant_fields', f: grant
       .links.pull-right
-        = link_to_add_association f, :grant_purchases, :class => 'btn btn-xs btn-info' do
+        = link_to_add_association f, :grant, :class => 'btn btn-xs btn-info' do
           %i.fa.fa-plus
 
       = f.button :submit, 'Save', :class => 'btn btn-primary'

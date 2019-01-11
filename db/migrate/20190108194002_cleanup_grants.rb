@@ -7,6 +7,7 @@ class CleanupGrants < ActiveRecord::Migration[5.2]
     rename_column :grants, :organization_id, :owner_id
     add_reference :grants, :contributor, after: :owner_id
     add_column :grants, :other_contributor, :string, after: :contributor_id
+    add_column :grants, :has_multiple_contributors, :boolean, after: :contributor_id
     add_column :grants, :legislative_authorization, :string, after: :amount
     add_column :grants, :award_date, :date, after: :fy_year
     add_column :grants, :over_allocation_allowed, :boolean, after: :sourceable_type

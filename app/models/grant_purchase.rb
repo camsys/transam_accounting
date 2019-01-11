@@ -8,8 +8,6 @@
 #------------------------------------------------------------------------------
 class GrantPurchase < ActiveRecord::Base
 
-  SOURCEABLE_TYPE = Rails.application.config.asset_purchase_source
-
   # Include the fiscal year mixin
   include FiscalYear
 
@@ -43,6 +41,7 @@ class GrantPurchase < ActiveRecord::Base
   FORM_PARAMS = [
     :id,
     :asset_id,
+    :global_sourceable,
     :sourceable_type,
     :sourceable_id,
     :pcnt_purchase_cost,
@@ -59,45 +58,17 @@ class GrantPurchase < ActiveRecord::Base
     FORM_PARAMS
   end
 
-  def self.sourceable_type
-    SOURCEABLE_TYPE
-  end
-
-  def self.sources(params=nil)
-    if params
-      # check whether params are valid
-      params = params.stringify_keys
-
-      # override special case if sourceable type is GrantBudget
-      clean_params = params.slice(*(params.keys & SOURCEABLE_TYPE.constantize.column_names))
-      SOURCEABLE_TYPE.constantize.where(clean_params)
-
-    else
-      SOURCEABLE_TYPE.constantize.active
-    end
-  end
-
-  def self.label
-    if SOURCEABLE_TYPE == 'FundingSource'
-      'Funding Program'
-    else
-      SOURCEABLE_TYPE.constantize.model_name.human.titleize
-    end
-  end
-
   #------------------------------------------------------------------------------
   #
   # Instance Methods
   #
   #------------------------------------------------------------------------------
 
-  # Virtual attribute for setting a grant by its ID so we can patch around
-  # a limitation in the accepts_nested_attributes_for
-  def sourceable_id=(val)
-    self.sourceable = SOURCEABLE_TYPE.constantize.find(val)
+  def global_sourceable
+    self.sourceable.to_global_id if self.sourceable.present?
   end
-  def sourceable_id
-    sourceable.try(:id)
+  def global_sourceable=(sourceable)
+    self.sourceable=GlobalID::Locator.locate sourceable
   end
 
   def to_s

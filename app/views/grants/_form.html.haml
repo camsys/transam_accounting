@@ -23,8 +23,9 @@
       .col-sm-3= f.input :global_sourceable
     .row
       .col-sm-3= f.association :owner, collection: Organization.all
-      .col-sm-3= f.association :contributor, collection: Organization.all
-      .col-sm-6= f.input :other_contributor
+      .col-sm-3= f.association :contributor, collection: [['Multiple', ''], ['Other','']] + Organization.all.collect{|f| [f.to_s, f.id]}
+      .col-sm-4= f.input :other_contributor
+      .col-sm-2= f.input :has_multiple_contributors
 
     .row
       .col-sm-9= f.input :legislative_authorization
