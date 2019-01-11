@@ -1,7 +1,7 @@
 .nested-fields{style: 'border:none;'}
   .row
     .col-md-6
-      = f.input :global_sourceable, :collection => FundingSource.map{|f| [ f.to_s, f.to_global_id ]}, :required => true, :label => 'Funding Program'
+      = f.input :global_sourceable, :collection => FundingSource.all.map{|f| [ f.to_s, f.to_global_id ]}, :required => true, :label => 'Funding Program'
     .col-md-5
       = f.input :pcnt_purchase_cost, :label => 'Pcnt', :wrapper => :vertical_append do
         = f.input_field :pcnt_purchase_cost, :class => 'form-control funding-pcnt', :min => 1, :max => 100
