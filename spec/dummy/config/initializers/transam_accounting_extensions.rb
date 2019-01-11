@@ -1,5 +1,3 @@
-Rails.application.config.asset_purchase_source = 'FundingSource'
-
 Rails.configuration.to_prepare do
 
   Asset.class_eval do

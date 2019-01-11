@@ -12,7 +12,14 @@
           :file => :vertical_file_input,
           :boolean => :vertical_boolean}) do |f|
 
-      %label#grant_purchases-error.error
+      %label#funding_sources-error.error
+      = f.simple_fields_for :funding_sources do |funding_source|
+        = render 'funding_sources_fields', f: funding_source
+      .links.pull-right
+        = link_to_add_association f, :funding_source, :class => 'btn btn-xs btn-info' do
+          %i.fa.fa-plus
+
+      %label#grants-error.error
       = f.simple_fields_for :grants do |grant|
         = render 'grant_fields', f: grant
       .links.pull-right
