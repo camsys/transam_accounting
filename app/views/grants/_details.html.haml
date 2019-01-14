@@ -8,8 +8,8 @@
     .row
       .col-sm-3= editable_association_tag(@grant, :global_sourceable, '* Type', FundingSource.all.collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]}, current_method: :global_sourceable)
     .row
-      .col-sm-3= editable_association_tag(@grant, :owner, '* Owner', Organization.all)
-      .col-sm-3= editable_association_tag(@grant, :contributor, '* Contributor', [['', 'Multiple'], ['', 'Other']] + Organization.all.collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]})
+      .col-sm-3= editable_association_tag(@grant, :owner, '* Owner', Organization.all.collect{|f| [f.id, f.to_s]})
+      .col-sm-3= editable_association_tag(@grant, :contributor, '* Contributor', [['', 'Multiple'], ['', 'Other']] + Organization.all.collect{|f| [f.id, f.to_s]})
       .col-sm-4= editable_field_tag(@grant, :other_contributor)
       .col-sm-2= editable_field_tag(@grant, :has_multiple_contributors, type: 'boolean')
     .row
@@ -20,7 +20,7 @@
         .form-group
           %label.control-label
             Date of Most Recent Amendment
-          .display-value= format_as_date(@grant.grant_amendments.last.try(:created_at).to_date)
+          .display-value= format_as_date(@grant.grant_amendments.last.try(:created_at).try(:to_date))
       .col-sm-4
         .form-group
           %label.control-label

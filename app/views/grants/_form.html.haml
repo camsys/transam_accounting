@@ -20,7 +20,7 @@
     .row
       .col-sm-3= select_tag(:funding_source_type, options_from_collection_for_select(FundingSourceType.all, "id", "name"))
     .row
-      .col-sm-3= f.input :global_sourceable
+      .col-sm-3= f.input :global_sourceable, collection: FundingSource.all.map{|f| [ f.to_s, f.to_global_id ]}
     .row
       .col-sm-3= f.association :owner, collection: Organization.all
       .col-sm-3= f.association :contributor, collection: [['Multiple', ''], ['Other','']] + Organization.all.collect{|f| [f.to_s, f.id]}
@@ -29,7 +29,10 @@
 
     .row
       .col-sm-9= f.input :legislative_authorization
-
+    .row
+      .col-sm-4
+        = f.input :award_date, :wrapper => :vertical_append, :label => "Date of Award" do
+          = f.input_field :award_date, :as => :string, :class => 'form-control datepicker', :value => format_as_date(f.object.award_date)
     .row
       .col-sm-4
         .form-group

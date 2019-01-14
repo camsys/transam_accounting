@@ -1,5 +1,5 @@
 module Abilities
-  class TransitManagerAccountingAbility
+  class AuthorizedAccountingAbility
     include CanCan::Ability
 
     def initialize(user, organization_ids=[])
@@ -8,9 +8,8 @@ module Abilities
         organization_ids = user.organization_ids
       end
 
-      can :manage, GeneralLedgerAccount do |gla|
-        organization_ids.include? gla.chart_of_account.organization_id
-      end
+
+      cannot :read, Grant
 
 
     end

@@ -1,8 +1,8 @@
 = form_tag grants_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
   .form-group
-    = select_tag(:sourceable_id, options_for_select(FundingSource.all.collect{|a| [a.name, a.id]}, :selected => @sourceable_id), :class => "form-control", :prompt => "Any Source...")
+    = select_tag(:global_sourceable, options_for_select(FundingSource.all.collect{|a| [a.name, a.to_global_id]}, :selected => @sourceable.try(:to_global_id)), :class => "form-control", :prompt => "Any Source...")
   .form-group
-    = select_tag(:fiscal_year, options_for_select(@fiscal_years, :selected => @fiscal_year), :class => "form-control", :prompt => "Any #{get_fy_label}...")
+    = select_tag(:fiscal_year, options_for_select(get_fiscal_years, :selected => @fiscal_year), :class => "form-control", :prompt => "Any #{get_fy_label}...")
 
   = button_tag :class => 'btn btn-default', :type => 'submit' do
     %i.fa.fa-filter

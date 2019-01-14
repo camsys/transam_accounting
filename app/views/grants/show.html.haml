@@ -20,7 +20,7 @@
               Apportionment Details
           %li
             %a{:href => "#assets", :data =>{:toggle => 'tab'}}
-              Apportionment Details
+              Assets
           %li
             %a{:href => "#amendments", :data =>{:toggle => 'tab'}}
               Amendments
@@ -39,12 +39,14 @@
             .tab-content
           .tab-pane.fade#assets
             .tab-content
-              = render 'assets'
+              - if @grant.assets.empty?
+                %p There are no assets associated with this grant.
+              - else
+                = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => @grant.assets}
           .tab-pane.fade#amendments
             .tab-content
               = render 'grant_amendments'
           .tab-pane.fade#hist
             .tab-content
-              = render 'history'
 
 = render 'scripts'

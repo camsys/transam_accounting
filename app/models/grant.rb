@@ -34,7 +34,7 @@ class Grant < ActiveRecord::Base
 
   # Has many grant purchases
   has_many :grant_purchases, :as => :sourceable, :dependent => :destroy
-  has_and_belongs_to_many :assets, :through => :grant_purchases
+  has_many :assets, through: :grant_purchases, source: Rails.application.config.asset_base_class_name.underscore
 
   # Has many grant purchases
   has_many :grant_budgets, :dependent => :destroy, :inverse_of => :grant
@@ -93,11 +93,12 @@ class Grant < ActiveRecord::Base
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
-  validates :organization,                    :presence => true
-  validates :grant_num,                            :presence => true, :uniqueness => true
+  validates :owner,                           :presence => true
+  validates :grant_num,                       :presence => true, :uniqueness => true
   validates :fy_year,                         :presence => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 1970}
   validates :sourceable,                      :presence => true
   validates :amount,                          :presence => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0}
+  validates :award_date,                      :presence => true
 
   #------------------------------------------------------------------------------
   # Scopes
@@ -112,6 +113,8 @@ class Grant < ActiveRecord::Base
     :owner_id,
     :contributor_id,
     :other_contributor,
+    :has_multiple_contributors,
+    :global_sourceable,
     :sourceable_type,
     :sourceable_id,
     :grant_num,
@@ -119,6 +122,7 @@ class Grant < ActiveRecord::Base
     :award_date,
     :amount,
     :legislative_authorization,
+    :over_allocation_allowed,
     :active,
     :grant_budgets_attributes => [GrantBudget.allowable_params]
   ]
@@ -188,7 +192,7 @@ class Grant < ActiveRecord::Base
   # end
 
   def closeout_date
-    workflow_events.where(event: 'close').created_at.to_date
+    workflow_events.where(event_type: 'close').last.try(:created_at).try(:to_date)
   end
 
   # Override the mixin method and delegate to it

@@ -15,9 +15,8 @@ Rails.application.routes.draw do
 
     member do
       get 'summary_info'
+      get 'fire_workflow_event'
     end
-    resources :comments
-    resources :documents
   end
 
 

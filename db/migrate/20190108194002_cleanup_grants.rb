@@ -12,11 +12,9 @@ class CleanupGrants < ActiveRecord::Migration[5.2]
     add_column :grants, :award_date, :date, after: :fy_year
     add_column :grants, :over_allocation_allowed, :boolean, after: :sourceable_type
 
-
-
     create_table :grant_amendments do |t|
       t.string :object_key, null: false, limit: 12
-      t.references :grant, foreign_key: true
+      t.references :grant
       t.string :amendment_num
       t.string :grant_num
       t.text :comments
