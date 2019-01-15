@@ -21,7 +21,7 @@
       .col-sm-3= f.input :global_sourceable, collection: FundingSource.all.map{|f| [ f.to_s, f.to_global_id, data: {funding_source_type_id: f.funding_source_type_id} ]}, label: 'Program', required: true
     .row
       .col-sm-3= f.association :owner, collection: Organization.all
-      .col-sm-3= f.association :contributor, collection: [['Multiple', 'multiple'], ['Other','other']] + Organization.all.collect{|f| [f.to_s, f.id]}
+      .col-sm-3= f.association :contributor, collection: [['Multiple', 'multiple'], ['Other','other']] + Organization.all.collect{|f| [f.to_s, f.id]}, required: true
       #other-contributor-div.col-sm-4{style: 'display:none;'}
         = f.input :other_contributor
 
@@ -57,6 +57,13 @@
   = f.button :submit, :class => "btn btn-primary", :id => 'grant_form_submit'
 
 :javascript
+
+  $('.grant_form').validate({
+    submitHandler: function(form) {
+      $('input').prop('disabled', false); // re-enable any disabled fields so they'll submit
+      form.submit();
+    }
+  });
 
   $('#funding_source_type_id').on('change', function(e) {
     var id = $(this).val();

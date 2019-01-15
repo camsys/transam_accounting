@@ -2,7 +2,7 @@
   table_dom_id = SecureRandom.hex
 
 - if can? :create, Grant
-  = link_to new_grant_grant_amendment_path(@grant), :remote => true, :class => "btn btn-primary btn-lg" do
+  = link_to new_grant_grant_amendment_path(@grant), :class => "btn btn-primary btn-lg" do
     %i.fa.fa-plus
     New Amendment
 

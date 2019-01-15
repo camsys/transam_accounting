@@ -1,4 +1,4 @@
-class GrantAmendmentsController < ApplicationController
+class GrantAmendmentsController < OrganizationAwareController
   before_action :set_grant
 
   before_action :set_grant_amendment, only: [:show, :edit, :update, :destroy]
@@ -24,6 +24,7 @@ class GrantAmendmentsController < ApplicationController
   # POST /grant_amendments
   def create
     @grant_amendment = @grant.grant_amendments.build(grant_amendment_params)
+    @grant_amendment.creator = current_user
 
     if @grant_amendment.save
       redirect_to @grant, notice: 'Grant amendment was successfully created.'

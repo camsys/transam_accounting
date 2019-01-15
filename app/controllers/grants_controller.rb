@@ -113,8 +113,11 @@ class GrantsController < OrganizationAwareController
       @grant.contributor_id = params[:grant][:contributor_id]
     end
 
+    @grant.creator = current_user
+    @grant.updater = current_user
+
     respond_to do |format|
-      if @grant.save!
+      if @grant.save
         notify_user(:notice, "The grant was successfully saved.")
         format.html { redirect_to grant_url(@grant) }
         format.json { render action: 'show', status: :created, location: @grant }
@@ -134,6 +137,8 @@ class GrantsController < OrganizationAwareController
     elsif params[:grant][:contributor_id].to_i > 0
       @grant.contributor_id = params[:grant][:contributor_id]
     end
+
+    @grant.updater = current_user
 
     respond_to do |format|
       if @grant.update(grant_params.except(:contributor_id))

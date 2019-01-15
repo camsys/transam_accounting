@@ -47,10 +47,11 @@
           %td.left= grant.object_key
           %td.left= grant.grant_num
           %td.left= grant.sourceable.funding_source_type
-          %td.left= grant.funding_surce
+          %td.left= grant.funding_source
           %td.left= grant.fy_year
           %td.left= grant.owner
-          %td.left= grant.contributor
+          %td.left= grant.has_multiple_contributors ? 'Multiple' : (grant.contributor.nil? ? 'Other' : grant.contributor)
+          %td.left= grant.legislative_authorization
           %td.left= format_as_date(grant.award_date)
           %td.left= format_as_date(grant.grant_amendments.last.created_at.to_date)
           %td.left= grant.state.titleize

@@ -17,7 +17,7 @@
         .row.other-fields-container
           -# need to pass an array of integers for existing JS to work so just set other as -1
           .col-sm-4.other-type-container{data: {other_type_ids: [-1]}}
-            = editable_association_tag(@grant, :contributor, '* Contributor', [['multiple', 'Multiple'], ['-1', 'Other']] + Organization.all.collect{|f| [f.id, f.to_s]})
+            = editable_association_tag(@grant, :contributor, '* Contributor', [['multiple', 'Multiple'], ['-1', 'Other']] + Organization.all.collect{|f| [f.id, f.to_s]}, current_value: @grant.has_multiple_contributors ? 'multiple' : (@grant.contributor.nil? ? '-1' : @grant.contributor_id))
           .col-sm-8.other-value-container
             = editable_field_tag(@grant, :other_contributor, required: false)
 
