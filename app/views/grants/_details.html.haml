@@ -7,7 +7,7 @@
         .form-group
           %label.control-label.string.required
             * Source
-          = select_tag(:funding_source_type_id, options_from_collection_for_select(FundingSourceType.where.not(name: 'Agency'), "id", "name"), class: 'form-control', include_blank: true)
+          = select_tag(:funding_source_type_id, options_from_collection_for_select(FundingSourceType.where.not(name: 'Agency'), "id", "name", @grant.sourceable.funding_source_type_id), class: 'form-control', include_blank: true)
 
     .row
       .col-sm-3= editable_association_tag(@grant, :global_sourceable, '* Type', FundingSource.all.collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]}, current_method: :global_sourceable)
