@@ -195,15 +195,6 @@ class Grant < ActiveRecord::Base
     workflow_events.where(event_type: 'close').last.try(:created_at).try(:to_date)
   end
 
-  # Override the mixin method and delegate to it
-  def fiscal_year(year = nil)
-    if year
-      super(year)
-    else
-      super(fy_year)
-    end
-  end
-
   def to_s
     grant_num
   end

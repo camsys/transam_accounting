@@ -38,7 +38,7 @@
         .form-group
           %label.control-label Method of Apportionment Structure
           .display-value Single Apportionment
-      .col-sm-4= f.input :fy_year
+      .col-sm-4= f.input :fy_year, collection: get_fiscal_years(Date.today-19.years,19)
 
     .row
       .col-sm-3

@@ -34,7 +34,7 @@
           %label.control-label
             Method of Apportionment Structure
           .display-value Single Apportionment
-      .col-sm-6= editable_field_tag(@grant, :fy_year, 'Grant Year')
+      .col-sm-6= editable_field_tag(@grant, :fy_year, 'Grant Year', get_fiscal_years(Date.today-19.years,19))
     .row
       .col-sm-3= editable_field_tag(@grant, :amount, 'Total Apportionment', required: true)
     .row

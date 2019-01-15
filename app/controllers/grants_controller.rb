@@ -30,6 +30,11 @@ class GrantsController < OrganizationAwareController
       conditions[:fy_year] = @fiscal_year
     end
 
+    @state = params[:state]
+    unless @state.blank?
+      conditions[:state] = @state
+    end
+
     # TODO fix for sourceable
     @grants = Grant.where(conditions)
 
