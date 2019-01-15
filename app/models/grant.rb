@@ -217,6 +217,7 @@ class Grant < ActiveRecord::Base
   # Set resonable defaults for a new grant
   def set_defaults
     # Set the fiscal year to the current fiscal year
+    self.has_multiple_contributors = self.has_multiple_contributors.nil? ? false : true
     self.fy_year ||= current_fiscal_year_year
     self.amount ||= 0
     self.active = self.active.nil? ? true : self.active

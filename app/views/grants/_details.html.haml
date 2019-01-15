@@ -4,14 +4,24 @@
       .col-sm-3= editable_field_tag(@grant, :grant_num, 'Grant Number', required: true)
     .row
       .col-sm-3
-        = select_tag(:funding_source_type, options_from_collection_for_select(FundingSourceType.all, "id", "name"))
+        .form-group
+          %label.control-label.string.required
+            * Source
+          = select_tag(:funding_source_type_id, options_from_collection_for_select(FundingSourceType.where.not(name: 'Agency'), "id", "name"), class: 'form-control', include_blank: true)
+
     .row
       .col-sm-3= editable_association_tag(@grant, :global_sourceable, '* Type', FundingSource.all.collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]}, current_method: :global_sourceable)
     .row
       .col-sm-3= editable_association_tag(@grant, :owner, '* Owner', Organization.all.collect{|f| [f.id, f.to_s]})
-      .col-sm-3= editable_association_tag(@grant, :contributor, '* Contributor', [['', 'Multiple'], ['', 'Other']] + Organization.all.collect{|f| [f.id, f.to_s]})
-      .col-sm-4= editable_field_tag(@grant, :other_contributor)
-      .col-sm-2= editable_field_tag(@grant, :has_multiple_contributors, type: 'boolean')
+      .col-sm-9
+        .row.other-fields-container
+          -# need to pass an array of integers for existing JS to work so just set other as -1
+          .col-sm-4.other-type-container{data: {other_type_ids: [-1]}}
+            = editable_association_tag(@grant, :contributor, '* Contributor', [['multiple', 'Multiple'], ['-1', 'Other']] + Organization.all.collect{|f| [f.id, f.to_s]})
+          .col-sm-8.other-value-container
+            = editable_field_tag(@grant, :other_contributor, required: false)
+
+
     .row
       .col-sm-9= editable_field_tag(@grant, :legislative_authorization)
     .row
@@ -34,9 +44,10 @@
           %label.control-label
             Method of Apportionment Structure
           .display-value Single Apportionment
-      .col-sm-6= editable_field_tag(@grant, :fy_year, 'Grant Year', get_fiscal_years(Date.today-19.years,19))
+      .col-sm-6
+        = editable_association_tag(@grant, :fy_year, 'Grant Year', get_fiscal_years(Date.today-19.years,19), current_method: :fy_year, suffix: '')
     .row
-      .col-sm-3= editable_field_tag(@grant, :amount, 'Total Apportionment', required: true)
+      .col-sm-3= editable_field_tag(@grant, :amount, 'Total Apportionment', required: true, type: 'currency')
     .row
       .col-sm-3= editable_field_tag(@grant, :over_allocation_allowed, 'Allow Over-Allocation', type: 'boolean')
     .row
@@ -45,6 +56,27 @@
           %label.control-label
             Grant Development Method
           .display-value Directly Generated
+
+
+:javascript
+  var fed_programs = "[#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'Federal')).map{|f| "{value: '#{f.id}', text: '#{f.to_s.gsub("'"){"\\\\'"}}'}"}.join(',')}]";
+
+  var state_programs = "[#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'State')).map{|f| "{value: '#{f.id}', text: '#{f.to_s.gsub("'"){"\\\\'"}}'}"}.join(',')}]";
+
+  var local_programs = "[#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'Local')).map{|f| "{value: '#{f.id}', text: '#{f.to_s.gsub("'"){"\\\\'"}}'}"}.join(',')}]";
+
+  $('#funding_source_type_id').on('change', function(e) {
+    var id = $(this).val();
+
+    if (parseInt(id) == parseInt("#{FundingSourceType.find_by(name: 'Federal').id}")){
+      $('#global_sourceable').data('source', fed_programs);
+    } else if (parseInt(id) == parseInt("#{FundingSourceType.find_by(name: 'State').id}")){
+    $('#global_sourceable').data('source', state_programs);
+    } else if (parseInt(id) == parseInt("#{FundingSourceType.find_by(name: 'Local').id}")){
+      $('#global_sourceable').data('source', local_programs);
+    }
+  });
+
 
 
 

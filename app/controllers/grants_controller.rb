@@ -106,7 +106,12 @@ class GrantsController < OrganizationAwareController
   # POST /grants.json
   def create
 
-    @grant = Grant.new(grant_params)
+    @grant = Grant.new(grant_params.except(:contributor_id))
+    if params[:grant][:contributor_id] == 'multiple'
+      @grant.has_multiple_contributors = true
+    elsif params[:grant][:contributor_id].to_i > 0
+      @grant.contributor_id = params[:grant][:contributor_id]
+    end
 
     respond_to do |format|
       if @grant.save!
@@ -124,8 +129,14 @@ class GrantsController < OrganizationAwareController
   # PATCH/PUT /grants/1.json
   def update
 
+    if params[:grant][:contributor_id] == 'multiple'
+      @grant.has_multiple_contributors = true
+    elsif params[:grant][:contributor_id].to_i > 0
+      @grant.contributor_id = params[:grant][:contributor_id]
+    end
+
     respond_to do |format|
-      if @grant.update(grant_params)
+      if @grant.update(grant_params.except(:contributor_id))
         notify_user(:notice, "The grant was successfully updated.")
         format.html { redirect_to grant_url(@grant) }
         format.json { head :no_content }
