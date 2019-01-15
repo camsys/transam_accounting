@@ -1,0 +1,56 @@
+- if can? :update, asset
+  #funding_sources_grant_purchases.well.well-sm{style: "overflow-y:scroll; max-height:250px; width:95%;"}
+    = simple_form_for(asset.transam_asset,
+        :as => :asset,
+        :url => inventory_path(asset.transam_asset),
+        :method => 'put',
+        :remote => true,
+        :html => {:class => 'form-vertical form-section funding_sources_grant_purchases_form'},
+        :wrapper => :vertical_form,
+        :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes,
+          :radio_buttons => :vertical_radio_and_checkboxes,
+          :file => :vertical_file_input,
+          :boolean => :vertical_boolean}) do |f|
+
+      %fieldset
+        %legend Funding Programs
+        %label#funding_sources-error.error
+        = f.simple_fields_for :funding_source_grant_purchases do |funding_source|
+          = render 'assets/funding_source_fields', f: funding_source
+        .links.pull-right
+          = link_to_add_association f, :funding_source_grant_purchases, partial: 'assets/funding_source_fields', :class => 'btn btn-xs btn-info' do
+            %i.fa.fa-plus
+
+      = f.button :submit, 'Save', :class => 'btn btn-primary'
+
+:javascript
+   $( document ).ready(function() {
+    $('.funding_sources_grant_purchases_form').validate({
+      submitHandler: function(form) {
+        $('.funding_sources_grant_purchases_form input').prop('disabled', false); // re-enable any disabled fields so they'll submit
+        form.trigger('submit.rails'); // submits form both as HTML or JS as defined in form data-remote
+      }
+    });
+    if ($('.funding_sources_grant_purchases_form input.funding-pcnt').length > 0) {
+      $('.funding_sources_grant_purchases_form input.funding-pcnt').rules( "add", {
+        pcntSumsHundred_funding_sources: true
+      });
+    }
+
+  });
+
+  $('body').on('change', '.funding_sources_grant_purchases_form .funding-pcnt', function() {
+     $('.funding_sources_grant_purchases_form input.funding-pcnt').rules( "add", {
+      pcntSumsHundred_funding_sources: true
+    });
+     $('.funding_sources_grant_purchases_form .funding-pcnt').valid();
+  });
+
+  $.validator.addMethod("pcntSumsHundred_funding_sources", function(value, element) {
+      var sum = 0;
+    $('.funding_sources_grant_purchases_form .funding-pcnt').each(function() {
+        sum += Number($(this).val());
+    });
+     return sum <= 100;
+  }, "Entries do not sum to 100%.");
+
