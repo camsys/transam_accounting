@@ -1,7 +1,17 @@
+= render partial: 'shared/xeditable_scripts', locals: {obj: @grant}
+
 :javascript
+
+  var user_tab_key = 'grant_tab_key';
 
   $(document).ready(function() {
 
     transam.make_same_height('.header-part');
 
+    // Manage the tabs
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+      // save the latest tab
+      var this_tab = $(this).attr('href');
+      transam.set_ui_key_value(user_tab_key, this_tab);
+    });
   });

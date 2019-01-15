@@ -12,12 +12,23 @@
           :file => :vertical_file_input,
           :boolean => :vertical_boolean}) do |f|
 
-      %label#grant_purchases-error.error
-      = f.simple_fields_for :grant_purchases do |grant_purchase|
-        = render 'grant_purchase_fields', f: grant_purchase
-      .links.pull-right
-        = link_to_add_association f, :grant_purchases, :class => 'btn btn-xs btn-info' do
-          %i.fa.fa-plus
+      %fieldset
+        %legend Funding Programs
+        %label#funding_sources-error.error
+        = f.simple_fields_for :funding_source_grant_purchases do |funding_source|
+          = render 'funding_source_fields', f: funding_source
+        .links.pull-right
+          = link_to_add_association f, :funding_source_grant_purchases, partial: 'funding_source_fields', :class => 'btn btn-xs btn-info' do
+            %i.fa.fa-plus
+
+      %fieldset
+        %legend Grants
+        %label#grants-error.error
+        = f.simple_fields_for :grant_grant_purchases do |grant|
+          = render 'grant_fields', f: grant
+        .links.pull-right
+          = link_to_add_association f, :grant_grant_purchases, partial: 'grant_fields', :class => 'btn btn-xs btn-info' do
+            %i.fa.fa-plus
 
       = f.button :submit, 'Save', :class => 'btn btn-primary'
 

@@ -11,11 +11,12 @@ Rails.application.routes.draw do
   end
 
   resources :grants do
+    resources :grant_amendments
+
     member do
       get 'summary_info'
+      get 'fire_workflow_event'
     end
-    resources :comments
-    resources :documents
   end
 
 

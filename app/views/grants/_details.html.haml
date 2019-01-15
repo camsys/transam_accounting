@@ -1,51 +1,82 @@
-- assets = @grant.assets.where.not(asset_type: AssetType.find_by(class_name: 'Expenditure'))
-- expenditures = @grant.assets.where(asset_type: AssetType.find_by(class_name: 'Expenditure'))
+.row.border-between
+  .col-sm-6
+    .row
+      .col-sm-3= editable_field_tag(@grant, :grant_num, 'Grant Number', required: true)
+    .row
+      .col-sm-3
+        .form-group
+          %label.control-label.string.required
+            * Source
+          = select_tag(:funding_source_type_id, options_from_collection_for_select(FundingSourceType.where.not(name: 'Agency'), "id", "name", @grant.sourceable.funding_source_type_id), class: 'form-control', include_blank: true)
 
-%ul.nav.nav-tabs
-  %li
-    %a{:href => "#gla", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @grant.general_ledger_accounts.count
-      = "GL Accounts"
+    .row
+      .col-sm-3= editable_association_tag(@grant, :global_sourceable, '* Type', FundingSource.all.collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]}, current_method: :global_sourceable)
+    .row
+      .col-sm-3= editable_association_tag(@grant, :owner, '* Owner', Organization.all.collect{|f| [f.id, f.to_s]})
+      .col-sm-9
+        .row.other-fields-container
+          -# need to pass an array of integers for existing JS to work so just set other as -1
+          .col-sm-4.other-type-container{data: {other_type_ids: [-1]}}
+            = editable_association_tag(@grant, :contributor, '* Contributor', [['multiple', 'Multiple'], ['-1', 'Other']] + Organization.all.collect{|f| [f.id, f.to_s]}, current_value: @grant.has_multiple_contributors ? 'multiple' : (@grant.contributor.nil? ? '-1' : @grant.contributor_id))
+          .col-sm-8.other-value-container
+            = editable_field_tag(@grant, :other_contributor, required: false)
 
-  - if GrantPurchase.sourceable_type.include? 'Grant'
-    %li
-      %a{:href => "#asst", :data =>{:toggle => 'tab'}}
-        %span.badge.pull-right= assets.count
-        = "Assets"
 
-  %li
-    %a{:href => "#docs", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @grant.documents.count
-      = "Documents "
+    .row
+      .col-sm-9= editable_field_tag(@grant, :legislative_authorization)
+    .row
+      .col-sm-4= editable_field_tag(@grant, :award_date, 'Date of Award', type: 'date')
+      .col-sm-4
+        .form-group
+          %label.control-label
+            Date of Most Recent Amendment
+          .display-value= format_as_date(@grant.grant_amendments.last.try(:created_at).try(:to_date))
+      .col-sm-4
+        .form-group
+          %label.control-label
+            Date of Closeout
+          .display-value= format_as_date(@grant.closeout_date)
 
-  %li
-    %a{:href => "#comm", :data =>{:toggle => 'tab'}}
-      %span.badge.pull-right= @grant.comments.count
-      = "Comments "
+  .col-sm-6
+    .row
+      .col-sm-6
+        .form-group
+          %label.control-label
+            Method of Apportionment Structure
+          .display-value Single Apportionment
+      .col-sm-6
+        = editable_association_tag(@grant, :fy_year, 'Grant Year', get_fiscal_years(Date.today-19.years,19), current_method: :fy_year, suffix: '')
+    .row
+      .col-sm-3= editable_field_tag(@grant, :amount, 'Total Apportionment', required: true, type: 'currency')
+    .row
+      .col-sm-3= editable_field_tag(@grant, :over_allocation_allowed, 'Allow Over-Allocation', type: 'boolean')
+    .row
+      .col-sm-3
+        .form-group
+          %label.control-label
+            Grant Development Method
+          .display-value Directly Generated
 
-.tab-content
-  .tab-pane.fade#gla
-    .tab-content
-      = render :partial => 'gla_table', :locals => {:glas => @grant.general_ledger_accounts}
 
-  - if GrantPurchase.sourceable_type.include? 'Grant'
-    .tab-pane.fade#asst
-      .tab-content
-        - if assets.empty?
-          %p There are no assets associated with this grant.
-        - else
-          = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => assets}
+:javascript
+  var fed_programs = "[#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'Federal')).map{|f| "{value: '#{f.id}', text: '#{f.to_s.gsub("'"){"\\\\'"}}'}"}.join(',')}]";
 
-  .tab-pane.fade#comm
-    .tab-content
-      = render 'comments'
+  var state_programs = "[#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'State')).map{|f| "{value: '#{f.id}', text: '#{f.to_s.gsub("'"){"\\\\'"}}'}"}.join(',')}]";
 
-  .tab-pane.fade#docs
-    .tab-content
-      = render 'documents'
+  var local_programs = "[#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'Local')).map{|f| "{value: '#{f.id}', text: '#{f.to_s.gsub("'"){"\\\\'"}}'}"}.join(',')}]";
 
-= render 'detail_scripts'
+  $('#funding_source_type_id').on('change', function(e) {
+    var id = $(this).val();
 
-- # Load module specific tab if they exist
-- SystemConfig.transam_module_names.each do |mod|
-  = render :partial => "grants/#{mod}_detail_tabs_scripts" rescue nil
+    if (parseInt(id) == parseInt("#{FundingSourceType.find_by(name: 'Federal').id}")){
+      $('#global_sourceable').data('source', fed_programs);
+    } else if (parseInt(id) == parseInt("#{FundingSourceType.find_by(name: 'State').id}")){
+    $('#global_sourceable').data('source', state_programs);
+    } else if (parseInt(id) == parseInt("#{FundingSourceType.find_by(name: 'Local').id}")){
+      $('#global_sourceable').data('source', local_programs);
+    }
+  });
+
+
+
+

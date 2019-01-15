@@ -1,27 +1,52 @@
 .row
-  .col-md-3
-    .panel.panel-default.header-part
+  .col-sm-12
+    .panel.panel-default
       .panel-heading
         .row
-          .col-md-6
-            %h3.panel-title
-              %i.fa.fa-usd
-              = @grant.to_s
-          .col-md-6
+          .col-sm-10
+            %h3.panel-title= "#{@grant.to_s} : #{@grant.sourceable.funding_source_type} : #{@grant.funding_source} : #{@grant.state.titleize}"
+          .col-sm-2
             = render 'actions'
-      .panel-body
-        = render 'summary'
-
-  .col-md-9
-    .panel.panel-default.header-part
-      .panel-heading
-        .row
-          .col-md-12
-            %h3.panel-title
-              %i.fa.fa-folder-open
+      .panel-body.panel-body-fixed
+        %ul.nav.nav-tabs
+          %li
+            %a{:href => "#details", :data =>{:toggle => 'tab'}}
               Details
+          %li
+            %a{:href => "#apportionments", :data =>{:toggle => 'tab'}}
+              Apportionments
+          %li
+            %a{:href => "#apportion_details", :data =>{:toggle => 'tab'}}
+              Apportionment Details
+          %li
+            %a{:href => "#assets", :data =>{:toggle => 'tab'}}
+              Assets
+          %li
+            %a{:href => "#amendments", :data =>{:toggle => 'tab'}}
+              Amendments
+          %li
+            %a{:href => "#hist", :data =>{:toggle => 'tab'}}
+              History
 
-      .panel-body
-        = render 'details'
+        .tab-content
+          .tab-pane.fade#details
+            .tab-content
+              = render 'details'
+          .tab-pane.fade#apportionments
+            .tab-content
+              = render 'apportionments'
+          .tab-pane.fade#apportion_details
+            .tab-content
+          .tab-pane.fade#assets
+            .tab-content
+              - if @grant.assets.empty?
+                %p There are no assets associated with this grant.
+              - else
+                = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => @grant.assets}
+          .tab-pane.fade#amendments
+            .tab-content
+              = render 'grant_amendments'
+          .tab-pane.fade#hist
+            .tab-content
 
 = render 'scripts'

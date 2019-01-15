@@ -1,10 +1,10 @@
 :ruby
-  formatted_grant_purchases = []
-  @asset.grant_purchases.each do |g|
-    if g.sourceable.present?
-      formatted_grant_purchases << "#{link_to(g.sourceable.to_s, eval(g.sourceable_path))} (#{format_as_percentage(g.pcnt_purchase_cost)})"
-    end
-  end
+  formatted_funding_sources = @asset.funding_sources.map{|g| "#{link_to(g.sourceable.to_s, eval(g.sourceable_path))} (#{format_as_percentage(g.pcnt_purchase_cost)})"}
 
-- if @asset.grant_purchases.count > 0
-  = format_field(GrantPurchase.label.pluralize, format_as_list(formatted_grant_purchases))
+  formatted_grants = @asset.grants.map{|g| "#{link_to(g.sourceable.to_s, eval(g.sourceable_path))} (#{format_as_percentage(g.pcnt_purchase_cost)})"}
+
+- if @asset.funding_sources.count > 0
+  = format_field('Funding Programs', format_as_list(formatted_funding_sources))
+
+- if @asset.grants.count > 0
+  = format_field('Grants', format_as_list(formatted_grants))

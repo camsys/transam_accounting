@@ -9,3 +9,10 @@
         = link_to edit_grant_path(@grant) do
           %i.fa.fa-edit.fa-fw
           = " Update this grant"
+      %li.divider
+      - @grant.allowable_events.each do |evt|
+        - if can? evt.to_sym, @grant
+          %li
+            = link_to fire_workflow_event_grant_path(@grant, :event => evt) do
+              %i.fa.fa-fw{:class => get_workflow_event_icon(evt)}
+              = evt.titleize
