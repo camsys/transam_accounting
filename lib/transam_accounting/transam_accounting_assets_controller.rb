@@ -82,7 +82,6 @@ module TransamAccountingAssetsController
     asset.depreciation_purchase_cost = proxy.depreciation_purchase_cost
     asset.salvage_value = proxy.salvage_value if proxy.salvage_value
 
-    asset.updator = current_user
     asset.update_asset_book_value
 
     if asset.save

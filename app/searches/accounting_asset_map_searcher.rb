@@ -27,7 +27,7 @@ class AccountingAssetMapSearcher < BaseSearcher
     clean_sourceable_id = remove_blanks(sourceable_id)
 
     unless clean_sourceable_id.empty?
-      grant_purchase_asset_ids = GrantPurchase.where(sourceable_id: clean_sourceable_id, sourceable_type: 'FundingSource').pluck(:asset_id)
+      grant_purchase_asset_ids = GrantPurchase.where(sourceable_id: clean_sourceable_id, sourceable_type: 'FundingSource').pluck(Rails.application.config.asset_base_class_name.foreign_key)
       @klass.where('id IN (?)', grant_purchase_asset_ids).distinct
     end
   end

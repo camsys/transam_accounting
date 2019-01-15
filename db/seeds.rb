@@ -203,3 +203,6 @@ data.each do |row|
   x.report_type = ReportType.where(:name => row[:type]).first
   x.save!
 end
+
+# asset query seeds
+require_relative File.join('asset_query_seeds')
