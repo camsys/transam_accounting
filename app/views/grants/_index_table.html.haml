@@ -53,7 +53,7 @@
           %td.left= grant.has_multiple_contributors ? 'Multiple' : (grant.contributor.nil? ? 'Other' : grant.contributor)
           %td.left= grant.legislative_authorization
           %td.left= format_as_date(grant.award_date)
-          %td.left= format_as_date(grant.grant_amendments.last.created_at.to_date)
+          %td.left= format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date))
           %td.left= grant.state.titleize
           %td.left= grant.updater
           %td.left= format_as_date_time(grant.updated_at)
