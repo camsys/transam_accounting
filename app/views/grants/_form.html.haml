@@ -68,6 +68,7 @@
   $('#funding_source_type_id').on('change', function(e) {
     var id = $(this).val();
 
+    $("#grant_global_sourceable option:selected").prop("selected", false)
     $('#grant_global_sourceable option').hide();
     $('#grant_global_sourceable option[data-funding-source-type-id="'+id+'"]').show();
   });
@@ -79,6 +80,7 @@
       $('#other-contributor-div').show();
     } else {
       $('#other-contributor-div').hide();
+      $('#grant_other_contributor').val('');
     }
 
   });
