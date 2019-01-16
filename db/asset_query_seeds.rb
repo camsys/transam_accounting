@@ -13,7 +13,7 @@ category_fields = {
       filter_type: 'multi_select',
       association: {
         table_name: 'funding_sources',
-        display_field_name: 'short_name'
+        display_field_name: 'name'
       }
     },
     {
