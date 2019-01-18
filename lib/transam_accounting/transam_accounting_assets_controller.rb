@@ -88,7 +88,7 @@ module TransamAccountingAssetsController
 
       Delayed::Job.enqueue AssetUpdateJob.new(asset.object_key), :priority => 0
 
-      notify_user(:notice, "Asset #{asset.name} was successfully updated.")
+      notify_user(:notice, "Asset #{asset} was successfully updated.")
     end
 
     redirect_to inventory_path(asset)
