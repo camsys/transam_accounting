@@ -9,6 +9,7 @@ class GrantsController < OrganizationAwareController
   add_breadcrumb "Grants", :grants_path
 
   before_action :set_grant, :only => [:show, :edit, :update, :destroy, :summary_info, :fire_workflow_event]
+  before_action :reformat_date_fields, only: [:create, :update]
 
   INDEX_KEY_LIST_VAR    = "grants_key_list_cache_var"
 
@@ -206,5 +207,14 @@ class GrantsController < OrganizationAwareController
     def grant_params
       params.require(:grant).permit(Grant.allowable_params)
     end
+
+  def reformat_date_fields
+    params[:grant][:award_date] = reformat_date(params[:grant][:award_date]) unless params[:grant][:award_date].blank?
+  end
+
+  def reformat_date(date_str)
+    form_date = Date.strptime(date_str, '%m/%d/%Y')
+    return form_date.strftime('%Y-%m-%d')
+  end
 
 end
