@@ -1,14 +1,13 @@
 :ruby
   table_dom_id = SecureRandom.hex
   show_actions ||= 0
-  sourceable ||= nil
 
 #grants_table_actions.btn-group
-  - if can? :create, Grant
-    = link_to new_grant_path(:sourceable_id => sourceable.try(:id)), :class => 'btn btn-default' do
-      %i.fa.fa-plus.fa-fw
-      = "Add Grant";
   - if show_actions == 1
+    - if can? :create, Grant
+      = link_to new_grant_path, :class => 'btn btn-default' do
+        %i.fa.fa-plus.fa-fw
+        = "Add Grant";
     = render :partial => "grants/index_actions"
 
 .table-responsive
@@ -42,7 +41,7 @@
         %th.left{:data => {:sortable => 'true'}} Last Update Date
 
     %tbody
-      - @grants.each do |grant|
+      - grants.each do |grant|
         %tr{:id => grant.object_key, :class => 'action-path'}
           %td.left= grant.object_key
           %td.left= grant.grant_num
