@@ -27,6 +27,9 @@ class GrantAmendmentsController < OrganizationAwareController
     @grant_amendment.creator = current_user
 
     if @grant_amendment.save
+      unless @grant_amendment.grant_num.blank?
+        @grant.update(grant_num: @grant_amendment.grant_num)
+      end
       redirect_to @grant, notice: 'Grant amendment was successfully created.'
     else
       render :new
@@ -36,6 +39,10 @@ class GrantAmendmentsController < OrganizationAwareController
   # PATCH/PUT /grant_amendments/1
   def update
     if @grant_amendment.update(grant_amendment_params)
+      unless @grant_amendment.grant_num.blank?
+        @grant.update(grant_num: @grant_amendment.grant_num)
+      end
+
       redirect_to @grant, notice: 'Grant amendment was successfully updated.'
     else
       render :edit
