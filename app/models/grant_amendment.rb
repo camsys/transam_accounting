@@ -1,8 +1,10 @@
 class GrantAmendment < ApplicationRecord
 
+  has_paper_trail
+
   include TransamObjectKey
 
-  belongs_to :grant
+  belongs_to :grant, touch: true
 
   belongs_to  :creator,     :class_name => "User",  :foreign_key => :created_by_user_id
 
@@ -23,4 +25,14 @@ class GrantAmendment < ApplicationRecord
     FORM_PARAMS
   end
 
+
+  def self.formatted_version(version)
+    [{
+        datetime: version.created_at,
+        event: "Amendment #{version.event.titleize}d",
+        event_type: 'Amendment',
+        comments: "Amendment #{version.changeset['amendment_num'][1]} was #{version.event}d. #{version.event == 'destroy' ? '' : version.changeset['comments'][1]}",
+        user: version.actor
+    }]
+  end
 end

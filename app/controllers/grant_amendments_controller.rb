@@ -3,6 +3,8 @@ class GrantAmendmentsController < OrganizationAwareController
 
   before_action :set_grant_amendment, only: [:show, :edit, :update, :destroy]
 
+  before_action :set_paper_trail_whodunnit
+
   # GET /grant_amendments
   def index
     @grant_amendments = @grant.grant_amendments
@@ -28,7 +30,7 @@ class GrantAmendmentsController < OrganizationAwareController
 
     if @grant_amendment.save
       unless @grant_amendment.grant_num.blank?
-        @grant.update(grant_num: @grant_amendment.grant_num)
+        @grant.update_columns(grant_num: @grant_amendment.grant_num)
       end
       redirect_to @grant, notice: 'Grant amendment was successfully created.'
     else
@@ -40,7 +42,7 @@ class GrantAmendmentsController < OrganizationAwareController
   def update
     if @grant_amendment.update(grant_amendment_params)
       unless @grant_amendment.grant_num.blank?
-        @grant.update(grant_num: @grant_amendment.grant_num)
+        @grant.update_columns(grant_num: @grant_amendment.grant_num)
       end
 
       redirect_to @grant, notice: 'Grant amendment was successfully updated.'

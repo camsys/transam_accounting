@@ -8,6 +8,8 @@
 #------------------------------------------------------------------------------
 class Grant < ActiveRecord::Base
 
+  has_paper_trail on: [:create, :update], only: [:state, :fy_year, :sourceable_type, :sourceable_id, :amount]
+
   # Include the object key mixin
   include TransamObjectKey
 
@@ -144,6 +146,63 @@ class Grant < ActiveRecord::Base
     FORM_PARAMS
   end
 
+  def self.formatted_version(version)
+    if version.event == 'create'
+      ver = [
+          {
+              datetime: version.created_at,
+              event: "Grant Created",
+              event_type: 'Create',
+              comments: "Grant is In Development.",
+              user: version.actor
+          },
+          {
+              datetime: version.created_at,
+              event: "Apportionment Created",
+              event_type: 'Apportionment',
+              comments: "Apportionment 'Primary' was created in the amount of #{version.changeset['amount'][1]}.",
+              user: version.actor
+          }
+      ]
+    else
+      if version.changeset.key? 'state'
+        event = self.new.state_paths(:from => version.changeset['state'][0], :to => version.changeset['state'][1]).first.first.event.to_s
+
+        ver = {
+            datetime: version.created_at,
+            event: "Grant #{event.titleize}#{event == 'close' ? 'd' : 'ed'}",
+            event_type: 'Updated',
+            comments: "Grant is #{version.changeset['state'][1].titleize}",
+            user: version.actor
+        }
+
+        case version.changeset['state'][1]
+          when 'open'
+            ver[:comments] += ', and funds can be assigned to assets.'
+          when 'closed'
+            ver[:comments] += '. No further edits or assignment of funds can be made.'
+          when 'reopened'
+            ver[:comments] += ', and funds can be assigned to assets.'
+        end
+
+      else
+        ver = {
+            datetime: version.created_at,
+            event: "Apportionment Updated",
+            event_type: 'Apportionment',
+            comments: "Apportionment 'Primary' was Updated.",
+            user: version.actor
+        }
+
+        version.changeset.each do |key, val|
+          ver[:comments] += " The #{key} was updated from: #{val[0]}, to: #{val[1]}."
+        end
+      end
+    end
+
+    ver
+  end
+
   #------------------------------------------------------------------------------
   #
   # Instance Methods
@@ -205,6 +264,11 @@ class Grant < ActiveRecord::Base
 
   def sourceable_path
     "#{sourceable_type.underscore}_path(:id => '#{sourceable.object_key}')"
+  end
+
+  # formats paper_trail versions
+  def history
+    PaperTrail::Version.where(item: [self, self.grant_amendments]).order(created_at: :desc).map{|v| v.item_type.constantize.formatted_version(v) }.flatten
   end
 
   #------------------------------------------------------------------------------
