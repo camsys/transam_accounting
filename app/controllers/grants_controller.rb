@@ -11,6 +11,8 @@ class GrantsController < OrganizationAwareController
   before_action :set_grant, :only => [:show, :edit, :update, :destroy, :summary_info, :fire_workflow_event]
   before_action :reformat_date_fields, only: [:create, :update]
 
+  before_action :set_paper_trail_whodunnit
+
   INDEX_KEY_LIST_VAR    = "grants_key_list_cache_var"
 
   def index
