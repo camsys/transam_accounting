@@ -26,5 +26,5 @@ class AssetDepreciationExpenseUpdateJob < ActivityJob
     super
     Rails.logger.debug "Executing AssetDepreciationExpenseUpdateJob at #{Time.now.to_s}"
   end
- p
+
 end
