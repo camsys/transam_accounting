@@ -6,7 +6,7 @@ class GrantAmendment < ApplicationRecord
 
   belongs_to :grant, touch: true
 
-  belongs_to  :creator,     :class_name => "User",  :foreign_key => :created_by_user_id
+  belongs_to  :creator, -> { unscope(where: :active) },     :class_name => "User",  :foreign_key => :created_by_user_id
 
   # List of hash parameters allowed by the controller
   FORM_PARAMS = [

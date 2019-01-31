@@ -46,9 +46,9 @@ class Grant < ActiveRecord::Base
 
   has_many :general_ledger_accounts, :through => :grant_budgets
 
-  belongs_to  :creator,     :class_name => "User",  :foreign_key => :created_by_user_id
+  belongs_to  :creator, -> { unscope(where: :active) },     :class_name => "User",  :foreign_key => :created_by_user_id
 
-  belongs_to  :updater,     :class_name => "User",  :foreign_key => :updated_by_user_id
+  belongs_to  :updater, -> { unscope(where: :active) },     :class_name => "User",  :foreign_key => :updated_by_user_id
 
 
   #------------------------------------------------------------------------------
