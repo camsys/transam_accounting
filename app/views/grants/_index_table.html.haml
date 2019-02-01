@@ -2,6 +2,16 @@
   table_dom_id = SecureRandom.hex
   show_actions ||= 0
 
+:css
+  #subheader-label h2 {
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+#subheader-label
+  %h2 Grants
+  %legend.asset-subheader
+    %span #{params[:state] == "all" ? "All" : "Filtered"}
+
 #grants_table_actions.btn-group
   - if show_actions == 1
     - if can? :create, Grant
@@ -42,9 +52,9 @@
 
     %tbody
       - grants.each do |grant|
-        %tr{:id => grant.object_key, :class => 'action-path'}
+        %tr{:id => grant.object_key}
           %td.left= grant.object_key
-          %td.left= grant.grant_num
+          %td.left= link_to grant.grant_num, grant_path(grant)
           %td.left= grant.sourceable.funding_source_type
           %td.left= grant.funding_source
           %td.left= grant.fy_year

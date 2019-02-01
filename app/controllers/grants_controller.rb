@@ -34,7 +34,9 @@ class GrantsController < OrganizationAwareController
     end
 
     @state = params[:state]
-    unless @state.blank?
+    if @state == "default" || @state.blank?
+      conditions[:state] = ["in_development", "open"]
+    elsif @state != "all"
       conditions[:state] = @state
     end
 
@@ -43,12 +45,6 @@ class GrantsController < OrganizationAwareController
 
     # cache the set of object keys in case we need them later
     cache_list(@grants, INDEX_KEY_LIST_VAR)
-
-    if @sourceable.blank?
-      add_breadcrumb "All"
-    else
-      add_breadcrumb @sourceable
-    end
 
     respond_to do |format|
       format.html # index.html.erb
