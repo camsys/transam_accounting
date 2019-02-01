@@ -45,7 +45,7 @@
             Method of Apportionment Structure
           .display-value Single Apportionment
       .col-sm-6
-        = editable_association_tag(@grant, :fy_year, 'Grant Year', get_fiscal_years(Date.today-19.years,19), current_method: :fy_year, suffix: '')
+        = editable_association_tag(@grant, :fy_year, 'Grant Year', get_fiscal_years(Date.today-19.years,19).map{|x| [x[1], x[0]]}.reverse, current_method: :fy_year, suffix: '')
     .row
       .col-sm-3= editable_field_tag(@grant, :amount, 'Total Apportionment', required: true, type: 'currency')
     .row

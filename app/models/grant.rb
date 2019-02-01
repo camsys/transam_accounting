@@ -18,6 +18,8 @@ class Grant < ActiveRecord::Base
 
   include TransamWorkflow
 
+  include TransamFormatHelper
+
   #------------------------------------------------------------------------------
   # Callbacks
   #------------------------------------------------------------------------------
@@ -107,6 +109,7 @@ class Grant < ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   scope :active, -> { where(:active => true) }
+  scope :open, -> { where(state: 'open') }
 
   # default scope
 
@@ -151,16 +154,16 @@ class Grant < ActiveRecord::Base
       ver = [
           {
               datetime: version.created_at,
-              event: "Grant Created",
-              event_type: 'Create',
-              comments: "Grant is In Development.",
+              event: "Apportionment Created",
+              event_type: 'Created',
+              comments: "Apportionment 'Primary' was created in the amount of #{format_as_currency(version.changeset['amount'][1])}.",
               user: version.actor
           },
           {
               datetime: version.created_at,
-              event: "Apportionment Created",
-              event_type: 'Apportionment',
-              comments: "Apportionment 'Primary' was created in the amount of #{version.changeset['amount'][1]}.",
+              event: "Grant Created",
+              event_type: 'Created',
+              comments: "Grant is In Development.",
               user: version.actor
           }
       ]
@@ -189,13 +192,17 @@ class Grant < ActiveRecord::Base
         ver = {
             datetime: version.created_at,
             event: "Apportionment Updated",
-            event_type: 'Apportionment',
+            event_type: 'Updated',
             comments: "Apportionment 'Primary' was Updated.",
             user: version.actor
         }
 
         version.changeset.each do |key, val|
-          ver[:comments] += " The #{key} was updated from: #{val[0]}, to: #{val[1]}."
+          if key.to_s == 'amount'
+            ver[:comments] += " The #{key} was updated from #{format_as_currency(val[0])} to #{format_as_currency(val[1])}."
+          else
+            ver[:comments] += " The #{key} was updated from #{val[0]} to #{val[1]}."
+          end
         end
       end
     end
@@ -208,6 +215,17 @@ class Grant < ActiveRecord::Base
   # Instance Methods
   #
   #------------------------------------------------------------------------------
+
+  def open?
+    state == 'open'
+  end
+
+  def updatable?
+    ['in_development', 'open'].include? state
+  end
+  def deleteable?
+    state == 'in_development'
+  end
 
   def funding_source
     sourceable_type == 'FundingSource' ? sourceable : sourceable.funding_source
@@ -223,7 +241,7 @@ class Grant < ActiveRecord::Base
   # Calculate the anount of the grant that has been spent on assets to date. This calculates
   # only the federal percentage
   def spent
-    GrantPurchase.where(sourceable: self).to_a.sum{ |gp| gp.asset.purchase_cost * gp.pcnt_purchase_cost / 100.0 }
+    GrantPurchase.where(sourceable: self).to_a.sum{ |gp| gp.send(Rails.application.config.asset_base_class_name.underscore).purchase_cost * gp.pcnt_purchase_cost / 100.0 }
   end
 
   # Returns the balance of the fund. If the account is overdrawn

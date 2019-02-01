@@ -1,12 +1,19 @@
+- disabled = f.object.sourceable && !f.object.sourceable.open?
+
 .nested-fields{style: 'border:none;'}
   .row
-    .col-md-6
-      = f.input :global_sourceable, :collection => Grant.active.where(owner_id: @organization_list).map{|f| [ f.to_s, f.to_global_id ]}, :required => true, :label => 'Grant'
-    .col-md-5
+    .col-md-4
+      = f.input :global_sourceable, :collection => Grant.active.open.where(owner_id: @organization_list).map{|f| [  "#{f.grant_num} : #{format_as_fiscal_year(f.fy_year)} : #{f.owner.short_name} : Primary : #{format_as_currency(f.balance)}" , f.to_global_id ]}, :required => true, :label => 'Grant #', disabled: disabled
+    .col-md-3
+      = f.input :other_sourceable, label: 'Grant # (Other)', disabled: disabled
+
+    .col-md-2
       = f.input :pcnt_purchase_cost, :label => 'Pcnt', :wrapper => :vertical_append do
-        = f.input_field :pcnt_purchase_cost, :class => 'form-control funding-pcnt', :min => 1, :max => 100
+        = f.input_field :pcnt_purchase_cost, :class => 'form-control funding-pcnt', :min => 1, :max => 100, disabled: disabled
         %span.input-group-addon
           %i.fa.fa-percent
+    .col-md-2
+      = f.input :expense_tag, label: 'Expense ID', disabled: disabled
 
     .col-md-1
       = link_to_remove_association f, :class => 'btn btn-xs btn-warning remove_grant', :style => 'margin-top: 27px;' do

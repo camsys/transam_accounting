@@ -11,3 +11,9 @@
             = link_to fire_workflow_event_grant_path(@grant, :event => evt) do
               %i.fa.fa-fw{:class => get_workflow_event_icon(evt)}
               = evt.titleize
+    - if (can? :destroy, @grant) && @grant.deleteable?
+      %li.divider
+      %li
+        = link_to grant_path(@grant), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
+          %i.fa.fa-trash-o.fa-fw
+          = " Remove this grant"

@@ -30,7 +30,7 @@ class GrantAmendment < ApplicationRecord
     [{
         datetime: version.created_at,
         event: "Amendment #{version.event.titleize}d",
-        event_type: 'Amendment',
+        event_type: "#{version.event.titleize}d",
         comments: "Amendment #{version.changeset['amendment_num'][1]} was #{version.event}d. #{version.event == 'destroy' ? '' : version.changeset['comments'][1]}",
         user: version.actor
     }]
