@@ -15,22 +15,23 @@
 #grants_table_actions.btn-group
   - if show_actions == 1
     - if can? :create, Grant
-      = link_to new_grant_path, :class => 'btn btn-default' do
+      = link_to new_grant_path, :class => 'btn btn-primary' do
         %i.fa.fa-plus.fa-fw
         = "Add Grant";
     = render :partial => "grants/index_actions"
 
+
 .table-responsive
   %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
     :pagination => 'true',
-    :show_pagination_switch => 'true',
+    :show_pagination_switch => 'false',
     :page_list => "[5, 10, 20, 50, 100, 200]",
     :page_size => current_user.num_table_rows,
     :search => 'false',
     :toolbar => "#grants_table_actions",
     :export_types => "['csv', 'txt', 'excel']",
-    :show_export => 'true',
-    :show_columns => 'true',
+    :show_export => 'false',
+    :show_columns => 'false',
     :state_save => 'true',
     :state_save_id_table => "grants_id",
     :state_save_expire => "1y"}}

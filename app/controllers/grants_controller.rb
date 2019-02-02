@@ -66,8 +66,7 @@ class GrantsController < OrganizationAwareController
   # GET /grants/1.json
   def show
 
-    add_breadcrumb @grant.sourceable, eval(@grant.sourceable_path)
-    add_breadcrumb @grant.to_s, grant_path(@grant)
+    add_breadcrumb "Grant Profile"
 
     @assets = @grant.assets.where('organization_id in (?)', @organization_list)
 
