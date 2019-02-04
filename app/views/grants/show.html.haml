@@ -1,12 +1,41 @@
+:css
+  .panel, .tab-content {
+    margin-left: 10px;
+  }
+
+  #subheader {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  #subheader .row {
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  .panel-action, #subheader legend {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-bottom: none;
+  }
+
+  .tab-content legend {
+    border-bottom: none;
+    margin-left: 5px;
+  }
+
 .row
   .col-sm-12
     .panel.panel-default
-      .panel-heading
+      #subheader
+        .row
+          .col-sm-12
+            %h2 Grant Profile
         .row
           .col-sm-10
-            %h3.panel-title= "#{@grant.to_s} : #{@grant.sourceable.funding_source_type} : #{@grant.funding_source} : #{@grant.state.titleize}"
+            %legend #{@grant.to_s} : #{@grant.sourceable.funding_source_type} : #{@grant.funding_source} : #{@grant.state.titleize}
           .col-sm-2
             = render 'actions'
+
       .panel-body.panel-body-fixed
         %ul.nav.nav-tabs
           %li
@@ -15,9 +44,9 @@
           %li
             %a{:href => "#apportionments", :data =>{:toggle => 'tab'}}
               Apportionments
-          %li
-            %a{:href => "#apportion_details", :data =>{:toggle => 'tab'}}
-              Apportionment Details
+          -#%li
+          -#  %a{:href => "#apportion_details", :data =>{:toggle => 'tab'}}
+          -#    Apportionment Details
           %li
             %a{:href => "#assets", :data =>{:toggle => 'tab'}}
               Assets
@@ -30,23 +59,29 @@
 
         .tab-content
           .tab-pane.fade#details
+            %legend Details
             .tab-content
               = render 'details'
           .tab-pane.fade#apportionments
+            %legend Apportionments
             .tab-content
               = render 'apportionments'
           .tab-pane.fade#apportion_details
+            %legend Apportionment Details
             .tab-content
           .tab-pane.fade#assets
+            %legend Assets
             .tab-content
               - if @grant.assets.empty?
                 %p There are no assets associated with this grant.
               - else
                 = render :partial => 'grant_assets', :locals => {:assets => @grant.assets, :grant_id => @grant.id}
           .tab-pane.fade#amendments
+            %legend Amendments
             .tab-content
               = render 'grant_amendments'
           .tab-pane.fade#hist
+            %legend History
             .tab-content
               = render 'history'
 

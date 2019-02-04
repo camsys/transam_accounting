@@ -1,19 +1,5 @@
-:css
-  legend {
-    border-bottom: none;
-    margin-left: -5px;
-  }
-
-  .row {
-    margin-left: 5px;
-  }
-
 .row
-  .col-sm-1
-    %legend Apportionments
-
-.row
-  .col-sm-4
+  .col-sm-2
     .form-group
       %label.control-label * Apportionment Name
       .display-value Primary
@@ -21,11 +7,11 @@
     .form-group
       %label.control-label * Year of Apportionment
       .display-value= @grant.fy_year
-  .col-sm-2
+  .col-sm-1
     .form-group
       %label.control-label * Source
       .display-value= @grant.sourceable.funding_source_type
-  .col-sm-2
+  .col-sm-1
     .form-group
       %label.control-label * Program
       .display-value= @grant.funding_source
