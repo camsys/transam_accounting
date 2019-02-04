@@ -4,15 +4,14 @@
 %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
   :card_view => "false",
   :pagination => 'true',
-  :show_pagination_switch => 'true',
-  :show_columns => 'true',
-  :search => 'true',
-  :show_export => 'true',
+  :show_pagination_switch => 'false',
+  :show_columns => 'false',
+  :show_export => 'false',
   :export_types => "['csv', 'txt', 'excel']",
   :show_toggle => 'false',
   :resizable => 'false',
   :search => 'false',
-  :show_multi_sort => 'true'}}
+  :show_multi_sort => 'true' }}
   -# TODO: implement search and filters
   %thead
     %tr
@@ -42,8 +41,8 @@
   %tbody
     - assets.each do |a|
       - a = TransamAsset.get_typed_asset(a)
-      %tr{:id => a.object_key}
-        %td.left= link_to a.asset_tag, inventory_path(a), target: :blank
+      %tr
+        %td.left= link_to a.asset_tag, inventory_path(a)
         %td.left= a.external_id
         %td.left= a.organization.short_name
         %td.left= a.manufacture_year
