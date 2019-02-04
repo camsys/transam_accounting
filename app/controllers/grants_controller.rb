@@ -117,7 +117,7 @@ class GrantsController < OrganizationAwareController
     respond_to do |format|
       if @grant.save
         notify_user(:notice, "The grant was successfully saved.")
-        format.html { redirect_to grant_url(@grant) }
+        format.html { redirect_to grant_path(@grant) }
         format.json { render action: 'show', status: :created, location: @grant }
       else
         format.html { render action: 'new' }
@@ -141,7 +141,7 @@ class GrantsController < OrganizationAwareController
     respond_to do |format|
       if @grant.update(grant_params.except(:contributor_id))
         notify_user(:notice, "The grant was successfully updated.")
-        format.html { redirect_to grant_url(@grant) }
+        format.html { redirect_to grant_path(@grant) }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

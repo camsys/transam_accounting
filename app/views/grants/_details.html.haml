@@ -1,4 +1,22 @@
+:css
+  legend {
+    border-bottom: none;
+    margin-left: -5px;
+  }
+
+  .row {
+    margin-left: 5px;
+  }
+
+  .row.border-between {
+    margin-left: 0px;
+  }
+
 .row.border-between
+  .row
+    .col-sm-1
+      %legend Details
+
   .col-sm-6
     .row
       .col-sm-3= editable_field_tag(@grant, :grant_num, 'Grant Number', required: true)

@@ -65,7 +65,8 @@
           .display-value Directly Generated
 
   // TODO: Add image to button
-  = f.button :submit, "Add Grant & Go To Grant Details", :class => "btn btn-primary", :id => 'grant_form_submit'
+  = f.button :submit, "+ Add Grant & Go To Grant Details", :class => "btn btn-primary", :id => 'grant_form_submit'
+  = link_to "Cancel", :back, :class => "btn btn-default", :role => 'button'
 
 
 :javascript
