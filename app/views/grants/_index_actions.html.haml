@@ -1,6 +1,6 @@
 = form_tag grants_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
   .form-group
-    = select_tag(:state, options_for_select(Grant.state_names.collect{|a| [a.titleize, a]}, :selected => @state), :class => "form-control", :prompt => "Status")
+    = select_tag(:state, options_for_select([["In Development / Open", "default"], ["All", "all"]].concat(Grant.state_names.collect{|a| [a.titleize, a]}), :selected => @state), :class => "form-control")
 
   = button_tag :class => 'btn btn-default', :type => 'submit' do
     %i.fa.fa-filter

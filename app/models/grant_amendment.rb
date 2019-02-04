@@ -6,7 +6,7 @@ class GrantAmendment < ApplicationRecord
 
   belongs_to :grant, touch: true
 
-  belongs_to  :creator,     :class_name => "User",  :foreign_key => :created_by_user_id
+  belongs_to  :creator, -> { unscope(where: :active) },     :class_name => "User",  :foreign_key => :created_by_user_id
 
   # List of hash parameters allowed by the controller
   FORM_PARAMS = [
@@ -30,7 +30,7 @@ class GrantAmendment < ApplicationRecord
     [{
         datetime: version.created_at,
         event: "Amendment #{version.event.titleize}d",
-        event_type: 'Amendment',
+        event_type: "#{version.event.titleize}d",
         comments: "Amendment #{version.changeset['amendment_num'][1]} was #{version.event}d. #{version.event == 'destroy' ? '' : version.changeset['comments'][1]}",
         user: version.actor
     }]

@@ -44,7 +44,9 @@ class GrantPurchase < ActiveRecord::Base
     :global_sourceable,
     :sourceable_type,
     :sourceable_id,
+    :other_sourceable,
     :pcnt_purchase_cost,
+    :expense_tag,
     :_destroy
   ]
 

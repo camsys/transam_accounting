@@ -34,7 +34,9 @@ class GrantsController < OrganizationAwareController
     end
 
     @state = params[:state]
-    unless @state.blank?
+    if @state == "default" || @state.blank?
+      conditions[:state] = ["in_development", "open"]
+    elsif @state != "all"
       conditions[:state] = @state
     end
 
@@ -43,12 +45,6 @@ class GrantsController < OrganizationAwareController
 
     # cache the set of object keys in case we need them later
     cache_list(@grants, INDEX_KEY_LIST_VAR)
-
-    if @sourceable.blank?
-      add_breadcrumb "All"
-    else
-      add_breadcrumb @sourceable
-    end
 
     respond_to do |format|
       format.html # index.html.erb
@@ -70,8 +66,7 @@ class GrantsController < OrganizationAwareController
   # GET /grants/1.json
   def show
 
-    add_breadcrumb @grant.sourceable, eval(@grant.sourceable_path)
-    add_breadcrumb @grant.to_s, grant_path(@grant)
+    add_breadcrumb "Grant Profile"
 
     @assets = @grant.assets.where('organization_id in (?)', @organization_list)
 
@@ -122,7 +117,7 @@ class GrantsController < OrganizationAwareController
     respond_to do |format|
       if @grant.save
         notify_user(:notice, "The grant was successfully saved.")
-        format.html { redirect_to grant_url(@grant) }
+        format.html { redirect_to grant_path(@grant) }
         format.json { render action: 'show', status: :created, location: @grant }
       else
         format.html { render action: 'new' }
@@ -146,7 +141,7 @@ class GrantsController < OrganizationAwareController
     respond_to do |format|
       if @grant.update(grant_params.except(:contributor_id))
         notify_user(:notice, "The grant was successfully updated.")
-        format.html { redirect_to grant_url(@grant) }
+        format.html { redirect_to grant_path(@grant) }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

@@ -1,4 +1,22 @@
+:css
+  legend {
+    border-bottom: none;
+    margin-left: -5px;
+  }
+
+  .row {
+    margin-left: 5px;
+  }
+
+  .row.border-between {
+    margin-left: 0px;
+  }
+
 .row.border-between
+  .row
+    .col-sm-1
+      %legend Details
+
   .col-sm-6
     .row
       .col-sm-3= editable_field_tag(@grant, :grant_num, 'Grant Number', required: true)
@@ -45,7 +63,7 @@
             Method of Apportionment Structure
           .display-value Single Apportionment
       .col-sm-6
-        = editable_association_tag(@grant, :fy_year, 'Grant Year', get_fiscal_years(Date.today-19.years,19), current_method: :fy_year, suffix: '')
+        = editable_association_tag(@grant, :fy_year, 'Grant Year', get_fiscal_years(Date.today-19.years,19).map{|x| [x[1], x[0]]}.reverse, current_method: :fy_year, suffix: '')
     .row
       .col-sm-3= editable_field_tag(@grant, :amount, 'Total Apportionment', required: true, type: 'currency')
     .row
@@ -68,30 +86,11 @@
     var id = $(this).val();
 
     if (parseInt(id) == parseInt('#{FundingSourceType.find_by(name: 'Federal').id}')){
-      $('#global_sourceable').editable({source: fed_programs});
+      $('#global_sourceable').editable('option', 'source', fed_programs);
     } else if (parseInt(id) == parseInt("#{FundingSourceType.find_by(name: 'State').id}")){
-      $('#global_sourceable').editable({source: state_programs});
+      $('#global_sourceable').editable('option', 'source', state_programs);
     } else if (parseInt(id) == parseInt("#{FundingSourceType.find_by(name: 'Local').id}")){
-      $('#global_sourceable').editable({source: local_programs});
-    }
-
-    console.log('aPPPLE PIE');
-
-  });
-
-  $('#global_sourceable').editable({
-    source: function () {
-      var id = $('#funding_source_type_id').val();
-
-      if (parseInt(id) == parseInt('#{FundingSourceType.find_by(name: 'Federal').id}')){
-        return fed_programs;
-      } else if (parseInt(id) == parseInt("#{FundingSourceType.find_by(name: 'State').id}")){
-        return state_programs;
-      } else if (parseInt(id) == parseInt("#{FundingSourceType.find_by(name: 'Local').id}")){
-        return local_programs;
-      }
-
-      console.log('blueberry pie');
+      $('#global_sourceable').editable('option', 'source', local_programs);
     }
   });
 

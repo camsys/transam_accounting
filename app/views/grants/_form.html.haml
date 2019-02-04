@@ -1,3 +1,16 @@
+:css
+  #details {
+    border-bottom: none;
+  }
+
+  #grant_amount {
+    text-align: right;
+  }
+
+  .display-value {
+    margin-left: 5px;
+  }
+
 = simple_form_for(@grant,
   :html => {:class => 'form-vertical grant_form'},
   :wrapper => :vertical_form,
@@ -7,7 +20,7 @@
     :boolean => :vertical_boolean}) do |f|
 
   %fieldset
-    %legend Details
+    %legend{id: 'details'} Details
 
     .row
       .col-sm-3= f.input :grant_num, label: 'Grant Number'
@@ -20,7 +33,7 @@
     .row
       .col-sm-3= f.input :global_sourceable, collection: FundingSource.all.map{|f| [ f.to_s, f.to_global_id, data: {funding_source_type_id: f.funding_source_type_id} ]}, label: 'Program', required: true
     .row
-      .col-sm-3= f.association :owner, collection: Organization.all
+      .col-sm-3= f.association :owner, collection: Organization.all.collect{|f| [f.to_s, f.id]}
       .col-sm-3= f.association :contributor, collection: [['Multiple', 'multiple'], ['Other','other']] + Organization.all.collect{|f| [f.to_s, f.id]}, required: true
       #other-contributor-div.col-sm-4{style: 'display:none;'}
         = f.input :other_contributor
@@ -28,7 +41,7 @@
     .row
       .col-sm-9= f.input :legislative_authorization
     .row
-      .col-sm-4
+      .col-sm-2
         = f.input :award_date, :wrapper => :vertical_append, :label => "Date of Award" do
           = f.input_field :award_date, :as => :string, :class => 'form-control datepicker', :value => format_as_date(f.object.award_date)
           %span.input-group-addon
@@ -38,7 +51,7 @@
         .form-group
           %label.control-label Method of Apportionment Structure
           .display-value Single Apportionment
-      .col-sm-4= f.input :fy_year, collection: get_fiscal_years(Date.today-19.years,19), label: 'Grant Year'
+      .col-sm-2= f.input :fy_year, collection: get_fiscal_years(Date.today-19.years,19).reverse, label: 'Grant Year'
     .row
       .col-sm-4
         = f.input :amount, :wrapper => :vertical_prepend, label: 'Total Apportionment' do
@@ -47,14 +60,14 @@
           = f.input_field :amount, :class => "form-control"
     .row
       .col-sm-3
-        = f.input :over_allocation_allowed, label: 'Allow Over-Allocation'
-    .row
-      .col-sm-3
         .form-group
           %label.control-label Grant Development Method
           .display-value Directly Generated
 
-  = f.button :submit, :class => "btn btn-primary", :id => 'grant_form_submit'
+  // TODO: Add image to button
+  = f.button :submit, "+ Add Grant & Go To Grant Details", :class => "btn btn-primary", :id => 'grant_form_submit'
+  = link_to "Cancel", :back, :class => "btn btn-default", :role => 'button'
+
 
 :javascript
 
@@ -87,3 +100,10 @@
 
   $('#funding_source_type_id').change();
   $('#grant_contributor_id').change();
+
+  $('#grant_award_date').datepicker("setDate", new Date());
+
+  // TODO: Can't add commas to numeric field. Can we make this a text field instead?
+  // $('#grant_amount').keyup(function(event) {
+  //   $(this).val($(this).val().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+  // });
