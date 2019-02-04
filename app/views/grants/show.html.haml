@@ -42,7 +42,7 @@
               - if @grant.assets.empty?
                 %p There are no assets associated with this grant.
               - else
-                = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => @grant.assets}
+                = render :partial => 'grant_assets', :locals => {:assets => @grant.assets, :grant_id => @grant.id}
           .tab-pane.fade#amendments
             .tab-content
               = render 'grant_amendments'
