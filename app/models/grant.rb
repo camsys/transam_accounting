@@ -18,8 +18,6 @@ class Grant < ActiveRecord::Base
 
   include TransamWorkflow
 
-  include TransamFormatHelper
-
   #------------------------------------------------------------------------------
   # Callbacks
   #------------------------------------------------------------------------------
@@ -156,7 +154,7 @@ class Grant < ActiveRecord::Base
               datetime: version.created_at,
               event: "Apportionment Created",
               event_type: 'Created',
-              comments: "Apportionment 'Primary' was created in the amount of #{version.format_as_currency(version.changeset['amount'][1])}.",
+              comments: "Apportionment 'Primary' was created in the amount of #{ActiveSupport::NumberHelper.number_to_currency(version.changeset['amount'][1], precision: 0)}.",
               user: version.actor
           },
           {
@@ -169,7 +167,7 @@ class Grant < ActiveRecord::Base
       ]
     else
       if version.changeset.key? 'state'
-        event = self.new.state_paths(:from => version.changeset['state'][0], :to => version.changeset['state'][1]).first.first.event.to_s
+        event = self.new.state_paths(:from => version.item.changeset['state'][0], :to => version.item.changeset['state'][1]).first.first.event.to_s
 
         ver = {
             datetime: version.created_at,
@@ -199,7 +197,7 @@ class Grant < ActiveRecord::Base
 
         version.changeset.each do |key, val|
           if key.to_s == 'amount'
-            ver[:comments] += " The #{key} was updated from #{version.format_as_currency(val[0])} to #{version.format_as_currency(val[1])}."
+            ver[:comments] += " The #{key} was updated from #{ActiveSupport::NumberHelper.number_to_currency(val[0], precision: 0)} to #{ActiveSupport::NumberHelper.number_to_currency(val[1], precision: 0)}."
           else
             ver[:comments] += " The #{key} was updated from #{val[0]} to #{val[1]}."
           end
