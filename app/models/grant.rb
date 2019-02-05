@@ -156,7 +156,7 @@ class Grant < ActiveRecord::Base
               datetime: version.created_at,
               event: "Apportionment Created",
               event_type: 'Created',
-              comments: "Apportionment 'Primary' was created in the amount of #{format_as_currency(version.changeset['amount'][1])}.",
+              comments: "Apportionment 'Primary' was created in the amount of #{version.format_as_currency(version.changeset['amount'][1])}.",
               user: version.actor
           },
           {
@@ -199,7 +199,7 @@ class Grant < ActiveRecord::Base
 
         version.changeset.each do |key, val|
           if key.to_s == 'amount'
-            ver[:comments] += " The #{key} was updated from #{format_as_currency(val[0])} to #{format_as_currency(val[1])}."
+            ver[:comments] += " The #{key} was updated from #{version.format_as_currency(val[0])} to #{version.format_as_currency(val[1])}."
           else
             ver[:comments] += " The #{key} was updated from #{val[0]} to #{val[1]}."
           end
