@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   end
 
   resources :grants do
+    resources :grant_apportionments
     resources :grant_amendments
 
     member do

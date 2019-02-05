@@ -23,6 +23,8 @@ class Grant < ActiveRecord::Base
   #------------------------------------------------------------------------------
   after_initialize                  :set_defaults
 
+  before_save                       :update_grant_apportionments
+
   #------------------------------------------------------------------------------
   # Associations
   #------------------------------------------------------------------------------
@@ -31,6 +33,8 @@ class Grant < ActiveRecord::Base
 
   # Has a single funding source
   belongs_to  :sourceable, :polymorphic => true
+
+  has_many :grant_apportionments
 
   has_many :grant_amendments
 
@@ -214,6 +218,10 @@ class Grant < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
+  def is_single_apportionment?
+    true # TODO: add multiple
+  end
+
   def open?
     state == 'open'
   end
@@ -284,7 +292,7 @@ class Grant < ActiveRecord::Base
 
   # formats paper_trail versions
   def history
-    PaperTrail::Version.where(item: [self, self.grant_amendments]).order(created_at: :desc).map{|v| v.item_type.constantize.formatted_version(v) }.flatten
+    PaperTrail::Version.where(item: [self, self.grant_apportionments, self.grant_amendments]).order(created_at: :desc).map{|v| v.item_type.constantize.formatted_version(v) }.flatten
   end
 
   #------------------------------------------------------------------------------
@@ -301,6 +309,16 @@ class Grant < ActiveRecord::Base
     self.fy_year ||= current_fiscal_year_year
     self.amount ||= 0
     self.active = self.active.nil? ? true : self.active
+  end
+
+  def update_grant_apportionments
+    if is_single_apportionment?
+      if grant_apportionments.empty?
+        grant_apportionments.create
+      else
+        grant_apportionments.update_all(sourceable: self.sourceable, amount: self.amount)
+      end
+    end
   end
 
 end

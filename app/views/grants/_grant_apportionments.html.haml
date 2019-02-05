@@ -1,0 +1,22 @@
+- @grant.grant_apportionments.each do |apportionment|
+  .row
+    .col-sm-2
+      = editable_field_tag([@grant,apportionment], :name)
+    .col-sm-2
+      = editable_field_tag([@grant, apportionment], :fy_year)
+    .col-sm-1
+      .form-group
+        %label.control-label * Source
+        .display-value= apportionment.sourceable.funding_source_type
+    .col-sm-1
+      .form-group
+        %label.control-label * Program
+        .display-value= apportionment.funding_source
+    .col-sm-2
+      .form-group
+        %label.control-label * Apportionment Amount
+        .display-value= format_as_currency(apportionment.amount)
+
+
+
+
