@@ -3,7 +3,9 @@
   :wrapper => :vertical_form,
   :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
 
-  = f.input :amendment_num, label: 'Amendment Number'
+  .row
+    .col-md-3
+      = f.input :amendment_num, label: 'Amendment Number', required: true
 
   .form-group.required.radio-buttons-inline
     %label.required.control-label
@@ -18,11 +20,14 @@
         = radio_button_tag :update_grant_num, 'no', @grant_amendment.grant_num.blank?
         No
 
-  = f.input :grant_num, label: 'Grant Number', disabled: @grant_amendment.grant_num.blank?
+  .row
+    .col-md-3
+      = f.input :grant_num, label: 'Grant Number', disabled: @grant_amendment.grant_num.blank?, input_html: {data: {grant_num: @grant.grant_num}}
 
   = f.input :comments
 
-  = f.button :submit, 'Save', :class => "btn btn-primary"
+  = f.button :submit, save_text, :class => "btn btn-primary"
+  = link_to "Cancel", :back, :class => "btn btn-default", :role => 'button'
 
 :javascript
   $('.grant_amendment_form').validate({
@@ -40,6 +45,8 @@
       $('#grant_amendment_grant_num').rules("add", {
         required: true
       });
+
+      $('#grant_amendment_grant_num').val($('#grant_amendment_grant_num').data('grant-num'));
     } else {
       $('label[for="grant_amendment_grant_num"]').html('Grant Number');
       $('#grant_amendment_grant_num').val('');

@@ -1,10 +1,15 @@
 :ruby
   table_dom_id = SecureRandom.hex
 
+:css
+  .th-inner {
+    margin-left: 8px;
+  }
+
 - if (can? :update, @grant) && @grant.updatable?
-  = link_to new_grant_grant_amendment_path(@grant), :class => "btn btn-primary btn-lg" do
+  = link_to new_grant_grant_amendment_path(@grant), :class => "btn btn-primary btn-md" do
     %i.fa.fa-plus
-    New Amendment
+    Add Amendment
 
 .table-responsive
   %table.table.table-hover{:id => table_dom_id,
@@ -14,7 +19,7 @@
           :sort_order => 'asc',
           :sortable => 'true',
           :side_pagination => 'server',
-          :show_pagination_switch => 'true',
+          :show_pagination_switch => 'false',
           :page_number => '1',
           :page_list => "[5, 10, 20, 50, 100, 200]",
           :page_size => current_user.num_table_rows,
@@ -33,12 +38,12 @@
           :single_select => 'false'}}
     %thead
       %tr
-        %th.center{:data => {:sortable => 'true'}} Amendment Number
-        %th.center{:data => {:sortable => 'true'}} Grant Number
-        %th.center{:data => {:sortable => 'true'}} Comments
-        %th.center{:data => {:sortable => 'true'}} Created By
-        %th.center{:data => {:sortable => 'true'}} Created Date & Time
-        %th.center{:data => {:sortable => 'false'}} Actions
+        %th.left{:data => {:sortable => 'true'}} Amendment Number
+        %th.left{:data => {:sortable => 'true'}} Grant Number
+        %th.left{:data => {:sortable => 'true'}} Comments
+        %th.left{:data => {:sortable => 'true'}} Created By
+        %th.left{:data => {:sortable => 'true'}} Created Date & Time
+        %th.left{:data => {:sortable => 'false'}} Actions
 
     %tbody
       - @grant.grant_amendments.each do |amendment|
