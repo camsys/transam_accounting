@@ -1,7 +1,56 @@
+require 'rubyXL'
+
 wb = xlsx_package.workbook
 
-wb.add_worksheet(name: "Grants") do |sheet|
-    @grants.each do |grant|
-        sheet.add_row [grant.grant_num]
+wb.styles do |style|
+
+    # Define styles
+    table_header = style.add_style(bg_color: "BFBFBF", b: true, font_name: "Calibri (body)", :border => { :style => :thin, :color => "00000000" })
+    column_header = style.add_style(b: true, font_name: "Calibri (body)")
+    table_data = style.add_style(font_name: "Calibri (body)")
+
+    # Add worksheet
+    wb.add_worksheet(name: "Grants") do |sheet|
+
+        # Define columns [column header, data value]
+        columns = {
+            grant_num: ["Grant #", "grant.grant_num"],
+            source: ["Source", "grant.sourceable.funding_source_type"],
+            program: ["Program", "grant.funding_source.to_s"],
+            grant_year: ["Grant Year", "grant.fy_year"],
+            owner: ["Owner", "grant.owner"],
+            contributor: ["Contributor", "grant.has_multiple_contributors ? 'Multiple' : (grant.contributor.nil? ? 'Other' : grant.contributor)"],
+            legislative_authorization: ["Legislative Authorization", "grant.legislative_authorization"],
+            award_date: ["Date of Award", "format_as_date(grant.award_date)"],
+            most_recent_amendment: ["Date of Most Recent Amendment", "format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date))"],
+            closeout_date: ["Date of Closeout", "grant.closeout_date"],
+            reopen_date: ["Date of Reopen", "grant.workflow_events.where(event_type: 'reopen').last.try(:created_at).try(:to_date)"],
+            apportionment_structure_method: ["Method of Apportionment Structure", "'Single Apportionment'"],
+            total_apportionment: ["Total Apportionment", "grant.amount"],
+            allow_over_allocation: ["Allow Over-Allocation", "grant.over_allocation_allowed"],
+            development_method: ["Grant Development Method", "'Directly Generated'"],
+            status: ["Status", "grant.state.titleize"],
+            last_update_by: ["Last Update By", "grant.updater"],
+            last_update_date: ["Last Update Date", "format_as_date_time(grant.updated_at)"]
+        }
+
+        # Merge table header cells and add padding
+        sheet.merge_cells "A1:#{RubyXL::Reference.ind2ref(0, columns.length - 1)}"
+
+        table_header_cells = ["Grant Data"]
+        (columns.length - 1).times do
+            table_header_cells << ""
+        end
+
+        # Add table header
+        sheet.add_row table_header_cells, style: table_header
+
+        # Add column headers
+        sheet.add_row columns.map{|key, value| value[0]}, style: column_header
+
+        # Add data
+        @grants.each do |grant|
+            sheet.add_row columns.map{|key, value| eval(value[1])}, style: table_data
+        end
     end
 end
