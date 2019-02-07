@@ -45,8 +45,8 @@
     });
      $('.funding_sources_grant_purchases_form .funding-pcnt').valid();
 
-     var amount = parseInt($(this).val()) * parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]']) / 100.0;
-     var currency_val = Number((parseFloat(amount)).toFixed(1)).toLocaleString();
+     var amount = parseInt($(this).val())*parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]'])/100;
+     var currency_val = Number((parseFloat(amount)).toFixed(2)).toLocaleString();
      $(this).closest('.pcnt-column').next().find('.grant-purchase-amount.display-value').html('$ ' + currency_val);
   });
 
