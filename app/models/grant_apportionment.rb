@@ -25,7 +25,7 @@ class GrantApportionment < ApplicationRecord
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
-  validates :name,                       :presence => true, :uniqueness => true
+  validates :name,                            :presence => true
   validates :fy_year,                         :presence => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 1970}
   validates :sourceable,                      :presence => true
   validates :amount,                          :presence => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0}
