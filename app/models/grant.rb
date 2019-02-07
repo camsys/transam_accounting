@@ -314,7 +314,7 @@ class Grant < ActiveRecord::Base
   def update_grant_apportionments
     if is_single_apportionment?
       if grant_apportionments.empty?
-        grant_apportionments.create
+        grant_apportionments.build
       else
         grant_apportionments.update_all(sourceable: self.sourceable, amount: self.amount)
       end
