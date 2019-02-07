@@ -49,6 +49,9 @@ class GrantsController < OrganizationAwareController
     respond_to do |format|
       format.html # index.html.erb
       format.json { render :json => @grants }
+      format.xlsx do
+        response.headers['Content-Disposition'] = "attachment; filename=Grant Table Export.xlsx"
+      end
     end
 
   end

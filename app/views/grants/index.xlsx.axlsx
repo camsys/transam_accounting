@@ -1,0 +1,7 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: "Grants") do |sheet|
+    @grants.each do |grant|
+        sheet.add_row [grant.grant_num]
+    end
+end

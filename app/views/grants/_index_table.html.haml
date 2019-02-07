@@ -14,10 +14,6 @@
 
 #grants_table_actions.btn-group
   - if show_actions == 1
-    - if can? :create, Grant
-      = link_to new_grant_path, :class => 'btn btn-primary' do
-        %i.fa.fa-plus.fa-fw
-        = "Add Grant";
     = render :partial => "grants/index_actions"
 
 
