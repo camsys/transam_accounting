@@ -316,7 +316,7 @@ class Grant < ActiveRecord::Base
       if grant_apportionments.empty?
         grant_apportionments.build
       else
-        grant_apportionments.update_all(sourceable: self.sourceable, amount: self.amount)
+        grant_apportionments.update_all(sourceable_type: self.sourceable_type, sourceable_id: self.sourceable_id, amount: self.amount)
       end
     end
   end
