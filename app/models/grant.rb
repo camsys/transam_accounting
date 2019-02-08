@@ -171,7 +171,7 @@ class Grant < ActiveRecord::Base
       ]
     else
       if version.changeset.key? 'state'
-        event = self.new.state_paths(:from => version.item.changeset['state'][0], :to => version.item.changeset['state'][1]).first.first.event.to_s
+        event = self.new.state_paths(:from => version.changeset['state'][0], :to => version.changeset['state'][1]).first.first.event.to_s
 
         ver = {
             datetime: version.created_at,
