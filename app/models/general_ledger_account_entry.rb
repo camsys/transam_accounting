@@ -14,7 +14,7 @@ class GeneralLedgerAccountEntry < ActiveRecord::Base
   # Associations
   #------------------------------------------------------------------------------
   belongs_to :general_ledger_account
-  belongs_to :asset
+  belongs_to :asset, class_name: Rails.application.config.asset_base_class_name
 
   #------------------------------------------------------------------------------
   # Validations
