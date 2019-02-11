@@ -23,7 +23,7 @@
     %legend{id: 'details'} Details
 
     .row
-      .col-sm-3= f.input :grant_num, label: 'Grant Number'
+      .col-sm-3= f.input :grant_num, label: 'Grant #'
     .row
       .col-sm-3
         .form-group
@@ -33,8 +33,8 @@
     .row
       .col-sm-3= f.input :global_sourceable, collection: FundingSource.all.map{|f| [ f.to_s, f.to_global_id, data: {funding_source_type_id: f.funding_source_type_id} ]}, label: 'Program', required: true
     .row
-      .col-sm-3= f.association :owner, collection: Organization.all.collect{|f| [f.to_s, f.id]}
-      .col-sm-3= f.association :contributor, collection: [['Multiple', 'multiple'], ['Other','other']] + Organization.all.collect{|f| [f.to_s, f.id]}, required: true
+      .col-sm-3= f.association :owner, collection: Organization.where.not(organization_type: OrganizationType.find_by(class_name: 'PlanningPartner')).collect{|f| [f.to_s, f.id]}
+      .col-sm-3= f.association :contributor, collection: [['Multiple', 'multiple'], ['Other','other']] + Organization.where.not(organization_type: OrganizationType.find_by(class_name: 'PlanningPartner')).collect{|f| [f.to_s, f.id]}, required: true
       #other-contributor-div.col-sm-4{style: 'display:none;'}
         = f.input :other_contributor
 
@@ -51,7 +51,7 @@
         .form-group
           %label.control-label Method of Apportionment Structure
           .display-value Single Apportionment
-      .col-sm-2= f.input :fy_year, collection: get_fiscal_years(Date.today-19.years,19).reverse, label: 'Grant Year'
+      .col-sm-2= f.input :fy_year, collection: get_fiscal_years(Date.today-18.years,19).reverse, label: 'Grant Year'
     .row
       .col-sm-4
         = f.input :amount, :wrapper => :vertical_prepend, label: 'Total Apportionment' do

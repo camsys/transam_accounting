@@ -1,7 +1,7 @@
 .row.border-between
   .col-sm-6
     .row
-      .col-sm-3= editable_field_tag(@grant, :grant_num, '* Grant Number', required: true)
+      .col-sm-3= editable_field_tag(@grant, :grant_num, '* Grant #', required: true)
     .row
       .col-sm-3
         .form-group
@@ -12,12 +12,12 @@
     .row
       .col-sm-3= editable_association_tag(@grant, :global_sourceable, '* Program', FundingSource.all.collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]}, current_method: :global_sourceable)
     .row
-      .col-sm-3= editable_association_tag(@grant, :owner, '* Owner', Organization.all.collect{|f| [f.id, f.to_s]})
+      .col-sm-3= editable_association_tag(@grant, :owner, '* Owner', Organization.where.not(organization_type: OrganizationType.find_by(class_name: 'PlanningPartner')).collect{|f| [f.id, f.to_s]})
       .col-sm-9
         .row.other-fields-container
           -# need to pass an array of integers for existing JS to work so just set other as -1
           .col-sm-4.other-type-container{data: {other_type_ids: [-1]}}
-            = editable_association_tag(@grant, :contributor, '* Contributor', [['multiple', 'Multiple'], ['-1', 'Other']] + Organization.all.collect{|f| [f.id, f.to_s]}, current_value: @grant.has_multiple_contributors ? 'multiple' : (@grant.contributor.nil? ? '-1' : @grant.contributor_id))
+            = editable_association_tag(@grant, :contributor, '* Contributor', [['multiple', 'Multiple'], ['-1', 'Other']] + Organization.where.not(organization_type: OrganizationType.find_by(class_name: 'PlanningPartner')).collect{|f| [f.id, f.to_s]}, current_value: @grant.has_multiple_contributors ? 'multiple' : (@grant.contributor.nil? ? '-1' : @grant.contributor_id))
           .col-sm-8.other-value-container
             = editable_field_tag(@grant, :other_contributor, required: false)
 
@@ -45,7 +45,7 @@
             * Method of Apportionment Structure
           .display-value Single Apportionment
       .col-sm-6
-        = editable_association_tag(@grant, :fy_year, '* Grant Year', get_fiscal_years(Date.today-19.years,19).map{|x| [x[1], x[0]]}.reverse, current_method: :fy_year, suffix: '')
+        = editable_association_tag(@grant, :fy_year, '* Grant Year', get_fiscal_years(Date.today-18.years,19).map{|x| [x[1], x[0]]}.reverse, current_method: :fy_year, suffix: '')
     .row
       .col-sm-3= editable_field_tag(@grant, :amount, '* Total Apportionment', required: true, type: 'currency')
     .row

@@ -106,6 +106,7 @@ class GrantsController < OrganizationAwareController
     if params[:grant][:contributor_id] == 'multiple'
       @grant.has_multiple_contributors = true
     elsif params[:grant][:contributor_id].to_i > 0
+      @grant.has_multiple_contributors = false
       @grant.contributor_id = params[:grant][:contributor_id]
     end
 
@@ -131,6 +132,7 @@ class GrantsController < OrganizationAwareController
     if params[:grant][:contributor_id] == 'multiple'
       @grant.has_multiple_contributors = true
     elsif params[:grant][:contributor_id].to_i > 0
+      @grant.has_multiple_contributors = false
       @grant.contributor_id = params[:grant][:contributor_id]
     end
 
