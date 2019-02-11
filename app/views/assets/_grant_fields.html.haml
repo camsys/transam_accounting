@@ -3,7 +3,7 @@
 .nested-fields{style: 'border:none;'}
   .row
     .col-md-3
-      = f.input :global_sourceable, :collection => Grant.active.open.where(owner_id: @organization_list).map{|f| [  "#{f.grant_num} : #{format_as_fiscal_year(f.fy_year)} : #{f.owner.short_name} : Primary : #{format_as_currency(f.balance)}" , f.to_global_id ]}, :required => true, :label => 'Grant #', disabled: disabled
+      = f.input :global_sourceable, :collection => Grant.active.open.where(owner_id: @organization_list).or(Grant.where(id: f.object.sourceable_id)).map{|f| [  "#{f.grant_num} : #{format_as_fiscal_year(f.fy_year)} : #{f.owner.short_name} : Primary : #{format_as_currency(f.balance)}" , f.to_global_id ]}, :required => true, :label => 'Grant #', disabled: disabled
     .col-md-2
       = f.input :other_sourceable, label: 'Grant # (Other)', disabled: disabled
 
