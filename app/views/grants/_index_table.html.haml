@@ -16,6 +16,10 @@
   - if show_actions == 1
     = render :partial => "grants/index_actions"
 
+- if can? :create, Grant
+  = link_to new_grant_path, :class => 'btn btn-primary pull-right' do
+    %i.fa.fa-plus.fa-fw
+    = "Add Grant";
 
 .table-responsive
   %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',

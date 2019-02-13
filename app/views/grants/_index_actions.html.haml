@@ -18,8 +18,3 @@
     %ul.dropdown-menu{:role => 'menu'}
       %li
         = link_to "XLSX", current_url(format: :xlsx), target: '_blank', title: 'Export all rows and columns to XLSX'
-
-  - if can? :create, Grant
-    = link_to new_grant_path, :class => 'btn btn-primary' do
-      %i.fa.fa-plus.fa-fw
-      = "Add Grant";
