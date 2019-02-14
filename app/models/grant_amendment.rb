@@ -27,11 +27,17 @@ class GrantAmendment < ApplicationRecord
 
 
   def self.formatted_version(version)
+    comments = "Amendment #{version.item.amendment_num} was #{version.event}d."
+
+    if version.event != 'destroy' && version.changeset['comments'].present?
+      comments += " #{version.changeset['comments'][1]}"
+    end
+
     [{
         datetime: version.created_at,
         event: "Amendment #{version.event.titleize}d",
         event_type: "#{version.event.titleize}d",
-        comments: "Amendment #{version.item.amendment_num} was #{version.event}d. #{version.event == 'destroy' ? '' : version.changeset['comments'][1]}",
+        comments: comments,
         user: version.actor
     }]
   end
