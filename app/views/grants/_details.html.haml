@@ -7,10 +7,10 @@
         .form-group
           %label.control-label.string.required
             * Source
-          = select_tag(:funding_source_type_id, options_from_collection_for_select(FundingSourceType.where.not(name: 'Agency'), "id", "name", @grant.sourceable.funding_source_type_id), class: 'form-control', include_blank: true)
+          = select_tag(:funding_source_type_id, options_from_collection_for_select(FundingSourceType.where.not(name: 'Agency'), "id", "name", @grant.sourceable.funding_source_type_id), class: 'form-control', include_blank: false)
 
     .row
-      .col-sm-3= editable_association_tag(@grant, :global_sourceable, '* Program', FundingSource.all.collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]}, current_method: :global_sourceable)
+      .col-sm-3= editable_association_tag(@grant, :global_sourceable, '* Program', FundingSource.where(funding_source_type: @grant.sourceable.funding_source_type).collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]}, current_method: :global_sourceable)
     .row
       .col-sm-3= editable_association_tag(@grant, :owner, '* Owner', Organization.where.not(organization_type: OrganizationType.find_by(class_name: 'PlanningPartner')).collect{|f| [f.id, f.to_s]})
       .col-sm-9
@@ -57,21 +57,36 @@
 
 
 :javascript
-  var fed_programs = JSON.parse('#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'Federal')).map{|f| {value: f.id, text: f.to_s}}.to_json.html_safe}');
-  var state_programs = JSON.parse('#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'State')).map{|f| {value: f.id, text: f.to_s}}.to_json.html_safe}');
-  var local_programs = JSON.parse('#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'Local')).map{|f| {value: f.id, text: f.to_s}}.to_json.html_safe}');
+  var fed_programs = JSON.parse('#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'Federal')).map{|f| {value: f.to_global_id.to_s, text: f.to_s}}.to_json.html_safe}');
+  var state_programs = JSON.parse('#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'State')).map{|f| {value: f.to_global_id.to_s, text: f.to_s}}.to_json.html_safe}');
+  var local_programs = JSON.parse('#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'Local')).map{|f| {value: f.to_global_id.to_s, text: f.to_s}}.to_json.html_safe}');
 
+  $(function(){
+    var source = $('#funding_source_type_id')
+    source.data('prev', source.val());
 
+    $('#global_sourceable').on('hidden', function(e, reason) {
+      if (reason === 'cancel') {
+        source.val(source.data('prev'));
+      } else if (reason == 'save') {
+        source.data('prev', source.val());
+      }
+    });
+        
+  });
+    
   $('#funding_source_type_id').on('change', function(e) {
     var id = $(this).val();
-
+    var program = $('#global_sourceable')
+    
     if (parseInt(id) == parseInt('#{FundingSourceType.find_by(name: 'Federal').id}')){
-      $('#global_sourceable').editable('option', 'source', fed_programs);
+      program.editable('option', 'source', fed_programs);
     } else if (parseInt(id) == parseInt("#{FundingSourceType.find_by(name: 'State').id}")){
-      $('#global_sourceable').editable('option', 'source', state_programs);
+      program.editable('option', 'source', state_programs);
     } else if (parseInt(id) == parseInt("#{FundingSourceType.find_by(name: 'Local').id}")){
-      $('#global_sourceable').editable('option', 'source', local_programs);
+      program.editable('option', 'source', local_programs);
     }
+    program.editable('show');
   });
 
 
