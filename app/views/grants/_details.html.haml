@@ -23,19 +23,19 @@
 
 
     .row
-      .col-sm-9= editable_field_tag(@grant, :legislative_authorization)
+      .col-sm-9= editable_field_tag(@grant, :legislative_authorization, required: false)
     .row
-      .col-sm-4= editable_field_tag(@grant, :award_date, '* Date of Award', type: 'date')
-      .col-sm-4
+      .col-sm-3= editable_field_tag(@grant, :award_date, '* Date of Award', type: 'date')
+      .col-sm-5
         .form-group
           %label.control-label
             Date of Most Recent Amendment
-          .display-value= format_as_date(@grant.grant_amendments.last.try(:created_at).try(:to_date))
+          .display-value= format_as_date(@grant.grant_amendments.last.try(:created_at).try(:to_date), blank: '-')
       .col-sm-4
         .form-group
           %label.control-label
             Date of Closeout
-          .display-value= format_as_date(@grant.closeout_date)
+          .display-value= format_as_date(@grant.closeout_date, blank: '-')
 
   .col-sm-6
     .row
