@@ -1,4 +1,7 @@
 class GrantAmendmentsController < OrganizationAwareController
+  add_breadcrumb "Home", :root_path
+  add_breadcrumb "Grants", :grants_path
+
   before_action :set_grant
 
   before_action :set_grant_amendment, only: [:show, :edit, :update, :destroy]
@@ -16,11 +19,16 @@ class GrantAmendmentsController < OrganizationAwareController
 
   # GET /grant_amendments/new
   def new
+    add_breadcrumb @grant.to_s, grant_path(@grant)
+    add_breadcrumb "New Amendment"
+
     @grant_amendment = @grant.grant_amendments.build
   end
 
   # GET /grant_amendments/1/edit
   def edit
+    add_breadcrumb @grant.to_s, grant_path(@grant)
+    add_breadcrumb "Update Amendment"
   end
 
   # POST /grant_amendments
