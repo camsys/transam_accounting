@@ -57,5 +57,6 @@
             - if (can? :update, @grant) && @grant.updatable?
               = link_to edit_grant_grant_amendment_path(@grant, amendment), :class => "button btn-xs", :title => "Edit amendment" do
                 %i.fa.fa-edit.fa-1-5x.text-success
-              = link_to grant_grant_amendment_path(@grant, amendment), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
-                %i.fa.fa-trash-o.fa-fw.text-danger
+              - if amendment.deleteable?
+                = link_to grant_grant_amendment_path(@grant, amendment), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
+                  %i.fa.fa-trash-o.fa-fw.text-danger

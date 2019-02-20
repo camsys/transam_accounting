@@ -41,4 +41,8 @@ class GrantAmendment < ApplicationRecord
         user: version.actor
     }]
   end
+
+  def deleteable?
+    self.id == self.grant.grant_amendments.last.try(:id)
+  end
 end

@@ -218,6 +218,20 @@ class Grant < ActiveRecord::Base
   #
   #------------------------------------------------------------------------------
 
+  def grant_num
+
+    grant_num_temp = nil
+
+    grant_amendments.order(created_at: :desc).each do |amendment|
+      grant_num_temp = amendment.grant_num
+      break if grant_num_temp.present?
+    end
+
+    grant_num_temp = read_attribute(:grant_num) unless grant_num_temp.present?
+
+    return grant_num_temp
+  end
+
   def is_single_apportionment?
     true # TODO: add multiple
   end
