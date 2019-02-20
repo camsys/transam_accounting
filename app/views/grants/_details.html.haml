@@ -5,10 +5,10 @@
         - if @grant.grant_amendments.empty?
           = editable_field_tag(@grant, :grant_num, '* Grant #', required: true)
         - else
-        .form-group
-          %label.control-label.required
-            * Grant #
-          .display-value= @grant.grant_num
+          .form-group
+            %label.control-label.required
+              * Grant #
+            .display-value= @grant.grant_num
     .row
       .col-sm-3
         .form-group
