@@ -74,7 +74,8 @@ system_config_extensions = [
     {engine_name: 'accounting', class_name: 'AssetsController', extension_name: 'TransamAccountingAssetsController', active: true},
     #{engine_name: 'accounting', class_name: 'Organization', extension_name: 'TransamAccountable', active: true}, comment out temporarily as all orgs dont have COA
     {engine_name: 'accounting', class_name: 'Policy', extension_name: 'TransamAccountingPolicy', active: true},
-    {engine_name: 'accounting', class_name: 'Vendor', extension_name: 'TransamAccountingVendor', active: true}
+    {engine_name: 'accounting', class_name: 'Vendor', extension_name: 'TransamAccountingVendor', active: true},
+    {engine_name: 'accounting', class_name: 'TransamAsset', extension_name: 'TransamValuable', active: true}
 
 ]
 
