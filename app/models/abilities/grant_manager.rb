@@ -1,5 +1,5 @@
 module Abilities
-  class GrantManagerAccountingAbility
+  class GrantManager
     include CanCan::Ability
 
     def initialize(user, organization_ids=[])
@@ -11,8 +11,6 @@ module Abilities
       can :manage, Grant do |grant|
         user.viewable_organization_ids.include? grant.owner_id
       end
-
-      can :read, Grant
 
     end
 
