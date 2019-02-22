@@ -39,6 +39,12 @@
 
   });
 
+  $('body').on('change', '.global-sourceable', function() {
+    id = $(this).attr('id');
+
+    $('#' + id.substring(0, id.length-'global_sourceable'.length) + 'other_sourceable').prop('disabled', $(this).val() != '');
+  });
+
   $('body').on('change', '.grants_grant_purchases_form .funding-pcnt', function() {
      $('.grants_grant_purchases_form input.funding-pcnt').rules( "add", {
       pcntSumsHundred_grants: true
