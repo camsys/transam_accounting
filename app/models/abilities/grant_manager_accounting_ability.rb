@@ -12,6 +12,8 @@ module Abilities
         user.viewable_organization_ids.include? grant.owner_id
       end
 
+      can :read, Grant
+
     end
 
   end
