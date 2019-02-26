@@ -1,3 +1,5 @@
+= render partial: 'shared/xeditable_edit_actions', locals: {obj: @grant.grant_apportionments.first, allowed_to_edit: ((can? :update, @grant) && @grant.updatable?)}
+
 - @grant.grant_apportionments.each do |apportionment|
   .row
     .col-sm-2
