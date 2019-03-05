@@ -16,16 +16,16 @@
   %legend.asset-subheader
     %span #{params[:state] == "all" ? "All" : "Filtered"}
 
-#grants_table_actions.btn-group
+#grants_table_actions.row
   - if show_actions == 1
     = render :partial => "grants/index_actions"
 
-.panel-action.pull-right
   - if can? :create, Grant
-    = link_to new_grant_path, :class => 'btn btn-primary' do
-      %i.fa.fa-plus.fa-fw
-      = "Add Grant";
-  .btn-group
+    .navbar-form.pull-right
+      = link_to new_grant_path, :class => 'btn btn-primary' do
+        %i.fa.fa-plus.fa-fw
+        = "Add Grant";
+  .navbar-form.pull-right
     %button.btn.btn-primary.btn-md.dropdown-toggle{:data => {:toggle => 'dropdown'}}
       %i.fa.fa-file
       = " Export"
@@ -42,7 +42,6 @@
     :page_list => "[10, 20, 50, 100, 200]",
     :page_size => '50',
     :search => 'false',
-    :toolbar => "#grants_table_actions",
     :export_types => "['csv', 'txt', 'excel']",
     :show_export => 'false',
     :show_columns => 'false',
