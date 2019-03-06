@@ -1,9 +1,9 @@
 - @grant.grant_apportionments.each do |apportionment|
   .row
     .col-sm-2
-      = editable_field_tag([@grant,apportionment], :name)
+      = editable_field_tag([@grant,apportionment], :name, 'Apportionment Name')
     .col-sm-2
-      = editable_association_tag([@grant, apportionment], :fy_year, '* Grant Year', get_fiscal_years(Date.today-18.years,19).map{|x| [x[1], x[0]]}.reverse, current_method: :fy_year, suffix: '')
+      = editable_association_tag([@grant, apportionment], :fy_year, '* Apportionment Year', get_fiscal_years(Date.today-18.years,19).map{|x| [x[1], x[0]]}.reverse, current_method: :fy_year, suffix: '')
     .col-sm-1
       .form-group
         %label.control-label * Source

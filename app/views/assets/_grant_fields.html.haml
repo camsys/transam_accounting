@@ -4,9 +4,9 @@
   .row
     .col-md-3
       = f.input :sourceable_type, as: :hidden, input_html: {value: 'Grant'} # hidden sourceable type field in case Other set
-      = f.input :global_sourceable, :collection => Grant.active.open.where(owner_id: @organization_list).or(Grant.where(id: f.object.sourceable_id)).map{|f| [  "#{f.grant_num} : #{format_as_fiscal_year(f.fy_year)} : #{f.owner.short_name} : Primary : #{format_as_currency(f.balance)}" , f.to_global_id ]}, :label => 'Grant #', disabled: disabled, prompt: 'Other', input_html: {class: 'global-sourceable'}
+      = f.input :global_sourceable, :collection => Grant.active.open.where(owner_id: @organization_list).or(Grant.where(id: f.object.sourceable_id)).map{|f| [  "#{f.grant_num} : #{format_as_fiscal_year(f.fy_year)} : #{f.owner.short_name} : Primary : #{format_as_currency(f.balance)}" , f.to_global_id ]}, :label => 'Grant Number', disabled: disabled, prompt: 'Other', input_html: {class: 'global-sourceable'}
     .col-md-2
-      = f.input :other_sourceable, label: 'Grant # (Other)', disabled: disabled
+      = f.input :other_sourceable, label: 'Grant Number (Other)', disabled: disabled
 
     .col-md-2.pcnt-column
       = f.input :pcnt_purchase_cost, :label => 'Pcnt', :wrapper => :vertical_append do
