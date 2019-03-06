@@ -10,14 +10,10 @@
               * Grant Number
             .display-value= @grant.grant_num
     .row
-      .col-sm-3
-        .form-group
-          %label.control-label.string.required
-            * Source
-          = select_tag(:funding_source_type_id, options_from_collection_for_select(FundingSourceType.where.not(name: 'Agency'), "id", "name", @grant.sourceable.funding_source_type_id), class: 'form-control', include_blank: false)
+      .col-sm-3.grant-source-type= editable_association_tag(@grant.sourceable, :funding_source_type, '* Source', FundingSourceType.where.not(name: 'Agency').collect{|f| [f.id, f.to_s]})
 
     .row
-      .col-sm-3= editable_association_tag(@grant, :global_sourceable, '* Program', FundingSource.where(funding_source_type: @grant.sourceable.funding_source_type).collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]}, current_method: :global_sourceable)
+      .col-sm-3.grant-program= editable_association_tag(@grant, :global_sourceable, '* Program', FundingSource.where(funding_source_type: @grant.sourceable.funding_source_type).collect{|f| ["#{f.to_global_id}", "#{f.to_s}"]}, current_method: :global_sourceable)
     .row
       .col-sm-3= editable_association_tag(@grant, :owner, '* Owner', Organization.where.not(organization_type: OrganizationType.find_by(class_name: 'PlanningPartner')).collect{|f| [f.id, f.to_s]})
       .col-sm-9
@@ -30,7 +26,7 @@
 
 
     .row
-      .col-sm-9= editable_field_tag(@grant, :legislative_authorization, required: false)
+      .col-sm-8= editable_field_tag(@grant, :legislative_authorization, required: false)
     .row
       .col-sm-3= editable_field_tag(@grant, :award_date, '* Date of Award', type: 'date')
       .col-sm-5
@@ -67,22 +63,8 @@
   var fed_programs = JSON.parse('#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'Federal')).map{|f| {value: f.to_global_id.to_s, text: f.to_s}}.to_json.html_safe}');
   var state_programs = JSON.parse('#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'State')).map{|f| {value: f.to_global_id.to_s, text: f.to_s}}.to_json.html_safe}');
   var local_programs = JSON.parse('#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'Local')).map{|f| {value: f.to_global_id.to_s, text: f.to_s}}.to_json.html_safe}');
-
-  $(function(){
-    var source = $('#funding_source_type_id')
-    source.data('prev', source.val());
-
-    $('#global_sourceable').on('hidden', function(e, reason) {
-      if (reason === 'cancel') {
-        source.val(source.data('prev'));
-      } else if (reason == 'save') {
-        source.data('prev', source.val());
-      }
-    });
-        
-  });
     
-  $('#funding_source_type_id').on('change', function(e) {
+  $('body').on('change', '.grant-source-type select', function(e) {
     var id = $(this).val();
     var program = $('#global_sourceable')
     
@@ -93,6 +75,7 @@
     } else if (parseInt(id) == parseInt("#{FundingSourceType.find_by(name: 'Local').id}")){
       program.editable('option', 'source', local_programs);
     }
+    program.editable('hide');
     program.editable('show');
   });
 
