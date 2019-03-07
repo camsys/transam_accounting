@@ -13,6 +13,8 @@ gem 'transam_transit', git: 'https://github.com/camsys/transam_transit', branch:
 gem 'mysql2', '~> 0.5.1' # lock gem for dummy app
 gem "capybara", '2.6.2' # lock gem for old capybara behavior on hidden element xpath
 
+gem 'rails-controller-testing' # assigns has been extracted to this gem
+
 # This gem allows us to share githooks. Githooks in the .hooks folder can be checked
 # in, and when "bundle install" is run this gem automatically creates symlinks into
 # your local .git/hooks. If you have pre-existing hooks in .git/hooks, it will move

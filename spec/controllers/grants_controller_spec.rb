@@ -5,57 +5,35 @@ include FiscalYear
 RSpec.describe GrantsController, :type => :controller do
 
   let(:test_user)  { create(:admin) }
-  let(:test_grant) { create(:grant) }
+  let(:test_grant) { create(:grant, :owner => subject.current_user.organization) }
 
   before(:each) do
     User.destroy_all
     test_user.organizations << test_user.organization
+    test_user.viewable_organizations << test_user.organization
     test_user.save!
     sign_in test_user
-  end
-
-  describe 'fiscal years' do
-    it 'no min fy' do
-      get :index
-
-      expect(subject.send(:fiscal_year_range)).to eq(get_fiscal_years)
-    end
-    it 'no num forecasting years' do
-      subject.instance_variable_set(:@organization, test_user.organization)
-      test_grant.update!(:fy_year => 2010, :organization => subject.current_user.organization)
-
-      expect(subject.send(:fiscal_year_range)).to eq(get_fiscal_years(Date.new(2010,7,1)))
-    end
-    it 'num forecast years' do
-      subject.instance_variable_set(:@organization, test_user.organization)
-      test_grant.update!(:fy_year => 2010, :organization => subject.current_user.organization)
-
-      expect(subject.send(:fiscal_year_range, 5)).to eq(get_fiscal_years(Date.new(2010,7,1),5))
-    end
   end
 
   describe 'GET index' do
     let(:test_asset) { create(:buslike_asset, :organization => subject.current_user.organization) }
     it 'all' do
-      test_grant.update!(:organization => subject.current_user.organization)
       get :index
 
       expect(assigns(:grants)).to include(test_grant)
     end
-    it 'sourceable' do
+    it 'global_sourceable' do
       test_funding_source = test_grant.sourceable
-      test_grant.update!(:organization => subject.current_user.organization)
-      get :index, params: {:sourceable_id => test_funding_source.id}
+      get :index, params: {:global_sourceable => test_funding_source.to_global_id}
 
-      expect(assigns(:sourceable_id)).to eq(test_funding_source.id)
+      expect(assigns(:sourceable)).to eq(test_funding_source)
       expect(assigns(:grants)).to include(test_grant)
 
-      get :index, params: {:sourceable_id => test_funding_source.id + 1}
+      get :index, params: {:global_sourceable => create(:funding_source).to_global_id}
       expect(assigns(:grants)).not_to include(test_grant)
     end
     it 'fiscal year' do
       test_fy = test_grant.fy_year
-      test_grant.update!(:organization => subject.current_user.organization)
       get :index, params: {:fiscal_year => test_fy}
 
       expect(assigns(:fiscal_year)).to eq(test_fy)
@@ -88,11 +66,6 @@ RSpec.describe GrantsController, :type => :controller do
     expect(assigns(:grant).to_json).to eq(Grant.new.to_json)
   end
 
-  it 'GET edit' do
-    get :edit, params: {:id => test_grant.object_key}
-
-    expect(assigns(:grant)).to eq(test_grant)
-  end
 
   it 'POST create' do
     post :create, params: {:grant => {:fy_year => Date.today.year+1, :amount => 55555}}

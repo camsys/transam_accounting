@@ -5,6 +5,8 @@ require 'rails_helper'
 
 RSpec.describe AssetsController, :type => :controller do
 
+  before {skip('Needs transam_asset. Not yet testable.')}
+
   let(:test_asset) { create(:buslike_asset) }
 
   class TestOrg < Organization
@@ -18,6 +20,7 @@ RSpec.describe AssetsController, :type => :controller do
   before(:each) do
     User.destroy_all
     test_user.organizations << test_user.organization
+    test_user.viewable_organizations << test_user.organization
     test_user.save!
     sign_in test_user
   end

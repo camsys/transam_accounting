@@ -2,7 +2,10 @@ require 'rails_helper'
 
 RSpec.describe GrantPurchase, :type => :model do
 
-  let(:test_purchase) { create(:grant_purchase) }
+  let(:test_purchase) {
+    skip('Needs transam_asset. Not yet testable.')
+    create(:grant_purchase)
+  }
 
   describe 'associations' do
     it 'has a source' do
@@ -29,14 +32,7 @@ RSpec.describe GrantPurchase, :type => :model do
   end
 
   it '#allowable_params' do
-    expect(GrantPurchase.allowable_params).to eq([
-      :id,
-      :asset_id,
-      :sourceable_type,
-      :sourceable_id,
-      :pcnt_purchase_cost,
-      :_destroy
-    ])
+    expect(GrantPurchase.allowable_params).to eq([:id, :asset_id, :global_sourceable, :sourceable_type, :sourceable_id, :other_sourceable, :pcnt_purchase_cost, :expense_tag, :_destroy])
   end
 
   it '.to_s' do

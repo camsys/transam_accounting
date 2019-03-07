@@ -6,6 +6,8 @@ RSpec.describe AssetDepreciableProxy, :type => :model do
   let(:test_asset) { create(:buslike_asset, :expected_useful_miles => 100000) }
 
   it '.set_defaults' do
+    skip('Needs transam_asset. Not yet testable.')
+
     test_proxy.set_defaults(test_asset)
 
     expect(test_proxy.object_key).to eq(test_asset.object_key)

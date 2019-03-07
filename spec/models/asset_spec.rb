@@ -6,6 +6,8 @@ include FiscalYear
 
 RSpec.describe Asset, :type => :model do
 
+
+
   class TestOrg < Organization
     def get_policy
       return Policy.where("`organization_id` = ?",self.id).order('created_at').last
@@ -14,18 +16,11 @@ RSpec.describe Asset, :type => :model do
 
   let(:test_asset) { create(:buslike_asset) }
   let(:test_gla) { create(:general_ledger_account) }
-  let(:test_expenditure) { create(:expenditure) }
 
   # ----------------------------------------------------------------
   # Rspec for TransaamGlAccountableAsset
   # GLA associations with assets
   # ----------------------------------------------------------------
-  it 'HABTM expenditures' do
-    test_expenditure.assets << test_asset
-    test_expenditure.save!
-
-    expect(test_asset.expenditures).to include(test_expenditure)
-  end
 
   # ----------------------------------------------------------------
   # Rspec for TransaamDepreciable
@@ -53,6 +48,8 @@ RSpec.describe Asset, :type => :model do
     expect(test_asset.depreciation_months).to eq(123)
   end
   it '.get_depreciation_table' do
+    skip('Needs depreciation entries. Not yet testable.')
+
     test_asset.update!(:asset_type => AssetType.find_by(:class_name => 'Vehicle'))
     create(:policy, :organization => test_asset.organization)
 
@@ -64,6 +61,8 @@ RSpec.describe Asset, :type => :model do
     expect(test_table[1][:accumulated_depreciation]).to eq(test_table[0][:accumulated_depreciation]+test_table[1][:depreciated_expense])
   end
   it '.update_book_value' do
+    skip('Needs depreciation entries. Not yet testable.')
+
     test_asset.update!(:asset_type => AssetType.find_by(:class_name => 'Vehicle'))
     test_policy = create(:policy, :organization => test_asset.organization)
 
