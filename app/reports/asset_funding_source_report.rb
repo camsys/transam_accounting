@@ -19,7 +19,7 @@ class AssetFundingSourceReport < AbstractReport
                 .joins('INNER JOIN funding_sources ON grant_purchases.sourceable_id = funding_sources.id')
                 .where(transam_assets: {organization_id: organization_id_list})
 
-    key = params[:key].split('-').map{|x| x.tr('_', ' ')}
+    key = params[:key].split('-').map{|x| x.to_s.tr('_', ' ')}
 
     params[:group_by] = 'Funding Program, Agency' if params[:group_by].nil?
     params[:group_by].split(',').each_with_index do |grp_clause, i|
@@ -127,13 +127,16 @@ class AssetFundingSourceReport < AbstractReport
     end
     data << [prev_header, row_data] if prev_header
 
+
+
+
     formats[0] = :hidden
 
     return {labels: labels + COMMON_LABELS, data: data, formats: formats + COMMON_FORMATS, header_format: labels[0] == 'Year of Purchase' ? :fiscal_year : :string}
   end
 
   def get_key(row)
-    row.slice(0, @clauses.count).map{|r| r.tr(' ','_')}.join('-')
+    row.slice(0, @clauses.count).map{|r| r.to_s.tr(' ','_')}.join('-')
   end
 
   def get_detail_path(id, key, opts={})
