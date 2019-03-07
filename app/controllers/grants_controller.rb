@@ -89,15 +89,6 @@ class GrantsController < OrganizationAwareController
 
   end
 
-  # GET /grants/1/edit
-  def edit
-
-    add_breadcrumb @grant.sourceable, eval(@grant.sourceable_path)
-    add_breadcrumb @grant.to_s, grant_path(@grant)
-    add_breadcrumb "Update"
-
-  end
-
   # POST /grants
   # POST /grants.json
   def create
