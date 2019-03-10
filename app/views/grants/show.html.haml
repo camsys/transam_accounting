@@ -37,8 +37,8 @@
             %li
               %a{:href => "#hist", :data =>{:toggle => 'tab'}}
                 History
-
-          .tab-content
+          -# IMPORTANT: add .editable-fields-container css so xeditable can enable for each tab
+          .tab-content.editable-fields-container 
             .tab-pane.fade#details
               %legend Details
               .tab-content
@@ -47,9 +47,9 @@
               %legend Apportionments
               .tab-content
                 = render 'grant_apportionments'
-            .tab-pane.fade#apportion_details
-              %legend Apportionment Details
-              .tab-content
+            -#.tab-pane.fade#apportion_details
+            -#  %legend Apportionment Details
+            -#  .tab-content
             .tab-pane.fade#assets
               %legend Assets
               .tab-content
