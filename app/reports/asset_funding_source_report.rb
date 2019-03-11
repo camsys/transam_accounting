@@ -8,7 +8,7 @@ class AssetFundingSourceReport < AbstractReport
   DETAIL_FORMATS = [:string, :string, :string, :string, :string, :currency]
 
   def self.get_detail_data(organization_id_list, params)
-    query = TransitAsset.unscoped.joins([{transam_asset: [:organization, :asset_subtype, :grant_purchases]}, :fta_asset_category, :fta_asset_class])
+    query = TransitAsset.unscoped.joins([{transam_asset: [:organization, :asset_subtype]}, :fta_asset_category, :fta_asset_class])
                 .joins('LEFT JOIN fta_vehicle_types ON transit_assets.fta_type_id = fta_vehicle_types.id AND transit_assets.fta_type_type="FtaVehicleType"')
                 .joins('LEFT JOIN fta_equipment_types ON transit_assets.fta_type_id = fta_equipment_types.id AND transit_assets.fta_type_type="FtaEquipmentType"')
                 .joins('LEFT JOIN fta_support_vehicle_types ON transit_assets.fta_type_id = fta_support_vehicle_types.id AND transit_assets.fta_type_type="FtaSupportVehicleType"')
@@ -16,7 +16,8 @@ class AssetFundingSourceReport < AbstractReport
                 .joins('LEFT JOIN fta_track_types ON transit_assets.fta_type_id = fta_track_types.id AND transit_assets.fta_type_type="FtaTrackType"')
                 .joins('LEFT JOIN fta_guideway_types ON transit_assets.fta_type_id = fta_guideway_types.id AND transit_assets.fta_type_type="FtaGuidewayType"')
                 .joins('LEFT JOIN fta_power_signal_types ON transit_assets.fta_type_id = fta_power_signal_types.id AND transit_assets.fta_type_type="FtaPowerSignalType"')
-                .joins('INNER JOIN funding_sources ON grant_purchases.sourceable_id = funding_sources.id')
+                .joins('LEFT JOIN grant_purchases  ON grant_purchases.transam_asset_id = transam_assets.id')
+                .joins('LEFT JOIN funding_sources ON grant_purchases.sourceable_id = funding_sources.id')
                 .where(transam_assets: {organization_id: organization_id_list})
 
     key = params[:key].split('-').map{|x| x.to_s.tr('_', ' ')}
@@ -31,10 +32,16 @@ class AssetFundingSourceReport < AbstractReport
         start_of_fy = DateTime.strptime("#{SystemConfig.instance.start_of_fiscal_year}-1900", "%m-%d-%Y").to_date
         clause = "IF(DAYOFYEAR(transam_assets.purchase_date) < DAYOFYEAR('#{start_of_fy}'), YEAR(transam_assets.purchase_date)-1, YEAR(transam_assets.purchase_date)) = ?"
       end
-      query = query.where(clause, key[i])
+
+      if key[i] == 'No Funding Program Data'
+        query = query.where('funding_sources.name IS NULL')
+      else
+        query = query.where(clause, key[i])
+      end
+
     end
 
-    data = query.pluck(:asset_tag, 'fta_asset_categories.name', 'fta_asset_classes.name', 'COALESCE(fta_vehicle_types.name, fta_equipment_types.name, fta_support_vehicle_types.name, fta_facility_types.name, fta_track_types.name, fta_guideway_types.name, fta_power_signal_types.name)', 'asset_subtypes.name', 'grant_purchases.pcnt_purchase_cost * transam_assets.purchase_cost / 100.0').to_a
+    data = query.pluck(:asset_tag, 'fta_asset_categories.name', 'fta_asset_classes.name', 'COALESCE(fta_vehicle_types.name, fta_equipment_types.name, fta_support_vehicle_types.name, fta_facility_types.name, fta_track_types.name, fta_guideway_types.name, fta_power_signal_types.name)', 'asset_subtypes.name', 'IF(grant_purchases.pcnt_purchase_cost IS NULL, transam_assets.purchase_cost, grant_purchases.pcnt_purchase_cost * transam_assets.purchase_cost / 100.0)').to_a
 
     {labels: DETAIL_LABELS, data: data, formats: DETAIL_FORMATS}
   end
@@ -72,8 +79,9 @@ class AssetFundingSourceReport < AbstractReport
     formats = []
 
     # Default scope orders by project_id
-    query = TransamAsset.unscoped.joins(:organization, :grant_purchases)
-                .joins('INNER JOIN funding_sources ON grant_purchases.sourceable_id = funding_sources.id')
+    query = TransamAsset.unscoped.joins(:organization)
+                .joins('LEFT JOIN grant_purchases  ON grant_purchases.transam_asset_id = transam_assets.id')
+                .joins('LEFT JOIN funding_sources ON grant_purchases.sourceable_id = funding_sources.id')
                 .where(organization_id: organization_id_list)
 
 
@@ -89,7 +97,7 @@ class AssetFundingSourceReport < AbstractReport
       elsif grp_clause.include? 'Funding Program'
         labels << 'Funding Program'
         formats << :string
-        clause = 'funding_sources.name'
+        clause = 'IF(funding_sources.name IS NULL, "No Funding Program Data",funding_sources.name)'
       elsif grp_clause.include? 'Year of Purchase'
         labels << 'Year of Purchase'
         formats << :fiscal_year
@@ -102,7 +110,7 @@ class AssetFundingSourceReport < AbstractReport
 
     # Generate queries for each column
     asset_counts = query.count
-    costs = query.sum('grant_purchases.pcnt_purchase_cost * transam_assets.purchase_cost / 100.0')
+    costs = query.sum('IF(grant_purchases.pcnt_purchase_cost IS NULL, transam_assets.purchase_cost, grant_purchases.pcnt_purchase_cost * transam_assets.purchase_cost / 100.0)')
 
     data = []
     prev_header = row_data = nil
