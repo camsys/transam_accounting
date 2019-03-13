@@ -16,7 +16,7 @@ class AssetFundingSourceReport < AbstractReport
                 .joins('LEFT JOIN fta_track_types ON transit_assets.fta_type_id = fta_track_types.id AND transit_assets.fta_type_type="FtaTrackType"')
                 .joins('LEFT JOIN fta_guideway_types ON transit_assets.fta_type_id = fta_guideway_types.id AND transit_assets.fta_type_type="FtaGuidewayType"')
                 .joins('LEFT JOIN fta_power_signal_types ON transit_assets.fta_type_id = fta_power_signal_types.id AND transit_assets.fta_type_type="FtaPowerSignalType"')
-                .joins('LEFT JOIN grant_purchases  ON grant_purchases.transam_asset_id = transam_assets.id')
+                .joins('LEFT JOIN grant_purchases  ON grant_purchases.transam_asset_id = transam_assets.id AND grant_purchases.sourceable_type="FundingSource"')
                 .joins('LEFT JOIN funding_sources ON grant_purchases.sourceable_id = funding_sources.id')
                 .where(transam_assets: {organization_id: organization_id_list})
 
@@ -80,7 +80,7 @@ class AssetFundingSourceReport < AbstractReport
 
     # Default scope orders by project_id
     query = TransamAsset.unscoped.joins(:organization)
-                .joins('LEFT JOIN grant_purchases  ON grant_purchases.transam_asset_id = transam_assets.id')
+                .joins('LEFT JOIN grant_purchases  ON grant_purchases.transam_asset_id = transam_assets.id AND grant_purchases.sourceable_type="FundingSource"')
                 .joins('LEFT JOIN funding_sources ON grant_purchases.sourceable_id = funding_sources.id')
                 .where(organization_id: organization_id_list)
 
@@ -105,7 +105,12 @@ class AssetFundingSourceReport < AbstractReport
         clause = "IF(DAYOFYEAR(transam_assets.purchase_date) < DAYOFYEAR('#{start_of_fy}'), YEAR(transam_assets.purchase_date)-1, YEAR(transam_assets.purchase_date))"
       end
       @clauses << clause
-      query = query.group(clause).order(clause)
+
+      if grp_clause.include? 'Funding Program'
+        query = query.group(clause).order('funding_sources.name IS NULL').order(clause)
+      else
+        query = query.group(clause).order(clause)
+      end
     end
 
     # Generate queries for each column
