@@ -1,27 +1,69 @@
+#subheader
+  .row
+    .col-sm-12
+      %h2 Grant Profile
+  %legend
+    .row
+      .col-sm-10
+        #{@grant.to_s} : #{@grant.sourceable.funding_source_type} : #{@grant.funding_source} : #{@grant.state.titleize}
+      .col-sm-2
+        = render 'actions'
+
 .row
-  .col-md-3
-    .panel.panel-default.header-part
+  .col-sm-12
+    .panel.panel-default
       .panel-heading
-        .row
-          .col-md-6
-            %h3.panel-title
-              %i.fa.fa-usd
-              = @grant.to_s
-          .col-md-6
-            = render 'actions'
-      .panel-body
-        = render 'summary'
-
-  .col-md-9
-    .panel.panel-default.header-part
-      .panel-heading
-        .row
-          .col-md-12
-            %h3.panel-title
-              %i.fa.fa-folder-open
-              Details
-
-      .panel-body
-        = render 'details'
+        %h3.panel-title
+          Details
+          = render partial: 'shared/xeditable_edit_actions', locals: {obj: @grant, allowed_to_edit: ((can? :update, @grant) && @grant.updatable?)}
+      #collapse-profile.panel-collapse.collapse.in
+        .panel-body.panel-body-fixed
+          %ul.nav.nav-tabs
+            %li
+              %a{:href => "#details", :data =>{:toggle => 'tab'}}
+                Details
+            %li
+              %a{:href => "#apportionments", :data =>{:toggle => 'tab'}}
+                Apportionments
+            -#%li
+            -#  %a{:href => "#apportion_details", :data =>{:toggle => 'tab'}}
+            -#    Apportionment Details
+            %li
+              %a{:href => "#assets", :data =>{:toggle => 'tab'}}
+                Assets
+            %li
+              %a{:href => "#amendments", :data =>{:toggle => 'tab'}}
+                Amendments
+            %li
+              %a{:href => "#hist", :data =>{:toggle => 'tab'}}
+                History
+          -# IMPORTANT: add .editable-fields-container css so xeditable can enable for each tab
+          .tab-content.editable-fields-container 
+            .tab-pane.fade#details
+              %legend Details
+              .tab-content
+                = render 'details'
+            .tab-pane.fade#apportionments
+              %legend Apportionments
+              .tab-content
+                = render 'grant_apportionments'
+            -#.tab-pane.fade#apportion_details
+            -#  %legend Apportionment Details
+            -#  .tab-content
+            .tab-pane.fade#assets
+              %legend Assets
+              .tab-content
+                - if @grant.assets.empty?
+                  %p There are no assets associated with this grant.
+                - else
+                  = render :partial => 'grant_assets', :locals => {:assets => @grant.assets, :grant_id => @grant.id}
+            .tab-pane.fade#amendments
+              %legend Amendments
+              .tab-content
+                = render 'grant_amendments'
+            .tab-pane.fade#hist
+              %legend History
+              .tab-content
+                = render 'history'
 
 = render 'scripts'

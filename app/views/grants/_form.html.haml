@@ -1,8 +1,15 @@
-:ruby
-  glas = Hash.new
-  ChartOfAccount.where(organization_id: @organization_list).each do |coa|
-    glas[coa.organization_id] = coa.general_ledger_accounts.ids
-  end
+:css
+  #details {
+    border-bottom: none;
+  }
+
+  #grant_amount {
+    text-align: right;
+  }
+
+  .display-value {
+    margin-left: 5px;
+  }
 
 = simple_form_for(@grant,
   :html => {:class => 'form-vertical grant_form'},
@@ -12,129 +19,91 @@
     :file => :vertical_file_input,
     :boolean => :vertical_boolean}) do |f|
 
-  - if @organization_list.count > 1
-    = f.association :organization, :required => true, :collection => Organization.where(id: @organization_list), :label_method => 'coded_name'
-  = f.input :sourceable_id, :collection => Grant.sources, :required => true, :label => Grant.label, :disabled => !@grant.new_record?
-  = f.input :name, :disabled => !@grant.new_record?
-  = f.input :fy_year, :collection => @fiscal_years, :label => get_fiscal_year_label
+  %fieldset
+    %legend{id: 'details'} Details
 
-  = f.input :amount, :wrapper=> :vertical_prepend, :label => "Amount" do
-    %span.input-group-addon
-      %i.fa.fa-usd
-    = f.input_field :amount, :class => "form-control"
+    .row
+      .col-sm-3= f.input :grant_num, label: 'Grant Number'
+    .row
+      .col-sm-3
+        .form-group
+          %label.control-label.string.required
+            * Source
+          = select_tag(:funding_source_type_id, options_from_collection_for_select(FundingSourceType.where.not(name: 'Agency'), "id", "name"), class: 'form-control', include_blank: true)
+    .row
+      .col-sm-3= f.input :global_sourceable, collection: FundingSource.all.map{|f| [ f.to_s, f.to_global_id, data: {funding_source_type_id: f.funding_source_type_id} ]}, label: 'Program', required: true
+    .row
+      .col-sm-3= f.association :owner, collection: Organization.where.not(organization_type: OrganizationType.find_by(class_name: 'PlanningPartner')).collect{|f| [f.to_s, f.id]}
+      .col-sm-3= f.association :contributor, collection: [['Multiple', 'multiple'], ['Other','other']] + Organization.where.not(organization_type: OrganizationType.find_by(class_name: 'PlanningPartner')).collect{|f| [f.to_s, f.id]}, required: true
+      #other-contributor-div.col-sm-4{style: 'display:none;'}
+        = f.input :other_contributor
 
-  #grant_budgets.well.well-sm{style: "overflow-y:scroll; max-height:250px;"}
-    %label.control-label
-      %i.fa.fa-usd.fa-1-5x
-      General Ledger
-    .links.pull-right
-      = link_to_add_association f, :grant_budgets, :class => 'btn btn-xs btn-info', data: {association_insertion_method: 'after'}, :disabled => !@grant.new_record? do
-        %i.fa.fa-plus
-    %label#grant_budgets-error.error
-    = f.simple_fields_for :grant_budgets do |grant_budget|
-      = render 'grant_budget_fields', f: grant_budget
+    .row
+      .col-sm-9= f.input :legislative_authorization
+    .row
+      .col-sm-2
+        = f.input :award_date, :wrapper => :vertical_append, :label => "Date of Award" do
+          = f.input_field :award_date, :as => :string, :class => 'form-control datepicker', :value => format_as_date(f.object.award_date)
+          %span.input-group-addon
+            %i.fa.fa-calendar
+    .row
+      .col-sm-4
+        .form-group
+          %label.control-label Method of Apportionment Structure
+          .display-value Single Apportionment
+      .col-sm-2= f.input :fy_year, collection: get_fiscal_years(Date.today-18.years,19).reverse, label: 'Grant Year'
+    .row
+      .col-sm-4
+        = f.input :amount, :wrapper => :vertical_prepend, label: 'Total Apportionment' do
+          %span.input-group-addon
+            %i.fa.fa-usd
+          = f.input_field :amount, :class => "form-control"
+    .row
+      .col-sm-3
+        .form-group
+          %label.control-label Grant Development Method
+          .display-value Directly Generated
 
-  = f.button :submit, :class => "btn btn-primary", :id => 'grant_form_submit'
+  // TODO: Add image to button
+  = f.button :submit, "+ Add Grant & Go To Grant Details", :class => "btn btn-primary", :id => 'grant_form_submit'
+  = link_to "Cancel", :back, :class => "btn btn-default", :role => 'button'
+
 
 :javascript
 
-  var glas = JSON.parse('#{glas.to_json.html_safe}');
-
-  $(document).ready(function(){
-    transam.make_same_height('.header-part');
-  });
-
-  $('body').on('change', '#grant_budgets .grant_budget_amount', function() {
-    $('.grant_budget_amount').valid();
-  });
-  $('#grant_amount').on('change', function() {
-    if ($('#grant_budgets .grant_budget_amount').length > 0) {
-      $('#grant_budgets .grant_budget_amount').rules("add", {
-        budgetsSum: $('#grant_amount').val()
-      });
-      $('.grant_budget_amount').valid();
-    }
-  });
-
-  $.validator.addMethod("budgetsSum", function(value, element, params) {
-    var sum = 0;
-    $('.grant_budget_amount').each(function() {
-        int = parseInt($(this).val())
-        if (int > 0) {
-          sum += int;
-        }
-    });
-
-    return sum <= parseInt(params);
-  }, "Sum of entries is not less than or equal to {0}.");
-
-  // jquery validations
   $('.grant_form').validate({
     submitHandler: function(form) {
+      $('input').prop('disabled', false); // re-enable any disabled fields so they'll submit
       form.submit();
     }
   });
 
-  $('#grant_organization_id').change(function() {
-    update_glas();
+  $('#funding_source_type_id').on('change', function(e) {
+    var id = $(this).val();
+
+    $("#grant_global_sourceable option:selected").prop("selected", false)
+    $('#grant_global_sourceable option').hide();
+    $('#grant_global_sourceable option[data-funding-source-type-id="'+id+'"]').show();
   });
 
-  $('#grant_sourceable_id').change(function() {
-    update_fiscal_year_range();
+  $('#grant_contributor_id').on('change', function(e) {
+    var id = $(this).val();
+
+    if ($('#grant_contributor_id option:selected').text() == 'Other') {
+      $('#other-contributor-div').show();
+    } else {
+      $('#other-contributor-div').hide();
+      $('#grant_other_contributor').val('');
+    }
+
   });
 
-  $('#grant_budgets').on('cocoon:after-insert', function(e, added_budget) {
-    if ($('#grant_organization_id').length > 0) {
-      update_glas();
-    }
+  $('#funding_source_type_id').change();
+  $('#grant_contributor_id').change();
 
-    added_budget.find('input.grant_budget_amount').rules("add", {
-      budgetsSum: $('#grant_amount').val()
-    });
-  })
+  $('#grant_award_date').datepicker("setDate", new Date());
 
-  function update_glas() {
-    org_id = parseInt($('#grant_organization_id').val());
-    var gla_ids = glas[org_id];
-
-    //console.log(gla_ids);
-    $('#grant_budgets select option').each(function() {
-        var val = $(this).val();
-        if((val && gla_ids != undefined && gla_ids.indexOf(parseInt(val)) > -1) || (val == "")) {
-            $(this).show();
-        } else {
-            $(this).prop('selected', false);
-            $(this).hide();
-        }
-    });
-
-
-
-  }
-
-  function update_fiscal_year_range()
-  {
-    var url = '#{find_fiscal_year_range_funding_sources_path}';
-    if ( $('#funding_bucket_proxy_program_id').val() > 0)
-    {
-      $.ajax({
-        url: url,
-        data: {program_id: $('#grant_sourceable_id').val()},
-        success: function(result){
-          $('#grant_fy_year').empty();
-
-          //Add a blank entry to the list.
-          $("#grant_fy_year").append( $("<option></option>").attr("value", "").text(''));
-          for(i = 0;i<result.length;i++){
-            //add an option for each organizations available to the tempalte
-            $("#grant_fy_year").append(
-                $("<option></option>").attr("value", result[i][1]).text(result[i][0])
-            );
-          }
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
-          }
-        });
-    }
-  }
+  // TODO: Can't add commas to numeric field. Can we make this a text field instead?
+  // $('#grant_amount').keyup(function(event) {
+  //   $(this).val($(this).val().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+  // });

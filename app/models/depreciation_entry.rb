@@ -15,6 +15,7 @@ class DepreciationEntry < ActiveRecord::Base
   #------------------------------------------------------------------------------
 
   belongs_to :asset
+  belongs_to :transam_asset
 
   has_and_belongs_to_many :general_ledger_account_entries
 

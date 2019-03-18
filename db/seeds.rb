@@ -70,16 +70,21 @@ report_types = [
   {:active => 0, :name => 'GL/Accounting Report', :description => 'GL/Accounting Report', :display_icon_name => 'fa fa-book'}
 ]
 system_config_extensions = [
-    {class_name: 'RehabilitationUpdateEvent', extension_name: 'TransamGlAccountableAssetEvent', active: true},
-    {class_name: 'AssetsController', extension_name: 'TransamAccountingAssetsController', active: true},
-    #{class_name: 'Organization', extension_name: 'TransamAccountable', active: true}, comment out temporarily as all orgs dont have COA
-    {class_name: 'Policy', extension_name: 'TransamAccountingPolicy', active: true},
-    {class_name: 'Vendor', extension_name: 'TransamAccountingVendor', active: true}
+    {engine_name: 'accounting', class_name: 'RehabilitationUpdateEvent', extension_name: 'TransamGlAccountableAssetEvent', active: true},
+    {engine_name: 'accounting', class_name: 'AssetsController', extension_name: 'TransamAccountingAssetsController', active: true},
+    #{engine_name: 'accounting', class_name: 'Organization', extension_name: 'TransamAccountable', active: true}, comment out temporarily as all orgs dont have COA
+    {engine_name: 'accounting', class_name: 'Policy', extension_name: 'TransamAccountingPolicy', active: true},
+    {engine_name: 'accounting', class_name: 'Vendor', extension_name: 'TransamAccountingVendor', active: true},
+    {engine_name: 'accounting', class_name: 'TransamAsset', extension_name: 'TransamValuable', active: true}
 
 ]
 
+roles = [
+    {name: 'grant_manager', privilege: true, show_in_user_mgmt: true, weight: 11}
+]
+
 lookup_tables = %w{ funding_source_types general_ledger_account_types general_ledger_account_subtypes depreciation_calculation_types depreciation_interval_types}
-merge_tables = %w{ asset_event_types activities report_types system_config_extensions}
+merge_tables = %w{ asset_event_types activities report_types system_config_extensions roles}
 
 lookup_tables.each do |table_name|
   puts "  Loading #{table_name}"
@@ -199,3 +204,6 @@ data.each do |row|
   x.report_type = ReportType.where(:name => row[:type]).first
   x.save!
 end
+
+# asset query seeds
+require_relative File.join('asset_query_seeds')

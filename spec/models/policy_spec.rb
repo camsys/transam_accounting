@@ -16,7 +16,7 @@ RSpec.describe Policy, :type => :model do
   end
 
   it 'form params' do
-    expect(TransamAccountingPolicy::FORM_PARAMS).to eq([
+    expect(TransamAccountingPolicy::ClassMethods.allowable_params).to eq([
       :depreciation_calculation_type_id,
       :depreciation_interval_type_id
     ])

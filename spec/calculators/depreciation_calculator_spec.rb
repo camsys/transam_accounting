@@ -27,6 +27,9 @@ RSpec.describe DepreciationCalculator, :type => :calculator do
 
   describe '#total_depreciation' do
     it 'is 0 for a purchase price of 0' do
+
+      skip('Needs depreciation entries. Not yet testable.')
+
       @test_asset.purchase_cost = 0
       @test_asset.save!
 
@@ -41,6 +44,7 @@ RSpec.describe DepreciationCalculator, :type => :calculator do
 
   describe '#book_value_start' do
     it 'is the purchase cost if first fiscal year' do
+      skip('Needs depreciation entries. Not yet testable.')
       expect(test_calculator.book_value_start(@test_asset,fiscal_year_end_date(@test_asset.depreciation_start_date))).to eq(@test_asset.purchase_cost)
     end
   end

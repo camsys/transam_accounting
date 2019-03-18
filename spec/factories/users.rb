@@ -3,15 +3,15 @@
 FactoryGirl.define do
 
   factory :user do
-    phone 999999999
-    password 'Welcome1'
+    phone { 999999999 }
+    password { 'Welcome1' }
     association :organization, :factory => :organization
-    active true
+    active { true }
 
     factory :guest do
-      first_name "bob"
-      last_name  "guest"
-      email 'bob@example.com'
+      first_name { "bob" }
+      last_name  { "guest" }
+      email { 'bob@example.com' }
 
       after(:create) do |u|
         u.add_role :guest
@@ -19,8 +19,8 @@ FactoryGirl.define do
     end
 
     factory :normal_user do
-      first_name "joe"
-      last_name  "normal"
+      first_name { "joe" }
+      last_name  { "normal" }
       sequence(:email) {|n| "joe#{n}@example.com"}
 
       after(:create) do |u|
@@ -29,8 +29,8 @@ FactoryGirl.define do
     end
 
     factory :manager do
-      first_name "kate"
-      last_name  "manager"
+      first_name { "kate" }
+      last_name  { "manager" }
       sequence(:email) {|n| "kate#{n}@example.com"}
 
       after(:create) do |u|
@@ -39,8 +39,8 @@ FactoryGirl.define do
     end
 
     factory :admin do
-      first_name "jill"
-      last_name  "admin"
+      first_name { "jill" }
+      last_name  { "admin" }
       sequence(:email) {|n| "jill#{n}@example.com"}
 
       after(:create) do |u|

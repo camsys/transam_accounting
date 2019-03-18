@@ -1,55 +1,57 @@
 class GrantsController < OrganizationAwareController
 
+  authorize_resource
+
   # Include the fiscal year mixin
   include FiscalYear
 
   add_breadcrumb "Home", :root_path
   add_breadcrumb "Grants", :grants_path
 
-  before_action :set_grant, :only => [:show, :edit, :update, :destroy, :summary_info]
+  before_action :set_grant, :only => [:show, :edit, :update, :destroy, :summary_info, :fire_workflow_event]
+  before_action :reformat_date_fields, only: [:create, :update]
+
+  before_action :set_paper_trail_whodunnit
 
   INDEX_KEY_LIST_VAR    = "grants_key_list_cache_var"
 
   def index
 
-    @fiscal_years = fiscal_year_range
-
      # Start to set up the query
-    conditions  = []
-    values      = []
+    conditions  = {}
 
-    conditions << 'organization_id IN (?)'
-    values << @organization_list
+    conditions[:owner_id] = @organization_list
 
-    @sourceable_id = params[:sourceable_id]
-    unless @sourceable_id.blank?
-      @sourceable_id = @sourceable_id.to_i
-      conditions << 'sourceable_id = ?'
-      values << @sourceable_id
+    if params[:global_sourceable]
+      @sourceable = GlobalID::Locator.locate params[:global_sourceable]
+        conditions[:sourceable] = @sourceable
     end
 
     @fiscal_year = params[:fiscal_year]
     unless @fiscal_year.blank?
       @fiscal_year = @fiscal_year.to_i
-      conditions << 'fy_year = ?'
-      values << @fiscal_year
+      conditions[:fy_year] = @fiscal_year
+    end
+
+    @state = params[:state]
+    if @state == "default" || @state.blank?
+      conditions[:state] = ["in_development", "open"]
+    elsif @state != "all"
+      conditions[:state] = @state
     end
 
     # TODO fix for sourceable
-    @grants = Grant.where(conditions.join(' AND '), *values)
+    @grants = Grant.where(conditions)
 
     # cache the set of object keys in case we need them later
     cache_list(@grants, INDEX_KEY_LIST_VAR)
 
-    if @sourceable_id.blank?
-      add_breadcrumb "All"
-    else
-      add_breadcrumb Grant::SOURCEABLE_TYPE.constantize.find_by(id: @sourceable_id)
-    end
-
     respond_to do |format|
       format.html # index.html.erb
       format.json { render :json => @grants }
+      format.xlsx do
+        response.headers['Content-Disposition'] = "attachment; filename=Grant Table Export.xlsx"
+      end
     end
 
   end
@@ -67,15 +69,9 @@ class GrantsController < OrganizationAwareController
   # GET /grants/1.json
   def show
 
-    add_breadcrumb @grant.sourceable, eval(@grant.sourceable_path)
-    add_breadcrumb @grant.to_s, grant_path(@grant)
+    add_breadcrumb "Grant Profile"
 
     @assets = @grant.assets.where('organization_id in (?)', @organization_list)
-
-    # get the @prev_record_path and @next_record_path view vars
-    get_next_and_prev_object_keys(@grant, INDEX_KEY_LIST_VAR)
-    @prev_record_path = @prev_record_key.nil? ? "#" : grant_path(@prev_record_key)
-    @next_record_path = @next_record_key.nil? ? "#" : grant_path(@next_record_key)
 
     respond_to do |format|
       format.html # show.html.erb
@@ -89,22 +85,7 @@ class GrantsController < OrganizationAwareController
 
     add_breadcrumb "New", new_grant_path
 
-    # get fiscal years up to planning year + 3 years
-    @fiscal_years = fiscal_year_range(4)
-
     @grant = Grant.new(:sourceable_id => params[:sourceable_id])
-
-  end
-
-  # GET /grants/1/edit
-  def edit
-
-    add_breadcrumb @grant.sourceable, eval(@grant.sourceable_path)
-    add_breadcrumb @grant.to_s, grant_path(@grant)
-    add_breadcrumb "Update"
-
-    # get fiscal years up to planning year + 3 years
-    @fiscal_years = fiscal_year_range(4)
 
   end
 
@@ -112,14 +93,21 @@ class GrantsController < OrganizationAwareController
   # POST /grants.json
   def create
 
-    @grant = Grant.new(grant_params.except(:sourceable_id))
-    @grant.sourceable = Grant::SOURCEABLE_TYPE.constantize.find_by(id: params[:grant][:sourceable_id])
-    @grant.organization_id = @organization_list.first if @grant.organization_id.nil?
+    @grant = Grant.new(grant_params.except(:contributor_id))
+    if params[:grant][:contributor_id] == 'multiple'
+      @grant.has_multiple_contributors = true
+    elsif params[:grant][:contributor_id].to_i > 0
+      @grant.has_multiple_contributors = false
+      @grant.contributor_id = params[:grant][:contributor_id]
+    end
+
+    @grant.creator = current_user
+    @grant.updater = current_user
 
     respond_to do |format|
-      if @grant.save!
+      if @grant.save
         notify_user(:notice, "The grant was successfully saved.")
-        format.html { redirect_to grant_url(@grant) }
+        format.html { redirect_to grant_path(@grant) }
         format.json { render action: 'show', status: :created, location: @grant }
       else
         format.html { render action: 'new' }
@@ -132,13 +120,19 @@ class GrantsController < OrganizationAwareController
   # PATCH/PUT /grants/1.json
   def update
 
-    # get fiscal years up to planning year + 3 years
-    @fiscal_years = fiscal_year_range(4)
+    if params[:grant][:contributor_id] == 'multiple'
+      @grant.has_multiple_contributors = true
+    elsif params[:grant][:contributor_id].to_i > 0
+      @grant.has_multiple_contributors = false
+      @grant.contributor_id = params[:grant][:contributor_id]
+    end
+
+    @grant.updater = current_user
 
     respond_to do |format|
-      if @grant.update(grant_params)
-        notify_user(:notice, "The Gratn was successfully updated.")
-        format.html { redirect_to grant_url(@grant) }
+      if @grant.update(grant_params.except(:contributor_id))
+        notify_user(:notice, "The grant was successfully updated.")
+        format.html { redirect_to grant_path(@grant) }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
@@ -152,17 +146,40 @@ class GrantsController < OrganizationAwareController
   def destroy
     name = @grant.to_s
     @grant.destroy
-    notify_user(:notice, "Grant # {name} was successfully removed.")
+    notify_user(:notice, "The grant was successfully removed.")
+
     respond_to do |format|
       format.html { redirect_to grants_url }
       format.json { head :no_content }
     end
   end
 
+  def fire_workflow_event
+
+    event_name = params[:event]
+
+    if Grant.event_names.include? event_name
+      if @grant.fire_state_event(event_name)
+        event = WorkflowEvent.new
+        event.creator = current_user
+        event.accountable = @grant
+        event.event_type = event_name
+        event.save
+      else
+        notify_user(:alert, "Could not #{event_name.humanize} grant #{@grant}")
+      end
+    else
+      notify_user(:alert, "#{event_name} is not a valid event for a grant")
+    end
+
+    redirect_back(fallback_location: root_path)
+
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_grant
-      @grant = Grant.find_by(object_key: params[:id], organization_id: @organization_list)
+      @grant = Grant.find_by(object_key: params[:id], owner_id: @organization_list)
 
       if @grant.nil?
        if Grant.find_by(object_key: params[:id]).nil?
@@ -175,22 +192,19 @@ class GrantsController < OrganizationAwareController
       end
     end
 
-    def fiscal_year_range(num_forecasting_years=nil)
-      # get range of fiscal years of all grants. Default to current fiscal
-      # years if there are no grants available
-      min_fy = Grant.where(:organization => @organization).minimum(:fy_year)
-
-      if min_fy.nil?
-        get_fiscal_years
-      else
-        date_str = "#{SystemConfig.instance.start_of_fiscal_year}-#{min_fy}"
-        start_of_min_fy = Date.strptime(date_str, "%m-%d-%Y")
-        get_fiscal_years(start_of_min_fy,num_forecasting_years)
-      end
-    end
-
     def grant_params
       params.require(:grant).permit(Grant.allowable_params)
     end
+
+  def reformat_date_fields
+    params[:grant][:award_date] = reformat_date(params[:grant][:award_date]) unless params[:grant][:award_date].blank?
+  end
+
+  def reformat_date(date_str)
+    # See if it's already in iso8601 format first
+    return date_str if date_str.match(/\A\d{4}-\d{2}-\d{2}\z/)
+
+    Date.strptime(date_str, '%m/%d/%Y').strftime('%Y-%m-%d')
+  end
 
 end

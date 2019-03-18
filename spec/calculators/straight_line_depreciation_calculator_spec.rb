@@ -15,6 +15,8 @@ RSpec.describe StraightLineDepreciationCalculator, :type => :calculator do
     @organization = create(:organization)
     @test_asset = create(:buslike_asset, :organization => @organization)
     @policy = create(:policy, :organization => @organization)
+
+    skip('Needs depreciation entries. Not yet testable.')
   end
 
   let(:test_calculator) { StraightLineDepreciationCalculator.new }

@@ -27,8 +27,8 @@ class FundingSource < ActiveRecord::Base
   belongs_to  :funding_source_type
 
   # Each funding source was created and updated by a user
-  belongs_to :creator, :class_name => "User", :foreign_key => :created_by_id
-  belongs_to :updator, :class_name => "User", :foreign_key => :updated_by_id
+  belongs_to :creator, -> { unscope(where: :active) }, :class_name => "User", :foreign_key => :created_by_id
+  belongs_to :updator, -> { unscope(where: :active) }, :class_name => "User", :foreign_key => :updated_by_id
 
   # Each funding program has zero or more documents. Documents are deleted when the program is deleted
   has_many    :documents,   :as => :documentable, :dependent => :destroy

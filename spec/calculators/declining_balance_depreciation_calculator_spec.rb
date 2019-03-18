@@ -3,6 +3,8 @@ include FiscalYear
 
 RSpec.describe DecliningBalanceDepreciationCalculator, :type => :calculator do
 
+  before { skip('Needs depreciation entries. Not yet testable.') }
+
   class TestOrg < Organization
     def get_policy
       return Policy.find_by_organization_id(self.id)

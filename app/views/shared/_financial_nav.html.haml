@@ -78,3 +78,10 @@
       - if lookup_context.template_exists?(view_component, 'shared', true)
         - count += 1
         = render :partial => "shared/#{view_component}", :locals => {:count => count}
+
+    - if (can? :read, Grant) && !(SystemConfig.transam_module_names.include? 'funding')
+      %li.divider
+      %li.text-left
+        = link_to grants_path do
+          %i.fa.fa-balance-scale.fa-fw
+          Grants

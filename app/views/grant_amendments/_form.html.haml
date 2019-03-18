@@ -1,0 +1,61 @@
+= simple_form_for([@grant, @grant_amendment],
+  :html => {:class => 'form-vertical grant_amendment_form' },
+  :wrapper => :vertical_form,
+  :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :vertical_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean}) do |f|
+
+  .row
+    .col-md-3
+      = f.input :amendment_num, label: 'Amendment Number', required: true
+
+  .form-group.required.radio-buttons-inline
+    %label.required.control-label
+      %abbr{title: 'required'} *
+      = " Update Grant Number"
+    %span.radio
+      %label
+        = radio_button_tag :update_grant_num, 'yes', @grant_amendment.grant_num.present?
+        Yes
+    %span.radio
+      %label
+        = radio_button_tag :update_grant_num, 'no', @grant_amendment.grant_num.blank?
+        No
+
+  .row
+    .col-md-3
+      = f.input :grant_num, label: 'Grant Number', disabled: @grant_amendment.grant_num.blank?, input_html: {data: {grant_num: @grant.grant_num}}
+
+  = f.input :comments
+
+  = f.button :submit, save_text, :class => "btn btn-primary"
+  = link_to "Cancel", :back, :class => "btn btn-default", :role => 'button'
+
+:javascript
+  $('.grant_amendment_form').validate({
+    submitHandler: function(form) {
+      $('input').prop('disabled', false); // re-enable any disabled fields so they'll submit
+      form.submit();
+    }
+  });
+
+  $("input[name='update_grant_num']").on("click", function() {
+    if ($(this).val() == 'yes') {
+      $('label[for="grant_amendment_grant_num"]').html('<abbr title="required">*</abbr> Grant Number');
+      $('#grant_amendment_grant_num').attr('disabled', false);
+
+      $('#grant_amendment_grant_num').rules("add", {
+        required: true
+      });
+
+      $('#grant_amendment_grant_num').val($('#grant_amendment_grant_num').data('grant-num'));
+    } else {
+      $('label[for="grant_amendment_grant_num"]').html('Grant Number');
+      $('#grant_amendment_grant_num').val('');
+      $('#grant_amendment_grant_num').attr('disabled', true);
+
+      $('#grant_amendment_grant_num').rules("add", {
+        required: false
+      });
+
+    }
+
+  })

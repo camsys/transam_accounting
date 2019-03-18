@@ -1,0 +1,7 @@
+.row
+  .col-md-6.col-md-offset-3
+    %fieldset
+      %legend Add Amendment
+      = render(:partial => 'shared/form_errors', :locals => {:obj => @grant_amendment}) unless @grant_amendment.errors.empty?
+
+      = render 'form', save_text: '+ Add Amendment'

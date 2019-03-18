@@ -1,0 +1,19 @@
+.nested-fields{style: 'border:none;'}
+  .row
+    .col-md-5
+      = f.input :global_sourceable, :collection => FundingSource.all.map{|f| [ f.to_s, f.to_global_id ]}, :required => true, :label => 'Funding Program'
+    .col-md-3.pcnt-column
+      = f.input :pcnt_purchase_cost, :label => 'Pcnt', :wrapper => :vertical_append do
+        = f.input_field :pcnt_purchase_cost, :class => 'form-control funding-pcnt', :min => 1, :max => 100
+        %span.input-group-addon
+          %i.fa.fa-percent
+    .col-md-3.amount-column
+      .form-group
+        %label.control-label Amount
+        .grant-purchase-amount.display-value= format_as_currency(@asset.purchase_cost * (f.object.pcnt_purchase_cost || 0) / 100.0)
+
+    .col-md-1
+      = link_to_remove_association f, :class => 'btn btn-xs btn-warning remove_funding_source', :style => 'margin-top: 27px;' do
+        %i.fa.fa-trash-o
+
+

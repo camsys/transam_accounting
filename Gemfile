@@ -7,11 +7,13 @@ source "https://rubygems.org"
 
 # To use debugger
 # gem 'debugger'
-gem 'transam_core', git: 'https://github.com/camsys/transam_core', branch: :quarter4
-gem 'transam_reporting', git: 'https://github.com/camsys/transam_reporting', branch: :quarter4
-gem 'transam_transit', git: 'https://github.com/camsys/transam_transit', branch: :quarter4
-gem 'mysql2', '~> 0.3.20' # lock gem for dummy app
+gem 'transam_core', git: 'https://github.com/camsys/transam_core', branch: :quarter1
+gem 'transam_reporting', git: 'https://github.com/camsys/transam_reporting', branch: :quarter1
+gem 'transam_transit', git: 'https://github.com/camsys/transam_transit', branch: :quarter1
+gem 'mysql2', '~> 0.5.1' # lock gem for dummy app
 gem "capybara", '2.6.2' # lock gem for old capybara behavior on hidden element xpath
+
+gem 'rails-controller-testing' # assigns has been extracted to this gem
 
 # This gem allows us to share githooks. Githooks in the .hooks folder can be checked
 # in, and when "bundle install" is run this gem automatically creates symlinks into

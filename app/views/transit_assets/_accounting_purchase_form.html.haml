@@ -1,0 +1,66 @@
+- if can? :update, asset
+  #grants_grant_purchases.well.well-sm{style: "overflow-y:scroll; max-height:250px; width:95%;"}
+    = simple_form_for(asset.transam_asset,
+        :as => :asset,
+        :url => inventory_path(asset.transam_asset),
+        :method => 'put',
+        :remote => true,
+        :html => {:class => 'form-vertical form-section grants_grant_purchases_form'},
+        :wrapper => :vertical_form,
+        :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes,
+          :radio_buttons => :vertical_radio_and_checkboxes,
+          :file => :vertical_file_input,
+          :boolean => :vertical_boolean}) do |f|
+
+      %fieldset
+        %legend Grants
+        %label#grants-error.error
+        = f.simple_fields_for :grant_grant_purchases do |grant|
+          = render 'assets/grant_fields', f: grant
+        .links.pull-right
+          = link_to_add_association f, :grant_grant_purchases, partial: 'assets/grant_fields', :class => 'btn btn-xs btn-info' do
+            %i.fa.fa-plus
+
+      = f.button :submit, 'Save', :class => 'btn btn-primary'
+
+:javascript
+   $( document ).ready(function() {
+    $('.grants_grant_purchases_form').validate({
+      submitHandler: function(form) {
+        $('.grants_grant_purchases_form input').prop('disabled', false); // re-enable any disabled fields so they'll submit
+        form.trigger('submit.rails'); // submits form both as HTML or JS as defined in form data-remote
+      }
+    });
+    if ($('.grants_grant_purchases_form input.funding-pcnt').length > 0) {
+      $('.grants_grant_purchases_form input.funding-pcnt').rules( "add", {
+        pcntSumsHundred_grants: true
+      });
+    }
+
+  });
+
+  $('body').on('change', '.global-sourceable', function() {
+    id = $(this).attr('id');
+
+    $('#' + id.substring(0, id.length-'global_sourceable'.length) + 'other_sourceable').prop('disabled', $(this).val() != '');
+  });
+
+  $('body').on('change', '.grants_grant_purchases_form .funding-pcnt', function() {
+     $('.grants_grant_purchases_form input.funding-pcnt').rules( "add", {
+      pcntSumsHundred_grants: true
+    });
+     $('.grants_grant_purchases_form .funding-pcnt').valid();
+
+     var amount = parseInt($(this).val())*parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]'])/100;
+     var currency_val = parseFloat(amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+     $(this).closest('.pcnt-column').next().find('.grant-purchase-amount.display-value').html('$ ' + currency_val);
+  });
+
+  $.validator.addMethod("pcntSumsHundred_grants", function(value, element) {
+      var sum = 0;
+    $('.grants_grant_purchases_form .funding-pcnt').each(function() {
+        sum += Number($(this).val());
+    });
+     return sum <= 100;
+  }, "Entries do not sum to 100%.");
+

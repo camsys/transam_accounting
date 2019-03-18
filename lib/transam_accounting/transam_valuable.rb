@@ -39,11 +39,18 @@ module TransamValuable
     # Associations
     #----------------------------------------------------
 
-    # each asset was purchased using one or more grants
+    # each asset was purchased using some sources
     has_many    :grant_purchases,  :foreign_key => :transam_asset_id, :dependent => :destroy, :inverse_of => :transam_asset
+    has_many    :grant_grant_purchases, -> { where(sourceable_type: 'Grant') },  :foreign_key => :transam_asset_id, :dependent => :destroy, :inverse_of => :transam_asset, class_name: 'GrantPurchase'
+    has_many    :funding_source_grant_purchases, -> { where(sourceable_type: 'FundingSource') },  :foreign_key => :transam_asset_id, :dependent => :destroy, :inverse_of => :transam_asset, class_name: 'GrantPurchase'
+
+    has_many :grants, through: :grant_purchases, :source => :sourceable, :source_type => 'Grant'
+    has_many :funding_sources, through: :grant_purchases, :source => :sourceable, :source_type => 'FundingSource'
 
     # Allow the form to submit grant purchases
     accepts_nested_attributes_for :grant_purchases, :reject_if => :all_blank, :allow_destroy => true
+    accepts_nested_attributes_for :grant_grant_purchases, :reject_if => :all_blank, :allow_destroy => true
+    accepts_nested_attributes_for :funding_source_grant_purchases, :reject_if => :all_blank, :allow_destroy => true
 
     has_many :depreciation_entries, :foreign_key => :transam_asset_id
 
@@ -74,7 +81,9 @@ module TransamValuable
   module ClassMethods
     def self.allowable_params
       [
-          :grant_purchases_attributes => [GrantPurchase.allowable_params]
+          :grant_purchases_attributes => [GrantPurchase.allowable_params],
+          :grant_grant_purchases_attributes => [GrantPurchase.allowable_params],
+          :funding_source_grant_purchases_attributes => [GrantPurchase.allowable_params]
       ]
     end
   end

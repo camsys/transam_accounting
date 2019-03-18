@@ -5,7 +5,15 @@
     %span.caret
   %ul.dropdown-menu{:role => 'menu'}
     - if can? :update, @grant
+      - @grant.allowable_events.each do |evt|
+        - if can? evt.to_sym, @grant
+          %li
+            = link_to fire_workflow_event_grant_path(@grant, :event => evt) do
+              %i.fa.fa-fw{:class => get_workflow_event_icon(evt)}
+              = evt.titleize
+    - if (can? :destroy, @grant) && @grant.deleteable?
+      %li.divider
       %li
-        = link_to edit_grant_path(@grant) do
-          %i.fa.fa-edit.fa-fw
-          = " Update this grant"
+        = link_to grant_path(@grant), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
+          %i.fa.fa-trash-o.fa-fw
+          = " Remove this grant"
