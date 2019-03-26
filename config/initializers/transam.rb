@@ -1,1 +1,1 @@
-Rails.application.config.rails_admin_accounting_lookup_tables = ['DepreciationIntervalType', 'ExpenseType']
+Rails.application.config.rails_admin_accounting_lookup_tables = ['DepreciationIntervalType', 'ExpenseType', 'FundingSourceType']
