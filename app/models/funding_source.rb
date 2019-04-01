@@ -19,6 +19,8 @@ class FundingSource < ActiveRecord::Base
   #------------------------------------------------------------------------------
   after_initialize                  :set_defaults
 
+  default_scope { where(funding_source_type: FundingSourceType.active) }
+
   #------------------------------------------------------------------------------
   # Associations
   #------------------------------------------------------------------------------

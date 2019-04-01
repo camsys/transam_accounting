@@ -64,6 +64,6 @@
             .tab-pane.fade#hist
               %legend History
               .tab-content
-                = render 'history'
+                = render partial: 'shared/papertrail_history', locals: {history: @grant.history}
 
 = render 'scripts'
