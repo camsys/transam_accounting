@@ -56,12 +56,14 @@
       var tdc_sum = 0;
       var tdc = "#{FundingSource.find_by(funding_source_type: FundingSourceType.find_by(name: 'TDC')).try(:to_global_id)}";
     $('.funding_sources_grant_purchases_form .funding-pcnt').each(function() {
-      if ($('#'+$('.funding_sources_grant_purchases_form .funding-pcnt').first().attr('id').substring(0,50)+'global_sourceable').val() != tdc) {
+      pcnt_field_id = $(this).attr('id');
+      program = $('#'+pcnt_field_id.substring(0,pcnt_field_id.length-18)+'global_sourceable').val();
+      if (program != tdc) {
         sum += Number($(this).val());
       } else {
         tdc_sum += Number($(this).val());
       }
     });
-     return (sum <= 100) && (tdc_sum <= 100);
-  }, "Entries do not sum to 100%.");
+    return (sum <= 100) && (tdc_sum <= 100);
+  }, "Entries do not sum to 100%333.");
 
