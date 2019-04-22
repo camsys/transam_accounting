@@ -9,6 +9,15 @@ module Abilities
         can :manage, FundingSource
       end
 
+      # BPT user can add comments on any asset
+      can :create, Comment do |c|
+        if c.commentable_type == 'FundingSource'
+          false
+        else
+          true
+        end
+      end
+
     end
   end
 end
