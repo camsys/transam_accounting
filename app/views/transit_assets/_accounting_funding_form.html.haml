@@ -58,7 +58,7 @@
     $('.funding_sources_grant_purchases_form .funding-pcnt').each(function() {
       pcnt_field_id = $(this).attr('id');
       program = $('#'+pcnt_field_id.substring(0,pcnt_field_id.length-18)+'global_sourceable').val();
-      if ($.inArray(program, tdc_funding_programs){
+      if ($.inArray(program, tdc_funding_programs)){
         tdc_sum += Number($(this).val());
       } else {
         sum += Number($(this).val());
