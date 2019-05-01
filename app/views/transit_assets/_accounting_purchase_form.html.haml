@@ -68,7 +68,7 @@
     // TDC is counted separately as they're "credits"
     var sum = 0;
     var tdc_sum = 0;
-    var tdc_grants = JSON.parse('#{Grant.where(sourceable: FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'TDC'))).map{|f| f.to_global_id}.to_json}'))
+    var tdc_grants = JSON.parse('#{Grant.where(sourceable: FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'TDC'))).map{|f| f.to_global_id}.to_json}')
     $('.grants_grant_purchases_form .funding-pcnt').each(function() {
       pcnt_field_id = $(this).attr('id');
       program = $('#'+pcnt_field_id.substring(0,pcnt_field_id.length-18)+'global_sourceable').val();
