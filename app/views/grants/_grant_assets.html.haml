@@ -45,7 +45,7 @@
         %th.right{:data => {:sortable => 'true', :order => 'desc', :visible => 'false'}} Scheduled Replacement Cost
 
     %tbody
-      - assets.each do |a|
+      - grant_purchases.each do |gp|
         - a = TransamAsset.get_typed_asset(a)
         %tr
           %td.left= link_to a.asset_tag, inventory_path(a)
@@ -57,7 +57,7 @@
           %td.left= a.fta_type_type.classify.constantize.find_by(id: a.fta_type_id).name
           %td.left= a.asset_subtype
           %td.right= format_as_currency(a.purchase_cost)
-          %td.right= format_as_currency(a.purchase_cost * 0.01 * GrantPurchase.find_by(transam_asset_id: a.transam_assetible_id, sourceable_type: "Grant", sourceable_id: grant_id).pcnt_purchase_cost)
+          %td.right= format_as_currency(a.purchase_cost * 0.01 * gp.pcnt_purchase_cost)
           %td.left= format_as_decimal(a.reported_condition_rating, 2)
           %td.left= a.service_status_type.name unless a.service_status_type.nil?
           %td.left= format_as_date(a.in_service_date)
