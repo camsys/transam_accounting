@@ -46,7 +46,7 @@
 
     %tbody
       - grant_purchases.each do |gp|
-        - a = TransamAsset.get_typed_asset(a)
+        - a = TransamAsset.get_typed_asset(gp.transam_asset)
         %tr
           %td.left= link_to a.asset_tag, inventory_path(a)
           %td.left= a.external_id
