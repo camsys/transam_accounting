@@ -1,17 +1,19 @@
+:css
+  .purchase_cost_amount {
+    text-align: right;
+  }
+
 .nested-fields.funding-source-fields{style: 'border:none;'}
   .row
     .col-md-5
       = f.input :global_sourceable, :collection => FundingSource.all.map{|f| [ f.to_s, f.to_global_id ]}, :required => true, :label => 'Program', :input_html => { class: 'funding-source-global-sourceable' }
      
-    .col-md-3.amount-column
-      .form-group
-        %label.control-label.required
-          %abbr *
-          Amount
-        .input-group.grant-purchase-amount
+    .col-md-3.grant-purchase-amount
+      = f.input :amount do 
+        .input-group
           %span.input-group-addon
             $
-          = number_field_tag(:purchase_cost_amount, (@asset.purchase_cost * (f.object.pcnt_purchase_cost || 0) / 100).to_i, class: 'form-control purchase_cost_amount', style: "text-align: right;", min: 1, step: 1, required: true)
+          = f.input_field :amount, class: 'form-control purchase_cost_amount', min: 1, step: 1, required: true
     .col-md-2.pcnt-column
       = f.input :pcnt_purchase_cost, as: :hidden, :input_html => { class: 'funding-pcnt'}
       .form-group
