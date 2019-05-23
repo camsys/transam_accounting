@@ -29,7 +29,7 @@ class GrantPurchase < ActiveRecord::Base
   #------------------------------------------------------------------------------
   #validates_presence_of :sourceable
   validates_presence_of Rails.application.config.asset_base_class_name.underscore.to_sym
-  validates :pcnt_purchase_cost,  :presence => true, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
+  validates :pcnt_purchase_cost,  :presence => true, :numericality => {:greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
 
   #------------------------------------------------------------------------------
   # Scopes

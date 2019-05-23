@@ -1,0 +1,34 @@
+- disabled = f.object.sourceable && !f.object.sourceable.open?
+
+.nested-fields.grant-fields{style: 'border:none;'}
+  .row
+    .col-md-3
+      = f.input :sourceable_type, as: :hidden, input_html: {value: 'Grant'} # hidden sourceable type field in case Other set
+      = f.input :global_sourceable, :collection => Grant.active.open.where(owner_id: @organization_list).or(Grant.where(id: f.object.sourceable_id)).map{|f| [  "#{f.grant_num} : #{format_as_fiscal_year(f.fy_year)} : #{f.owner.short_name} : Primary : #{format_as_currency(f.balance)}" , f.to_global_id ]}, :label => 'Grant Number', disabled: disabled, prompt: 'Other', input_html: {class: 'global-sourceable'}
+    .col-md-2
+      = f.input :other_sourceable, label: 'Grant Number (Other)', disabled: disabled
+
+    .col-md-2.amount-column
+      .form-group
+        %label.control-label.required
+          %abbr *
+          Amount
+        .input-group.grant-purchase-amount
+          %span.input-group-addon
+            $
+          = number_field_tag(:purchase_cost_amount, (@asset.purchase_cost * (f.object.pcnt_purchase_cost || 0) / 100).to_i, class: 'form-control purchase_cost_amount', style: "text-align: right;", min: 1, step: 1, required: true)
+    .col-md-2.pcnt-column
+      = f.input :pcnt_purchase_cost, as: :hidden, :input_html => { class: 'funding-pcnt'}
+      .form-group
+        %label.control-label % Funding
+        .grant-purchase-pcnt.display-value{style: "text-align: right; padding: 4px;"}= "#{(f.object.pcnt_purchase_cost || 0)} %"
+
+
+    .col-md-2
+      = f.input :expense_tag, label: 'Expense ID', disabled: disabled
+
+    .col-md-1.pull-right
+      = link_to_remove_association f, :class => 'remove_grant asset-subform-action pull-right' do
+        %i.fa.fa-2x.fa-minus-circle{style: 'margin-top: 27px;'}
+
+
