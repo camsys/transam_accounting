@@ -1,3 +1,4 @@
+- funding_pcnt_precision = Rails.application.config.try(:funding_pcnt_decimal_precision) || 2
 - if can? :update, asset
   #funding_sources_grant_purchases.asset-subform{style: "width:95%;"}
     = simple_form_for(asset.transam_asset,
@@ -24,6 +25,7 @@
 :javascript
    $( document ).ready(function() {
     $('.funding_sources_grant_purchases_form').validate({
+      ignore: [],
       submitHandler: function(form) {
         $('.funding_sources_grant_purchases_form input').prop('disabled', false); // re-enable any disabled fields so they'll submit
         form.trigger('submit.rails'); // submits form both as HTML or JS as defined in form data-remote
@@ -45,7 +47,7 @@
      var pcnt = $(this).val() * 100 / parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]']);
      
      $(this).parents('.funding-source-fields').find('.funding-pcnt').val(pcnt);
-     $(this).parents('.funding-source-fields').find('.grant-purchase-pcnt.display-value').html(pcnt.toFixed(2) + " %");
+     $(this).parents('.funding-source-fields').find('.grant-purchase-pcnt.display-value').html(pcnt.toFixed(#{funding_pcnt_precision}) + " %");
   });
 
   $.validator.addMethod("pcntSumHundred_funding_sources", function(value, element) {

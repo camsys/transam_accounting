@@ -1,3 +1,5 @@
+:ruby
+  funding_pcnt_precision = Rails.application.config.try(:funding_pcnt_decimal_precision) || 2
 - if can? :update, asset
   #grants_grant_purchases.asset-subform{style: "width:95%;"}
     = simple_form_for(asset.transam_asset,
@@ -24,6 +26,7 @@
 :javascript
    $( document ).ready(function() {
     $('.grants_grant_purchases_form').validate({
+      ignore: [],
       submitHandler: function(form) {
         $('.grants_grant_purchases_form input').prop('disabled', false); // re-enable any disabled fields so they'll submit
         form.trigger('submit.rails'); // submits form both as HTML or JS as defined in form data-remote
@@ -38,9 +41,15 @@
   });
 
   $('.grants_grant_purchases_form').on('change', '.global-sourceable', function() {
-    id = $(this).attr('id');
+    var id = $(this).attr('id');
 
-    $('#' + id.substring(0, id.length-'global_sourceable'.length) + 'other_sourceable').prop('disabled', $(this).val() != '');
+    var other_grant_num_field = $('#' + id.substring(0, id.length-'global_sourceable'.length) + 'other_sourceable');
+    if($(this).val() != '') {
+      other_grant_num_field.prop('disabled', true);
+      other_grant_num_field.val('');
+    } else {
+      other_grant_num_field.prop('disabled', false);
+    }
   });
 
   $('body').on('change', '.grants_grant_purchases_form .purchase_cost_amount', function() {
@@ -52,7 +61,7 @@
      var pcnt = $(this).val() * 100 / parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]']);
      
      $(this).parents('.grant-fields').find('.funding-pcnt').val(pcnt);
-     $(this).parents('.grant-fields').find('.grant-purchase-pcnt.display-value').html(pcnt.toFixed(2) + " %");
+     $(this).parents('.grant-fields').find('.grant-purchase-pcnt.display-value').html(pcnt.toFixed(#{funding_pcnt_precision}) + " %");
   });
 
   $.validator.addMethod("pcntSumsHundred_grants", function(value, element) {
