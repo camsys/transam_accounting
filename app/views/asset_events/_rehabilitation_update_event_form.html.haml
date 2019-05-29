@@ -2,7 +2,9 @@
 
 :ruby
   vehicle_rebuild_types = VehicleRebuildType.active
-  unless ['RevenueVehicle', 'ServiceVehicle'].include?(@asset.fta_asset_class&.class_name)
+  if ['RevenueVehicle', 'ServiceVehicle'].include?(@asset.fta_asset_class&.class_name)
+    include_ulm = true
+  else
     vehicle_rebuild_types = VehicleRebuildType.none
   end
 
@@ -24,7 +26,7 @@
     %span.input-group-addon
       %a.transam-popover{data: {placement: 'auto', toggle: 'popover', html: 'true', content: "- Estimated Service Life (ESL) will be extended by the number of months entered here. <br>- Useful Life Benchmark (ULB) will be extended by the number of months entered here, rounded to the nearest 12 month interval."}, title: 'Extend Useful Life by (months)', tabindex: '0'}
         %i.fa.fa-info-circle
-  - if @asset.is_a?(RevenueVehicle)
+  - if include_ulm
     = f.input :extended_useful_life_miles, :wrapper => :vertical_prepend, label: 'Extend Useful Life by (miles)' do
       = f.input_field :extended_useful_life_miles, :class => 'form-control', :required => false, :value => 0, :min => 0, :label => false
       %span.input-group-addon
