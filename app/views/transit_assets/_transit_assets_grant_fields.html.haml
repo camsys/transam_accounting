@@ -3,6 +3,11 @@
     text-align: right;
   }
 
+  .right-align-label {
+    width: 100%;
+    text-align: right;
+  }
+
 - disabled = f.object.sourceable && !f.object.sourceable.open?
 
 .nested-fields.grant-fields{style: 'border:none;'}
@@ -16,7 +21,7 @@
 
       .col-md-2.grant-purchase-amount
 
-        = f.input :amount do 
+        = f.input :amount, label_html: {class: 'right-align-label'} do 
           .input-group
             %span.input-group-addon
               $
@@ -24,7 +29,7 @@
       .col-md-2.pcnt-column
         = f.input :pcnt_purchase_cost, as: :hidden, :input_html => { class: 'funding-pcnt'}
         .form-group
-          %label.control-label % Funding
+          %label.control-label.right-align-label % Funding
           .grant-purchase-pcnt.display-value{style: "text-align: right; padding: 4px;"}= "#{(format_as_decimal(f.object.pcnt_purchase_cost, Rails.application.config.try(:funding_pcnt_decimal_precision) || 2) || 0)} %"
 
       .col-md-1
@@ -52,11 +57,11 @@
 
       .col-md-2
         .form-group
-          %label.control-label Amount
+          %label.control-label.right-align-label Amount
           .display-value{style: 'text-align: right;'}= format_as_currency(f.object.amount)
       .col-md-2
         .form-group
-          %label.control-label % Funding
+          %label.control-label.right-align-label % Funding
           .grant-purchase-pcnt.display-value{style: "text-align: right; padding: 4px;"}= "#{(format_as_decimal(f.object.pcnt_purchase_cost, Rails.application.config.try(:funding_pcnt_decimal_precision) || 2) || 0)} %"
 
       .col-md-1
