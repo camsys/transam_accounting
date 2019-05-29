@@ -261,7 +261,7 @@ class Grant < ActiveRecord::Base
   # Calculate the anount of the grant that has been spent on assets to date. This calculates
   # only the federal percentage
   def spent
-    GrantPurchase.where(sourceable: self).to_a.sum{ |gp| gp.send(Rails.application.config.asset_base_class_name.underscore).purchase_cost * gp.pcnt_purchase_cost / 100.0 }
+    GrantPurchase.where(sourceable: self).sum(:amount)
   end
 
   # Returns the balance of the fund. If the account is overdrawn

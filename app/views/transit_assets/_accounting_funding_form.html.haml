@@ -1,5 +1,6 @@
+- funding_pcnt_precision = Rails.application.config.try(:funding_pcnt_decimal_precision) || 2
 - if can? :update, asset
-  #funding_sources_grant_purchases.well.well-sm{style: "overflow-y:scroll; max-height:250px; width:95%;"}
+  #funding_sources_grant_purchases.asset-subform{style: "width:95%;"}
     = simple_form_for(asset.transam_asset,
         :as => :asset,
         :url => inventory_path(asset.transam_asset),
@@ -13,19 +14,18 @@
           :boolean => :vertical_boolean}) do |f|
 
       %fieldset
-        %legend Funding Programs
+        %legend{style: 'font-size: medium;'} Funding Programs
         %label#funding_sources-error.error
         = f.simple_fields_for :funding_source_grant_purchases do |funding_source|
-          = render 'assets/funding_source_fields', f: funding_source
+          = render 'transit_assets/transit_assets_funding_source_fields', f: funding_source
         .links.pull-right
-          = link_to_add_association f, :funding_source_grant_purchases, partial: 'assets/funding_source_fields', :class => 'btn btn-xs btn-info' do
-            %i.fa.fa-plus
-
-      = f.button :submit, 'Save', :class => 'btn btn-primary'
+          = link_to_add_association f, :funding_source_grant_purchases, partial: 'transit_assets/transit_assets_funding_source_fields', :class => 'asset-subform-action' do
+            %i.fa.fa-2x.fa-plus-circle
 
 :javascript
    $( document ).ready(function() {
     $('.funding_sources_grant_purchases_form').validate({
+      ignore: [],
       submitHandler: function(form) {
         $('.funding_sources_grant_purchases_form input').prop('disabled', false); // re-enable any disabled fields so they'll submit
         form.trigger('submit.rails'); // submits form both as HTML or JS as defined in form data-remote
@@ -33,32 +33,32 @@
     });
     if ($('.funding_sources_grant_purchases_form input.funding-pcnt').length > 0) {
       $('.funding_sources_grant_purchases_form input.funding-pcnt').rules( "add", {
-        pcntSumsHundred_funding_sources: true
+        pcntSumHundred_funding_sources: true
       });
     }
-
   });
 
-  $('body').on('change', '.funding_sources_grant_purchases_form .funding-pcnt', function() {
+  $('body').on('change', '.funding_sources_grant_purchases_form .purchase_cost_amount', function() {
      $('.funding_sources_grant_purchases_form input.funding-pcnt').rules( "add", {
-      pcntSumsHundred_funding_sources: true
+      pcntSumHundred_funding_sources: true
     });
      $('.funding_sources_grant_purchases_form .funding-pcnt').valid();
 
-     var amount = parseInt($(this).val())*parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]'])/100;
-     var currency_val = parseFloat(amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-     $(this).closest('.pcnt-column').next().find('.grant-purchase-amount.display-value').html('$ ' + currency_val);
+     var pcnt = $(this).val() * 100 / parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]']);
+     
+     $(this).parents('.funding-source-fields').find('.funding-pcnt').val(pcnt);
+     $(this).parents('.funding-source-fields').find('.grant-purchase-pcnt.display-value').html(pcnt.toFixed(#{funding_pcnt_precision}) + " %");
   });
 
-  $.validator.addMethod("pcntSumsHundred_funding_sources", function(value, element) {
+  $.validator.addMethod("pcntSumHundred_funding_sources", function(value, element) {
       // TDC is counted separately as they're "credits"
       var sum = 0;
       var tdc_sum = 0;
       var tdc_funding_programs = JSON.parse('#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'TDC')).map{|f| f.to_global_id.to_s}.to_json.html_safe}')
     $('.funding_sources_grant_purchases_form .funding-pcnt').each(function() {
-      pcnt_field_id = $(this).attr('id');
-      program = $('#'+pcnt_field_id.substring(0,pcnt_field_id.length-18)+'global_sourceable').val();
-      if ($.inArray(program, tdc_funding_programs)){
+      var program = $(this).parents('.funding-source-fields').find('.funding-source-global-sourceable').val();
+
+      if ($.inArray(program, tdc_funding_programs) >= 0){
         tdc_sum += Number($(this).val());
       } else {
         sum += Number($(this).val());
