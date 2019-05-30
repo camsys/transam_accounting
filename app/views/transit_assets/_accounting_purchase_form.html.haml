@@ -32,11 +32,10 @@
         form.trigger('submit.rails'); // submits form both as HTML or JS as defined in form data-remote
       }
     });
-    if ($('.grants_grant_purchases_form input.funding-pcnt').length > 0) {
-      $('.grants_grant_purchases_form input.funding-pcnt').rules( "add", {
-        pcntSumsHundred_grants: true
-      });
-    }
+    
+    $('.grants_grant_purchases_form input.purchase_cost_amount').rules( "add", {
+      pcntSumsHundred_grants: true
+    });
 
   });
 
@@ -53,7 +52,7 @@
   });
 
   $('body').on('change', '.grants_grant_purchases_form .purchase_cost_amount', function() {
-     $('.grants_grant_purchases_form input.funding-pcnt').rules( "add", {
+     $('.grants_grant_purchases_form input.purchase_cost_amount').rules( "add", {
       pcntSumsHundred_grants: true
     });
      $('.grants_grant_purchases_form .funding-pcnt').valid();
@@ -78,7 +77,7 @@
       }
     });
     return (sum <= 100) && (tdc_sum <= 100);
-  }, "Entries do not sum to 100%.");
+  }, "% Funding do not sum to 100%.");
 
 
 
