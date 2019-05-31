@@ -33,10 +33,11 @@
       }
     });
     
-    $('.grants_grant_purchases_form input.purchase_cost_amount').rules( "add", {
-      pcntSumsHundred_grants: true
-    });
-
+    if($('.grants_grant_purchases_form input.purchase_cost_amount').length > 0) {
+      $('.grants_grant_purchases_form input.purchase_cost_amount').rules( "add", {
+        pcntSumsHundred_grants: true
+      });
+    }
   });
 
   $('.grants_grant_purchases_form').on('change', '.global-sourceable', function() {
