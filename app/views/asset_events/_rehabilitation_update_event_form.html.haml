@@ -24,7 +24,7 @@
   = f.input :extended_useful_life_months, :wrapper => :vertical_prepend, label: 'Extend Useful Life by (months)' do
     = f.input_field :extended_useful_life_months, :class => 'form-control', :required => false, :value => 0, :min => 0, :label => false
     %span.input-group-addon
-      %a.transam-popover{data: {placement: 'auto', toggle: 'popover', html: 'true', content: "- Estimated Service Life (ESL) will be extended by the number of months entered here. <br>- Useful Life Benchmark (ULB) will be extended by the number of months entered here, rounded to the nearest 12 month interval."}, title: 'Extend Useful Life by (months)', tabindex: '0'}
+      %a.transam-popover{data: {placement: 'auto', toggle: 'popover', html: 'true', content: "- Estimated Service Life (ESL) will be extended by the number of months entered here."}, title: 'Extend Useful Life by (months)', tabindex: '0'}
         %i.fa.fa-info-circle
   - if include_ulm
     = f.input :extended_useful_life_miles, :wrapper => :vertical_prepend, label: 'Extend Useful Life by (miles)' do
