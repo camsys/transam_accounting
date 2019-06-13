@@ -1,12 +1,38 @@
+-# This overwrites _rehabilitation_update_event_form in transam_transit and transam_core engine
+
 :ruby
-  if @asset_event.asset_event_asset_subsystems.empty?
-    AssetSubsystem.for_type(@asset.asset_type).each do |ss|
-      @asset_event.asset_event_asset_subsystems.build(asset_subsystem: ss)
-    end
+  vehicle_rebuild_types = VehicleRebuildType.active
+  if ['RevenueVehicle', 'ServiceVehicle'].include?(@asset.fta_asset_class&.class_name)
+    include_ulm = true
+  else
+    vehicle_rebuild_types = VehicleRebuildType.none
   end
 
 = render :layout => "update_event_form" do |f|
-  = f.input :event_date, :label => 'Date of Report', :wrapper => :vertical_append do
+  .row
+    .col-sm-6
+      = f.association :vehicle_rebuild_type, :collection => vehicle_rebuild_types, :label => 'Rebuild / Rehab Type', :include_blank => 'Other'
+    .col-sm-6.other_vehicle_rebuild_type_container
+      = f.input :other_vehicle_rebuild_type, label: 'Rebuild / Rehab Type (Other)', required: true
+  = f.input :total_cost, :wrapper => :vertical_prepend, label: 'Cost of Rebuild / Rehabilitation' do
+    %span.input-group-addon
+      %i.fa.fa-usd
+    = f.input_field :total_cost, :class => 'form-control', :required => true, :value => 0, :min => 0, :label => false
+    %span.input-group-addon
+      %a.transam-popover{data: {placement: 'auto', toggle: 'popover', html: 'true', content: "This will increase the Cost (Adjusted) of the asset by the amount entered."}, title: 'Cost of Rebuild / Rehabilitation', tabindex: '0'}
+        %i.fa.fa-info-circle
+  = f.input :extended_useful_life_months, :wrapper => :vertical_prepend, label: 'Extend Useful Life by (months)' do
+    = f.input_field :extended_useful_life_months, :class => 'form-control', :required => false, :value => 0, :min => 0, :label => false
+    %span.input-group-addon
+      %a.transam-popover{data: {placement: 'auto', toggle: 'popover', html: 'true', content: "- Estimated Service Life (ESL) will be extended by the number of months entered here."}, title: 'Extend Useful Life by (months)', tabindex: '0'}
+        %i.fa.fa-info-circle
+  - if include_ulm
+    = f.input :extended_useful_life_miles, :wrapper => :vertical_prepend, label: 'Extend Useful Life by (miles)' do
+      = f.input_field :extended_useful_life_miles, :class => 'form-control', :required => false, :value => 0, :min => 0, :label => false
+      %span.input-group-addon
+        %a.transam-popover{data: {placement: 'auto', toggle: 'popover', html: 'true', content: "Estimated Service Life (ESL) will be extended by the number of miles entered here."}, title: 'Extend Useful Life by (miles)', tabindex: '0'}
+          %i.fa.fa-info-circle
+  = f.input :event_date, :label => 'Date of Rebuild / Rehabilitation', :wrapper => :vertical_append do
     = f.input_field :event_date, :as => :string, :class => 'form-control datepicker',
       :data => {'date-container' => "##{format_as_id(@asset_event.asset_event_type.name)}_dialog",
         'date-start-date' => "#{format_as_date(start_of_fiscal_year(Organization.get_typed_organization(@asset.organization).first_archivable_fiscal_year))}",
@@ -14,46 +40,16 @@
         :value => format_as_date(f.object.event_date)
     %span.input-group-addon
       %i.fa.fa-calendar
-  - if AssetSubsystem.active.count > 0
-    .row
-      .col-sm-4.col-sm-offset-8.text-center
-        .col-sm-6
-          .control-label Parts
-        .col-sm-6
-          .control-label Labor
-    = f.simple_fields_for :asset_event_asset_subsystems do |s|
-      = s.input :asset_subsystem_id, :as => :hidden
-      .form-group#costs
-        %label.control-label.col-sm-8.text-right
-          = s.object.asset_subsystem
-        .col-sm-4
-          .col-sm-6.form-group
-            = s.input :parts_cost, :wrapper => :vertical_prepend, :label => false do
-              %span.input-group-addon
-                %i.fa.fa-usd
-              = s.input_field :parts_cost, :class => 'form-control', :label => false
-          .col-sm-6.form-group
-            = s.input :labor_cost, :wrapper => :vertical_prepend, label: false do
-              %span.input-group-addon
-                %i.fa.fa-usd
-              = s.input_field :labor_cost, :class => 'form-control', :label => false
-    .form-group.col-sm-4.col-sm-offset-8
-      %label Total Cost
-      .input-group
-        %span.input-group-addon
-          %i.fa.fa-usd
-        %input#total.form-control{type: "number", disabled: true, val: 0}
-  - else
-    = f.input :total_cost, :wrapper => :vertical_prepend, label: 'Total Cost' do
-      %span.input-group-addon
-        %i.fa.fa-usd
-      = f.input_field :total_cost, :class => 'form-control', :required => true, :value => 0, :label => false
-  = f.input :extended_useful_life_months
-  = f.input :extended_useful_life_miles if @asset.class.to_s.include? 'Vehicle'
 
-  = f.input :comments, :required => true, :input_html => { :rows => 6 }, :placeholder => "Describe work performed...", label: "Notes"
+  - SystemConfig.transam_module_names.each do |mod|
+    - view_component = "#{mod}_rehabilitation_update_event_form"
+    - if lookup_context.template_exists?(view_component, 'asset_events', true)
+      = render :partial => "asset_events/#{view_component}", :locals => {:f => f}
+
+  = f.input :comments, :required => true, :input_html => { :rows => 6 }, :placeholder => "Describe work performed..."
+
   .form-group
-    = f.button :submit, "Add Rehabilitation", :class => 'btn btn-primary'
+    = f.button :submit, "Save", :class => 'btn btn-primary'
 
 :javascript
 
@@ -69,33 +65,48 @@
       $("#total").val(total_rehab_costs);
     });
 
-  });
 
-  $('#asset_event_event_date').change(function() {
-    $.ajax({
-      url: '#{get_depreciation_months_left_inventory_path(@asset)}',
-      data: {
-          on_date: function() {
-            return $('#asset_event_event_date').val();
-          }
-      },
-      success: function(result){
-        if (parseInt(result) == 0) {
-          $('#asset_event_extended_useful_life_months').rules("add", {
-            min: 1
-          });
-        } else {
-          $('#asset_event_extended_useful_life_months').rules("add", {
-            min: 0
-          });
-        }
-      },
-      error: function (xhr, ajaxOptions, thrownError) {
-        alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+    function show_hide_other_vehicle_rebuild_type(vehicle_rebuild_type_id) {
+      if(vehicle_rebuild_type_id) {
+        $('.other_vehicle_rebuild_type_container').hide();
+        $('#asset_event_other_vehicle_rebuild_type').removeAttr('required');
+        $('#asset_event_other_vehicle_rebuild_type').val('');
+      } else {
+        $('.other_vehicle_rebuild_type_container').show();
+        $('#asset_event_other_vehicle_rebuild_type').attr('required', 'required');
       }
+    }
+
+    show_hide_other_vehicle_rebuild_type(#{@asset_event.vehicle_rebuild_type_id || ''});
+
+    $('#asset_event_vehicle_rebuild_type_id').change(function() {
+      show_hide_other_vehicle_rebuild_type($(this).val());
     });
+
+    $('#asset_event_event_date').change(function() {
+      $.ajax({
+        url: '#{get_depreciation_months_left_inventory_path(@asset)}',
+        data: {
+            on_date: function() {
+              return $('#asset_event_event_date').val();
+            }
+        },
+        success: function(result){
+          if (parseInt(result) == 0) {
+            $('#asset_event_extended_useful_life_months').rules("add", {
+              min: 1
+            });
+          } else {
+            $('#asset_event_extended_useful_life_months').rules("add", {
+              min: 0
+            });
+          }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
+        }
+      });
+    });
+
   });
-
-
-
 

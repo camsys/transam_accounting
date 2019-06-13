@@ -56,7 +56,7 @@
                 - if @grant.assets.empty?
                   %p There are no assets associated with this grant.
                 - else
-                  = render :partial => 'grant_assets', :locals => {:assets => @grant.assets, :grant_id => @grant.id}
+                  = render :partial => 'grant_assets', :locals => {:grant_purchases => @grant.grant_purchases}
             .tab-pane.fade#amendments
               %legend Amendments
               .tab-content
@@ -64,6 +64,6 @@
             .tab-pane.fade#hist
               %legend History
               .tab-content
-                = render 'history'
+                = render partial: 'shared/papertrail_history', locals: {history: @grant.history}
 
 = render 'scripts'

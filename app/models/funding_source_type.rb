@@ -11,6 +11,9 @@ class FundingSourceType < ActiveRecord::Base
   has_many    :funding_sources
 
   # All types that are available
+
+  default_scope { active }
+
   scope :active, -> { where(:active => true) }
   scope :funding_program, -> { where("name != 'Agency'") }
   scope :contributor, -> { where("name IN ('State', 'Agency')") }

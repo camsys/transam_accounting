@@ -1,0 +1,74 @@
+:css
+  .purchase_cost_amount {
+    text-align: right;
+  }
+
+  .right-align-label {
+    width: 100%;
+    text-align: right;
+  }
+
+- disabled = f.object.sourceable && !f.object.sourceable.open?
+
+.nested-fields.grant-fields{style: 'border:none;'}
+  .row
+    .asset-subform-action
+      .col-md-4
+        = f.input :sourceable_type, as: :hidden, input_html: {value: 'Grant'} # hidden sourceable type field in case Other set
+        = f.input :global_sourceable, :collection => Grant.active.open.where(owner_id: @organization_list).or(Grant.where(id: f.object.sourceable_id)).map{|f| [  "#{f.grant_num} : #{format_as_fiscal_year(f.fy_year)} : #{f.owner.short_name} : Primary : #{format_as_currency(f.balance, negative_format: "(%u%n)" )}" , f.to_global_id ]}, :label => 'Grant #', disabled: disabled, include_blank: 'Other', input_html: {class: 'global-sourceable grant-global-sourceable'}
+      .col-md-2
+        = f.input :other_sourceable, label: 'Grant # (Other)', disabled: disabled
+
+      .col-md-2.grant-purchase-amount
+
+        = f.input :amount, label_html: {class: 'right-align-label'} do 
+          .input-group
+            %span.input-group-addon
+              $
+            = f.input_field :amount, class: 'form-control purchase_cost_amount', min: 1, step: 1, required: true
+      .col-md-2.pcnt-column
+        = f.input :pcnt_purchase_cost, as: :hidden, :input_html => { class: 'funding-pcnt'}
+        .form-group
+          %label.control-label.right-align-label % Funding
+          .grant-purchase-pcnt.display-value{style: "text-align: right; padding: 4px;"}= "#{(format_as_decimal(f.object.pcnt_purchase_cost, Rails.application.config.try(:funding_pcnt_decimal_precision) || 2) || 0)} %"
+
+      .col-md-1
+        = f.input :expense_tag, label: 'Expense ID', disabled: disabled
+
+      .col-md-1.pull-right
+        = link_to_remove_association f, :class => 'remove_grant pull-right' do
+          %i.fa.fa-2x.fa-minus-circle{style: 'margin-top: 27px;'}
+
+    .asset-subform-display{style: 'display: none;'}
+      .col-md-4
+        .form-group
+          %label.control-label Grant #
+          - grant = f.object.sourceable
+          .display-value
+            - if grant
+              = "#{grant.grant_num} : #{format_as_fiscal_year(grant.fy_year)} : #{grant.owner.short_name} : Primary : "
+              %span.grant-balance= "#{format_as_currency(grant.balance, negative_format: "(%u%n)")}" 
+            - else
+              = "Other"
+      .col-md-2
+        .form-group
+          %label.control-label Grant # (Other)
+          .display-value= f.object.other_sourceable
+
+      .col-md-2
+        .form-group
+          %label.control-label.right-align-label Amount
+          .display-value{style: 'text-align: right;'}= format_as_currency(f.object.amount)
+      .col-md-2
+        .form-group
+          %label.control-label.right-align-label % Funding
+          .grant-purchase-pcnt.display-value{style: "text-align: right; padding: 4px;"}= "#{(format_as_decimal(f.object.pcnt_purchase_cost, Rails.application.config.try(:funding_pcnt_decimal_precision) || 2) || 0)} %"
+
+      .col-md-1
+        .form-group
+          %label.control-label Expense ID
+          .display-value= f.object.expense_tag
+
+
+
+

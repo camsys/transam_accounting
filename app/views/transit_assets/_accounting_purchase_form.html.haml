@@ -1,5 +1,7 @@
+:ruby
+  funding_pcnt_precision = Rails.application.config.try(:funding_pcnt_decimal_precision) || 2
 - if can? :update, asset
-  #grants_grant_purchases.well.well-sm{style: "overflow-y:scroll; max-height:250px; width:95%;"}
+  #grants_grant_purchases.asset-subform{style: "width:95%;"}
     = simple_form_for(asset.transam_asset,
         :as => :asset,
         :url => inventory_path(asset.transam_asset),
@@ -13,54 +15,70 @@
           :boolean => :vertical_boolean}) do |f|
 
       %fieldset
-        %legend Grants
+        %legend{style: 'font-size: medium;'} Grants
         %label#grants-error.error
         = f.simple_fields_for :grant_grant_purchases do |grant|
-          = render 'assets/grant_fields', f: grant
+          = render 'transit_assets/transit_assets_grant_fields', f: grant
         .links.pull-right
-          = link_to_add_association f, :grant_grant_purchases, partial: 'assets/grant_fields', :class => 'btn btn-xs btn-info' do
-            %i.fa.fa-plus
-
-      = f.button :submit, 'Save', :class => 'btn btn-primary'
+          = link_to_add_association f, :grant_grant_purchases, partial: 'transit_assets/transit_assets_grant_fields', :class => 'asset-subform-action' do
+            %i.fa.fa-2x.fa-plus-circle
 
 :javascript
    $( document ).ready(function() {
     $('.grants_grant_purchases_form').validate({
+      ignore: [],
       submitHandler: function(form) {
         $('.grants_grant_purchases_form input').prop('disabled', false); // re-enable any disabled fields so they'll submit
         form.trigger('submit.rails'); // submits form both as HTML or JS as defined in form data-remote
       }
     });
-    if ($('.grants_grant_purchases_form input.funding-pcnt').length > 0) {
-      $('.grants_grant_purchases_form input.funding-pcnt').rules( "add", {
+    
+    if($('.grants_grant_purchases_form input.purchase_cost_amount').length > 0) {
+      $('.grants_grant_purchases_form input.purchase_cost_amount').rules( "add", {
         pcntSumsHundred_grants: true
       });
     }
-
   });
 
-  $('body').on('change', '.global-sourceable', function() {
-    id = $(this).attr('id');
+  $('.grants_grant_purchases_form').on('change', '.global-sourceable', function() {
+    var id = $(this).attr('id');
 
-    $('#' + id.substring(0, id.length-'global_sourceable'.length) + 'other_sourceable').prop('disabled', $(this).val() != '');
+    var other_grant_num_field = $('#' + id.substring(0, id.length-'global_sourceable'.length) + 'other_sourceable');
+    if($(this).val() != '') {
+      other_grant_num_field.prop('disabled', true);
+      other_grant_num_field.val('');
+    } else {
+      other_grant_num_field.prop('disabled', false);
+    }
   });
 
-  $('body').on('change', '.grants_grant_purchases_form .funding-pcnt', function() {
-     $('.grants_grant_purchases_form input.funding-pcnt').rules( "add", {
+  $('body').on('change', '.grants_grant_purchases_form .purchase_cost_amount', function() {
+     $('.grants_grant_purchases_form input.purchase_cost_amount').rules( "add", {
       pcntSumsHundred_grants: true
     });
      $('.grants_grant_purchases_form .funding-pcnt').valid();
 
-     var amount = parseInt($(this).val())*parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]'])/100;
-     var currency_val = parseFloat(amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-     $(this).closest('.pcnt-column').next().find('.grant-purchase-amount.display-value').html('$ ' + currency_val);
+     var pcnt = $(this).val() * 100 / parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]']);
+     
+     $(this).parents('.grant-fields').find('.funding-pcnt').val(pcnt);
+     $(this).parents('.grant-fields').find('.grant-purchase-pcnt.display-value').html(pcnt.toFixed(#{funding_pcnt_precision}) + " %");
   });
 
   $.validator.addMethod("pcntSumsHundred_grants", function(value, element) {
-      var sum = 0;
+    // TDC is counted separately as they're "credits"
+    var sum = 0;
+    var tdc_sum = 0;
+    var tdc_grants = JSON.parse('#{Grant.where(sourceable: FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'TDC'))).map{|f| f.to_global_id.to_s}.to_json.html_safe}')
     $('.grants_grant_purchases_form .funding-pcnt').each(function() {
+      var program = $(this).parents('.grant-fields').find('.global-sourceable').val();
+      if ($.inArray(program, tdc_grants) >= 0){
+        tdc_sum += Number($(this).val());
+      } else {
         sum += Number($(this).val());
+      }
     });
-     return sum <= 100;
-  }, "Entries do not sum to 100%.");
+    return (sum <= 100) && (tdc_sum <= 100);
+  }, "% Funding do not sum to 100%.");
+
+
 

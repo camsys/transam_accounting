@@ -21,9 +21,9 @@
   .tab-pane.fade#asst
     .tab-content
       - if @funding_source.assets.empty?
-        %p There are no assets associated with this grant.
+        %p There are no assets associated with this program.
       - else
-        = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => @funding_source.assets}
+        = render :partial => 'assets/asset_compact_datatable', :locals => {:assets => @funding_source.assets.distinct}
 
   .tab-pane.fade#docs
     .tab-content

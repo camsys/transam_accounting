@@ -1,0 +1,47 @@
+:css
+  .purchase_cost_amount {
+    text-align: right;
+  }
+
+  .right-align-label {
+    width: 100%;
+    text-align: right;
+  }
+
+.nested-fields.funding-source-fields{style: 'border:none;'}
+  .row
+    .asset-subform-action
+      .col-md-5
+        = f.input :global_sourceable, :collection => FundingSource.all.map{|f| [ f.to_s, f.to_global_id ]}, :required => true, :label => 'Program', :input_html => { class: 'funding-source-global-sourceable' }
+       
+      .col-md-3.grant-purchase-amount
+        = f.input :amount, label_html: {class: 'right-align-label'} do 
+          .input-group
+            %span.input-group-addon
+              $
+            = f.input_field :amount, class: 'form-control purchase_cost_amount', min: 1, step: 1, required: true
+      .col-md-2.pcnt-column
+        = f.input :pcnt_purchase_cost, as: :hidden, :input_html => { class: 'funding-pcnt'}
+        .form-group
+          %label.control-label.right-align-label % Funding
+          .grant-purchase-pcnt.display-value{style: "text-align: right; padding: 4px;"}= "#{(format_as_decimal(f.object.pcnt_purchase_cost, Rails.application.config.try(:funding_pcnt_decimal_precision) || 2) || 0)} %"
+    
+      .col-md-1.pull-right
+        = link_to_remove_association f, :class => 'remove_funding_source pull-right' do
+          %i.fa.fa-2x.fa-minus-circle{style: 'margin-top: 27px;'}
+    .asset-subform-display{style: 'display: none;'}
+      .col-md-5
+        .form-group
+          %label.control-label Program
+          .display-value= f.object.sourceable&.to_s
+       
+      .col-md-3
+        .form-group
+          %label.control-label.right-align-label Amount
+          .display-value{style: 'text-align: right;'}= format_as_currency(f.object.amount)
+      .col-md-2
+        .form-group
+          %label.control-label.right-align-label % Funding
+          .grant-purchase-pcnt.display-value{style: "text-align: right; padding: 4px;"}= "#{(format_as_decimal(f.object.pcnt_purchase_cost, Rails.application.config.try(:funding_pcnt_decimal_precision) || 2) || 0)} %"
+
+

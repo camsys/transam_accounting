@@ -8,7 +8,7 @@ class AssetFundingSourceReport < AbstractReport
   DETAIL_FORMATS = [:string, :string, :string, :string, :string, :currency]
 
   def self.get_detail_data(organization_id_list, params)
-    query = TransitAsset.unscoped.joins([{transam_asset: [:organization, :asset_subtype]}, :fta_asset_category, :fta_asset_class])
+    query = TransitAsset.unscoped.operational.joins([{transam_asset: [:organization, :asset_subtype]}, :fta_asset_category, :fta_asset_class])
                 .joins('LEFT JOIN fta_vehicle_types ON transit_assets.fta_type_id = fta_vehicle_types.id AND transit_assets.fta_type_type="FtaVehicleType"')
                 .joins('LEFT JOIN fta_equipment_types ON transit_assets.fta_type_id = fta_equipment_types.id AND transit_assets.fta_type_type="FtaEquipmentType"')
                 .joins('LEFT JOIN fta_support_vehicle_types ON transit_assets.fta_type_id = fta_support_vehicle_types.id AND transit_assets.fta_type_type="FtaSupportVehicleType"')
@@ -78,8 +78,7 @@ class AssetFundingSourceReport < AbstractReport
     labels = []
     formats = []
 
-    # Default scope orders by project_id
-    query = TransamAsset.unscoped.joins(:organization)
+    query = TransamAsset.unscoped.operational.joins(:organization)
                 .joins('LEFT JOIN grant_purchases  ON grant_purchases.transam_asset_id = transam_assets.id AND grant_purchases.sourceable_type="FundingSource"')
                 .joins('LEFT JOIN funding_sources ON grant_purchases.sourceable_id = funding_sources.id')
                 .where(organization_id: organization_id_list)

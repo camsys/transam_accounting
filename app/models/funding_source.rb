@@ -19,6 +19,8 @@ class FundingSource < ActiveRecord::Base
   #------------------------------------------------------------------------------
   after_initialize                  :set_defaults
 
+  default_scope { where(funding_source_type: FundingSourceType.active) }
+
   #------------------------------------------------------------------------------
   # Associations
   #------------------------------------------------------------------------------
@@ -40,7 +42,7 @@ class FundingSource < ActiveRecord::Base
   has_many    :grants, :as => :sourceable, :dependent => :destroy
 
   has_many :grant_purchases, :as => :sourceable, :dependent => :destroy
-  has_many :assets, :through => :grant_purchases, :class_name => Rails.application.config.asset_base_class_name
+  has_many :assets, through: :grant_purchases, source: Rails.application.config.asset_base_class_name.underscore
 
   #------------------------------------------------------------------------------
   # Validations

@@ -28,7 +28,7 @@
             %i.fa.fa-calendar
 
       .col-xs-4
-        = f.input :depreciation_purchase_cost, :wrapper=> :vertical_prepend, :label => "Depreciation Purchase Cost" do
+        = f.input :depreciation_purchase_cost, :wrapper=> :vertical_prepend, :label => "Depreciation Cost (Purchase)" do
           %span.input-group-addon
             %i.fa.fa-usd
           = f.input_field :depreciation_purchase_cost, :class => "form-control", :disabled => @asset.depreciation_purchase_cost != @asset.book_value
