@@ -44,7 +44,7 @@ class BookValueUpdateEvent < AssetEvent
 
   # This must be overriden otherwise a stack error will occur  
   def get_update
-    "Book value: #{self.book_value}."
+    "Book value: #{self.book_value}"
   end
 
   def can_update?
