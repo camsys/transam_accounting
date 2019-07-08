@@ -26,6 +26,7 @@ class DepreciationEntry < ActiveRecord::Base
   #validates :asset,           :presence => true
   validates :description,     :presence => true
   validates :book_value,      :presence => true
+  validates    :description,  :uniqueness => { :scope => [:transam_asset_id, :event_date]}
 
 
   # List of allowable form param hash keys
