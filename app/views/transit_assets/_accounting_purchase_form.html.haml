@@ -58,7 +58,7 @@
     });
      $('.grants_grant_purchases_form .funding-pcnt').valid();
 
-     var pcnt = $(this).val() * 100 / parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]']);
+     var pcnt = $(this).val() * 100 / parseInt($(this).closest('.tab-content').find('#purchase_cost').editable('getValue')['asset[purchase_cost]']);
      
      $(this).parents('.grant-fields').find('.funding-pcnt').val(pcnt);
      $(this).parents('.grant-fields').find('.grant-purchase-pcnt.display-value').html(pcnt.toFixed(#{funding_pcnt_precision}) + " %");
@@ -69,7 +69,7 @@
     var sum = 0;
     var tdc_sum = 0;
     var tdc_grants = JSON.parse('#{Grant.where(sourceable: FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'TDC'))).map{|f| f.to_global_id.to_s}.to_json.html_safe}')
-    $('.grants_grant_purchases_form .funding-pcnt').each(function() {
+    $(element).closest('.tab-content').find('.grants_grant_purchases_form .funding-pcnt').each(function() {
       var program = $(this).parents('.grant-fields').find('.global-sourceable').val();
       if ($.inArray(program, tdc_grants) >= 0){
         tdc_sum += Number($(this).val());
