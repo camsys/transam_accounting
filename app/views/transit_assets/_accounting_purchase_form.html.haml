@@ -14,6 +14,8 @@
           :file => :vertical_file_input,
           :boolean => :vertical_boolean}) do |f|
 
+      #grant_purchase_cost{style: 'display:none;'}= asset.purchase_cost
+
       %fieldset
         %legend{style: 'font-size: medium;'} Grants
         %label#grants-error.error
@@ -58,7 +60,7 @@
     });
      $('.grants_grant_purchases_form .funding-pcnt').valid();
 
-     var pcnt = $(this).val() * 100 / parseInt($(this).closest('.tab-content').find('#purchase_cost').editable('getValue')['asset[purchase_cost]']);
+     var pcnt = $(this).val() * 100 / parseInt($('#grant_purchase_cost').text());
      
      $(this).parents('.grant-fields').find('.funding-pcnt').val(pcnt);
      $(this).parents('.grant-fields').find('.grant-purchase-pcnt.display-value').html(pcnt.toFixed(#{funding_pcnt_precision}) + " %");
