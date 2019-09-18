@@ -26,7 +26,7 @@ activities = [
       system_activity: true,
       frequency_quantity: 1,
       frequency_type_id: 3,
-      execution_time: '00:01',
+      execution_time: '22:01',
       job_name: 'AssetDepreciationExpenseUpdateJob',
       active: true }
 ]
