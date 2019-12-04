@@ -33,7 +33,7 @@ class AssetDispositionUpdateJob < AbstractAssetUpdateJob
       gl_mapping.asset_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: -asset.adjusted_cost_basis, asset: asset)
 
       disposition_event = asset.disposition_updates.last
-      if disposition_event.sales_proceeds > 0
+      if disposition_event.sales_proceeds.to_i > 0
         gl_mapping.gain_loss_account.general_ledger_account_entries.create!(event_date: asset.disposition_date, description: " Disposal: #{asset.asset_path}", amount: -disposition_event.sales_proceeds, asset: asset)
       end
     end

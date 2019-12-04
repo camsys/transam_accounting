@@ -17,18 +17,18 @@
   = f.input :total_cost, :wrapper => :vertical_prepend, label: 'Cost of Rebuild / Rehabilitation' do
     %span.input-group-addon
       %i.fa.fa-usd
-    = f.input_field :total_cost, :class => 'form-control', :required => true, :value => 0, :min => 0, :label => false
+    = f.input_field :total_cost, :class => 'form-control', :required => true, :value => (f.object.total_cost || 0), :min => 0, :label => false
     %span.input-group-addon
       %a.transam-popover{data: {placement: 'auto', toggle: 'popover', html: 'true', content: "This will increase the Cost (Adjusted) of the asset by the amount entered."}, title: 'Cost of Rebuild / Rehabilitation', tabindex: '0'}
         %i.fa.fa-info-circle
   = f.input :extended_useful_life_months, :wrapper => :vertical_prepend, label: 'Extend Useful Life by (months)' do
-    = f.input_field :extended_useful_life_months, :class => 'form-control', :required => false, :value => 0, :min => 0, :label => false
+    = f.input_field :extended_useful_life_months, :class => 'form-control', :required => false, :value => f.object.extended_useful_life_months || 0, :min => 0, :label => false
     %span.input-group-addon
       %a.transam-popover{data: {placement: 'auto', toggle: 'popover', html: 'true', content: "- Estimated Service Life (ESL) will be extended by the number of months entered here."}, title: 'Extend Useful Life by (months)', tabindex: '0'}
         %i.fa.fa-info-circle
   - if include_ulm
     = f.input :extended_useful_life_miles, :wrapper => :vertical_prepend, label: 'Extend Useful Life by (miles)' do
-      = f.input_field :extended_useful_life_miles, :class => 'form-control', :required => false, :value => 0, :min => 0, :label => false
+      = f.input_field :extended_useful_life_miles, :class => 'form-control', :required => false, :value => f.object.extended_useful_life_miles || 0, :min => 0, :label => false
       %span.input-group-addon
         %a.transam-popover{data: {placement: 'auto', toggle: 'popover', html: 'true', content: "Estimated Service Life (ESL) will be extended by the number of miles entered here."}, title: 'Extend Useful Life by (miles)', tabindex: '0'}
           %i.fa.fa-info-circle
