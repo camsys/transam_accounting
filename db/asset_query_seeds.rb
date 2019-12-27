@@ -20,6 +20,11 @@ category_fields = {
       name: 'pcnt_purchase_cost',
       label: '% Funding',
       filter_type: 'numeric'
+    },
+    {
+      name: 'amount',
+      label: 'Amount (Funding)',
+      filter_type: 'numeric'
     }
   ]
 }
