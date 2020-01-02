@@ -3,7 +3,7 @@ puts "======= Loading core asset query configurations ======="
 
 # transam_assets table
 grant_purchase_table = QueryAssetClass.find_or_create_by(table_name: 'grant_purchases', transam_assets_join: "left join grant_purchases on grant_purchases.transam_asset_id = transam_assets.id and grant_purchases.sourceable_type = 'FundingSource'")
-grant_purchase_grants_table = QueryAssetClass.find_or_create_by(table_name: 'grant_purchases', transam_assets_join: "left join grant_purchases on grant_purchases.transam_asset_id = transam_assets.id and grant_purchases.sourceable_type = 'Grant'")
+grant_purchase_grants_table = QueryAssetClass.find_or_create_by(table_name: 'grant_purchases_grants', transam_assets_join: "left join grant_purchases AS grant_purchases_grants on grant_purchases_grants.transam_asset_id = transam_assets.id and grant_purchases_grants.sourceable_type = 'Grant'")
 
 
 # Query Category and fields
