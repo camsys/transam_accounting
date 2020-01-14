@@ -3,19 +3,14 @@
     assets = TransamAsset.where(organization_id: @organization_list)
     lookup_table_data = Grant.active.map{|g| {id: g.id, name: "#{g.grant_num} : #{format_as_fiscal_year(g.fy_year)} : #{g.owner.short_name} : Primary" }}
 
-    idx = []
+    idx = 0
     others = GrantPurchase.where(transam_asset: assets).where.not(other_sourceable: [nil, ""]).pluck(:other_sourceable).uniq.map{|name|
       idx -= 1
       {id: idx, name: "#{name} : - : - : -"}
     }
 
-    idx = 0 # indicate other
-    others = assets.where.not(other_title_ownership_organization: [nil, ""]).pluck(:other_title_ownership_organization).uniq.map{|name|
-      idx -= 1
-      {id: idx, name: name}
-    }
-
     data = (lookup_table_data + others).sort_by{|d| d[:name]}
+  end
 
 - if @query_field.query_category.name == 'Funding' # Program
   = render "query_filters/filter_forms/#{@query_field.filter_type}"
