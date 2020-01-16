@@ -6,7 +6,7 @@
     idx = 0
     others = GrantPurchase.where(transam_asset: assets).where.not(other_sourceable: [nil, ""]).pluck(:other_sourceable).uniq.map{|name|
       idx -= 1
-      {id: idx, name: "#{name} : - : - : -"}
+      {id: idx, name: "#{name} : - : - : -", data_name: name}
     }
 
     data = (lookup_table_data + others).sort_by{|d| d[:name]}
