@@ -83,3 +83,12 @@ category_fields.each do |category_name, fields|
     category_name.to_s == 'Funding' ? qf.query_asset_classes << grant_purchase_table : qf.query_asset_classes << grant_purchase_grants_table
   end
 end
+
+# create field for salvage_value on transam_assets
+qf = QueryField.find_or_create_by(
+  name: 'salvage_value',
+  label: 'Salvage Value',
+  query_category: QueryCategory.find_or_create_by(name: 'Life Cycle (Depreciation)'),
+  filter_type: 'numeric'
+)
+qf.query_asset_classes << QueryAssetClass.find_by(table_name: 'transam_assets')
