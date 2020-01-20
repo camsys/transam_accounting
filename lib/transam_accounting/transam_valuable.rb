@@ -243,6 +243,7 @@ module TransamValuable
     # Set resonable defaults for a new asset
     def set_depreciation_defaults
       self.depreciation_start_date ||= self.in_service_date
+      self.depreciation_useful_life ||= self.expected_useful_life
       self.depreciation_purchase_cost ||= self.purchase_cost
       self.book_value ||= self.depreciation_purchase_cost.to_i
       self.salvage_value ||= 0
