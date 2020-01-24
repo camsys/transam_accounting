@@ -1,6 +1,32 @@
 ### Load asset query configurations
 puts "======= Loading core asset query configurations ======="
 
+if SystemConfig.instance.default_fiscal_year_formatter == 'start_year'
+  view_sql = <<-SQL
+        DROP VIEW if exists formatted_grants_view;
+        CREATE OR REPLACE VIEW formatted_grants_view AS
+        SELECT grants.id AS id, CONCAT(grant_num, ' : ', fy_year, ' : ', organizations.short_name, ' : Primary') AS grant_num
+        FROM grants
+        INNER JOIN organizations ON grants.owner_id = organizations.id
+  SQL
+elsif SystemConfig.instance.default_fiscal_year_formatter == 'end_year'
+  view_sql = <<-SQL
+        DROP VIEW if exists formatted_grants_view;
+        CREATE OR REPLACE VIEW formatted_grants_view AS
+        SELECT grants.id AS id, CONCAT(grant_num, ' : ', fy_year+1, ' : ', organizations.short_name, ' : Primary') AS grant_num
+        FROM grants
+        INNER JOIN organizations ON grants.owner_id = organizations.id
+  SQL
+else
+  view_sql = <<-SQL
+        DROP VIEW if exists formatted_grants_view;
+        CREATE OR REPLACE VIEW formatted_grants_view AS
+        SELECT grants.id AS id, CONCAT(grant_num, ' : ', substring(CAST(fy_year as CHAR(4)), 3, 2), IF(fy_year % 100 = 99, '00', substring(CAST((fy_year+1) as CHAR(4)), 3, 2)), ' : ', organizations.short_name, ' : Primary') AS grant_num
+        FROM grants
+        INNER JOIN organizations ON grants.owner_id = organizations.id
+  SQL
+end
+
 # transam_assets table
 grant_purchase_table = QueryAssetClass.find_or_create_by(table_name: 'grant_purchases', transam_assets_join: "left join grant_purchases on grant_purchases.transam_asset_id = transam_assets.id and grant_purchases.sourceable_type = 'FundingSource'")
 grant_purchase_grants_table = QueryAssetClass.find_or_create_by(table_name: 'grant_purchases_grants', transam_assets_join: "left join grant_purchases AS grant_purchases_grants on grant_purchases_grants.transam_asset_id = transam_assets.id and grant_purchases_grants.sourceable_type = 'Grant'")
@@ -36,7 +62,7 @@ category_fields = {
       filter_type: 'multi_select',
       pairs_with: 'other_sourceable',
       association: {
-        table_name: 'grants',
+        table_name: 'formatted_grants_view',
         display_field_name: 'grant_num'
       }
     },
