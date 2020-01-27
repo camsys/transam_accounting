@@ -3,7 +3,6 @@ class CreateGrantsViewQueryTool < ActiveRecord::DataMigration
 
     if SystemConfig.instance.default_fiscal_year_formatter == 'start_year'
       view_sql = <<-SQL
-        DROP VIEW if exists formatted_grants_view;
         CREATE OR REPLACE VIEW formatted_grants_view AS
         SELECT grants.id AS id, CONCAT(grant_num, ' : ', fy_year, ' : ', organizations.short_name, ' : Primary') AS grant_num
         FROM grants
@@ -11,7 +10,6 @@ class CreateGrantsViewQueryTool < ActiveRecord::DataMigration
       SQL
     elsif SystemConfig.instance.default_fiscal_year_formatter == 'end_year'
       view_sql = <<-SQL
-        DROP VIEW if exists formatted_grants_view;
         CREATE OR REPLACE VIEW formatted_grants_view AS
         SELECT grants.id AS id, CONCAT(grant_num, ' : ', fy_year+1, ' : ', organizations.short_name, ' : Primary') AS grant_num
         FROM grants
@@ -19,7 +17,6 @@ class CreateGrantsViewQueryTool < ActiveRecord::DataMigration
       SQL
     else
       view_sql = <<-SQL
-        DROP VIEW if exists formatted_grants_view;
         CREATE OR REPLACE VIEW formatted_grants_view AS
         SELECT grants.id AS id, CONCAT(grant_num, ' : ', substring(CAST(fy_year as CHAR(4)), 3, 2), IF(fy_year % 100 = 99, '00', substring(CAST((fy_year+1) as CHAR(4)), 3, 2)), ' : ', organizations.short_name, ' : Primary') AS grant_num
         FROM grants
