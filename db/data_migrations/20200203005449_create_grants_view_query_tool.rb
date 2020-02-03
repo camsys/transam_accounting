@@ -6,7 +6,7 @@ class CreateGrantsViewQueryTool < ActiveRecord::DataMigration
         CREATE OR REPLACE VIEW formatted_grants_view AS
         SELECT grants.id AS id, CONCAT(grant_num, ' : ', fy_year, ' : ', organizations.short_name, ' : Primary') AS grant_num
         FROM grants
-        INNER JOIN organizations ON grants.owner_id = organizations.id
+        INNER JOIN organizations ON grants.owner_id = organizations.id;
         
         CREATE OR REPLACE VIEW formatted_other_grants_view AS
         SELECT other_sourceable AS id, CONCAT(other_sourceable, ' : - : - : -') AS grant_num
@@ -18,7 +18,7 @@ class CreateGrantsViewQueryTool < ActiveRecord::DataMigration
         CREATE OR REPLACE VIEW formatted_grants_view AS
         SELECT grants.id AS id, CONCAT(grant_num, ' : ', fy_year+1, ' : ', organizations.short_name, ' : Primary') AS grant_num
         FROM grants
-        INNER JOIN organizations ON grants.owner_id = organizations.id
+        INNER JOIN organizations ON grants.owner_id = organizations.id;
         
         CREATE OR REPLACE VIEW formatted_other_grants_view AS
         SELECT other_sourceable AS id, CONCAT(other_sourceable, ' : - : - : -') AS grant_num
@@ -30,7 +30,7 @@ class CreateGrantsViewQueryTool < ActiveRecord::DataMigration
         CREATE OR REPLACE VIEW formatted_grants_view AS
         SELECT grants.id AS id, CONCAT(grant_num, ' : ', IF(fy_year % 100 < 10, CONCAT('0',fy_year % 100), fy_year % 100), '-' ,IF(fy_year % 100 = 99, '00', IF(fy_year % 100 + 1 < 10, CONCAT('0',fy_year % 100 + 1), fy_year % 100 + 1)), ' : ', organizations.short_name, ' : Primary') AS grant_num
         FROM grants
-        INNER JOIN organizations ON grants.owner_id = organizations.id
+        INNER JOIN organizations ON grants.owner_id = organizations.id;
         
         CREATE OR REPLACE VIEW formatted_other_grants_view AS
         SELECT other_sourceable AS id, CONCAT(other_sourceable, ' : - : - : -') AS grant_num
