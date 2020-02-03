@@ -7,6 +7,11 @@ if SystemConfig.instance.default_fiscal_year_formatter == 'start_year'
         SELECT grants.id AS id, CONCAT(grant_num, ' : ', fy_year, ' : ', organizations.short_name, ' : Primary') AS grant_num
         FROM grants
         INNER JOIN organizations ON grants.owner_id = organizations.id
+        
+        CREATE OR REPLACE VIEW formatted_other_grants_view AS
+        SELECT other_sourceable AS id, CONCAT(other_sourceable, ' : - : - : -') AS grant_num
+        FROM grant_purchases
+        WHERE sourceable_type = 'Grant' AND other_sourceable IS NOT NULL
   SQL
 elsif SystemConfig.instance.default_fiscal_year_formatter == 'end_year'
   view_sql = <<-SQL
@@ -14,13 +19,23 @@ elsif SystemConfig.instance.default_fiscal_year_formatter == 'end_year'
         SELECT grants.id AS id, CONCAT(grant_num, ' : ', fy_year+1, ' : ', organizations.short_name, ' : Primary') AS grant_num
         FROM grants
         INNER JOIN organizations ON grants.owner_id = organizations.id
+        
+        CREATE OR REPLACE VIEW formatted_other_grants_view AS
+        SELECT other_sourceable AS id, CONCAT(other_sourceable, ' : - : - : -') AS grant_num
+        FROM grant_purchases
+        WHERE sourceable_type = 'Grant' AND other_sourceable IS NOT NULL
   SQL
 else
   view_sql = <<-SQL
         CREATE OR REPLACE VIEW formatted_grants_view AS
-        SELECT grants.id AS id, CONCAT(grant_num, ' : ', substring(CAST(fy_year as CHAR(4)), 3, 2), IF(fy_year % 100 = 99, '00', substring(CAST((fy_year+1) as CHAR(4)), 3, 2)), ' : ', organizations.short_name, ' : Primary') AS grant_num
+        SELECT grants.id AS id, CONCAT(grant_num, ' : ', IF(fy_year % 100 < 10, CONCAT('0',fy_year % 100), fy_year % 100), '-' ,IF(fy_year % 100 = 99, '00', IF(fy_year % 100 + 1 < 10, CONCAT('0',fy_year % 100 + 1), fy_year % 100 + 1)), ' : ', organizations.short_name, ' : Primary') AS grant_num
         FROM grants
         INNER JOIN organizations ON grants.owner_id = organizations.id
+        
+        CREATE OR REPLACE VIEW formatted_other_grants_view AS
+        SELECT other_sourceable AS id, CONCAT(other_sourceable, ' : - : - : -') AS grant_num
+        FROM grant_purchases
+        WHERE sourceable_type = 'Grant' AND other_sourceable IS NOT NULL
   SQL
 end
 
@@ -67,7 +82,11 @@ category_fields = {
       name: 'other_sourceable',
       label: 'Grant # (Other)',
       filter_type: 'text',
-      hidden: true
+      hidden: true,
+      association: {
+          table_name: 'formatted_other_grants_view',
+          display_field_name: 'grant_num'
+      }
     },
     {
       name: 'amount',
