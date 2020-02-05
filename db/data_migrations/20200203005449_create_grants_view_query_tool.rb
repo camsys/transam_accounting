@@ -48,6 +48,6 @@ class CreateGrantsViewQueryTool < ActiveRecord::DataMigration
     QueryField.find_by(name: 'sourceable_id', label: 'Grant #').query_association_class.update!(table_name: 'formatted_grants_view')
 
     ac = QueryAssociationClass.create!(table_name: 'formatted_other_grants_view', display_field_name: 'grant_num', id_field_name: 'id')
-    QueryField.find_by(name: 'other_sourceable').update!(query_association_class: ac)
+    #QueryField.find_by(name: 'other_sourceable').update!(query_association_class: ac)
   end
 end
