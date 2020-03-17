@@ -83,11 +83,17 @@ class GrantsController < OrganizationAwareController
   # GET /grant/new
   def new
 
-    add_breadcrumb "New", new_grant_path
+    # add_breadcrumb "New", new_grant_path
 
     @grant = Grant.new(:sourceable_id => params[:sourceable_id])
 
   end
+
+  def helper_new
+    @grant = Grant.new(:sourceable_id => params[:sourceable_id])
+    return @grant
+  end
+  helper_method :helper_new
 
   # POST /grants
   # POST /grants.json

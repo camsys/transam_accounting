@@ -2,7 +2,28 @@
   table_dom_id = SecureRandom.hex
   show_actions ||= 0
 
+  def get_row(grant, row)
+      # row = [
+      #   grant.object_key,
+      #   (link_to grant.grant_num) + ' ,' + grant_path(grant),
+      #   grant.sourceable.funding_source_type,
+      #   grant.funding_source,
+      #   grant.fy_year,
+      #   grant.owner,
+      #   grant.has_multiple_contributors ? 'Multiple' : (grant.contributor.nil? ? 'Other' : grant.contributor),
+      #   grant.legislative_authorization,
+      #   format_as_date(grant.award_date),
+      #   format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date)),
+      #   grant.state.titleize,
+      #   grant.updater,
+      #   format_as_date_time(grant.updated_at)]
+  end
+
 :css
+  html {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
   #subheader-label h2 {
     border-bottom: 1px solid #e5e5e5;
   }
@@ -20,55 +41,107 @@
   %legend.asset-subheader
     %span #{params[:state] == "all" ? "All" : "Filtered"}
 
-#grants_table_actions.row
-  - if show_actions == 1
-    = render :partial => "grants/index_actions"
 
-.table-responsive
-  %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
-    :pagination => 'true',
-    :show_pagination_switch => 'false',
-    :page_number => '1',
-    :page_list => "[10, 20, 50, 100, 200]",
-    :page_size => current_user.num_table_rows,
-    :search => 'false',
-    :export_types => "['csv', 'txt', 'excel']",
-    :show_export => 'false',
-    :show_columns => 'false',
-    :cookie => 'true',
-    :cookie_id_table => "grants_id",
-    :cookie_expire => "1y"}}
-    %thead
-      %tr
-        %th.left{:data => {:visible => 'false'}} Object Key
-        %th.left{:data => {:sortable => 'true'}} Grant Number
-        %th.left{:data => {:sortable => 'true'}} Source
-        %th.left{:data => {:sortable => 'true'}} Program
-        %th.left{:data => {:sortable => 'true'}} Grant Year
-        %th.left{:data => {:sortable => 'true'}} Owner
-        %th.left{:data => {:sortable => 'true'}} Contributor
-        %th.left{:data => {:sortable => 'true'}} Legislative Authorization
-        %th.left{:data => {:sortable => 'true'}} Date of Award
-        %th.left{:data => {:sortable => 'true'}} Date of Most Recent Amendment
-        %th.left{:data => {:sortable => 'true'}} Status
-        %th.left{:data => {:sortable => 'true'}} Last Update By
-        %th.left{:data => {:sortable => 'true'}} Last Update Date
 
-    %tbody
-      - grants.each do |grant|
-        %tr{:id => grant.object_key}
-          %td.left= grant.object_key
-          %td.left= link_to grant.grant_num, grant_path(grant)
-          %td.left= grant.sourceable.funding_source_type
-          %td.left= grant.funding_source
-          %td.left= grant.fy_year
-          %td.left= grant.owner
-          %td.left= grant.has_multiple_contributors ? 'Multiple' : (grant.contributor.nil? ? 'Other' : grant.contributor)
-          %td.left= grant.legislative_authorization
-          %td.left= format_as_date(grant.award_date)
-          %td.left= format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date))
-          %td.left= grant.state.titleize
-          %td.left= grant.updater
-          %td.left= format_as_date_time(grant.updated_at)
+.library-table
+  %table.elbat{:id => table_dom_id,
+    :use => 'true',
+    :data => {:use => 'true',
+      :pagination => 'client',
+      :current_page => '0',
+      :current_page_size => '10',
+      :page_sizes => "10,20,50,100,200",
+      :search => 'client',
+      :export => "['csv', 'txt', 'excel']",
+      :columns => "Object Key,10%,
+                  Grant Number,12%,
+                  Source,5%,
+                  Program,8%,
+                  Grant Year,5%,
+                  Owner,5%,
+                  Contributor,8%,
+                  Legislative Authorization,8%,
+                  Date of Award,8%,
+                  Date of Most Recent Amendment,8%,
+                  Status,5%,
+                  Last Update By,10%,
+                  Last Update Date,12%,",
+      :cookies => "true",
+      :sort => 'client',
+      :sort_params => @params,
+      :filter => "[]",
+      :data_source => 'client',
+      :url => ''}}
+  - grants.each do |grant|
+
+    :javascript
+      add_row('#{table_dom_id}',
+      [
+        '#{h grant.object_key }',
+        '#{h link_to grant.grant_num, grant_path(grant) }',
+        '#{h grant.sourceable.funding_source_type }',
+        '#{h grant.funding_source }',
+        '#{h grant.fy_year }',
+        '#{h grant.owner }',
+        '#{h grant.has_multiple_contributors ? 'Multiple' : (grant.contributor.nil? ? 'Other' : grant.contributor) }',
+        '#{h grant.legislative_authorization }',
+        '#{h format_as_date(grant.award_date) }',
+        '#{h format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date)) }',
+        '#{h grant.state.titleize}',
+        '#{h grant.updater }',
+        '#{h format_as_date_time(grant.updated_at) }'
+      ]);
+
+
+-##grants_table_actions.row
+-#  - if show_actions == 1
+-#    = render :partial => "grants/index_actions", :sourceable => @sourceable
+-#
+-#.table-responsive
+-#  %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
+-#    :pagination => 'true',
+-#    :show_pagination_switch => 'false',
+-#    :page_number => '1',
+-#    :page_list => "[10, 20, 50, 100, 200]",
+-#    :page_size => current_user.num_table_rows,
+-#    :search => 'false',
+-#    :export_types => "['csv', 'txt', 'excel']",
+-#    :show_export => 'false',
+-#    :show_columns => 'false',
+-#    :cookie => 'true',
+-#    :cookie_id_table => "grants_id",
+-#    :cookie_expire => "1y"}}
+-#    %thead
+-#      %tr
+-#        %th.left{:data => {:visible => 'false'}} Object Key
+-#        %th.left{:data => {:sortable => 'true'}} Grant Number
+-#        %th.left{:data => {:sortable => 'true'}} Source
+-#        %th.left{:data => {:sortable => 'true'}} Program
+-#        %th.left{:data => {:sortable => 'true'}} Grant Year
+-#        %th.left{:data => {:sortable => 'true'}} Owner
+-#        %th.left{:data => {:sortable => 'true'}} Contributor
+-#        %th.left{:data => {:sortable => 'true'}} Legislative Authorization
+-#        %th.left{:data => {:sortable => 'true'}} Date of Award
+-#        %th.left{:data => {:sortable => 'true'}} Date of Most Recent Amendment
+-#        %th.left{:data => {:sortable => 'true'}} Status
+-#        %th.left{:data => {:sortable => 'true'}} Last Update By
+-#        %th.left{:data => {:sortable => 'true'}} Last Update Date
+-#
+-#    %tbody
+-#      - grants.each do |grant|
+-#        %tr{:id => grant.object_key}
+-#          %td.left= grant.object_key
+-#          %td.left= link_to grant.grant_num, grant_path(grant)
+-#          %td.left= grant.sourceable.funding_source_type
+-#          %td.left= grant.funding_source
+-#          %td.left= grant.fy_year
+-#          %td.left= grant.owner
+-#          %td.left= grant.has_multiple_contributors ? 'Multiple' : (grant.contributor.nil? ? 'Other' : grant.contributor)
+-#          %td.left= grant.legislative_authorization
+-#          %td.left= format_as_date(grant.award_date)
+-#          %td.left= format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date))
+-#          %td.left= grant.state.titleize
+-#          %td.left= grant.updater
+-#          %td.left= format_as_date_time(grant.updated_at)
 
 = render :partial => 'shared/table_scripts', :locals => {:table_id => table_dom_id, :path_pattern => grant_path("xxx")}

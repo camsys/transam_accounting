@@ -66,7 +66,7 @@
 
   // TODO: Add image to button
   = f.button :submit, "+ Add Grant & Go To Grant Details", :class => "btn btn-primary", :id => 'grant_form_submit'
-  = link_to "Cancel", :back, :class => "btn btn-default", :role => 'button'
+  = link_to "Cancel", :back, :class => "btn btn-default", :id => "closeFlyout", :role => 'button'
 
 
 :javascript
@@ -107,3 +107,9 @@
   // $('#grant_amount').keyup(function(event) {
   //   $(this).val($(this).val().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ","));
   // });
+
+  toggleExtend($("label.flyout-label"), $(".bootstrap-table"), true);
+
+  document.getElementById("closeFlyout").addEventListener("click", function(){
+    document.getElementById("closeFlyout").form.reset();
+  });
