@@ -50,6 +50,13 @@ class BookValueUpdateEvent < AssetEvent
   def can_update?
      false # set to false so it doesnt show up in the asset detail page action menu and existing events cannot be updated
   end
+
+  ######## API Serializer ##############
+  def api_json(options={})
+    super.merge({
+      book_value: book_value
+    })
+  end
   
   protected
 
