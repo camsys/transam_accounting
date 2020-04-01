@@ -1,9 +1,9 @@
 :ruby
-  funding_pcnt_precision = Rails.application.config.try(:funding_pcnt_decimal_precision) || 2
-
-#grant_purchase_cost{style: 'display:none;'}= f.object.purchase_cost
+  funding_pcnt_precision = Rails.application.config.try(:funding_pcnt_decimal_precision) || 2#grant_purchase_cost{style: 'display:none;'}= f.object.purchase_cost
 
 - if ['Track', 'PowerSignal', 'Guideway'].include? @asset.class.to_s
+  #grant_purchase_cost{style: 'display:none;'}= f.object.purchase_cost
+
   %fieldset
     %legend{style: 'font-size: medium;'} Grants
     %label#grants-error.error
@@ -25,6 +25,9 @@
             :radio_buttons => :vertical_radio_and_checkboxes,
             :file => :vertical_file_input,
             :boolean => :vertical_boolean}) do |f|
+
+      #grant_purchase_cost{style: 'display:none;'}= f.object.purchase_cost
+
       %fieldset
         %legend{style: 'font-size: medium;'} Grants
         %label#grants-error.error
