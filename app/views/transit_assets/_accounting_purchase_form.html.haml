@@ -1,29 +1,16 @@
 :ruby
   funding_pcnt_precision = Rails.application.config.try(:funding_pcnt_decimal_precision) || 2
-- if can? :update, asset
-  #grants_grant_purchases.asset-subform{style: "width:95%;"}
-    = simple_form_for(asset.transam_asset,
-        :as => :asset,
-        :url => inventory_path(asset.transam_asset),
-        :method => 'put',
-        :remote => true,
-        :html => {:class => 'form-vertical form-section grants_grant_purchases_form'},
-        :wrapper => :vertical_form,
-        :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes,
-          :radio_buttons => :vertical_radio_and_checkboxes,
-          :file => :vertical_file_input,
-          :boolean => :vertical_boolean}) do |f|
 
-      #grant_purchase_cost{style: 'display:none;'}= asset.purchase_cost
+#grant_purchase_cost{style: 'display:none;'}= f.object.purchase_cost
 
-      %fieldset
-        %legend{style: 'font-size: medium;'} Grants
-        %label#grants-error.error
-        = f.simple_fields_for :grant_grant_purchases do |grant|
-          = render 'transit_assets/transit_assets_grant_fields', f: grant
-        .links.pull-right
-          = link_to_add_association f, :grant_grant_purchases, partial: 'transit_assets/transit_assets_grant_fields', :class => 'asset-subform-action' do
-            %i.fa.fa-2x.fa-plus-circle
+%fieldset
+  %legend{style: 'font-size: medium;'} Grants
+  %label#grants-error.error
+  = f.simple_fields_for :grant_grant_purchases do |grant|
+    = render 'transit_assets/transit_assets_grant_fields', f: grant
+  .links.pull-right
+    = link_to_add_association f, :grant_grant_purchases, partial: 'transit_assets/transit_assets_grant_fields', :class => 'asset-subform-action' do
+      %i.fa.fa-2x.fa-plus-circle
 
 :javascript
    $( document ).ready(function() {
