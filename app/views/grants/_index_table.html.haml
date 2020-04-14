@@ -42,12 +42,12 @@
     %span #{params[:state] == "all" ? "All" : "Filtered"}
 
 
-
+  = javascript_include_tag  "https://kit.fontawesome.com/#{ENV['FONT_AWESOME']}.js"
 .library-table
   %table.elbat{:id => table_dom_id,
     :use => 'true',
     :data => {:use => 'true',
-      :pagination => 'client',
+      :side => 'client',
       :current_page => '0',
       :current_page_size => '10',
       :page_sizes => "10,20,50,100,200",
@@ -66,18 +66,30 @@
                   Status,5%,
                   Last Update By,10%,
                   Last Update Date,12%,",
+      :selected_columns => "Grant Number,
+                  Source,
+                  Program,
+                  Grant Year,
+                  Owner,
+                  Contributor,
+                  Legislative Authorization,
+                  Date of Award,
+                  Date of Most Recent Amendment,
+                  Status,
+                  Last Update By,
+                  Last Update Date",
       :cookies => "true",
       :sort => 'client',
       :sort_params => @params,
       :filter => "[]",
       :data_source => 'client',
       :url => ''}}
-  - grants.each do |grant|
+  - grants.each_with_index do |grant, index|
 
     :javascript
       add_row('#{table_dom_id}',
       [
-        '#{h grant.object_key }',
+        // '#{h grant.object_key }',
         '#{h link_to grant.grant_num, grant_path(grant) }',
         '#{h grant.sourceable.funding_source_type }',
         '#{h grant.funding_source }',
@@ -90,7 +102,7 @@
         '#{h grant.state.titleize}',
         '#{h grant.updater }',
         '#{h format_as_date_time(grant.updated_at) }'
-      ]);
+      ], #{index});
 
 
 -##grants_table_actions.row
