@@ -50,6 +50,13 @@ class BookValueUpdateEvent < AssetEvent
   def can_update?
      false # set to false so it doesnt show up in the asset detail page action menu and existing events cannot be updated
   end
+
+  ######## API Serializer ##############
+  def api_json(options={})
+    super.merge({
+      book_value: book_value
+    })
+  end
   
   protected
 
@@ -59,41 +66,43 @@ class BookValueUpdateEvent < AssetEvent
   end
 
   def create_depreciation_entry
-    depr_amount = asset.depreciation_entries.where('event_date <= ?',self.event_date).sum(:book_value) - book_value
+    asset_instance = self.send(Rails.application.config.asset_base_class_name.underscore)
 
-    asset.depreciation_entries.create!(description: "Manual Adjustment: #{self.comments}", book_value: -depr_amount, event_date: self.event_date)
-    asset.update_columns(current_depreciation_date: self.event_date)
+    depr_amount = asset_instance.depreciation_entries.where('event_date <= ?',self.event_date).sum(:book_value) - book_value
 
-    gl_mapping = asset.general_ledger_mapping
+    asset_instance.depreciation_entries.create!(description: "Manual Adjustment: #{self.comments}", book_value: -depr_amount, event_date: self.event_date)
+    asset_instance.update_columns(current_depreciation_date: self.event_date)
+
+    gl_mapping = asset_instance.general_ledger_mapping
     if gl_mapping.present? # check whether this app records GLAs at all
-      gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Accumulated Depreciation: #{asset.asset_path}", amount: -depr_amount, asset: asset)
+      gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Accumulated Depreciation: #{asset.asset_path}", amount: -depr_amount, asset: asset_instance)
 
-      gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Deprectiation Expense: #{asset.asset_path}", amount: depr_amount, asset: asset)
+      gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: event_date, description: "Manual Adjustment - Deprectiation Expense: #{asset.asset_path}", amount: depr_amount, asset: asset_instance)
     end
 
     # destroy any manual adjustments past the depr start
-    asset.depreciation_entries.manual_adjustments.where('event_date > ?',self.event_date).each do |depr_entry|
+    asset_instance.depreciation_entries.manual_adjustments.where('event_date > ?',self.event_date).each do |depr_entry|
       if gl_mapping.present?
-        gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: event_date, description: "REVERSED Manual Adjustment - Accumulated Depreciation: #{asset.asset_path}", amount: -depr_entry.book_value, asset: asset)
+        gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: event_date, description: "REVERSED Manual Adjustment - Accumulated Depreciation: #{asset.asset_path}", amount: -depr_entry.book_value, asset: asset_instance)
 
-        gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: event_date, description: "REVERSED Manual Adjustment - Depreciation Expense: #{asset.asset_path}", amount: depr_entry.book_value, asset: asset)
+        gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: event_date, description: "REVERSED Manual Adjustment - Depreciation Expense: #{asset.asset_path}", amount: depr_entry.book_value, asset: asset_instance)
       end
 
       depr_entry.destroy!
     end
 
-    asset.depreciation_entries.depreciation_expenses.where('event_date > ?',self.event_date).each do |depr_entry|
+    asset_instance.depreciation_entries.depreciation_expenses.where('event_date > ?',self.event_date).each do |depr_entry|
       if gl_mapping.present?
-        gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: event_date, description: "REVERSED Accumulated Depreciation: #{asset.asset_path}", amount: -depr_entry.book_value, asset: asset)
+        gl_mapping.accumulated_depr_account.general_ledger_account_entries.create!(event_date: event_date, description: "REVERSED Accumulated Depreciation: #{asset.asset_path}", amount: -depr_entry.book_value, asset: asset_instance)
 
-        gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: event_date, description: "REVERSED Deprectiation Expense: #{asset.asset_path}", amount: depr_entry.book_value, asset: asset)
+        gl_mapping.depr_expense_account.general_ledger_account_entries.create!(event_date: event_date, description: "REVERSED Deprectiation Expense: #{asset.asset_path}", amount: depr_entry.book_value, asset: asset_instance)
       end
 
       depr_entry.destroy!
     end
 
-    asset.update_asset_book_value
-    asset.save(:validate => false)
+    asset_instance.update_asset_book_value
+    asset_instance.save(:validate => false)
 
     return true
   end

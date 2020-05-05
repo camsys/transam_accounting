@@ -34,6 +34,7 @@ module TransamValuable
     #------------------------------------------------------------------------------
     before_validation  :set_depreciation_defaults
     after_save         :update_asset_book_value
+    after_create       :set_depreciation_useful_life
 
     #----------------------------------------------------
     # Associations
@@ -243,6 +244,7 @@ module TransamValuable
     # Set resonable defaults for a new asset
     def set_depreciation_defaults
       self.depreciation_start_date ||= self.in_service_date
+      self.depreciation_useful_life ||= self.expected_useful_life unless new_record?
       self.depreciation_purchase_cost ||= self.purchase_cost
       self.book_value ||= self.depreciation_purchase_cost.to_i
       self.salvage_value ||= 0
@@ -250,6 +252,10 @@ module TransamValuable
 
       return true # always return true so can continue to validations
 
+    end
+
+    def set_depreciation_useful_life
+      update_columns(depreciation_useful_life: self.expected_useful_life)
     end
 
 
