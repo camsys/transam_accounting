@@ -2,22 +2,6 @@
   table_dom_id = SecureRandom.hex
   show_actions ||= 0
 
-  def get_row(grant, row)
-      # row = [
-      #   grant.object_key,
-      #   (link_to grant.grant_num) + ' ,' + grant_path(grant),
-      #   grant.sourceable.funding_source_type,
-      #   grant.funding_source,
-      #   grant.fy_year,
-      #   grant.owner,
-      #   grant.has_multiple_contributors ? 'Multiple' : (grant.contributor.nil? ? 'Other' : grant.contributor),
-      #   grant.legislative_authorization,
-      #   format_as_date(grant.award_date),
-      #   format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date)),
-      #   grant.state.titleize,
-      #   grant.updater,
-      #   format_as_date_time(grant.updated_at)]
-  end
 
 :css
   html {
@@ -36,13 +20,52 @@
     position:relative;
   }
 
+  .col-item:nth-child(1){
+    width:10%;
+  }
+  .col-item:nth-child(2){
+    width:12%;
+  }
+  .col-item:nth-child(3){
+    width:5%;
+  }
+  .col-item:nth-child(4){
+    width:8%;
+  }
+  .col-item:nth-child(5){
+    width:5%;
+  }
+  .col-item:nth-child(6){
+    width:5%;
+  }
+  .col-item:nth-child(7){
+    width:8%;
+  }
+  .col-item:nth-child(8){
+    width:8%;
+  }
+  .col-item:nth-child(9){
+    width:8%;
+  }
+  .col-item:nth-child(10){
+    width:8%;
+  }
+  .col-item:nth-child(11){
+    width:5%;
+  }
+  .col-item:nth-child(12){
+    width:10%;
+  }
+  .col-item:nth-child(13){
+    width:12%;
+  }
+
 #subheader-label
   %h2 Grants
   %legend.asset-subheader
     %span #{params[:state] == "all" ? "All" : "Filtered"}
 
-
-  = javascript_include_tag  "https://kit.fontawesome.com/#{ENV['FONT_AWESOME']}.js"
+= javascript_include_tag  "https://kit.fontawesome.com/#{ENV['FONT_AWESOME']}.js"
 .library-table
   %table.elbat{:id => table_dom_id,
     :use => 'true',
@@ -53,19 +76,19 @@
       :page_sizes => "10,20,50,100,200",
       :search => 'client',
       :export => "['csv', 'txt', 'excel']",
-      :columns => "Object Key,10%,
-                  Grant Number,12%,
-                  Source,5%,
-                  Program,8%,
-                  Grant Year,5%,
-                  Owner,5%,
-                  Contributor,8%,
-                  Legislative Authorization,8%,
-                  Date of Award,8%,
-                  Date of Most Recent Amendment,8%,
-                  Status,5%,
-                  Last Update By,10%,
-                  Last Update Date,12%,",
+      :columns => "Object Key,drilldown-link,
+                  Grant Number,,
+                  Source,,
+                  Program,,
+                  Grant Year,,
+                  Owner,,
+                  Contributor,,
+                  Legislative Authorization,,
+                  Date of Award,,
+                  Date of Most Recent Amendment,,
+                  Status,,
+                  Last Update By,,
+                  Last Update Date,,",
       :selected_columns => "Grant Number,
                   Source,
                   Program,
@@ -80,7 +103,7 @@
                   Last Update Date",
       :cookies => "true",
       :sort => 'client',
-      :sort_params => @params,
+      :params => "{}",
       :filter => "[]",
       :data_source => 'client',
       :url => ''}}
@@ -88,21 +111,20 @@
 
     :javascript
       add_row('#{table_dom_id}',
-      [
-        // '#{h grant.object_key }',
-        '#{h link_to grant.grant_num, grant_path(grant) }',
-        '#{h grant.sourceable.funding_source_type }',
-        '#{h grant.funding_source }',
-        '#{h grant.fy_year }',
-        '#{h grant.owner }',
-        '#{h grant.has_multiple_contributors ? 'Multiple' : (grant.contributor.nil? ? 'Other' : grant.contributor) }',
-        '#{h grant.legislative_authorization }',
-        '#{h format_as_date(grant.award_date) }',
-        '#{h format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date)) }',
-        '#{h grant.state.titleize}',
-        '#{h grant.updater }',
-        '#{h format_as_date_time(grant.updated_at) }'
-      ], #{index});
+      {
+        "Grant Number": '#{h link_to grant.grant_num, grant_path(grant) }',
+        "Source": '#{h grant.sourceable.funding_source_type }',
+        "Program": '#{h grant.funding_source }',
+        "Grant Year": '#{h grant.fy_year }',
+        "Owner": '#{h grant.owner }',
+        "Contributor": '#{h grant.has_multiple_contributors ? 'Multiple' : (grant.contributor.nil? ? 'Other' : grant.contributor) }',
+        "Legislative Authorization": '#{h grant.legislative_authorization }',
+        "Date of Award": '#{h format_as_date(grant.award_date) }',
+        "Date of Most Recent Amendment": '#{h format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date)) }',
+        "Status": '#{h grant.state.titleize}',
+        "Last Update By": '#{h grant.updater }',
+        "Last Update Date": '#{h format_as_date_time(grant.updated_at) }',
+      }, #{index});
 
 
 -##grants_table_actions.row
