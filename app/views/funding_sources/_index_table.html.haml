@@ -6,86 +6,190 @@
   #programs_table_actions.btn-toolbar
     = render :partial => "funding_sources/index_actions"
 
-.table-responsive
-  %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
-    :pagination => 'true',
-    :show_pagination_switch => 'false',
-    :page_list => "5, 10, 20, 50, 100, 200, 10000]",
-    :page_size => current_user.num_table_rows,
-    :search => 'false',
-    :toolbar => "#programs_table_actions",
-    :export_types => "['csv', 'txt', 'excel']",
-    :show_export => 'true',
-    :show_columns => 'true',
-    :cookie => 'true',
-    :cookie_id_table => "funding_sources_id",
-    :cookie_expire => "1y"}}
 
-    %thead
-      %tr
-        %th.center{:data => {:visible => 'false'}} Object Key
-        %th.center{:data => {:visible => 'false', :sortable => 'true'}} External ID
-        %th.center{:data => {:sortable => 'true'}} Name
-        %th.center{:data => {:sortable => 'true'}} Source
+:css
 
-        %th.center{:data => {:sortable => 'true'}} Type
-        %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Inflation Rate
+  .col-item:nth-child(1){
+    width:5%;
+  }
+  .col-item:nth-child(2){
+    width:10%;
+  }
+  .col-item:nth-child(3){
+    width:5%;
+  }
+  .col-item:nth-child(4){
+    width:8%;
+  }
+  .col-item:nth-child(5){
+    width:5%;
+  }
+  .col-item:nth-child(6){
+    width:5%;
+  }
+  .col-item:nth-child(7){
+    width:8%;
+  }
+  .col-item:nth-child(8){
+    width:8%;
+  }
+  .col-item:nth-child(9){
+    width:8%;
+  }
+  .col-item:nth-child(10){
+    width:8%;
+  }
+  .col-item:nth-child(11){
+    width:5%;
+  }
+  .col-item:nth-child(12){
+    width:10%;
+  }
+  .col-item:nth-child(13){
+    width:12%;
+  }
 
-        %th.center{:data => {:sortable => 'true'}} Life of $ (yrs)
-        %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Pcnt Match
+= javascript_include_tag  "https://kit.fontawesome.com/#{ENV['FONT_AWESOME']}.js"
+.library-table
+  %table.elbat{:id => table_dom_id,
+    :use => 'true',
+    :data => {:use => 'true',
+      :side => 'client',
+      :current_page => '0',
+      :current_page_size => '10',
+      :page_sizes => "10,20,50,100,200",
+      :search => 'client',
+      :export => "['csv', 'txt', 'excel']",
+      :columns => "Program Name,drilldown-link,
+                  Source,
+                  Program Type,
+                  Inflation Rate,
+                  Life of $ (yrs),
+                  % Match,
+                  Valid From,
+                  Valid To,
+                  Description,
+                  Details,
+                  External ID,
+                  Object Key,",
+      :selected_columns => "Program Name,
+                  Source,
+                  Program Type,
+                  Inflation Rate,
+                  Life of $ (yrs),
+                  % Match,
+                  Valid From,
+                  Valid To",
+      :cookies => "true",
+      :sort => 'client',
+      :params => "{}",
+      :filter => "[]",
+      :data_source => 'client',
+      :url => ''}}
+  - funding_sources.each_with_index do |f, index|
 
-        %th.center{:data => {:sortable => 'true'}} Valid From
-        %th.center{:data => {:sortable => 'true'}} Valid To
+    :javascript
+      add_row('#{table_dom_id}',
+      {                  
+        "Program Name": '#{h link_to f.name, funding_sources_path(f) }',
+        "Source": '#{h f.funding_source_type }',
+        "Program Type": '#{h f.formula_fund.present? ? "Formula" : (f.discretionary_fund.present? ? "Discretionary" : "Unknown") }',
+        "Inflation Rate": '#{h f.inflation_rate.present? ? f.inflation_rate : "" }',
+        "Life of $ (yrs)": '#{h format_as_integer(f.life_in_years) }',
+        "% Match": '#{h f.match_required }',
+        "Valid From": '#{h format_as_fiscal_year(f.fy_start) }',
+        "Valid To": '#{h format_as_fiscal_year(f.fy_end) }',
+        "Description": '#{h f.description }',
+        "Details": '#{h f.details }',
+        "External ID": '#{h f.external_id }',
+        "Object Key": '#{h f.object_key }',
+      }, #{index});
 
-        %th
 
-    %tbody
-      - funding_sources.each do |f|
-        %tr{:id => f.object_key, :class => 'action-path'}
-          %td.left= f.object_key
-          %td.left= f.external_id
-          =# add whitespace so always read as text and not number. JS plugin trims later
-          %td.left{data: {tableexport: {msonumberformat: "\\@", value: "#{f.name}   "}}}
-            = f.name
-          %td.left= f.funding_source_type
 
-          %td.center= f.formula_fund.present? ? 'Formula' : (f.discretionary_fund.present? ? 'Discretionary' : 'Unknown')
-          %td.right= f.inflation_rate.present? ? f.inflation_rate : ''
 
-          %td.center= format_as_integer(f.life_in_years)
-          %td.right= f.match_required
 
-          %td.center= format_as_fiscal_year(f.fy_start)
-          %td.center= format_as_fiscal_year(f.fy_end)
 
-          %td.center.nowrap{:data => {:field => 'action-cell'}}
-            %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: "#{f.description}<br>#{f.details}"}, title: 'Details', tabindex: '0'}
-              %i.fa.fa-info-circle
-            - if can? :update, f
-              = link_to edit_funding_source_path(f), :class => "button btn-xs", :title => "Edit program" do
-                %i.fa.fa-edit.fa-1-5x.text-success
-              - if (can? :destroy, f) && f.deleteable?
-                = link_to funding_source_path(f), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
-                  %i.fa.fa-trash-o.fa-fw.text-danger
+-# .table-responsive
+-#   %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
+-#     :pagination => 'true',
+-#     :show_pagination_switch => 'false',
+-#     :page_list => "5, 10, 20, 50, 100, 200, 10000]",
+-#     :page_size => current_user.num_table_rows,
+-#     :search => 'false',
+-#     :toolbar => "#programs_table_actions",
+-#     :export_types => "['csv', 'txt', 'excel']",
+-#     :show_export => 'true',
+-#     :show_columns => 'true',
+-#     :cookie => 'true',
+-#     :cookie_id_table => "funding_sources_id",
+-#     :cookie_expire => "1y"}}
+
+-#     %thead
+-#       %tr
+-#         %th.center{:data => {:visible => 'false'}} Object Key
+-#         %th.center{:data => {:visible => 'false', :sortable => 'true'}} External ID
+-#         %th.center{:data => {:sortable => 'true'}} Name
+-#         %th.center{:data => {:sortable => 'true'}} Source
+
+-#         %th.center{:data => {:sortable => 'true'}} Type
+-#         %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Inflation Rate
+
+-#         %th.center{:data => {:sortable => 'true'}} Life of $ (yrs)
+-#         %th.center{:data => {:sortable => 'true', :formatter => 'percentage_formatter'}} Pcnt Match
+
+-#         %th.center{:data => {:sortable => 'true'}} Valid From
+-#         %th.center{:data => {:sortable => 'true'}} Valid To
+
+-#         %th
+
+-#     %tbody
+-#       - funding_sources.each do |f|
+-#         %tr{:id => f.object_key, :class => 'action-path'}
+-#           %td.left= f.object_key
+-#           %td.left= f.external_id
+-#           =# add whitespace so always read as text and not number. JS plugin trims later
+-#           %td.left{data: {tableexport: {msonumberformat: "\\@", value: "#{f.name}   "}}}
+-#             = f.name
+-#           %td.left= f.funding_source_type
+
+-#           %td.center= f.formula_fund.present? ? 'Formula' : (f.discretionary_fund.present? ? 'Discretionary' : 'Unknown')
+-#           %td.right= f.inflation_rate.present? ? f.inflation_rate : ''
+
+-#           %td.center= format_as_integer(f.life_in_years)
+-#           %td.right= f.match_required
+
+-#           %td.center= format_as_fiscal_year(f.fy_start)
+-#           %td.center= format_as_fiscal_year(f.fy_end)
+
+-#           %td.center.nowrap{:data => {:field => 'action-cell'}}
+-#             %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: "#{f.description}<br>#{f.details}"}, title: 'Details', tabindex: '0'}
+-#               %i.fa.fa-info-circle
+-#             - if can? :update, f
+-#               = link_to edit_funding_source_path(f), :class => "button btn-xs", :title => "Edit program" do
+-#                 %i.fa.fa-edit.fa-1-5x.text-success
+-#               - if (can? :destroy, f) && f.deleteable?
+-#                 = link_to funding_source_path(f), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
+-#                   %i.fa.fa-trash-o.fa-fw.text-danger
 
 = render 'shared/table_formatters'
 
-:javascript
+-# :javascript
 
-  $('#' + '#{table_dom_id}').on('post-body.bs.table', function () {
-    $('.transam-popover').popover({
-      trigger: 'hover'
-    });
+-#   $('#' + '#{table_dom_id}').on('post-body.bs.table', function () {
+-#     $('.transam-popover').popover({
+-#       trigger: 'hover'
+-#     });
 
-    $('.transam-tooltip').tooltip();
-  });
+-#     $('.transam-tooltip').tooltip();
+-#   });
 
-  $('#' + '#{table_dom_id}').on('click', 'td', function () {
-    var path = "#{funding_source_path('xxx')}";
-    var row = $(this).parent('tr').attr('id');
+-#   $('#' + '#{table_dom_id}').on('click', 'td', function () {
+-#     var path = "#{funding_source_path('xxx')}";
+-#     var row = $(this).parent('tr').attr('id');
 
-    if ($(this).attr('data-field') != 'action-cell') {
-      var url = path.replace("xxx", row);
-      document.location.href = url;
-    }
-  });
+-#     if ($(this).attr('data-field') != 'action-cell') {
+-#       var url = path.replace("xxx", row);
+-#       document.location.href = url;
+-#     }
+-#   });
