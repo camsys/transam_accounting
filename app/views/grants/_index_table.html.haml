@@ -2,9 +2,6 @@
   table_dom_id = SecureRandom.hex
   show_actions ||= 0
 
-#grants_table_actions.row
-  - if show_actions == 1
-    = render :partial => "grants/index_actions", :sourceable => @sourceable
 
 :css
   html {
@@ -27,7 +24,7 @@
     width:12%;
   }
   .col-item:nth-child(2){
-    width:12%;
+    width:8%;
   }
   .col-item:nth-child(3){
     width:5%;
@@ -45,7 +42,7 @@
     width:8%;
   }
   .col-item:nth-child(8){
-    width:10%;
+    width:12%;
   }
   .col-item:nth-child(9){
     width:8%;
@@ -54,19 +51,24 @@
     width:11%;
   }
   .col-item:nth-child(11){
-    width:5%;
+    width:7%;
   }
   .col-item:nth-child(12){
     width:10%;
   }
   .col-item:nth-child(13){
-    width:12%;
+    width:8%;
   }
 
 #subheader-label
   %h2 Grants
   %legend.asset-subheader
     %span #{params[:state] == "all" ? "All" : "Filtered"}
+
+
+#grants_table_actions.row
+  - if show_actions == 1
+    = render :partial => "grants/index_actions", :sourceable => @sourceable
 
 = javascript_include_tag  "https://kit.fontawesome.com/#{ENV['FONT_AWESOME']}.js"
 .library-table
@@ -79,19 +81,19 @@
       :page_sizes => "10,20,50,100,200",
       :search => 'client',
       :export => "['csv', 'txt', 'excel']",
-      :columns => "Object Key,drilldown-link,
-                  Grant Number,,
-                  Source,,
-                  Program,,
-                  Grant Year,,
-                  Owner,,
-                  Contributor,,
-                  Legislative Authorization,,
-                  Date of Award,,
-                  Date of Most Recent Amendment,,
-                  Status,,
-                  Last Update By,,
-                  Last Update Date,,",
+      :columns => "Object Key,
+                  Grant Number,drilldown-link,
+                  Source,
+                  Program,
+                  Grant Year,
+                  Owner,
+                  Contributor,
+                  Legislative Authorization,
+                  Date of Award,right-align,
+                  Date of Most Recent Amendment,
+                  Status,
+                  Last Update By,
+                  Last Update Date,",
       :selected_columns => "Grant Number,
                   Source,
                   Program,
