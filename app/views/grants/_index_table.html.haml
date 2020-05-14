@@ -2,6 +2,9 @@
   table_dom_id = SecureRandom.hex
   show_actions ||= 0
 
+#grants_table_actions.row
+  - if show_actions == 1
+    = render :partial => "grants/index_actions", :sourceable => @sourceable
 
 :css
   html {
@@ -21,7 +24,7 @@
   }
 
   .col-item:nth-child(1){
-    width:10%;
+    width:12%;
   }
   .col-item:nth-child(2){
     width:12%;
@@ -42,13 +45,13 @@
     width:8%;
   }
   .col-item:nth-child(8){
-    width:8%;
+    width:10%;
   }
   .col-item:nth-child(9){
     width:8%;
   }
   .col-item:nth-child(10){
-    width:8%;
+    width:11%;
   }
   .col-item:nth-child(11){
     width:5%;
