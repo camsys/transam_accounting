@@ -91,7 +91,7 @@
     :javascript
       add_row('#{table_dom_id}',
       {                  
-        "Program Name": '#{h link_to f.name, funding_sources_path(f) }',
+        "Program Name": '#{h link_to f.name, funding_source_path(f) }',
         "Source": '#{h f.funding_source_type }',
         "Program Type": '#{h f.formula_fund.present? ? "Formula" : (f.discretionary_fund.present? ? "Discretionary" : "Unknown") }',
         "Inflation Rate": '#{h f.inflation_rate.present? ? f.inflation_rate : "" }',
