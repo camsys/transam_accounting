@@ -20,45 +20,6 @@
     position:relative;
   }
 
-  .col-item:nth-child(1){
-    width:12%;
-  }
-  .col-item:nth-child(2){
-    width:8%;
-  }
-  .col-item:nth-child(3){
-    width:5%;
-  }
-  .col-item:nth-child(4){
-    width:8%;
-  }
-  .col-item:nth-child(5){
-    width:5%;
-  }
-  .col-item:nth-child(6){
-    width:5%;
-  }
-  .col-item:nth-child(7){
-    width:8%;
-  }
-  .col-item:nth-child(8){
-    width:12%;
-  }
-  .col-item:nth-child(9){
-    width:8%;
-  }
-  .col-item:nth-child(10){
-    width:11%;
-  }
-  .col-item:nth-child(11){
-    width:7%;
-  }
-  .col-item:nth-child(12){
-    width:10%;
-  }
-  .col-item:nth-child(13){
-    width:8%;
-  }
 
 #subheader-label
   %h2 Grants
@@ -74,38 +35,26 @@
 .library-table
   %table.elbat{:id => table_dom_id,
     :use => 'true',
-    :data => {:use => 'true',
-      :side => 'client',
+    :data => {:side => 'client',
       :current_page => '0',
       :current_page_size => '10',
-      :page_sizes => "10,20,50,100,200",
+      :page_sizes => "10,20,50,100",
       :search => 'client',
       :export => "['csv', 'txt', 'excel']",
-      :columns => "Object Key,
-                  Grant Number,drilldown-link,
-                  Source,
-                  Program,
-                  Grant Year,
-                  Owner,
-                  Contributor,
-                  Legislative Authorization,
-                  Date of Award,right-align,
-                  Date of Most Recent Amendment,
-                  Status,
-                  Last Update By,
-                  Last Update Date,right-align",
-      :selected_columns => "Grant Number,
-                  Source,
-                  Program,
-                  Grant Year,
-                  Owner,
-                  Contributor,
-                  Legislative Authorization,
-                  Date of Award,
-                  Date of Most Recent Amendment,
-                  Status,
-                  Last Update By,
-                  Last Update Date",
+      :columns => '{"0":{"name":"Object Key","width":"8%"},
+                    "1":{"name":"Grant Number","width":"8%","type":"drilldown-link"},
+                    "2":{"name":"Source","width":"5%"},
+                    "3":{"name":"Program","width":"8%"},
+                    "4":{"name":"Grant Year","width":"5%"},
+                    "5":{"name":"Owner","width":"5%"},
+                    "6":{"name":"Contributor","width":"8%"},
+                    "7":{"name":"Legislative Authorization","width":"12%"},
+                    "8":{"name":"Date of Award","width":"8%","type":"right-align"},
+                    "9":{"name":"Date of Most Recent Amendment","width":"11%"},
+                    "10":{"name":"Status","width":"7%"},
+                    "11":{"name":"Last Update By","width":"10%"},
+                    "12":{"name":"Last Update Date","width":"8%","type":"right-align"}}',  
+      :selected_columns => "1,2,3,4,5,6,7,8,9,10,11,12",
       :cookies => "true",
       :sort => 'client',
       :params => "{}",
@@ -117,18 +66,18 @@
     :javascript
       add_row('#{table_dom_id}',
       {
-        "Grant Number": '#{h link_to grant.grant_num, grant_path(grant) }',
-        "Source": '#{h grant.sourceable.funding_source_type }',
-        "Program": '#{h grant.funding_source }',
-        "Grant Year": '#{h grant.fy_year }',
-        "Owner": '#{h grant.owner }',
-        "Contributor": '#{h grant.has_multiple_contributors ? 'Multiple' : (grant.contributor.nil? ? 'Other' : grant.contributor) }',
-        "Legislative Authorization": '#{h grant.legislative_authorization }',
-        "Date of Award": '#{h format_as_date(grant.award_date) }',
-        "Date of Most Recent Amendment": '#{h format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date)) }',
-        "Status": '#{h grant.state.titleize}',
-        "Last Update By": '#{h grant.updater }',
-        "Last Update Date": '#{h format_as_date_time(grant.updated_at) }',
+        "1": '#{h link_to grant.grant_num, grant_path(grant) }',
+        "2": '#{h grant.sourceable.funding_source_type }',
+        "3": '#{h grant.funding_source }',
+        "4": '#{h grant.fy_year }',
+        "5": '#{h grant.owner }',
+        "6": '#{h grant.has_multiple_contributors ? "Multiple" : (grant.contributor.nil? ? "Other" : grant.contributor) }',
+        "7": '#{h grant.legislative_authorization }',
+        "8": '#{h format_as_date(grant.award_date) }',
+        "9": '#{h format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date)) }',
+        "10": '#{h grant.state.titleize}',
+        "11": '#{h grant.updater }',
+        "12": '#{h format_as_date_time(grant.updated_at) }',
       }, #{index});
 
 
