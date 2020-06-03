@@ -59,7 +59,7 @@
         "2": '#{h f.formula_fund.present? ? "Formula" : (f.discretionary_fund.present? ? "Discretionary" : "Unknown") }',
         "3": '#{h f.inflation_rate.present? ? f.inflation_rate : "" }',
         "4": '#{h format_as_integer(f.life_in_years) }',
-        "5": '#{h format_as_percentage(f.match_required) }',
+        "5": '#{h format_as_percentage(f.match_required, 3) }',
         "6": '#{h format_as_fiscal_year(f.fy_start) }',
         "7": '#{h format_as_fiscal_year(f.fy_end) }',
         "8": '#{h f.description }',
