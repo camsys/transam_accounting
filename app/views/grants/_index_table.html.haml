@@ -36,6 +36,7 @@
   %table.elbat{:id => table_dom_id,
     :use => 'true',
     :data => {:side => 'client',
+      :table_code => 'grants',
       :current_page => '0',
       :current_page_size => '10',
       :page_sizes => "10,20,50,100",
@@ -45,8 +46,8 @@
                     "1":{"name":"Grant Number","width":"8%","type":"drilldown-link"},
                     "2":{"name":"Source","width":"5%"},
                     "3":{"name":"Program","width":"8%"},
-                    "4":{"name":"Grant Year","width":"5%"},
-                    "5":{"name":"Owner","width":"5%"},
+                    "year":{"name":"Grant Year","width":"5%"},
+                    "owner":{"name":"Owner","width":"5%"},
                     "6":{"name":"Contributor","width":"8%"},
                     "7":{"name":"Legislative Authorization","width":"12%"},
                     "8":{"name":"Date of Award","width":"8%","type":"right-align"},
@@ -54,7 +55,7 @@
                     "10":{"name":"Status","width":"7%"},
                     "11":{"name":"Last Update By","width":"10%"},
                     "12":{"name":"Last Update Date","width":"8%","type":"right-align"}}',  
-      :selected_columns => "1,2,3,4,5,6,7,8,9,10,11,12",
+      :selected_columns => "1,2,3,year,owner,6,7,8,9,10,11,12",
       :cookies => "true",
       :sort => 'client',
       :params => "{}",
@@ -62,47 +63,48 @@
       :data_source => 'client',
       :url => ''}}
 
-  :ruby
+  -# :ruby
 
-    def pre_sort(vals)
-      vals.map.with_index { |grant,index| { grant.id => index } }
-    end    
-    sort = {"0"=> grants.sort_by { |grant| grant.id }.map.with_index { |grant,index| { grant.id => index } } ,
-      "1"=> grants.sort_by { |grant| grant.grant_num }.map.with_index { |grant,index| { grant.id => index } } ,
-      "2"=> grants.sort_by { |grant| grant.sourceable.funding_source_type }.map.with_index { |grant,index| { grant.id => index } },
-      "3"=> grants.sort_by { |grant| grant.funding_source }.map.with_index { |grant,index| { grant.id => index } },
-      "4"=> grants.sort_by { |grant| grant.fy_year }.map.with_index { |grant,index| { grant.id => index } },
-      "5"=> grants.sort_by { |grant| grant.owner }.map.with_index { |grant,index| { grant.id => index } },
-      "6"=> grants.sort_by { |grant| grant.has_multiple_contributors ? "Multiple" : (grant.contributor.nil? ? "Other" : grant.contributor) }.map.with_index { |grant,index| { grant.id => index } },
-      "7"=> grants.sort_by { |grant| grant.legislative_authorization }.map.with_index { |grant,index| { grant.id => index } },
-      "8"=> grants.sort_by { |grant| grant.award_date }.map.with_index { |grant,index| { grant.id => index } },
-      "9"=> grants.sort_by { |grant| grant.grant_amendments.last.try(:created_at).try(:to_date) }.map.with_index { |grant,index| { grant.id => index } },
-      "10"=> grants.sort_by { |grant| grant.state.titleize }.map.with_index { |grant,index| { grant.id => index } },
-      "11"=> grants.sort_by { |grant| grant.updater }.map.with_index { |grant,index| { grant.id => index } },
-      "12"=> grants.sort_by { |grant| grant.updated_at }.map.with_index { |grant,index| { grant.id => index } }}
+    -# def pre_sort(vals)
+    -#   vals.map.with_index { |grant,index| { grant.id => index } }
+    -# end    
+    -# sort = {"0"=> grants.sort_by { |grant| grant.id }.map.with_index { |grant,index| { grant.id => index } } ,
+    -#   "1"=> grants.sort_by { |grant| grant.grant_num }.map.with_index { |grant,index| { grant.id => index } } ,
+    -#   "2"=> grants.sort_by { |grant| grant.sourceable.funding_source_type }.map.with_index { |grant,index| { grant.id => index } },
+    -#   "3"=> grants.sort_by { |grant| grant.funding_source }.map.with_index { |grant,index| { grant.id => index } },
+    -#   "year"=> grants.sort_by { |grant| grant.fy_year }.map.with_index { |grant,index| { grant.id => index } },
+    -#   "owner"=> grants.sort_by { |grant| grant.owner }.map.with_index { |grant,index| { grant.id => index } },
+    -#   "6"=> grants.sort_by { |grant| grant.has_multiple_contributors ? "Multiple" : (grant.contributor.nil? ? "Other" : grant.contributor) }.map.with_index { |grant,index| { grant.id => index } },
+    -#   "7"=> grants.sort_by { |grant| grant.legislative_authorization }.map.with_index { |grant,index| { grant.id => index } },
+    -#   "8"=> grants.sort_by { |grant| grant.award_date }.map.with_index { |grant,index| { grant.id => index } },
+    -#   "9"=> grants.sort_by { |grant| grant.grant_amendments.last.try(:created_at).try(:to_date) }.map.with_index { |grant,index| { grant.id => index } },
+    -#   "10"=> grants.sort_by { |grant| grant.state.titleize }.map.with_index { |grant,index| { grant.id => index } },
+    -#   "11"=> grants.sort_by { |grant| grant.updater }.map.with_index { |grant,index| { grant.id => index } },
+    -#   "12"=> grants.sort_by { |grant| grant.updated_at }.map.with_index { |grant,index| { grant.id => index } }}
 
 
 
   - grants.each_with_index do |grant, index|
 
     :javascript
-      console.log("#{sort}");
       add_row('#{table_dom_id}',
       {
-        "0": {"content":'#{h grant.id }',"sort":'#{sort["0"][index][grant.id]}'},
-        "1": {"content":'#{h link_to grant.grant_num, grant_path(grant) }',"sort":'#{sort["1"][index][grant.id]}'},
-        "2": {"content":'#{h grant.sourceable.funding_source_type }',"sort":'#{sort["2"][index][grant.id]}'},
-        "3": {"content":'#{h grant.funding_source }',"sort":'#{sort["3"][index][grant.id]}'},
-        "4": {"content":'#{h grant.fy_year }',"sort":'#{sort["4"][index][grant.id]}'},
-        "5": {"content":'#{h grant.owner }',"sort":'#{sort["5"][index][grant.id]}'},
-        "6": {"content":'#{h grant.has_multiple_contributors ? "Multiple" : (grant.contributor.nil? ? "Other" : grant.contributor) }',"sort":'#{sort["6"][index][grant.id]}'},
-        "7": {"content":'#{h grant.legislative_authorization }',"sort":'#{sort["7"][index][grant.id]}'},
-        "8": {"content":'#{h format_as_date(grant.award_date) }',"sort":'#{sort["8"][index][grant.id]}'},
-        "9": {"content":'#{h format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date)) }',"sort":'#{sort["9"][index][grant.id]}'},
-        "10": {"content":'#{h grant.state.titleize}',"sort":'#{sort["10"][index][grant.id]}'},
-        "11": {"content":'#{h grant.updater }',"sort":'#{sort["11"][index][grant.id]}'},
-        "12": {"content":'#{h format_as_date_time(grant.updated_at) }',"sort":'#{sort["12"][index][grant.id]}'}
+        "0":'#{h grant.id }',
+        "1":'#{h link_to grant.grant_num, grant_path(grant) }',
+        "2":'#{h grant.sourceable.funding_source_type }',
+        "3":'#{h grant.funding_source }',
+        "year":'#{h grant.fy_year }',
+        "owner":'#{h grant.owner }',
+        "6":'#{h grant.has_multiple_contributors ? "Multiple" : (grant.contributor.nil? ? "Other" : grant.contributor) }',
+        "7":'#{h grant.legislative_authorization }',
+        "8":'#{h format_as_date(grant.award_date) }',
+        "9":'#{h format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date)) }',
+        "10":'#{h grant.state.titleize}',
+        "11":'#{h grant.updater }',
+        "12":'#{h format_as_date_time(grant.updated_at) }'
       }, #{index});
+
+
 
 
 -##grants_table_actions.row
@@ -155,5 +157,33 @@
 -#          %td.left= grant.state.titleize
 -#          %td.left= grant.updater
 -#          %td.left= format_as_date_time(grant.updated_at)
+
+
+-# '{"0":{"asc":"true"},
+-#                         "1":{"asc":"true"},
+-#                         "2":{"asc":"true"},
+-#                         "3":{"asc":"true"},
+-#                         "4":{"asc":"true"},
+-#                         "5":{"asc":"true"},
+-#                         "6":{"asc":"true"},
+-#                         "7":{"asc":"true"},
+-#                         "8":{"asc":"true"},
+-#                         "9":{"asc":"true"},
+-#                         "10":{"asc":"true"},
+-#                         "11":{"asc":"true"},
+-#                         "12":{"asc":"true"}}'
+      -# //"0": {"content":'#{h grant.id }',"sort":'#{sort["0"][index][grant.id]}'},
+      -# //  "1": {"content":'#{h link_to grant.grant_num, grant_path(grant) }',"sort":'#{sort["1"][index][grant.id]}'},
+      -# //  "2": {"content":'#{h grant.sourceable.funding_source_type }',"sort":'#{sort["2"][index][grant.id]}'},
+      -# //  "3": {"content":'#{h grant.funding_source }',"sort":'#{sort["3"][index][grant.id]}'},
+      -# //  "4": {"content":'#{h grant.fy_year }',"sort":'#{sort["4"][index][grant.id]}'},
+      -# //  "5": {"content":'#{h grant.owner }',"sort":'#{sort["5"][index][grant.id]}'},
+      -# //  "6": {"content":'#{h grant.has_multiple_contributors ? "Multiple" : (grant.contributor.nil? ? "Other" : grant.contributor) }',"sort":'#{sort["6"][index][grant.id]}'},
+      -# //  "7": {"content":'#{h grant.legislative_authorization }',"sort":'#{sort["7"][index][grant.id]}'},
+      -# //  "8": {"content":'#{h format_as_date(grant.award_date) }',"sort":'#{sort["8"][index][grant.id]}'},
+      -# //  "9": {"content":'#{h format_as_date(grant.grant_amendments.last.try(:created_at).try(:to_date)) }',"sort":'#{sort["9"][index][grant.id]}'},
+      -# //  "10": {"content":'#{h grant.state.titleize}',"sort":'#{sort["10"][index][grant.id]}'},
+      -# //  "11": {"content":'#{h grant.updater }',"sort":'#{sort["11"][index][grant.id]}'},
+      -# //  "12": {"content":'#{h format_as_date_time(grant.updated_at) }',"sort":'#{sort["12"][index][grant.id]}'}
 
 = render :partial => 'shared/table_scripts', :locals => {:table_id => table_dom_id, :path_pattern => grant_path("xxx")}
