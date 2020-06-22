@@ -21,7 +21,7 @@
       :page_sizes => "10,20,50,100",
       :search => 'client',
       :export => "['csv', 'txt', 'excel']",
-      :columns => '{"0":{"name":"Program Name","type":"drilldown-link","width":"25%"},
+      :columns => '{"name":{"name":"Program Name","type":"drilldown-link","width":"25%"},
                     "1":{"name":"Source","width":"12%"},
                     "2":{"name":"Program Type","width":"15%"},
                     "3":{"name":"Inflation Rate","width":"10%"},
@@ -34,7 +34,7 @@
                     "10":{"name":"External ID","width":"10%"},
                     "11":{"name":"Object Key","width":"12%"},
                     "12":{"name":"Actions","type":"action-column","width":"15%"}}',
-      :selected_columns => "0,1,2,3,4,5,6,7,12",
+      :selected_columns => "name,1,2,3,4,5,6,7,12",
       :cookies => "true",
       :sort => 'client',
       :params => "{}",
@@ -55,7 +55,7 @@
     :javascript
       add_row('#{table_dom_id}',
       {                  
-        "0": '#{h link_to f.name, funding_source_path(f) }',
+        "name": '#{h link_to f.name, funding_source_path(f) }',
         "1": '#{h f.funding_source_type }',
         "2": '#{h f.formula_fund.present? ? "Formula" : (f.discretionary_fund.present? ? "Discretionary" : "Unknown") }',
         "3": '#{h f.inflation_rate.present? ? format_as_percentage(f.inflation_rate, 3) : "" }',
