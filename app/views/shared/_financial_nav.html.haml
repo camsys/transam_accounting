@@ -48,31 +48,31 @@
 
     - if count > 0
       %li.divider
-    %li.text-left.dropdown-submenu
+    %li.text-left
       = link_to funding_sources_path do
         %i.fa.fa-book.fa-fw
         Programs
 
-      %ul.dropdown-menu
-        - FundingSourceType.all.each do |type|
-          - if FundingSource.where(funding_source_type_id: type.id).count > 0
-            %li.text-left.dropdown-submenu
-              = link_to '#' do
-                %i.fa.fa-fw.fa-book
-                = type
-              %ul.dropdown-menu
-                - FundingSource.where(funding_source_type_id: type.id).each do | program |
-                  %li.text-left
-                    = link_to funding_source_path(program) do
-                      %i.fa.fa-fw.fa-book
-                      = program
-        - if can? :create, FundingSource
-          - if FundingSource.all.count > 0
-            %li.divider
-          %li
-            = link_to new_funding_source_path do
-              %i.fa.fa-plus.fa-fw
-              = "Add Funding Program";
+      -# %ul.dropdown-menu
+      -#   - FundingSourceType.all.each do |type|
+      -#     - if FundingSource.where(funding_source_type_id: type.id).count > 0
+      -#       %li.text-left.dropdown-submenu
+      -#         = link_to '#' do
+      -#           %i.fa.fa-fw.fa-book
+      -#           = type
+      -#         %ul.dropdown-menu
+      -#           - FundingSource.where(funding_source_type_id: type.id).each do | program |
+      -#             %li.text-left
+      -#               = link_to funding_source_path(program) do
+      -#                 %i.fa.fa-fw.fa-book
+      -#                 = program
+      -#   - if can? :create, FundingSource
+      -#     - if FundingSource.all.count > 0
+      -#       %li.divider
+      -#     %li
+      -#       = link_to new_funding_source_path do
+      -#         %i.fa.fa-plus.fa-fw
+      -#         = "Add Funding Program";
 
     - SystemConfig.transam_module_names.each do |mod|
       - view_component = "#{mod}_financial_nav"
