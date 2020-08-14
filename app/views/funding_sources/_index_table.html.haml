@@ -2,6 +2,9 @@
   table_dom_id = SecureRandom.hex
   show_actions ||= 0
 
+#subheader-label
+  %h2 Programs
+
 - if show_actions == 1
   #programs_table_actions.btn-toolbar
     = render :partial => "funding_sources/index_actions"
