@@ -36,8 +36,10 @@
                     "9":{"name":"Details","width":"8%"},
                     "10":{"name":"External ID","width":"10%"},
                     "11":{"name":"Object Key","width":"12%"},
+                    "created_by":{"name":"Created By","width":"12%"},
+                    "status":{"name":"Status", "width":"10%"},
                     "12":{"name":"Actions","type":"action-column","width":"15%"}}',
-      :selected_columns => "name,1,2,3,4,5,6,7,12",
+      :selected_columns => "name,1,2,3,4,5,6,7,created_by,status,12",
       :cookies => "true",
       :sort => 'client',
       :params => "{}",
@@ -46,7 +48,7 @@
       :url => ''}}
   - funding_sources.each_with_index do |f, index|
     %div.actions
-      %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: "#{f.description}<br>#{f.details}"}, title: 'Details', tabindex: '0'}
+      %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: "<b>Description:</b>#{f.description}<br><b>Details:</b>#{f.details}<br><b>Type:</b>#{f.formula_fund.present? ? "Formula" : (f.discretionary_fund.present? ? "Discretionary" : "Unknown")}<br><b>Source:</b>#{f.funding_source_type}<br><b>Life of $:</b>#{format_as_integer(f.life_in_years)}<br><b>Pcnt Match:</b>#{format_as_percentage(f.match_required, 3)}<br><b>Start:</b>#{format_as_fiscal_year(f.fy_start)}<br><b>End:</b>#{format_as_fiscal_year(f.fy_end)}"}, title: "#{f.name}", tabindex: '0'}
         %i.fa.fa-info-circle
       - if can? :update, f
         = link_to edit_funding_source_path(f), :class => "button btn-xs", :title => "Edit program" do
@@ -70,6 +72,8 @@
         "9": '#{h f.details }',
         "10": '#{h f.external_id }',
         "11": '#{h f.object_key }',
+        "status":'#{h f.active ? "Active" : "Inactive" }',
+        "created_by":'#{h current_user.organization.short_name }',
       }, #{index});
       // TEMP UNTIL WE DO THIS FOR REAL
       // TODO: PLEASE DON'T LET THIS GO TO PRODUCTION
