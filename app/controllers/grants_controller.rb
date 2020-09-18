@@ -136,7 +136,13 @@ class GrantsController < OrganizationAwareController
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
-        format.json { render json: @grant.errors, status: :unprocessable_entity }
+
+        if params[:is_xeditable]
+          format.json { render json: {errors: @grant.errors}, status: :ok }
+        else
+          format.json { render json: @grant.errors, status: :unprocessable_entity }
+        end
+
       end
     end
   end
