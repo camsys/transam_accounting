@@ -160,12 +160,12 @@
     $('.transam-tooltip').tooltip();
   });
 
-  $('#' + '#{table_dom_id}').on('click', 'td', function () {
-    var path = "#{funding_source_path('xxx')}";
-    var row = $(this).parent('tr').attr('id');
-
-    if ($(this).attr('data-field') != 'action-cell') {
-      var url = path.replace("xxx", row);
-      document.location.href = url;
-    }
-  });
+  //$('#' + '#{table_dom_id}').on('click', 'td', function () {
+  //  var path = "#{funding_source_path('xxx')}";
+  //  var row = $(this).parent('tr').attr('id');
+  //
+  //  if ($(this).attr('data-field') != 'action-cell') {
+  //    var url = path.replace("xxx", row);
+  //    document.location.href = url;
+  //  }
+  //});
