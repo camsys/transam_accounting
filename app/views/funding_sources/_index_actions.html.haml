@@ -4,11 +4,20 @@
     margin-left: 4px;
   }
 
+-# :ruby
+-#   @funding_source = FundingSource.new
+
 - if can? :create, FundingSource
-  .btn-group.navbar-right
-    = link_to new_funding_source_path, :class => 'btn btn-default' do
+  .btn-group
+    .btn.btn-default#flyout
       %i.fa.fa-plus.fa-fw
       = "Add Funding Program";
+  :javascript
+    $(document).ready(()=>{
+      add_flyout("#flyout", "Add New Program", '#{raw escape_javascript(render "funding_sources/form")}', "flyout-right");
+    });
+    
+
 
 -# = form_tag funding_sources_path, :id => 'filter_form', :method => "get", :class => 'navbar-form navbar-right panel-action' do
 -#   .form-group

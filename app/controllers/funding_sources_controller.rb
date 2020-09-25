@@ -34,6 +34,9 @@ class FundingSourcesController < OrganizationAwareController
       @show_active_only = params[:show_active_only]
     end
 
+    # allowing for add funding program flyout button
+    @funding_source = FundingSource.new
+
 
     #puts conditions.inspect
     #puts values.inspect
