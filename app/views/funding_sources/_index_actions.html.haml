@@ -8,10 +8,10 @@
 -#   @funding_source = FundingSource.new
 
 - if can? :create, FundingSource
-  .btn-group
+  .btn-group.navbar-right
     .btn.btn-default#flyout
       %i.fa.fa-plus.fa-fw
-      = "Add Funding Program";
+      = "Add Program";
   :javascript
     $(document).ready(()=>{
       add_flyout("#flyout", "Add New Program", '#{raw escape_javascript(render "funding_sources/form")}', "flyout-right");
