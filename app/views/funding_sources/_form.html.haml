@@ -15,14 +15,14 @@
         %label.required.control-label
           %abbr{title: 'required'} *
           = " Type"
-        = radio_button_tag :fund, 'formula', @funding_source.formula_fund, {disabled: !@funding_source.new_record?, style: 'margin-left: 10px;'}
+        = radio_button_tag :fund, 'formula', @funding_source.formula_fund, {disabled: !@funding_source.new_record?, style: 'margin-left: 10px;', checked:true}
         Formula
         = radio_button_tag :fund, 'discretionary', @funding_source.discretionary_fund, {disabled: !@funding_source.new_record?, style: 'margin-left: 10px;'}
         Discretionary
     .col-sm-6
       .inflation-rate
         = f.input :inflation_rate, :label => 'Inflation Rate', :wrapper => :vertical_append do
-          = f.input_field :inflation_rate, :class => 'form-control', :max => 100, :step => 0.001
+          = f.input_field :inflation_rate, :class => 'form-control', :max => 100, :step => 0.001, :value => 0.000
           %span.input-group-addon
             %i.fa.fa-percent
 
@@ -34,7 +34,7 @@
         = f.input_field :life_in_years, :class => 'form-control', :min => 1, :allow_blank => true
         %span.input-group-addon= "years"
     .col-sm-4
-      = f.input :match_required, :label => 'Pcnt Match', :wrapper => :vertical_append do
+      = f.input :match_required, :label => '% Match', :wrapper => :vertical_append do
         = f.input_field :match_required, :class => 'form-control', :max => 100, :step => 0.001
         %span.input-group-addon
           %i.fa.fa-percent
