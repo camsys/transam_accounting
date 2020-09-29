@@ -81,8 +81,6 @@ class FundingSourcesController < OrganizationAwareController
 
     add_breadcrumb @funding_source.name, funding_source_path(@funding_source)
 
-    @funding_template = FundingTemplate.new(funding_source_id: @funding_source.id)
-
     # Set the funding line items
     @grants = @funding_source.grants.where('organization_id = ?', @organization.id).order('fy_year')
 

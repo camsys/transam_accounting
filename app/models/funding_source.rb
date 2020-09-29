@@ -44,6 +44,9 @@ class FundingSource < ActiveRecord::Base
   has_many :grant_purchases, :as => :sourceable, :dependent => :destroy
   has_many :assets, through: :grant_purchases, source: Rails.application.config.asset_base_class_name.underscore
 
+  # program eligibility - a program has many organizations
+  has_and_belongs_to_many :organizations
+
   #------------------------------------------------------------------------------
   # Validations
   #------------------------------------------------------------------------------
@@ -78,6 +81,7 @@ class FundingSource < ActiveRecord::Base
     :formula_fund,
     :discretionary_fund,
     :inflation_rate,
+    {:organization_ids => []},
     :active
   ]
 

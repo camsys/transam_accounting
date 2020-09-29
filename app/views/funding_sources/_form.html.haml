@@ -45,16 +45,61 @@
     .col-sm-4
       = f.input :fy_end, as: :fiscal_year, :label => 'Valid To'
 
+
+  .row
+    .col-sm-8
+      = f.hidden_field :organization_ids, :multiple => true
+      .form-group.required
+        %label.required.control-label
+          %abbr{title: 'required'} *
+          = " Program Eligibility"
+        #org_select.input-md
+
   = f.button :submit, 'Save', :class => "btn btn-primary"
 
 :javascript
 
+  var selected_set_name = 'funding_source_organization_ids';
+  var shuttle_target_id = 'selected_grantees';
+
   // Document Ready
   $(document).ready(function(){
+
+    // Add an submit event handler for the form
+    $(".funding_source_form").submit(function(){
+      if ($(this).valid()) {
+        var shuttle_target = $('#' + shuttle_target_id);
+        var form_target = $('#' + selected_set_name);
+        // select all the options in the selected array from the other shuttle list list
+        var id_list = new Array();
+        shuttle_target.children().map(function () {
+          id_list.push($(this).val());
+        });
+        form_target.val(id_list);
+        $('input[name="funding_source[organization_ids][]"]').each(function ( index, element ) {
+            if ($.inArray($(element).val(), id_list) == -1) {
+                $(element).val('');
+            }
+        });
+      }
+    });
+
     transam.make_same_height('.header-part');
     if ($("input[name='fund']:checked").val() != 'formula') {
       $(".inflation-rate").hide();
     }
+
+    var t = $('#org_select').bootstrapTransfer({
+    	target_id: shuttle_target_id,
+     	hilite_selection: false
+     });
+
+    var filter_orgs = JSON.parse('#{(Organization.where('id IN (?) AND organization_type_id != ?', @organization_list, OrganizationType.find_by(class_name: 'PlanningPartner').id).map{|o| {value: o.id, content: o.coded_name} }|| []).to_json.html_safe}');
+    var selected = JSON.parse('#{( @funding_source.organizations.ids || []).to_json.html_safe}');
+
+    t.populate(filter_orgs);
+    t.set_values(selected);
+    transam.make_same_height('.form-part');
   });
 
   $("input[name='fund']").on("click", function() {
@@ -89,9 +134,6 @@
         integer: 'Please enter a whole number greater than or equal to 1.',
         min: 'Please enter a whole number greater than or equal to 1.'
       }
-    },
-    submitHandler: function(form) {
-      form.submit();
     }
   });
 
