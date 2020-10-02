@@ -51,6 +51,7 @@ RSpec.describe FundingSource, :type => :model do
       :formula_fund,
       :discretionary_fund,
       :inflation_rate,
+      {:organization_ids=>[]},
       :active
     ])
   end
