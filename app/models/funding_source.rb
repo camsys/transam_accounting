@@ -51,6 +51,7 @@ class FundingSource < ActiveRecord::Base
   # Validations
   #------------------------------------------------------------------------------
   validates :name,                      :presence => true, :uniqueness => true
+  validates :full_name,                 :presence => true
   validates :description,               :presence => true
   validates :funding_source_type,       :presence => true
 
@@ -70,6 +71,7 @@ class FundingSource < ActiveRecord::Base
   # List of hash parameters allowed by the controller
   FORM_PARAMS = [
     :object_key,
+    :full_name,
     :name,
     :description,
     :details,

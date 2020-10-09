@@ -14,6 +14,10 @@ RSpec.describe FundingSource, :type => :model do
   end
 
   describe 'validations' do
+    it 'must have a full name' do
+      test_fund.full_name = nil
+      expect(test_fund.valid?).to be false
+    end
     it 'must have a name' do
       test_fund.name = nil
       expect(test_fund.valid?).to be false
@@ -40,6 +44,7 @@ RSpec.describe FundingSource, :type => :model do
   it '#allowable_params' do
     expect(FundingSource.allowable_params).to eq([
       :object_key,
+      :full_name,
       :name,
       :description,
       :details,
