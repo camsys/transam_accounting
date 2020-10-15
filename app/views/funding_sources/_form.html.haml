@@ -1,5 +1,4 @@
 = render(:partial => 'shared/form_errors', :locals => {:obj => @funding_source}) unless @funding_source.errors.empty?
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.css" integrity="sha512-Mt1nIzxiqvaBOCab6g5E3xZAqzrLjflwEkdL2chMsRJ7zzND7r2OtVf/6GxDvOFu9PwhQy8qtevg79rsmidasQ==" crossorigin="anonymous" />
 = simple_form_for(@funding_source,
   :html => {:class => 'form-vertical funding_source_form' },
   :wrapper => :vertical_form,
@@ -46,33 +45,17 @@
       = f.input :fy_start, as: :fiscal_year, :label => 'Valid From'
     .col-sm-4
       = f.input :fy_end, as: :fiscal_year, :label => 'Valid To'
-
-
-  -# .row
-  -#   .col-sm-8
-  -#     = f.hidden_field :organization_ids, :multiple => true
-  -#     .form-group.required
-  -#       %label.required.control-label
-  -#         %abbr{title: 'required'} *
-  -#         = " Program Eligibility"
-  -#       #org_select.input-md
-  -# = f.input :organization_ids, input_html: { multiple: true }
-  -# .row
-  -#   .col-sm-8
-  -#     #org_select
-  -#       = f.input :organization_ids, collection: (Organization.where('id IN (?) AND organization_type_id != ?', @organization_list, OrganizationType.find_by(class_name: 'PlanningPartner').id)), :multiple => true
   
   .row
     .col-sm-8
       .form-group.float.optional
-        %label.control-label.float.optional
-          Organizations
-        = f.hidden_field :organization_ids, :multiple => true
-        #org_select
-          %select{multiple:true}
-            - (Organization.where('id IN (?) AND organization_type_id != ?', @organization_list, OrganizationType.find_by(class_name: 'PlanningPartner').id)).each do |org|
-              %option{value: org.id}
-                = org.coded_name
+        %label.required.control-label
+          %abbr{title: 'required'} *
+          Program Eligibility
+        = f.select(:organization_ids,
+                Organization.where('id IN (?) AND organization_type_id != ?', @organization_list, OrganizationType.find_by(class_name: 'PlanningPartner').id).collect {|a| [a.coded_name, a.id]},
+                {:include_blank => true},
+                {multiple: true})
 
   = f.button :submit, 'Save', :class => "btn btn-primary"
 
@@ -84,33 +67,13 @@
   // Document Ready
   $(document).ready(function(){
 
-    // Add an submit event handler for the form
-    $(".funding_source_form").submit(function(){
-      if ($(this).valid()) {
-        var shuttle_target = $('#' + shuttle_target_id);
-        var form_target = $('#' + selected_set_name);
-        // select all the options in the selected array from the other shuttle list list
-        var id_list = new Array();
-        shuttle_target.children().map(function () {
-          id_list.push($(this).val());
-        });
-        form_target.val(id_list);
-        $('input[name="funding_source[organization_ids][]"]').val($("#org_select > select").val());
-        $('input[name="funding_source[organization_ids][]"]').each(function ( index, element ) {
-            if ($.inArray($(element).val(), id_list) == -1) {
-                $(element).val('');
-            }
-        });
-      }
-    });
-
     transam.make_same_height('.header-part');
     if ($("input[name='fund']:checked").val() != 'formula') {
       $(".inflation-rate").hide();
     }
 
     $(function() {
-      $("#org_select select").selectize({
+      $("#funding_source_organization_ids").selectize({
           plugins: ['remove_button'],
           delimiter: ',',
           persist: false,
@@ -122,18 +85,6 @@
           }
       });
     });
-
-    /*var t = $('#org_select').bootstrapTransfer({
-    	target_id: shuttle_target_id,
-     	hilite_selection: false
-     });
-
-    var filter_orgs = JSON.parse('#{(Organization.where('id IN (?) AND organization_type_id != ?', @organization_list, OrganizationType.find_by(class_name: 'PlanningPartner').id).map{|o| {value: o.id, content: o.coded_name} }|| []).to_json.html_safe}');
-    var selected = JSON.parse('#{( @funding_source.organizations.ids || []).to_json.html_safe}');
-
-    t.populate(filter_orgs);
-    t.set_values(selected);
-    transam.make_same_height('.form-part');*/
   });
 
   $("input[name='fund']").on("click", function() {

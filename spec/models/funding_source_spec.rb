@@ -11,6 +11,9 @@ RSpec.describe FundingSource, :type => :model do
     it 'has many grants' do
       expect(test_fund).to have_many(:grants)
     end
+    it 'responds to orgs' do
+      expect(test_fund).to have_many(:organizations)
+    end
   end
 
   describe 'validations' do
