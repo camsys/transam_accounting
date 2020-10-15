@@ -10,7 +10,7 @@
 
   .row
     .col-sm-6
-      = f.input :formula_fund, :as => :hidden
+      = f.input :formula_fund, :as => :hidden, :input_html => { :checked => true }
       = f.input :discretionary_fund, :as => :hidden
       .form-group.required
         %label.required.control-label
@@ -66,6 +66,8 @@
 
   // Document Ready
   $(document).ready(function(){
+
+    $("#fund_formula").click(); // TODO: do better.
 
     transam.make_same_height('.header-part');
     if ($("input[name='fund']:checked").val() != 'formula') {
