@@ -52,17 +52,15 @@
         %label.required.control-label
           %abbr{title: 'required'} *
           Program Eligibility
+        -# by default add users primary org to funding program's eligible orgs
         = f.select(:organization_ids,
                 Organization.where('id IN (?) AND organization_type_id != ?', @organization_list, OrganizationType.find_by(class_name: 'PlanningPartner').id).collect {|a| [a.coded_name, a.id]},
-                {:include_blank => true},
+                {:include_blank => true, :selected => (@funding_source.new_record? ? [current_user.organization_id] : f.object.organization_ids) },
                 {multiple: true})
 
   = f.button :submit, 'Save', :class => "btn btn-primary"
 
 :javascript
-
-  var selected_set_name = 'funding_source_organization_ids';
-  var shuttle_target_id = 'selected_grantees';
 
   // Document Ready
   $(document).ready(function(){
