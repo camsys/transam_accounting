@@ -25,6 +25,7 @@
       :search => 'client',
       :export => "['csv', 'txt']",
       :columns => '{"name":{"name":"Program Name","type":"drilldown-link","width":"25%"},
+                    "full_name":{"name":"Full Name","width":"15%"},
                     "1":{"name":"Source","width":"12%"},
                     "2":{"name":"Program Type","width":"15%"},
                     "3":{"name":"Inflation Rate","width":"10%"},
@@ -39,7 +40,7 @@
                     "created_by":{"name":"Created By","width":"12%"},
                     "status":{"name":"Program Status", "width":"10%"},
                     "12":{"name":"Actions","type":"action-column","width":"15%"}}',
-      :selected_columns => "name,1,2,3,4,5,6,7,created_by,status,12",
+      :selected_columns => "name,full_name,1,2,3,4,5,6,7,created_by,status,12",
       :cookies => "true",
       :sort => 'client',
       :params => "{}",
@@ -47,21 +48,23 @@
       :data_source => 'client',
       :url => ''}}
   - funding_sources.each_with_index do |f, index|
-    %div.actions
+    %div.actions{:id => index}
       %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: "<b>Description:</b>#{f.description}<br><b>Details:</b>#{f.details}<br><b>Type:</b>#{f.formula_fund.present? ? "Formula" : (f.discretionary_fund.present? ? "Discretionary" : "Unknown")}<br><b>Source:</b>#{f.funding_source_type}<br><b>Life of $:</b>#{format_as_integer(f.life_in_years)}<br><b>Pcnt Match:</b>#{format_as_percentage(f.match_required, 3)}<br><b>Start:</b>#{format_as_fiscal_year(f.fy_start)}<br><b>End:</b>#{format_as_fiscal_year(f.fy_end)}"}, title: "#{f.name}", tabindex: '0'}
         %i.fa.fa-info-circle
       - if can? :update, f
-        = link_to edit_funding_source_path(f), :class => "button btn-xs", :title => "Edit program" do
+        = link_to edit_funding_source_path(f, :format => :js), :id => "#{f.object_key}", :class => "button btn-xs edit_flyout", :title => "Edit program", :remote => true do
           %i.fa.fa-edit.fa-1-5x.text-success
         - if (can? :destroy, f) && f.deleteable?
           = link_to funding_source_path(f), :method => :delete, :data => {:confirm => "Are you sure? The action cannot be undone."}  do
             %i.fa.fa-trash-o.fa-fw.text-danger
+    
     
     :javascript
       add_row('#{table_dom_id}',
       {                  
         "name": '#{h link_to f.name, funding_source_path(f) }',
         "1": '#{h f.funding_source_type }',
+        "full_name": '#{h f.full_name }',
         "2": '#{h f.formula_fund.present? ? "Formula" : (f.discretionary_fund.present? ? "Discretionary" : "Unknown") }',
         "3": '#{h f.inflation_rate.present? ? format_as_percentage(f.inflation_rate, 3) : "" }',
         "4": '#{h format_as_integer(f.life_in_years) }',
@@ -78,8 +81,21 @@
       // TEMP UNTIL WE DO THIS FOR REAL
       // TODO: PLEASE DON'T LET THIS GO TO PRODUCTION
       // HACKY HACK IS HACKY
-      add_aux_queue('#{table_dom_id}',()=>$(".actions").eq(#{index}).detach().appendTo($("##{table_dom_id} .action-column").eq(#{index}).find(".cell-text")));
+      add_aux_queue('#{table_dom_id}',()=>{
+        $("##{table_dom_id} ~ .actions##{index}").detach().appendTo($("##{table_dom_id} .action-column").eq(#{index}).find(".cell-text"));
+      });
+      //add_aux_queue('#{table_dom_id}',()=>$(".actions").eq(#{index}).detach().appendTo($("##{table_dom_id} .action-column").eq(#{index}).find(".cell-text")));
 
+  -# :javascript
+  -#   $(".button.flyout").on("click", (e)=>{
+  -#     //console.log($(e.target).closest(".flyout").find(".flyout_wrapper"));
+  -#     // e.stopImmediatePropagation();
+  -#     if(!$(e.target).attr("flyout")) {
+  -#       add_flyout(e.target, "Edit Program", '#{raw escape_javascript(render :template => "funding_sources/edit", :locals => {:obj => @funding_source})}', "flyout-right");
+  -#       $(e.target).attr("flyout", true);
+  -#       //$(e.target).closest(".flyout").find(".flyout_wrapper").toggleClass("close");
+  -#     }
+  -#   });
 
 
 

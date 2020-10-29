@@ -71,6 +71,7 @@ class FundingSource < ActiveRecord::Base
   FORM_PARAMS = [
     :object_key,
     :name,
+    :full_name,
     :description,
     :details,
     :funding_source_type_id,
