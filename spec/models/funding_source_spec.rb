@@ -12,7 +12,7 @@ RSpec.describe FundingSource, :type => :model do
       expect(test_fund).to have_many(:grants)
     end
     it 'responds to orgs' do
-      expect(test_fund).to have_many(:organizations)
+      expect(test_fund).to have_and_belong_to_many(:organizations)
     end
   end
 
