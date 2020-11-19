@@ -1,3 +1,8 @@
+# --------------------------------
+# # NOT USED see TTPLAT-1832 or https://wiki.camsys.com/pages/viewpage.action?pageId=51183790
+# --------------------------------
+
+
 class GeneralLedgerAccountsController < OrganizationAwareController
   include FiscalYearHelper
 
