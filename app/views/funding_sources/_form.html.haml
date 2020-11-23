@@ -73,7 +73,8 @@
     }
 
     $(function() {
-      $("#funding_source_organization_ids").selectize({
+      $("[id='funding_source_organization_ids']").each(function(){
+        $(this).selectize({
           plugins: ['remove_button'],
           delimiter: ',',
           persist: false,
@@ -83,7 +84,9 @@
                 text: input
             }
           }
+        });
       });
+      
     });
   });
 

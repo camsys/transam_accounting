@@ -49,7 +49,7 @@
       :url => ''}}
   - funding_sources.each_with_index do |f, index|
     %div.actions{:id => index}
-      %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: "<b>Description:</b>#{f.description}<br><b>Details:</b>#{f.details}<br><b>Type:</b>#{f.formula_fund.present? ? "Formula" : (f.discretionary_fund.present? ? "Discretionary" : "Unknown")}<br><b>Source:</b>#{f.funding_source_type}<br><b>Life of $:</b>#{format_as_integer(f.life_in_years)}<br><b>Pcnt Match:</b>#{format_as_percentage(f.match_required, 3)}<br><b>Start:</b>#{format_as_fiscal_year(f.fy_start)}<br><b>End:</b>#{format_as_fiscal_year(f.fy_end)}"}, title: "#{f.name}", tabindex: '0'}
+      %a.transam-popover{data: {placement: 'left', toggle: 'popover', html: 'true', content: "<b>Description:</b>#{f.description}<br><b>Details:</b>#{f.details}<br><b>Type:</b>#{f.formula_fund.present? ? "Formula" : (f.discretionary_fund.present? ? "Discretionary" : "Unknown")}<br><b>Source:</b>#{f.funding_source_type}<br><b>Life of $:</b>#{format_as_integer(f.life_in_years)}<br><b>% Match:</b>#{format_as_percentage(f.match_required, 3)}<br><b>Start:</b>#{format_as_fiscal_year(f.fy_start)}<br><b>End:</b>#{format_as_fiscal_year(f.fy_end)}"}, title: "#{f.name}", tabindex: '0'}
         %i.fa.fa-info-circle
       - if can? :update, f
         = link_to edit_funding_source_path(f, :format => :js), :id => "#{f.object_key}", :class => "button btn-xs edit_flyout", :title => "Edit program", :remote => true do
