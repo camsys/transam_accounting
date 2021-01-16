@@ -11,6 +11,9 @@ RSpec.describe FundingSource, :type => :model do
     it 'has many grants' do
       expect(test_fund).to have_many(:grants)
     end
+    it 'responds to orgs' do
+      expect(test_fund).to have_and_belong_to_many(:organizations)
+    end
   end
 
   describe 'validations' do
@@ -41,6 +44,7 @@ RSpec.describe FundingSource, :type => :model do
     expect(FundingSource.allowable_params).to eq([
       :object_key,
       :name,
+      :full_name,
       :description,
       :details,
       :funding_source_type_id,
@@ -51,6 +55,7 @@ RSpec.describe FundingSource, :type => :model do
       :formula_fund,
       :discretionary_fund,
       :inflation_rate,
+      {:organization_ids=>[]},
       :active
     ])
   end

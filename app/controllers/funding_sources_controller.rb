@@ -4,6 +4,7 @@ class FundingSourcesController < OrganizationAwareController
   include FiscalYear
 
   authorize_resource :except => :details
+  protect_from_forgery except: :edit
 
   add_breadcrumb "Home", :root_path
   add_breadcrumb "Funding Programs", :funding_sources_path
@@ -33,6 +34,9 @@ class FundingSourcesController < OrganizationAwareController
     else
       @show_active_only = params[:show_active_only]
     end
+
+    # allowing for add funding program flyout button
+    @funding_source = FundingSource.new
 
 
     #puts conditions.inspect
@@ -107,6 +111,12 @@ class FundingSourcesController < OrganizationAwareController
 
     add_breadcrumb @funding_source.name, funding_source_path(@funding_source)
     add_breadcrumb "Update"
+
+    respond_to do |format|
+      format.html
+      format.json { render :json => @funding_source }
+      format.js
+    end
 
   end
 

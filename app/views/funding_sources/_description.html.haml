@@ -1,12 +1,37 @@
+= format_field("Program Eligibility", format_as_list(funding_source.organizations) )
 .row
   .col-xs-12
     %fieldset
       %legend.panel-legend Description
-      = funding_source.description
+      .desc-content
+        = funding_source.description
 
 %br
 .row
   .col-xs-12
     %fieldset
       %legend.panel-legend Details
-      = format_as_text(funding_source.details)
+      .desc-content
+        = funding_source.details
+      %legend.panel-legend Type
+      .desc-content
+        = funding_source.formula_fund.present? ? "Formula" : (funding_source.discretionary_fund.present? ? "Discretionary" : "Unknown")
+      %legend.panel-legend Source
+      .desc-content
+        = funding_source.funding_source_type
+      %legend.panel-legend Life of $
+      .desc-content
+        = format_as_integer(funding_source.life_in_years)
+      %legend.panel-legend Inflation Rate
+      .desc-content
+        = funding_source.inflation_rate
+      %legend.panel-legend Pcnt Match
+      .desc-content
+        = format_as_percentage(funding_source.match_required, 3)
+      %legend.panel-legend Start
+      .desc-content
+        = format_as_fiscal_year(funding_source.fy_start)
+      %legend.panel-legend End
+      .desc-content
+        = format_as_fiscal_year(funding_source.fy_end)
+      -# = format_as_text(funding_source.details)

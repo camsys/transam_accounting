@@ -2,6 +2,9 @@ require 'rails_helper'
 
 describe "funding_sources/_form.html.haml", :type => :view do
   it 'fields' do
+
+    allow(controller).to receive(:current_user).and_return(create(:admin))
+
     assign(:funding_source, FundingSource.new)
     render
 
