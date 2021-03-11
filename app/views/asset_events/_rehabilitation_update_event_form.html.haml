@@ -33,7 +33,7 @@
         %a.transam-popover{data: {placement: 'auto', toggle: 'popover', html: 'true', content: "Estimated Service Life (ESL) will be extended by the number of miles entered here."}, title: 'Extend Useful Life by (miles)', tabindex: '0'}
           %i.fa.fa-info-circle
   = f.input :event_date, :label => 'Date of Rebuild / Rehabilitation', :wrapper => :vertical_append do
-    = f.input_field :event_date, :as => :string, :class => 'form-control datepicker',
+    = f.input_field :event_date, :as => :string, :class => 'form-control datepicker', :readonly => 'true',
       :data => {'date-container' => "##{format_as_id(@asset_event.asset_event_type.name)}_dialog",
         'date-start-date' => "#{format_as_date(start_of_fiscal_year(Organization.get_typed_organization(@asset.organization).first_archivable_fiscal_year))}",
         'date-end-date' => "#{format_as_date(@asset.policy_analyzer.get_depreciation_date(Date.today)-1.day)}"},
