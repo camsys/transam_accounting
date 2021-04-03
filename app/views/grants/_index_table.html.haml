@@ -93,7 +93,7 @@
         "1":'#{h link_to grant.grant_num, grant_path(grant) }',
         "2":'#{h grant.sourceable.funding_source_type }',
         "3":'#{h grant.funding_source }',
-        "year":'#{h grant.fy_year }',
+        "year":'#{h format_as_fiscal_year(grant.fy_year) }',
         "owner":'#{h grant.owner }',
         "6":'#{h grant.has_multiple_contributors ? "Multiple" : (grant.contributor.nil? ? "Other" : grant.contributor) }',
         "7":'#{h grant.legislative_authorization }',
