@@ -53,6 +53,13 @@
       .col-sm-3= editable_field_tag(@grant, :amount, '* Total Apportionment', required: true, type: 'currency')
     .row
       .col-sm-3
+        %label.control-label
+          ="Balance" 
+        .display-value
+          ="#{format_as_currency(@grant.balance)}"
+    %br
+    .row
+      .col-sm-3
         .form-group
           %label.control-label
             Grant Development Method
