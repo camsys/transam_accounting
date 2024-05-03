@@ -38,4 +38,7 @@ Dummy::Application.configure do
   ENV["SYSTEM_SEND_FROM_ADDRESS"] = "donotreply@camsys-apps.com"
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  # Required for aws-sdk-core
+  ENV["AWS_REGION"] = "us-east-1"
 end
