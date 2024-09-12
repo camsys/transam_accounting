@@ -34,6 +34,24 @@
 
 :javascript
    $( document ).ready(function() {
+    function check_add_funding_program_button() {
+      if ($('#edit_asset .nested-fields:visible').length >= 7) {
+        $('#edit_asset .links a').hide();
+      } else {
+        $('#edit_asset .links a').show();
+      }
+    }
+
+    $('#edit_asset').on('cocoon:after-insert', function() {
+      check_add_funding_program_button();
+    });
+
+    $('#edit_asset').on('cocoon:after-remove', function() {
+      check_add_funding_program_button();
+    });
+
+    check_add_funding_program_button();
+
     $('.funding_sources_grant_purchases_form').validate({
       ignore: [],
       submitHandler: function(form) {
