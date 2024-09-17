@@ -38,6 +38,7 @@
             %i.fa.fa-2x.fa-plus-circle
 
 :javascript
+  var purchase_cost;
    $( document ).ready(function() {
     $('.grants_grant_purchases_form').validate({
       ignore: [],
@@ -49,7 +50,7 @@
     
     if($('.grants_grant_purchases_form input.purchase_cost_amount').length > 0) {
       $('.grants_grant_purchases_form input.purchase_cost_amount').rules( "add", {
-        pcntSumsHundred_grants: true
+        sumTotal_grants: true
       });
     }
   });
@@ -66,24 +67,25 @@
     }
   });
 
-  $('body').on('change', '.grants_grant_purchases_form .purchase_cost_amount', function() {
+  $('body').on('change', '.grants_grant_purchases_form .purchase_cost_amount, #purchase_cost_group input', function() {
+     purchase_cost = parseInt($('#purchase_cost_group').find("input").val()) || parseInt($('#grant_purchase_cost').text());
      $('.grants_grant_purchases_form input.purchase_cost_amount').rules( "add", {
-      pcntSumsHundred_grants: true
+      sumTotal_grants: true
     });
      $('.grants_grant_purchases_form .funding-pcnt').valid();
 
-     var pcnt = $(this).val() * 100 / parseInt($('#grant_purchase_cost').text());
-     
+     var pcnt = $(this).val() * 100 / purchase_cost;
      $(this).parents('.grant-fields').find('.funding-pcnt').val(pcnt);
      $(this).parents('.grant-fields').find('.grant-purchase-pcnt.display-value').html(pcnt.toFixed(#{funding_pcnt_precision}) + " %");
   });
 
-  $.validator.addMethod("pcntSumsHundred_grants", function(value, element) {
+  $.validator.addMethod("sumTotal_grants", function(value, element) {
     // TDC is counted separately as they're "credits"
+    purchase_cost = parseInt($('#purchase_cost_group').find("input").val()) || parseInt($('#grant_purchase_cost').text());
     var sum = 0;
     var tdc_sum = 0;
     var tdc_grants = JSON.parse('#{Grant.where(sourceable: FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'TDC'))).map{|f| f.to_global_id.to_s}.to_json.html_safe}')
-    $(element).closest('.tab-content').find('.grants_grant_purchases_form .funding-pcnt').each(function() {
+    $(element).closest('.tab-content').find('.grants_grant_purchases_form .grant-fields:visible .purchase_cost_amount').each(function() {
       var program = $(this).parents('.grant-fields').find('.global-sourceable').val();
       if ($.inArray(program, tdc_grants) >= 0){
         tdc_sum += Number($(this).val());
@@ -91,8 +93,8 @@
         sum += Number($(this).val());
       }
     });
-    return (sum <= 100) && (tdc_sum <= 100);
-  }, "% Funding do not sum to 100%.");
+    return (sum <= purchase_cost) && (tdc_sum <= purchase_cost);
+  }, "Funding exceeds 100%.");
 
 
 
