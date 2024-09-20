@@ -1,3 +1,3 @@
 module TransamAccounting
-  VERSION = "2.42.0"
+  VERSION = "2.47.0-rc"
 end
