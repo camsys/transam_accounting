@@ -33,7 +33,26 @@
 
 
 :javascript
+   var purchase_cost;
    $( document ).ready(function() {
+    function check_add_funding_program_button() {
+      if ($('#edit_asset .nested-fields:visible').length >= 7) {
+        $('#edit_asset .links a').hide();
+      } else {
+        $('#edit_asset .links a').show();
+      }
+    }
+
+    $('#edit_asset').on('cocoon:after-insert', function() {
+      check_add_funding_program_button();
+    });
+
+    $('#edit_asset').on('cocoon:after-remove', function() {
+      check_add_funding_program_button();
+    });
+
+    check_add_funding_program_button();
+
     $('.funding_sources_grant_purchases_form').validate({
       ignore: [],
       submitHandler: function(form) {
@@ -44,29 +63,32 @@
 
     if($('.funding_sources_grant_purchases_form input.purchase_cost_amount').length > 0) {
       $('.funding_sources_grant_purchases_form input.purchase_cost_amount').rules( "add", {
-        pcntSumHundred_funding_sources: true
+        sumTotal_funding_sources: true
       });
     }
   });
 
-  $('body').on('change', '.funding_sources_grant_purchases_form .purchase_cost_amount', function() {
+  $('body').on('change', '.funding_sources_grant_purchases_form .purchase_cost_amount, #purchase_cost_group input', function() {
+     purchase_cost = parseInt($('#purchase_cost_group').find("input").val());
      $('.funding_sources_grant_purchases_form input.purchase_cost_amount').rules( "add", {
-      pcntSumHundred_funding_sources: true
+      sumTotal_funding_sources: true
     });
      $('.funding_sources_grant_purchases_form .funding-pcnt').valid();
 
-     var pcnt = $(this).val() * 100 / parseInt($(this).closest('.tab-content').find('#purchase_cost').editable('getValue')['asset[purchase_cost]']);
-     
+     var pcnt = $(this).val() * 100 / purchase_cost;
      $(this).parents('.funding-source-fields').find('.funding-pcnt').val(pcnt);
      $(this).parents('.funding-source-fields').find('.grant-purchase-pcnt.display-value').html(pcnt.toFixed(#{funding_pcnt_precision}) + " %");
   });
 
-  $.validator.addMethod("pcntSumHundred_funding_sources", function(value, element) {
-      // TDC is counted separately as they're "credits"
-      var sum = 0;
-      var tdc_sum = 0;
-      var tdc_funding_programs = JSON.parse('#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'TDC')).map{|f| f.to_global_id.to_s}.to_json.html_safe}')
-    $(element).closest('.tab-content').find('.funding_sources_grant_purchases_form .funding-pcnt').each(function() {
+  $.validator.addMethod("sumTotal_funding_sources", function(value, element) {
+    // TDC is counted separately as they're "credits"
+    if(purchase_cost === undefined || purchase_cost === NaN) {
+      purchase_cost = parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]']);
+    }
+    var sum = 0;
+    var tdc_sum = 0;
+    var tdc_funding_programs = JSON.parse('#{FundingSource.where(funding_source_type: FundingSourceType.find_by(name: 'TDC')).map{|f| f.to_global_id.to_s}.to_json.html_safe}')
+    $(element).closest('.tab-content').find('.funding_sources_grant_purchases_form .funding-source-fields:visible .purchase_cost_amount').each(function() {
       var program = $(this).parents('.funding-source-fields').find('.funding-source-global-sourceable').val();
 
       if ($.inArray(program, tdc_funding_programs) >= 0){
@@ -75,6 +97,6 @@
         sum += Number($(this).val());
       }
     });
-    return (sum <= 100) && (tdc_sum <= 100);
-  }, "% Funding do not sum to 100%.");
+    return (sum <= purchase_cost) && (tdc_sum <= purchase_cost);
+  }, "Funding exceeds 100%.");
 
