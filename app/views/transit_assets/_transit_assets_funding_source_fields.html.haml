@@ -14,10 +14,10 @@
       .col-md-5
         = f.input :global_sourceable, :collection => FundingSource.all.order(:name).map{|f| [ f.to_s, f.to_global_id, {'data-federal': f.federal?} ]}, :required => true, :label => 'Program', :input_html => { class: 'funding-source-global-sourceable' }
       .col-md-2
-        = f.input :fain, :label => 'FAIN', :input_html => { class: 'fain'}
+        = f.input :fain, :label => 'FAIN', :input_html => { class: 'fain'}, :required => true
        
       .col-md-3.grant-purchase-amount
-        = f.input :amount, label_html: {class: 'right-align-label'} do 
+        = f.input :amount, label_html: {class: 'right-align-label'}, required: true do
           .input-group
             %span.input-group-addon
               $
