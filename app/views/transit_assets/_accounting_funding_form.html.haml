@@ -48,10 +48,12 @@
       var fain_field = $(funding_source).closest(".asset-subform-action").find(".fain");
       if ($(funding_source).find(":selected")[0]?.dataset?.federal === "true") {
         $(fain_field).attr("required", true);
-        $(fain_field).prop("disabled", false);
+        $(fain_field).addClass("required");
+        $(fain_field).prop("readonly", false);
       } else {
         $(fain_field).attr("required", false).val("");
-        $(fain_field).prop("disabled", true);
+        $(fain_field).removeClass("required");
+        $(fain_field).prop("readonly", true);
       }
     };
 
