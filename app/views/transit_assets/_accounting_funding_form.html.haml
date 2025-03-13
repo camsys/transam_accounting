@@ -93,7 +93,7 @@
   });
 
   $('body').on('change', '.funding_sources_grant_purchases_form .purchase_cost_amount, #purchase_cost_group input', function() {
-     purchase_cost = parseInt($('#purchase_cost_group').find("input").val());
+     purchase_cost = parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]']);
      $('.funding_sources_grant_purchases_form input.purchase_cost_amount').rules( "add", {
       sumTotal_funding_sources: true
     });
@@ -106,7 +106,7 @@
 
   $.validator.addMethod("sumTotal_funding_sources", function(value, element) {
     // TDC is counted separately as they're "credits"
-    if(purchase_cost === undefined || purchase_cost === NaN) {
+    if(purchase_cost === undefined || isNaN(purchase_cost)) {
       purchase_cost = parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]']);
     }
     var sum = 0;
