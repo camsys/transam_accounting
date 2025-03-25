@@ -43,11 +43,29 @@
       }
     }
 
-    $('#edit_asset').on('cocoon:after-insert', function() {
+    // enable/disable FAIN field depending on if the funding source is federal
+    function check_fain_fields(funding_source) {
+      var fain_field = $(funding_source).closest(".asset-subform-action").find(".fain");
+      if ($(funding_source).find(":selected")[0]?.dataset?.federal === "true") {
+        $(fain_field).attr("required", true);
+        $(fain_field).addClass("required");
+        $(fain_field).prop("readonly", false);
+      } else {
+        $(fain_field).attr("required", false).val("");
+        $(fain_field).removeClass("required");
+        $(fain_field).prop("readonly", true);
+      }
+    };
+
+    $('.funding-source-global-sourceable').on('change', function() {check_fain_fields($(this))});
+
+    $('#edit_asset').on('cocoon:after-insert', function(e, inserted) {
       check_add_funding_program_button();
+      check_fain_fields($(inserted).find('.funding-source-global-sourceable'));
+      $(inserted).find('.funding-source-global-sourceable').on('change', function() {check_fain_fields($(this))});
     });
 
-    $('#edit_asset').on('cocoon:after-remove', function() {
+    $('#edit_asset').on('cocoon:after-remove', function(e, removed) {
       check_add_funding_program_button();
     });
 
@@ -56,6 +74,7 @@
       if ($('#edit_asset .links a:visible').length > 0) {
         check_add_funding_program_button();
       }
+      $('.funding-source-global-sourceable').each(function() {check_fain_fields($(this))});
     });
 
     $('.funding_sources_grant_purchases_form').validate({
@@ -74,7 +93,7 @@
   });
 
   $('body').on('change', '.funding_sources_grant_purchases_form .purchase_cost_amount, #purchase_cost_group input', function() {
-     purchase_cost = parseInt($('#purchase_cost_group').find("input").val());
+     purchase_cost = parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]']);
      $('.funding_sources_grant_purchases_form input.purchase_cost_amount').rules( "add", {
       sumTotal_funding_sources: true
     });
@@ -87,7 +106,7 @@
 
   $.validator.addMethod("sumTotal_funding_sources", function(value, element) {
     // TDC is counted separately as they're "credits"
-    if(purchase_cost === undefined || purchase_cost === NaN) {
+    if(purchase_cost === undefined || isNaN(purchase_cost)) {
       purchase_cost = parseInt($('#purchase_cost').editable('getValue')['asset[purchase_cost]']);
     }
     var sum = 0;

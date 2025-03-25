@@ -30,6 +30,7 @@ class GrantPurchase < ActiveRecord::Base
   #validates_presence_of :sourceable
   validates_presence_of Rails.application.config.asset_base_class_name.underscore.to_sym
   validates :pcnt_purchase_cost,  :presence => true, :numericality => {:greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
+  validates_presence_of :fain, :if => :sourceable_federal_funding?
 
   #------------------------------------------------------------------------------
   # Scopes
@@ -48,6 +49,7 @@ class GrantPurchase < ActiveRecord::Base
     :pcnt_purchase_cost,
     :amount,
     :expense_tag,
+    :fain,
     :_destroy
   ]
 
@@ -84,6 +86,10 @@ class GrantPurchase < ActiveRecord::Base
 
   def sourceable_path
     "#{sourceable_type.underscore}_path(id: '#{sourceable.object_key}')"
+  end
+
+  def sourceable_federal_funding?
+    self.sourceable_type == "FundingSource" ? self.sourceable.federal? : false
   end
 
   #------------------------------------------------------------------------------
