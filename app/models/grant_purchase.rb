@@ -31,7 +31,7 @@ class GrantPurchase < ActiveRecord::Base
   validates_presence_of Rails.application.config.asset_base_class_name.underscore.to_sym
   validates :pcnt_purchase_cost,  :presence => true, :numericality => {:greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
   validates_presence_of :fain, :if => :sourceable_federal_funding?
-  validate :total_funding_not_over_hundred_pcnt
+  validate :total_funding_not_over_purchase_cost
 
   #------------------------------------------------------------------------------
   # Scopes
@@ -105,19 +105,19 @@ class GrantPurchase < ActiveRecord::Base
 
   end
 
-  def total_funding_not_over_hundred_pcnt
+  def total_funding_not_over_purchase_cost
     unless self._destroy
       existing_funding = self.sourceable_type == "FundingSource" ? self.transam_asset.funding_source_grant_purchases : self.transam_asset.grant_grant_purchases
-      pcnt_total = 0
+      funding_total = 0
 
       existing_funding.each do |f|
         if !f._destroy
-          pcnt_total += f.pcnt_purchase_cost
+          funding_total += f.amount
         end
       end
 
-      if pcnt_total > 100
-        errors.add(:pcnt_purchase_cost, ": total funding from #{self.sourceable_type.underscore.humanize.downcase}s cannot exceed 100% of purchase cost")
+      if funding_total > self.transam_asset.purchase_cost
+        errors.add(:amount, ": total funding from #{self.sourceable_type.underscore.humanize.downcase}s cannot exceed 100% of purchase cost")
       end
     end
   end
