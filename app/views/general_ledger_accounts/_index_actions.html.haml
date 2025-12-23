@@ -4,7 +4,7 @@
   -#  = " Add General Ledger Account";
   = link_to general_ledger_mappings_path(chart_of_account_id: @chart_of_accounts.id), :class => 'btn btn-default' do
     %i.fa.fa-map-signs.fa-fw
-    = " GL Mappings";
+    = " GL Mappings"
 - if can? :manage, GeneralLedgerAccount
   .btn-group{:role => 'group'}
     %button.btn.btn-info.move-assets-button{:type => 'button'}
