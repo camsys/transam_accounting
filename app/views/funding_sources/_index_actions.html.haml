@@ -11,7 +11,7 @@
   .btn-group.navbar-right
     .btn.btn-default.flyout_button#flyout
       %i.fa.fa-plus.fa-fw
-      = "Add Program";
+      = "Add Program"
   :javascript
     $(document).ready(()=>{
       add_flyout("#flyout", "Add New Program", '#{raw escape_javascript(render "funding_sources/form")}', "flyout-right");
