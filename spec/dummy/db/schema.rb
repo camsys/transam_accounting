@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_06_10_202853) do
+ActiveRecord::Schema.define(version: 2026_09_30_182015) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.string "object_key", limit: 12
@@ -201,10 +201,9 @@ ActiveRecord::Schema.define(version: 2025_06_10_202853) do
   end
 
   create_table "asset_groups_assets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.integer "asset_id"
     t.bigint "transam_asset_id"
     t.integer "asset_group_id", null: false
-    t.index ["asset_id", "asset_group_id"], name: "asset_groups_assets_idx1"
+    t.index ["asset_group_id"], name: "asset_groups_assets_idx1"
     t.index ["transam_asset_id"], name: "index_asset_groups_assets_on_transam_asset_id"
   end
 
@@ -411,10 +410,9 @@ ActiveRecord::Schema.define(version: 2025_06_10_202853) do
   end
 
   create_table "assets_districts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.integer "asset_id"
     t.bigint "transam_asset_id"
     t.integer "district_id"
-    t.index ["asset_id", "district_id"], name: "assets_districts_idx1"
+    t.index ["district_id"], name: "assets_districts_idx1"
     t.index ["transam_asset_id"], name: "index_assets_districts_on_transam_asset_id"
   end
 
@@ -1586,7 +1584,7 @@ ActiveRecord::Schema.define(version: 2025_06_10_202853) do
   create_table "notices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.string "object_key", limit: 12, null: false
     t.string "subject", limit: 64, null: false
-    t.string "summary", limit: 128, null: false
+    t.string "summary", limit: 254, null: false
     t.text "details"
     t.integer "notice_type_id"
     t.integer "organization_id"
@@ -1949,6 +1947,7 @@ ActiveRecord::Schema.define(version: 2025_06_10_202853) do
     t.boolean "default_rule"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer "procurement_lead_time", default: 0
     t.index ["asset_subtype_id"], name: "policy_asset_subtype_rules_idx2"
     t.index ["policy_id"], name: "policy_asset_subtype_rules_idx1"
   end
