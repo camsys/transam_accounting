@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_01_31_184018) do
+ActiveRecord::Schema.define(version: 2026_09_30_182015) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.string "object_key", limit: 12
@@ -140,6 +140,7 @@ ActiveRecord::Schema.define(version: 2024_01_31_184018) do
     t.string "other_vehicle_rebuild_type"
     t.integer "reporting_year"
     t.integer "ntd_report_mileage"
+    t.integer "assessed_value"
     t.index ["asset_event_type_id"], name: "asset_events_idx3"
     t.index ["asset_id"], name: "asset_events_idx2"
     t.index ["base_transam_asset_id"], name: "index_asset_events_on_base_transam_asset_id"
@@ -200,10 +201,9 @@ ActiveRecord::Schema.define(version: 2024_01_31_184018) do
   end
 
   create_table "asset_groups_assets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.integer "asset_id"
     t.bigint "transam_asset_id"
     t.integer "asset_group_id", null: false
-    t.index ["asset_id", "asset_group_id"], name: "asset_groups_assets_idx1"
+    t.index ["asset_group_id"], name: "asset_groups_assets_idx1"
     t.index ["transam_asset_id"], name: "index_asset_groups_assets_on_transam_asset_id"
   end
 
@@ -410,10 +410,9 @@ ActiveRecord::Schema.define(version: 2024_01_31_184018) do
   end
 
   create_table "assets_districts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.integer "asset_id"
     t.bigint "transam_asset_id"
     t.integer "district_id"
-    t.index ["asset_id", "district_id"], name: "assets_districts_idx1"
+    t.index ["district_id"], name: "assets_districts_idx1"
     t.index ["transam_asset_id"], name: "index_assets_districts_on_transam_asset_id"
   end
 
@@ -1201,6 +1200,7 @@ ActiveRecord::Schema.define(version: 2024_01_31_184018) do
     t.string "sourceable_type"
     t.string "other_sourceable"
     t.integer "amount"
+    t.string "fain"
     t.index ["asset_id"], name: "grant_purchases_idx1"
     t.index ["transam_asset_id"], name: "index_grant_purchases_on_transam_asset_id"
   end
@@ -1584,7 +1584,7 @@ ActiveRecord::Schema.define(version: 2024_01_31_184018) do
   create_table "notices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.string "object_key", limit: 12, null: false
     t.string "subject", limit: 64, null: false
-    t.string "summary", limit: 128, null: false
+    t.string "summary", limit: 254, null: false
     t.text "details"
     t.integer "notice_type_id"
     t.integer "organization_id"
@@ -1947,6 +1947,7 @@ ActiveRecord::Schema.define(version: 2024_01_31_184018) do
     t.boolean "default_rule"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer "procurement_lead_time", default: 0
     t.index ["asset_subtype_id"], name: "policy_asset_subtype_rules_idx2"
     t.index ["policy_id"], name: "policy_asset_subtype_rules_idx1"
   end
@@ -2237,6 +2238,7 @@ ActiveRecord::Schema.define(version: 2024_01_31_184018) do
     t.index ["dual_fuel_type_id"], name: "index_service_vehicles_on_dual_fuel_type_id"
     t.index ["fuel_type_id"], name: "index_service_vehicles_on_fuel_type_id"
     t.index ["ramp_manufacturer_id"], name: "index_service_vehicles_on_ramp_manufacturer_id"
+    t.index ["serial_number"], name: "serial_number_idx1"
     t.index ["service_vehiclible_type", "service_vehiclible_id"], name: "service_vehiclible_idx"
   end
 
@@ -2415,6 +2417,7 @@ ActiveRecord::Schema.define(version: 2024_01_31_184018) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "rebuilt_year"
+    t.string "location_address"
     t.index ["asset_subtype_id"], name: "index_transam_assets_on_asset_subtype_id"
     t.index ["disposition_date"], name: "disposition_date_idx1"
     t.index ["manufacturer_id"], name: "index_transam_assets_on_manufacturer_id"
